@@ -55,7 +55,7 @@ use crate::{client, client::GetToken, client::serde_with};
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -105,7 +105,7 @@ impl<'a, S> MyBusinessBusinessInformation<S> {
         MyBusinessBusinessInformation {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://mybusinessbusinessinformation.googleapis.com/".to_string(),
             _root_url: "https://mybusinessbusinessinformation.googleapis.com/".to_string(),
         }
@@ -131,7 +131,7 @@ impl<'a, S> MyBusinessBusinessInformation<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -163,6 +163,7 @@ impl<'a, S> MyBusinessBusinessInformation<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdWordsLocationExtensions {
@@ -183,6 +184,7 @@ impl client::Part for AdWordsLocationExtensions {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list attributes](AttributeListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Attribute {
@@ -213,6 +215,7 @@ impl client::Resource for Attribute {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttributeMetadata {
@@ -250,6 +253,7 @@ impl client::Part for AttributeMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttributeValueMetadata {
@@ -275,6 +279,7 @@ impl client::Part for AttributeValueMetadata {}
 /// * [attributes get google updated locations](LocationAttributeGetGoogleUpdatedCall) (response)
 /// * [get attributes locations](LocationGetAttributeCall) (response)
 /// * [update attributes locations](LocationUpdateAttributeCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Attributes {
@@ -298,6 +303,7 @@ impl client::ResponseResult for Attributes {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [batch get categories](CategoryBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchGetCategoriesResponse {
@@ -313,6 +319,7 @@ impl client::ResponseResult for BatchGetCategoriesResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BusinessHours {
@@ -328,6 +335,7 @@ impl client::Part for BusinessHours {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Categories {
@@ -348,6 +356,7 @@ impl client::Part for Categories {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
@@ -380,6 +389,7 @@ impl client::Part for Category {}
 /// 
 /// * [get chains](ChainGetCall) (response)
 /// * [search chains](ChainSearchCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Chain {
@@ -407,6 +417,7 @@ impl client::ResponseResult for Chain {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChainName {
@@ -427,6 +438,7 @@ impl client::Part for ChainName {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ChainUri {
@@ -442,6 +454,7 @@ impl client::Part for ChainUri {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
@@ -467,6 +480,7 @@ impl client::Part for Date {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete locations](LocationDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -478,6 +492,7 @@ impl client::ResponseResult for Empty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeFormServiceItem {
@@ -500,6 +515,7 @@ impl client::Part for FreeFormServiceItem {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [search google locations](GoogleLocationSearchCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLocation {
@@ -526,6 +542,7 @@ impl client::Resource for GoogleLocation {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get google updated locations](LocationGetGoogleUpdatedCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleUpdatedLocation {
@@ -549,6 +566,7 @@ impl client::ResponseResult for GoogleUpdatedLocation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Label {
@@ -572,6 +590,7 @@ impl client::Part for Label {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LatLng {
@@ -594,6 +613,7 @@ impl client::Part for LatLng {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list attributes](AttributeListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAttributeMetadataResponse {
@@ -618,6 +638,7 @@ impl client::ResponseResult for ListAttributeMetadataResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list categories](CategoryListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCategoriesResponse {
@@ -641,6 +662,7 @@ impl client::ResponseResult for ListCategoriesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations list accounts](AccountLocationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLocationsResponse {
@@ -675,6 +697,7 @@ impl client::ResponseResult for ListLocationsResponse {}
 /// * [get google updated locations](LocationGetGoogleUpdatedCall) (none)
 /// * [patch locations](LocationPatchCall) (request|response)
 /// * [update attributes locations](LocationUpdateAttributeCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
@@ -762,6 +785,7 @@ impl client::ResponseResult for Location {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Metadata {
@@ -830,6 +854,7 @@ impl client::Part for Metadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Money {
@@ -853,6 +878,7 @@ impl client::Part for Money {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MoreHours {
@@ -872,6 +898,7 @@ impl client::Part for MoreHours {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MoreHoursType {
@@ -896,6 +923,7 @@ impl client::Part for MoreHoursType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OpenInfo {
@@ -919,6 +947,7 @@ impl client::Part for OpenInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PhoneNumbers {
@@ -939,6 +968,7 @@ impl client::Part for PhoneNumbers {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlaceInfo {
@@ -959,6 +989,7 @@ impl client::Part for PlaceInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Places {
@@ -975,6 +1006,7 @@ impl client::Part for Places {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostalAddress {
@@ -1026,6 +1058,7 @@ impl client::Part for PostalAddress {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Profile {
@@ -1041,6 +1074,7 @@ impl client::Part for Profile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RelationshipData {
@@ -1065,6 +1099,7 @@ impl client::Part for RelationshipData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RelevantLocation {
@@ -1085,6 +1120,7 @@ impl client::Part for RelevantLocation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RepeatedEnumAttributeValue {
@@ -1109,6 +1145,7 @@ impl client::Part for RepeatedEnumAttributeValue {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [search chains](ChainSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchChainsResponse {
@@ -1128,6 +1165,7 @@ impl client::ResponseResult for SearchChainsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [search google locations](GoogleLocationSearchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchGoogleLocationsRequest {
@@ -1154,6 +1192,7 @@ impl client::RequestValue for SearchGoogleLocationsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [search google locations](GoogleLocationSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchGoogleLocationsResponse {
@@ -1170,6 +1209,7 @@ impl client::ResponseResult for SearchGoogleLocationsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAreaBusiness {
@@ -1193,6 +1233,7 @@ impl client::Part for ServiceAreaBusiness {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceItem {
@@ -1216,6 +1257,7 @@ impl client::Part for ServiceItem {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceType {
@@ -1236,6 +1278,7 @@ impl client::Part for ServiceType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpecialHourPeriod {
@@ -1267,6 +1310,7 @@ impl client::Part for SpecialHourPeriod {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpecialHours {
@@ -1283,6 +1327,7 @@ impl client::Part for SpecialHours {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StructuredServiceItem {
@@ -1302,6 +1347,7 @@ impl client::Part for StructuredServiceItem {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimeOfDay {
@@ -1326,6 +1372,7 @@ impl client::Part for TimeOfDay {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimePeriod {
@@ -1354,6 +1401,7 @@ impl client::Part for TimePeriod {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UriAttributeValue {
@@ -1391,7 +1439,7 @@ impl client::Part for UriAttributeValue {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `locations_create(...)` and `locations_list(...)`
 /// // to build up your call.
@@ -1473,7 +1521,7 @@ impl<'a, S> AccountMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
@@ -1532,7 +1580,7 @@ impl<'a, S> AttributeMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_get(...)` and `list(...)`
 /// // to build up your call.
@@ -1605,7 +1653,7 @@ impl<'a, S> CategoryMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `search(...)`
 /// // to build up your call.
@@ -1675,7 +1723,7 @@ impl<'a, S> ChainMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `search(...)`
 /// // to build up your call.
@@ -1732,7 +1780,7 @@ impl<'a, S> GoogleLocationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `attributes_get_google_updated(...)`, `delete(...)`, `get(...)`, `get_attributes(...)`, `get_google_updated(...)`, `patch(...)` and `update_attributes(...)`
 /// // to build up your call.
@@ -1902,7 +1950,7 @@ impl<'a, S> LocationMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2172,12 +2220,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().locations_list("parent")
-///              .read_mask(&Default::default())
+///              .read_mask(FieldMask::new::<&str>(&[]))
 ///              .page_token("eos")
 ///              .page_size(-4)
 ///              .order_by("ea")
@@ -2284,6 +2332,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2449,7 +2498,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2562,6 +2611,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2731,7 +2781,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2831,6 +2881,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2980,7 +3031,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3088,6 +3139,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3250,7 +3302,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3337,6 +3389,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3467,7 +3520,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3555,6 +3608,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3690,7 +3744,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3917,7 +3971,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4004,6 +4058,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4134,7 +4189,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4221,6 +4276,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4351,12 +4407,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().get("name")
-///              .read_mask(&Default::default())
+///              .read_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -4443,6 +4499,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4580,7 +4637,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4667,6 +4724,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4797,12 +4855,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().get_google_updated("name")
-///              .read_mask(&Default::default())
+///              .read_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -4889,6 +4947,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5027,7 +5086,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5038,7 +5097,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().patch(req, "name")
 ///              .validate_only(true)
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -5298,7 +5357,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessBusinessInformation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5308,7 +5367,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().update_attributes(req, "name")
-///              .attribute_mask(&Default::default())
+///              .attribute_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```

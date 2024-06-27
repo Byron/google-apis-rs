@@ -1,4 +1,4 @@
-site_name: Container Analysis v5.0.4+20240223
+site_name: Container Analysis v5.0.5+20240625
 site_url: http://byron.github.io/google-apis-rs/google-containeranalysis1_beta1-cli
 site_description: A complete library to interact with Container Analysis (protocol v1beta1)
 
@@ -10,6 +10,15 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Notes Get': 'projects_locations-notes-get.md'
+    - 'Locations Notes List': 'projects_locations-notes-list.md'
+    - 'Locations Notes Occurrences List': 'projects_locations-notes-occurrences-list.md'
+    - 'Locations Occurrences Get': 'projects_locations-occurrences-get.md'
+    - 'Locations Occurrences Get Notes': 'projects_locations-occurrences-get-notes.md'
+    - 'Locations Occurrences Get Vulnerability Summary': 'projects_locations-occurrences-get-vulnerability-summary.md'
+    - 'Locations Occurrences List': 'projects_locations-occurrences-list.md'
+    - 'Locations Resources Export Sbom': 'projects_locations-resources-export-sbom.md'
+    - 'Locations Resources Generate Packages Summary': 'projects_locations-resources-generate-packages-summary.md'
     - 'Notes Batch Create': 'projects_notes-batch-create.md'
     - 'Notes Create': 'projects_notes-create.md'
     - 'Notes Delete': 'projects_notes-delete.md'
@@ -36,5 +45,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

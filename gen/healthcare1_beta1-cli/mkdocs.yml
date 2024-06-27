@@ -1,4 +1,4 @@
-site_name: Cloud Healthcare v5.0.4+20240228
+site_name: Cloud Healthcare v5.0.5+20240605
 site_url: http://byron.github.io/google-apis-rs/google-healthcare1_beta1-cli
 site_description: A complete library to interact with Cloud Healthcare (protocol v1beta1)
 
@@ -114,6 +114,7 @@ nav:
     - 'Locations Datasets Fhir Stores Delete': 'projects_locations-datasets-fhir-stores-delete.md'
     - 'Locations Datasets Fhir Stores Explain Data Access': 'projects_locations-datasets-fhir-stores-explain-data-access.md'
     - 'Locations Datasets Fhir Stores Export': 'projects_locations-datasets-fhir-stores-export.md'
+    - 'Locations Datasets Fhir Stores Export History': 'projects_locations-datasets-fhir-stores-export-history.md'
     - 'Locations Datasets Fhir Stores Fhir  Concept Map Search Translate': 'projects_locations-datasets-fhir-stores-fhir--concept-map-search-translate.md'
     - 'Locations Datasets Fhir Stores Fhir  Concept Map Translate': 'projects_locations-datasets-fhir-stores-fhir--concept-map-translate.md'
     - 'Locations Datasets Fhir Stores Fhir  Consent Enforcement Status': 'projects_locations-datasets-fhir-stores-fhir--consent-enforcement-status.md'
@@ -141,6 +142,7 @@ nav:
     - 'Locations Datasets Fhir Stores Get Fhir Store Metrics': 'projects_locations-datasets-fhir-stores-get-fhir-store-metrics.md'
     - 'Locations Datasets Fhir Stores Get Iam Policy': 'projects_locations-datasets-fhir-stores-get-iam-policy.md'
     - 'Locations Datasets Fhir Stores Import': 'projects_locations-datasets-fhir-stores-import.md'
+    - 'Locations Datasets Fhir Stores Import History': 'projects_locations-datasets-fhir-stores-import-history.md'
     - 'Locations Datasets Fhir Stores List': 'projects_locations-datasets-fhir-stores-list.md'
     - 'Locations Datasets Fhir Stores Patch': 'projects_locations-datasets-fhir-stores-patch.md'
     - 'Locations Datasets Fhir Stores Rollback': 'projects_locations-datasets-fhir-stores-rollback.md'
@@ -179,5 +181,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

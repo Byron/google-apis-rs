@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc Metastore* API at revision *20240228*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Dataproc Metastore* API at revision *20240613*. The CLI is at version *5.0.5*.
 
 ```bash
 metastore1-beta [options]
@@ -53,6 +53,8 @@ metastore1-beta [options]
                 locations-services-backups-list <parent> [-p <v>]... [-o <out>]
                 locations-services-backups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-backups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-cancel-migration <service> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-complete-migration <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-databases-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-services-databases-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -70,12 +72,15 @@ metastore1-beta [options]
                 locations-services-metadata-imports-list <parent> [-p <v>]... [-o <out>]
                 locations-services-metadata-imports-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-migration-executions-delete <name> [-p <v>]... [-o <out>]
+                locations-services-migration-executions-get <name> [-p <v>]... [-o <out>]
+                locations-services-migration-executions-list <parent> [-p <v>]... [-o <out>]
                 locations-services-move-table-to-database <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-query-metadata <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-remove-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-restore <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-services-start-migration <service> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   metastore1-beta --help
 

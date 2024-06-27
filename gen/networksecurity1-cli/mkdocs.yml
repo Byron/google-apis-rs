@@ -1,4 +1,4 @@
-site_name: NetworkSecurity v5.0.4+20240221
+site_name: NetworkSecurity v5.0.5+20240606
 site_url: http://byron.github.io/google-apis-rs/google-networksecurity1-cli
 site_description: A complete library to interact with NetworkSecurity (protocol v1)
 
@@ -19,10 +19,25 @@ nav:
     - 'Locations Address Groups List References': 'organizations_locations-address-groups-list-references.md'
     - 'Locations Address Groups Patch': 'organizations_locations-address-groups-patch.md'
     - 'Locations Address Groups Remove Items': 'organizations_locations-address-groups-remove-items.md'
+    - 'Locations Firewall Endpoints Create': 'organizations_locations-firewall-endpoints-create.md'
+    - 'Locations Firewall Endpoints Delete': 'organizations_locations-firewall-endpoints-delete.md'
+    - 'Locations Firewall Endpoints Get': 'organizations_locations-firewall-endpoints-get.md'
+    - 'Locations Firewall Endpoints List': 'organizations_locations-firewall-endpoints-list.md'
+    - 'Locations Firewall Endpoints Patch': 'organizations_locations-firewall-endpoints-patch.md'
     - 'Locations Operations Cancel': 'organizations_locations-operations-cancel.md'
     - 'Locations Operations Delete': 'organizations_locations-operations-delete.md'
     - 'Locations Operations Get': 'organizations_locations-operations-get.md'
     - 'Locations Operations List': 'organizations_locations-operations-list.md'
+    - 'Locations Security Profile Groups Create': 'organizations_locations-security-profile-groups-create.md'
+    - 'Locations Security Profile Groups Delete': 'organizations_locations-security-profile-groups-delete.md'
+    - 'Locations Security Profile Groups Get': 'organizations_locations-security-profile-groups-get.md'
+    - 'Locations Security Profile Groups List': 'organizations_locations-security-profile-groups-list.md'
+    - 'Locations Security Profile Groups Patch': 'organizations_locations-security-profile-groups-patch.md'
+    - 'Locations Security Profiles Create': 'organizations_locations-security-profiles-create.md'
+    - 'Locations Security Profiles Delete': 'organizations_locations-security-profiles-delete.md'
+    - 'Locations Security Profiles Get': 'organizations_locations-security-profiles-get.md'
+    - 'Locations Security Profiles List': 'organizations_locations-security-profiles-list.md'
+    - 'Locations Security Profiles Patch': 'organizations_locations-security-profiles-patch.md'
 - 'Projects':
     - 'Locations Address Groups Add Items': 'projects_locations-address-groups-add-items.md'
     - 'Locations Address Groups Clone Items': 'projects_locations-address-groups-clone-items.md'
@@ -52,6 +67,11 @@ nav:
     - 'Locations Client Tls Policies Patch': 'projects_locations-client-tls-policies-patch.md'
     - 'Locations Client Tls Policies Set Iam Policy': 'projects_locations-client-tls-policies-set-iam-policy.md'
     - 'Locations Client Tls Policies Test Iam Permissions': 'projects_locations-client-tls-policies-test-iam-permissions.md'
+    - 'Locations Firewall Endpoint Associations Create': 'projects_locations-firewall-endpoint-associations-create.md'
+    - 'Locations Firewall Endpoint Associations Delete': 'projects_locations-firewall-endpoint-associations-delete.md'
+    - 'Locations Firewall Endpoint Associations Get': 'projects_locations-firewall-endpoint-associations-get.md'
+    - 'Locations Firewall Endpoint Associations List': 'projects_locations-firewall-endpoint-associations-list.md'
+    - 'Locations Firewall Endpoint Associations Patch': 'projects_locations-firewall-endpoint-associations-patch.md'
     - 'Locations Gateway Security Policies Create': 'projects_locations-gateway-security-policies-create.md'
     - 'Locations Gateway Security Policies Delete': 'projects_locations-gateway-security-policies-delete.md'
     - 'Locations Gateway Security Policies Get': 'projects_locations-gateway-security-policies-get.md'
@@ -89,5 +109,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

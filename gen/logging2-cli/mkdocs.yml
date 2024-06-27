@@ -1,4 +1,4 @@
-site_name: Logging v5.0.4+20240223
+site_name: Logging v5.0.5+20240531
 site_url: http://byron.github.io/google-apis-rs/google-logging2-cli
 site_description: A complete library to interact with Logging (protocol v2)
 
@@ -86,9 +86,12 @@ nav:
     - 'Locations Buckets Views Create': 'folders_locations-buckets-views-create.md'
     - 'Locations Buckets Views Delete': 'folders_locations-buckets-views-delete.md'
     - 'Locations Buckets Views Get': 'folders_locations-buckets-views-get.md'
+    - 'Locations Buckets Views Get Iam Policy': 'folders_locations-buckets-views-get-iam-policy.md'
     - 'Locations Buckets Views List': 'folders_locations-buckets-views-list.md'
     - 'Locations Buckets Views Logs List': 'folders_locations-buckets-views-logs-list.md'
     - 'Locations Buckets Views Patch': 'folders_locations-buckets-views-patch.md'
+    - 'Locations Buckets Views Set Iam Policy': 'folders_locations-buckets-views-set-iam-policy.md'
+    - 'Locations Buckets Views Test Iam Permissions': 'folders_locations-buckets-views-test-iam-permissions.md'
     - 'Locations Get': 'folders_locations-get.md'
     - 'Locations List': 'folders_locations-list.md'
     - 'Locations Operations Cancel': 'folders_locations-operations-cancel.md'
@@ -123,8 +126,11 @@ nav:
     - 'Buckets Views Create': 'locations_buckets-views-create.md'
     - 'Buckets Views Delete': 'locations_buckets-views-delete.md'
     - 'Buckets Views Get': 'locations_buckets-views-get.md'
+    - 'Buckets Views Get Iam Policy': 'locations_buckets-views-get-iam-policy.md'
     - 'Buckets Views List': 'locations_buckets-views-list.md'
     - 'Buckets Views Patch': 'locations_buckets-views-patch.md'
+    - 'Buckets Views Set Iam Policy': 'locations_buckets-views-set-iam-policy.md'
+    - 'Buckets Views Test Iam Permissions': 'locations_buckets-views-test-iam-permissions.md'
     - 'Get': 'locations_get.md'
     - 'List': 'locations_list.md'
     - 'Operations Cancel': 'locations_operations-cancel.md'
@@ -163,9 +169,12 @@ nav:
     - 'Locations Buckets Views Create': 'organizations_locations-buckets-views-create.md'
     - 'Locations Buckets Views Delete': 'organizations_locations-buckets-views-delete.md'
     - 'Locations Buckets Views Get': 'organizations_locations-buckets-views-get.md'
+    - 'Locations Buckets Views Get Iam Policy': 'organizations_locations-buckets-views-get-iam-policy.md'
     - 'Locations Buckets Views List': 'organizations_locations-buckets-views-list.md'
     - 'Locations Buckets Views Logs List': 'organizations_locations-buckets-views-logs-list.md'
     - 'Locations Buckets Views Patch': 'organizations_locations-buckets-views-patch.md'
+    - 'Locations Buckets Views Set Iam Policy': 'organizations_locations-buckets-views-set-iam-policy.md'
+    - 'Locations Buckets Views Test Iam Permissions': 'organizations_locations-buckets-views-test-iam-permissions.md'
     - 'Locations Get': 'organizations_locations-get.md'
     - 'Locations List': 'organizations_locations-list.md'
     - 'Locations Operations Cancel': 'organizations_locations-operations-cancel.md'
@@ -208,9 +217,12 @@ nav:
     - 'Locations Buckets Views Create': 'projects_locations-buckets-views-create.md'
     - 'Locations Buckets Views Delete': 'projects_locations-buckets-views-delete.md'
     - 'Locations Buckets Views Get': 'projects_locations-buckets-views-get.md'
+    - 'Locations Buckets Views Get Iam Policy': 'projects_locations-buckets-views-get-iam-policy.md'
     - 'Locations Buckets Views List': 'projects_locations-buckets-views-list.md'
     - 'Locations Buckets Views Logs List': 'projects_locations-buckets-views-logs-list.md'
     - 'Locations Buckets Views Patch': 'projects_locations-buckets-views-patch.md'
+    - 'Locations Buckets Views Set Iam Policy': 'projects_locations-buckets-views-set-iam-policy.md'
+    - 'Locations Buckets Views Test Iam Permissions': 'projects_locations-buckets-views-test-iam-permissions.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations List': 'projects_locations-list.md'
     - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
@@ -242,5 +254,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

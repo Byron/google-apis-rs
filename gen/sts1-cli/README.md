@@ -25,13 +25,11 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Security Token* API at revision *20240222*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Security Token* API at revision *20240612*. The CLI is at version *5.0.5*.
 
 ```bash
 sts1 [options]
         methods
-                introspect (-r <kv>)... [-p <v>]... [-o <out>]
-                oauthtoken (-r <kv>)... [-p <v>]... [-o <out>]
                 token (-r <kv>)... [-p <v>]... [-o <out>]
   sts1 --help
 

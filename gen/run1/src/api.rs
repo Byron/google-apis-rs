@@ -76,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -123,7 +123,7 @@ impl<'a, S> CloudRun<S> {
         CloudRun {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://run.googleapis.com/".to_string(),
             _root_url: "https://run.googleapis.com/".to_string(),
         }
@@ -137,7 +137,7 @@ impl<'a, S> CloudRun<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -169,6 +169,7 @@ impl<'a, S> CloudRun<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Addressable {
@@ -184,6 +185,7 @@ impl client::Part for Addressable {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
@@ -203,6 +205,7 @@ impl client::Part for AuditConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
@@ -223,6 +226,7 @@ impl client::Part for AuditLogConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuthorizedDomain {
@@ -241,6 +245,7 @@ impl client::Part for AuthorizedDomain {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Binding {
@@ -262,6 +267,7 @@ impl client::Part for Binding {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CSIVolumeSource {
@@ -289,6 +295,7 @@ impl client::Part for CSIVolumeSource {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [executions cancel namespaces](NamespaceExecutionCancelCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CancelExecutionRequest { _never_set: Option<bool> }
@@ -300,6 +307,7 @@ impl client::RequestValue for CancelExecutionRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConfigMapEnvSource {
@@ -322,6 +330,7 @@ impl client::Part for ConfigMapEnvSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConfigMapKeySelector {
@@ -347,6 +356,7 @@ impl client::Part for ConfigMapKeySelector {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConfigMapVolumeSource {
@@ -377,6 +387,7 @@ impl client::Part for ConfigMapVolumeSource {}
 /// 
 /// * [configurations get namespaces](NamespaceConfigurationGetCall) (response)
 /// * [locations configurations get projects](ProjectLocationConfigurationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Configuration {
@@ -405,6 +416,7 @@ impl client::ResponseResult for Configuration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConfigurationSpec {
@@ -420,6 +432,7 @@ impl client::Part for ConfigurationSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConfigurationStatus {
@@ -447,6 +460,7 @@ impl client::Part for ConfigurationStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Container {
@@ -520,6 +534,7 @@ impl client::Part for Container {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerOverride {
@@ -545,6 +560,7 @@ impl client::Part for ContainerOverride {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContainerPort {
@@ -574,6 +590,7 @@ impl client::Part for ContainerPort {}
 /// * [domainmappings get namespaces](NamespaceDomainmappingGetCall) (response)
 /// * [locations domainmappings create projects](ProjectLocationDomainmappingCreateCall) (request|response)
 /// * [locations domainmappings get projects](ProjectLocationDomainmappingGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DomainMapping {
@@ -603,6 +620,7 @@ impl client::ResponseResult for DomainMapping {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DomainMappingSpec {
@@ -627,6 +645,7 @@ impl client::Part for DomainMappingSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DomainMappingStatus {
@@ -661,6 +680,7 @@ impl client::Part for DomainMappingStatus {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations operations delete projects](ProjectLocationOperationDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -672,6 +692,7 @@ impl client::ResponseResult for Empty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EmptyDirVolumeSource {
@@ -691,6 +712,7 @@ impl client::Part for EmptyDirVolumeSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnvFromSource {
@@ -714,6 +736,7 @@ impl client::Part for EnvFromSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnvVar {
@@ -736,6 +759,7 @@ impl client::Part for EnvVar {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnvVarSource {
@@ -756,6 +780,7 @@ impl client::Part for EnvVarSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecAction {
@@ -777,6 +802,7 @@ impl client::Part for ExecAction {}
 /// * [executions cancel namespaces](NamespaceExecutionCancelCall) (response)
 /// * [executions get namespaces](NamespaceExecutionGetCall) (response)
 /// * [jobs run namespaces](NamespaceJobRunCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Execution {
@@ -805,6 +831,7 @@ impl client::ResponseResult for Execution {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecutionReference {
@@ -828,6 +855,7 @@ impl client::Part for ExecutionReference {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecutionSpec {
@@ -850,6 +878,7 @@ impl client::Part for ExecutionSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecutionStatus {
@@ -901,6 +930,7 @@ impl client::Part for ExecutionStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecutionTemplateSpec {
@@ -919,6 +949,7 @@ impl client::Part for ExecutionTemplateSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
@@ -943,6 +974,7 @@ impl client::Part for Expr {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GRPCAction {
@@ -961,6 +993,7 @@ impl client::Part for GRPCAction {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRunV1Condition {
@@ -997,6 +1030,7 @@ impl client::Part for GoogleCloudRunV1Condition {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations operations list projects](ProjectLocationOperationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningListOperationsResponse {
@@ -1021,6 +1055,7 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// 
 /// * [locations operations get projects](ProjectLocationOperationGetCall) (response)
 /// * [locations operations wait projects](ProjectLocationOperationWaitCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningOperation {
@@ -1052,6 +1087,7 @@ impl client::ResponseResult for GoogleLongrunningOperation {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations operations wait projects](ProjectLocationOperationWaitCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningWaitOperationRequest {
@@ -1068,6 +1104,7 @@ impl client::RequestValue for GoogleLongrunningWaitOperationRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpcStatus {
@@ -1089,6 +1126,7 @@ impl client::Part for GoogleRpcStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HTTPGetAction {
@@ -1117,6 +1155,7 @@ impl client::Part for HTTPGetAction {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HTTPHeader {
@@ -1141,6 +1180,7 @@ impl client::Part for HTTPHeader {}
 /// * [jobs create namespaces](NamespaceJobCreateCall) (request|response)
 /// * [jobs get namespaces](NamespaceJobGetCall) (response)
 /// * [jobs replace job namespaces](NamespaceJobReplaceJobCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
@@ -1170,9 +1210,18 @@ impl client::ResponseResult for Job {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobSpec {
+    /// A unique string used as a suffix for creating a new execution. The Job will become ready when the execution is successfully completed. The sum of job name and token length must be fewer than 63 characters.
+    #[serde(rename="runExecutionToken")]
+    
+    pub run_execution_token: Option<String>,
+    /// A unique string used as a suffix for creating a new execution. The Job will become ready when the execution is successfully started. The sum of job name and token length must be fewer than 63 characters.
+    #[serde(rename="startExecutionToken")]
+    
+    pub start_execution_token: Option<String>,
     /// Optional. Describes the execution that will be created when running a job.
     
     pub template: Option<ExecutionTemplateSpec>,
@@ -1185,6 +1234,7 @@ impl client::Part for JobSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatus {
@@ -1212,6 +1262,7 @@ impl client::Part for JobStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct KeyToPath {
@@ -1239,6 +1290,7 @@ impl client::Part for KeyToPath {}
 /// * [authorizeddomains list namespaces](NamespaceAuthorizeddomainListCall) (response)
 /// * [authorizeddomains list projects](ProjectAuthorizeddomainListCall) (response)
 /// * [locations authorizeddomains list projects](ProjectLocationAuthorizeddomainListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAuthorizedDomainsResponse {
@@ -1263,6 +1315,7 @@ impl client::ResponseResult for ListAuthorizedDomainsResponse {}
 /// 
 /// * [configurations list namespaces](NamespaceConfigurationListCall) (response)
 /// * [locations configurations list projects](ProjectLocationConfigurationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListConfigurationsResponse {
@@ -1296,6 +1349,7 @@ impl client::ResponseResult for ListConfigurationsResponse {}
 /// 
 /// * [domainmappings list namespaces](NamespaceDomainmappingListCall) (response)
 /// * [locations domainmappings list projects](ProjectLocationDomainmappingListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListDomainMappingsResponse {
@@ -1328,6 +1382,7 @@ impl client::ResponseResult for ListDomainMappingsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [executions list namespaces](NamespaceExecutionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListExecutionsResponse {
@@ -1360,6 +1415,7 @@ impl client::ResponseResult for ListExecutionsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [jobs list namespaces](NamespaceJobListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListJobsResponse {
@@ -1392,6 +1448,7 @@ impl client::ResponseResult for ListJobsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations list projects](ProjectLocationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLocationsResponse {
@@ -1411,6 +1468,7 @@ impl client::ResponseResult for ListLocationsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListMeta {
@@ -1440,6 +1498,7 @@ impl client::Part for ListMeta {}
 /// 
 /// * [revisions list namespaces](NamespaceRevisionListCall) (response)
 /// * [locations revisions list projects](ProjectLocationRevisionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListRevisionsResponse {
@@ -1473,6 +1532,7 @@ impl client::ResponseResult for ListRevisionsResponse {}
 /// 
 /// * [routes list namespaces](NamespaceRouteListCall) (response)
 /// * [locations routes list projects](ProjectLocationRouteListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListRoutesResponse {
@@ -1506,6 +1566,7 @@ impl client::ResponseResult for ListRoutesResponse {}
 /// 
 /// * [services list namespaces](NamespaceServiceListCall) (response)
 /// * [locations services list projects](ProjectLocationServiceListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServicesResponse {
@@ -1538,6 +1599,7 @@ impl client::ResponseResult for ListServicesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [tasks list namespaces](NamespaceTaskListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTasksResponse {
@@ -1566,6 +1628,7 @@ impl client::ResponseResult for ListTasksResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalObjectReference {
@@ -1581,6 +1644,7 @@ impl client::Part for LocalObjectReference {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
@@ -1606,10 +1670,11 @@ pub struct Location {
 impl client::Part for Location {}
 
 
-/// Represents a persistent volume that will be mounted using NFS. This volume will be shared between all instances of the Service and data will not be deleted when the instance is shut down.
+/// Represents a persistent volume that will be mounted using NFS. This volume will be shared between all instances of the resource and data will not be deleted when the instance is shut down.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NFSVolumeSource {
@@ -1632,6 +1697,7 @@ impl client::Part for NFSVolumeSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectMeta {
@@ -1697,6 +1763,7 @@ impl client::Part for ObjectMeta {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Overrides {
@@ -1721,6 +1788,7 @@ impl client::Part for Overrides {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OwnerReference {
@@ -1760,6 +1828,7 @@ impl client::Part for OwnerReference {}
 /// * [locations jobs set iam policy projects](ProjectLocationJobSetIamPolicyCall) (response)
 /// * [locations services get iam policy projects](ProjectLocationServiceGetIamPolicyCall) (response)
 /// * [locations services set iam policy projects](ProjectLocationServiceSetIamPolicyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
@@ -1786,6 +1855,7 @@ impl client::ResponseResult for Policy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Probe {
@@ -1832,6 +1902,7 @@ impl client::Part for Probe {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceRecord {
@@ -1854,6 +1925,7 @@ impl client::Part for ResourceRecord {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceRequirements {
@@ -1877,6 +1949,7 @@ impl client::Part for ResourceRequirements {}
 /// 
 /// * [revisions get namespaces](NamespaceRevisionGetCall) (response)
 /// * [locations revisions get projects](ProjectLocationRevisionGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Revision {
@@ -1905,6 +1978,7 @@ impl client::ResponseResult for Revision {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionSpec {
@@ -1923,6 +1997,14 @@ pub struct RevisionSpec {
     #[serde(rename="imagePullSecrets")]
     
     pub image_pull_secrets: Option<Vec<LocalObjectReference>>,
+    /// Optional. The Node Selector configuration. Map of selector key to a value which matches a node.
+    #[serde(rename="nodeSelector")]
+    
+    pub node_selector: Option<HashMap<String, String>>,
+    /// Runtime. Leave unset for default.
+    #[serde(rename="runtimeClassName")]
+    
+    pub runtime_class_name: Option<String>,
     /// Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has. If not provided, the revision will use the project's default service account.
     #[serde(rename="serviceAccountName")]
     
@@ -1943,6 +2025,7 @@ impl client::Part for RevisionSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionStatus {
@@ -1978,6 +2061,7 @@ impl client::Part for RevisionStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionTemplate {
@@ -2001,6 +2085,7 @@ impl client::Part for RevisionTemplate {}
 /// 
 /// * [routes get namespaces](NamespaceRouteGetCall) (response)
 /// * [locations routes get projects](ProjectLocationRouteGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Route {
@@ -2029,6 +2114,7 @@ impl client::ResponseResult for Route {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RouteSpec {
@@ -2044,6 +2130,7 @@ impl client::Part for RouteSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RouteStatus {
@@ -2076,6 +2163,7 @@ impl client::Part for RouteStatus {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [jobs run namespaces](NamespaceJobRunCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RunJobRequest {
@@ -2091,6 +2179,7 @@ impl client::RequestValue for RunJobRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SecretEnvSource {
@@ -2113,6 +2202,7 @@ impl client::Part for SecretEnvSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SecretKeySelector {
@@ -2138,6 +2228,7 @@ impl client::Part for SecretKeySelector {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SecretVolumeSource {
@@ -2164,6 +2255,7 @@ impl client::Part for SecretVolumeSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SecurityContext {
@@ -2189,6 +2281,7 @@ impl client::Part for SecurityContext {}
 /// * [locations services create projects](ProjectLocationServiceCreateCall) (request|response)
 /// * [locations services get projects](ProjectLocationServiceGetCall) (response)
 /// * [locations services replace service projects](ProjectLocationServiceReplaceServiceCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
@@ -2199,7 +2292,7 @@ pub struct Service {
     /// The kind of resource. It must be "Service".
     
     pub kind: Option<String>,
-    /// Metadata associated with this Service, including name, namespace, labels, and annotations. In Cloud Run, annotations with ‘run.googleapis.com/’ and ‘autoscaling.knative.dev’ are restricted, and the accepted annotations will be different depending on the resource type. The following Cloud Run-specific annotations are accepted in Service.metadata.annotations. * `run.googleapis.com/binary-authorization-breakglass` * `run.googleapis.com/binary-authorization` * `run.googleapis.com/client-name` * `run.googleapis.com/custom-audiences` * `run.googleapis.com/default-url-disabled`: Service. * `run.googleapis.com/description` * `run.googleapis.com/gc-traffic-tags` * `run.googleapis.com/ingress` * `run.googleapis.com/ingress` sets the ingress settings for the Service. See [the ingress settings documentation](https://cloud.google.com/run/docs/securing/ingress) for details on configuring ingress settings. * `run.googleapis.com/ingress-status` is output-only and contains the currently active ingress settings for the Service. `run.googleapis.com/ingress-status` may differ from `run.googleapis.com/ingress` while the system is processing a change to `run.googleapis.com/ingress` or if the system failed to process a change to `run.googleapis.com/ingress`. When the system has processed all changes successfully `run.googleapis.com/ingress-status` and `run.googleapis.com/ingress` are equal.
+    /// Metadata associated with this Service, including name, namespace, labels, and annotations. In Cloud Run, annotations with ‘run.googleapis.com/’ and ‘autoscaling.knative.dev’ are restricted, and the accepted annotations will be different depending on the resource type. The following Cloud Run-specific annotations are accepted in Service.metadata.annotations. * `run.googleapis.com/binary-authorization-breakglass` * `run.googleapis.com/binary-authorization` * `run.googleapis.com/client-name` * `run.googleapis.com/custom-audiences` * `run.googleapis.com/default-url-disabled` * `run.googleapis.com/description` * `run.googleapis.com/gc-traffic-tags` * `run.googleapis.com/ingress` * `run.googleapis.com/ingress` sets the ingress settings for the Service. See [the ingress settings documentation](https://cloud.google.com/run/docs/securing/ingress) for details on configuring ingress settings. * `run.googleapis.com/ingress-status` is output-only and contains the currently active ingress settings for the Service. `run.googleapis.com/ingress-status` may differ from `run.googleapis.com/ingress` while the system is processing a change to `run.googleapis.com/ingress` or if the system failed to process a change to `run.googleapis.com/ingress`. When the system has processed all changes successfully `run.googleapis.com/ingress-status` and `run.googleapis.com/ingress` are equal.
     
     pub metadata: Option<ObjectMeta>,
     /// Holds the desired state of the Service (from the client).
@@ -2218,6 +2311,7 @@ impl client::ResponseResult for Service {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceSpec {
@@ -2236,6 +2330,7 @@ impl client::Part for ServiceSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceStatus {
@@ -2277,6 +2372,7 @@ impl client::Part for ServiceStatus {}
 /// 
 /// * [locations jobs set iam policy projects](ProjectLocationJobSetIamPolicyCall) (request)
 /// * [locations services set iam policy projects](ProjectLocationServiceSetIamPolicyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
@@ -2307,6 +2403,7 @@ impl client::RequestValue for SetIamPolicyRequest {}
 /// * [locations domainmappings delete projects](ProjectLocationDomainmappingDeleteCall) (response)
 /// * [locations revisions delete projects](ProjectLocationRevisionDeleteCall) (response)
 /// * [locations services delete projects](ProjectLocationServiceDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
@@ -2337,6 +2434,7 @@ impl client::ResponseResult for Status {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StatusCause {
@@ -2358,6 +2456,7 @@ impl client::Part for StatusCause {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StatusDetails {
@@ -2389,6 +2488,7 @@ impl client::Part for StatusDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TCPSocketAction {
@@ -2411,6 +2511,7 @@ impl client::Part for TCPSocketAction {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [tasks get namespaces](NamespaceTaskGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Task {
@@ -2439,6 +2540,7 @@ impl client::ResponseResult for Task {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskAttemptResult {
@@ -2458,6 +2560,7 @@ impl client::Part for TaskAttemptResult {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskSpec {
@@ -2489,6 +2592,7 @@ impl client::Part for TaskSpec {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskStatus {
@@ -2530,6 +2634,7 @@ impl client::Part for TaskStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskTemplateSpec {
@@ -2550,6 +2655,7 @@ impl client::Part for TaskTemplateSpec {}
 /// 
 /// * [locations jobs test iam permissions projects](ProjectLocationJobTestIamPermissionCall) (request)
 /// * [locations services test iam permissions projects](ProjectLocationServiceTestIamPermissionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
@@ -2570,6 +2676,7 @@ impl client::RequestValue for TestIamPermissionsRequest {}
 /// 
 /// * [locations jobs test iam permissions projects](ProjectLocationJobTestIamPermissionCall) (response)
 /// * [locations services test iam permissions projects](ProjectLocationServiceTestIamPermissionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
@@ -2585,6 +2692,7 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TrafficTarget {
@@ -2618,6 +2726,7 @@ impl client::Part for TrafficTarget {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Volume {
@@ -2650,6 +2759,7 @@ impl client::Part for Volume {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VolumeMount {
@@ -2699,7 +2809,7 @@ impl client::Part for VolumeMount {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `authorizeddomains_list(...)`, `configurations_get(...)`, `configurations_list(...)`, `domainmappings_create(...)`, `domainmappings_delete(...)`, `domainmappings_get(...)`, `domainmappings_list(...)`, `executions_cancel(...)`, `executions_delete(...)`, `executions_get(...)`, `executions_list(...)`, `jobs_create(...)`, `jobs_delete(...)`, `jobs_get(...)`, `jobs_list(...)`, `jobs_replace_job(...)`, `jobs_run(...)`, `revisions_delete(...)`, `revisions_get(...)`, `revisions_list(...)`, `routes_get(...)`, `routes_list(...)`, `services_create(...)`, `services_delete(...)`, `services_get(...)`, `services_list(...)`, `services_replace_service(...)`, `tasks_get(...)` and `tasks_list(...)`
 /// // to build up your call.
@@ -2754,7 +2864,7 @@ impl<'a, S> NamespaceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List configurations.
+    /// List configurations. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -2916,7 +3026,7 @@ impl<'a, S> NamespaceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List executions.
+    /// List executions. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -2996,7 +3106,7 @@ impl<'a, S> NamespaceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List jobs.
+    /// List jobs. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3096,7 +3206,7 @@ impl<'a, S> NamespaceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List revisions.
+    /// List revisions. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3137,7 +3247,7 @@ impl<'a, S> NamespaceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List routes.
+    /// List routes. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3219,7 +3329,7 @@ impl<'a, S> NamespaceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists services for the given project and region.
+    /// Lists services for the given project and region. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3326,7 +3436,7 @@ impl<'a, S> NamespaceMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `authorizeddomains_list(...)`, `locations_authorizeddomains_list(...)`, `locations_configurations_get(...)`, `locations_configurations_list(...)`, `locations_domainmappings_create(...)`, `locations_domainmappings_delete(...)`, `locations_domainmappings_get(...)`, `locations_domainmappings_list(...)`, `locations_jobs_get_iam_policy(...)`, `locations_jobs_set_iam_policy(...)`, `locations_jobs_test_iam_permissions(...)`, `locations_list(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_operations_wait(...)`, `locations_revisions_delete(...)`, `locations_revisions_get(...)`, `locations_revisions_list(...)`, `locations_routes_get(...)`, `locations_routes_list(...)`, `locations_services_create(...)`, `locations_services_delete(...)`, `locations_services_get(...)`, `locations_services_get_iam_policy(...)`, `locations_services_list(...)`, `locations_services_replace_service(...)`, `locations_services_set_iam_policy(...)` and `locations_services_test_iam_permissions(...)`
 /// // to build up your call.
@@ -3400,7 +3510,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List configurations.
+    /// List configurations. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3673,7 +3783,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List revisions.
+    /// List revisions. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3714,7 +3824,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// List routes.
+    /// List routes. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3814,7 +3924,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists services for the given project and region.
+    /// Lists services for the given project and region. Results are sorted by creation time, descending.
     /// 
     /// # Arguments
     ///
@@ -3945,7 +4055,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4053,6 +4163,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4231,7 +4342,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4329,6 +4440,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4471,7 +4583,7 @@ where
 }
 
 
-/// List configurations.
+/// List configurations. Results are sorted by creation time, descending.
 ///
 /// A builder for the *configurations.list* method supported by a *namespace* resource.
 /// It is not used directly, but through a [`NamespaceMethods`] instance.
@@ -4493,7 +4605,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4626,6 +4738,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4840,7 +4953,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5143,7 +5256,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5261,6 +5374,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5453,7 +5567,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5551,6 +5665,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5715,7 +5830,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5848,6 +5963,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6062,7 +6178,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6353,7 +6469,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6466,6 +6582,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6651,7 +6768,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6749,6 +6866,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6891,7 +7009,7 @@ where
 }
 
 
-/// List executions.
+/// List executions. Results are sorted by creation time, descending.
 ///
 /// A builder for the *executions.list* method supported by a *namespace* resource.
 /// It is not used directly, but through a [`NamespaceMethods`] instance.
@@ -6913,7 +7031,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7046,6 +7164,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7260,7 +7379,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7551,7 +7670,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7664,6 +7783,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7849,7 +7969,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7947,6 +8067,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8089,7 +8210,7 @@ where
 }
 
 
-/// List jobs.
+/// List jobs. Results are sorted by creation time, descending.
 ///
 /// A builder for the *jobs.list* method supported by a *namespace* resource.
 /// It is not used directly, but through a [`NamespaceMethods`] instance.
@@ -8111,7 +8232,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8244,6 +8365,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8458,7 +8580,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8750,7 +8872,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9041,7 +9163,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9159,6 +9281,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9351,7 +9474,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9449,6 +9572,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9591,7 +9715,7 @@ where
 }
 
 
-/// List revisions.
+/// List revisions. Results are sorted by creation time, descending.
 ///
 /// A builder for the *revisions.list* method supported by a *namespace* resource.
 /// It is not used directly, but through a [`NamespaceMethods`] instance.
@@ -9613,7 +9737,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9746,6 +9870,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9959,7 +10084,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10057,6 +10182,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10199,7 +10325,7 @@ where
 }
 
 
-/// List routes.
+/// List routes. Results are sorted by creation time, descending.
 ///
 /// A builder for the *routes.list* method supported by a *namespace* resource.
 /// It is not used directly, but through a [`NamespaceMethods`] instance.
@@ -10221,7 +10347,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10354,6 +10480,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10568,7 +10695,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10871,7 +10998,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10989,6 +11116,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11181,7 +11309,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11279,6 +11407,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11421,7 +11550,7 @@ where
 }
 
 
-/// Lists services for the given project and region.
+/// Lists services for the given project and region. Results are sorted by creation time, descending.
 ///
 /// A builder for the *services.list* method supported by a *namespace* resource.
 /// It is not used directly, but through a [`NamespaceMethods`] instance.
@@ -11443,7 +11572,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11576,6 +11705,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11790,7 +11920,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12093,7 +12223,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12191,6 +12321,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12355,7 +12486,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12488,6 +12619,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12701,7 +12833,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12809,6 +12941,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12987,7 +13120,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13095,6 +13228,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13273,7 +13407,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13371,6 +13505,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13513,7 +13648,7 @@ where
 }
 
 
-/// List configurations.
+/// List configurations. Results are sorted by creation time, descending.
 ///
 /// A builder for the *locations.configurations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -13535,7 +13670,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13668,6 +13803,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13882,7 +14018,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14185,7 +14321,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14303,6 +14439,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14495,7 +14632,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14593,6 +14730,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14757,7 +14895,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14890,6 +15028,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15103,7 +15242,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15206,6 +15345,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15378,7 +15518,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15670,7 +15810,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15961,7 +16101,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16059,6 +16199,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16223,7 +16364,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16321,6 +16462,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16485,7 +16627,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16598,6 +16740,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16784,7 +16927,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17075,7 +17218,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17193,6 +17336,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17385,7 +17529,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17483,6 +17627,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17625,7 +17770,7 @@ where
 }
 
 
-/// List revisions.
+/// List revisions. Results are sorted by creation time, descending.
 ///
 /// A builder for the *locations.revisions.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -17647,7 +17792,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17780,6 +17925,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17993,7 +18139,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18091,6 +18237,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18233,7 +18380,7 @@ where
 }
 
 
-/// List routes.
+/// List routes. Results are sorted by creation time, descending.
 ///
 /// A builder for the *locations.routes.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -18255,7 +18402,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18388,6 +18535,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18602,7 +18750,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18905,7 +19053,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19023,6 +19171,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19215,7 +19364,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19313,6 +19462,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19477,7 +19627,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19580,6 +19730,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19729,7 +19880,7 @@ where
 }
 
 
-/// Lists services for the given project and region.
+/// Lists services for the given project and region. Results are sorted by creation time, descending.
 ///
 /// A builder for the *locations.services.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -19751,7 +19902,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19884,6 +20035,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20098,7 +20250,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20402,7 +20554,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20694,7 +20846,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20985,7 +21137,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudRun::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21098,6 +21250,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Policy Simulator* API at revision *20240303*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Policy Simulator* API at revision *20240623*. The CLI is at version *5.0.5*.
 
 ```bash
 policysimulator1 [options]
@@ -40,11 +40,7 @@ policysimulator1 [options]
                 get <name> [-p <v>]... [-o <out>]
                 list <name> [-p <v>]... [-o <out>]
         organizations
-                locations-org-policy-violations-previews-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-org-policy-violations-previews-get <name> [-p <v>]... [-o <out>]
-                locations-org-policy-violations-previews-list <parent> [-p <v>]... [-o <out>]
                 locations-org-policy-violations-previews-operations-get <name> [-p <v>]... [-o <out>]
-                locations-org-policy-violations-previews-org-policy-violations-list <parent> [-p <v>]... [-o <out>]
                 locations-replays-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-replays-get <name> [-p <v>]... [-o <out>]
                 locations-replays-operations-get <name> [-p <v>]... [-o <out>]

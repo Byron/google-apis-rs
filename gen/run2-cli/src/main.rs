@@ -50,6 +50,195 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _projects_locations_export_image(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "destination-repo" => Some(("destinationRepo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination-repo"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudRunV2ExportImageRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_export_image(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_export_image_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_export_image_metadata(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_export_metadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_export_metadata(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_jobs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -75,6 +264,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "binary-authorization.breakglass-justification" => Some(("binaryAuthorization.breakglassJustification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binary-authorization.policy" => Some(("binaryAuthorization.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binary-authorization.use-default" => Some(("binaryAuthorization.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "client" => Some(("client", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version" => Some(("clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -94,7 +284,9 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "observed-generation" => Some(("observedGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "run-execution-token" => Some(("runExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "start-execution-token" => Some(("startExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.annotations" => Some(("template.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.parallelism" => Some(("template.parallelism", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -117,7 +309,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "reason", "reconciling", "revision-reason", "satisfies-pzs", "service-account", "severity", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "policy", "reason", "reconciling", "revision-reason", "run-execution-token", "satisfies-pzs", "service-account", "severity", "start-execution-token", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -355,6 +547,58 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["etag", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_jobs_executions_export_status(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_jobs_executions_export_status(opt.value_of("name").unwrap_or(""), opt.value_of("operation-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -811,6 +1055,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "binary-authorization.breakglass-justification" => Some(("binaryAuthorization.breakglassJustification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binary-authorization.policy" => Some(("binaryAuthorization.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binary-authorization.use-default" => Some(("binaryAuthorization.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "client" => Some(("client", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version" => Some(("clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -830,7 +1075,9 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "observed-generation" => Some(("observedGeneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "run-execution-token" => Some(("runExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "start-execution-token" => Some(("startExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.annotations" => Some(("template.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.parallelism" => Some(("template.parallelism", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -853,7 +1100,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "reason", "reconciling", "revision-reason", "satisfies-pzs", "service-account", "severity", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "completion-time", "connector", "create-time", "creator", "delete-time", "egress", "encryption-key", "etag", "execution-count", "execution-environment", "execution-reason", "expire-time", "generation", "labels", "last-modifier", "last-transition-time", "latest-created-execution", "launch-stage", "max-retries", "message", "name", "observed-generation", "parallelism", "policy", "reason", "reconciling", "revision-reason", "run-execution-token", "satisfies-pzs", "service-account", "severity", "start-execution-token", "state", "task-count", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1456,6 +1703,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "binary-authorization.breakglass-justification" => Some(("binaryAuthorization.breakglassJustification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binary-authorization.policy" => Some(("binaryAuthorization.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binary-authorization.use-default" => Some(("binaryAuthorization.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "client" => Some(("client", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version" => Some(("clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1485,6 +1733,7 @@ where
                     "template.health-check-disabled" => Some(("template.healthCheckDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.max-instance-request-concurrency" => Some(("template.maxInstanceRequestConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "template.node-selector.accelerator" => Some(("template.nodeSelector.accelerator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.revision" => Some(("template.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.scaling.max-instance-count" => Some(("template.scaling.maxInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.scaling.min-instance-count" => Some(("template.scaling.minInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1505,7 +1754,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uri" => Some(("uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "custom-audiences", "default-uri-disabled", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "health-check-disabled", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "observed-generation", "reason", "reconciling", "revision", "revision-reason", "satisfies-pzs", "scaling", "service-account", "session-affinity", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator", "annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "custom-audiences", "default-uri-disabled", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "health-check-disabled", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "node-selector", "observed-generation", "policy", "reason", "reconciling", "revision", "revision-reason", "satisfies-pzs", "scaling", "service-account", "session-affinity", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1826,6 +2075,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "binary-authorization.breakglass-justification" => Some(("binaryAuthorization.breakglassJustification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binary-authorization.policy" => Some(("binaryAuthorization.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binary-authorization.use-default" => Some(("binaryAuthorization.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "client" => Some(("client", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-version" => Some(("clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1855,6 +2105,7 @@ where
                     "template.health-check-disabled" => Some(("template.healthCheckDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "template.labels" => Some(("template.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "template.max-instance-request-concurrency" => Some(("template.maxInstanceRequestConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "template.node-selector.accelerator" => Some(("template.nodeSelector.accelerator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.revision" => Some(("template.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "template.scaling.max-instance-count" => Some(("template.scaling.maxInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "template.scaling.min-instance-count" => Some(("template.scaling.minInstanceCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1875,7 +2126,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uri" => Some(("uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "custom-audiences", "default-uri-disabled", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "health-check-disabled", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "observed-generation", "reason", "reconciling", "revision", "revision-reason", "satisfies-pzs", "scaling", "service-account", "session-affinity", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator", "annotations", "binary-authorization", "breakglass-justification", "client", "client-version", "connector", "create-time", "creator", "custom-audiences", "default-uri-disabled", "delete-time", "description", "egress", "encryption-key", "etag", "execution-environment", "execution-reason", "expire-time", "generation", "health-check-disabled", "ingress", "labels", "last-modifier", "last-transition-time", "latest-created-revision", "latest-ready-revision", "launch-stage", "max-instance-count", "max-instance-request-concurrency", "message", "min-instance-count", "name", "node-selector", "observed-generation", "policy", "reason", "reconciling", "revision", "revision-reason", "satisfies-pzs", "scaling", "service-account", "session-affinity", "severity", "state", "template", "terminal-condition", "timeout", "type", "uid", "update-time", "uri", "use-default", "vpc-access"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1891,6 +2142,9 @@ where
             match key {
                 "validate-only" => {
                     call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
                 },
                 "allow-missing" => {
                     call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
@@ -1908,7 +2162,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["allow-missing", "validate-only"].iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "update-mask", "validate-only"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1968,6 +2222,58 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["etag", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_services_revisions_export_status(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_services_revisions_export_status(opt.value_of("name").unwrap_or(""), opt.value_of("operation-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2294,6 +2600,15 @@ where
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-export-image", Some(opt)) => {
+                        call_result = self._projects_locations_export_image(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-export-image-metadata", Some(opt)) => {
+                        call_result = self._projects_locations_export_image_metadata(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-export-metadata", Some(opt)) => {
+                        call_result = self._projects_locations_export_metadata(opt, dry_run, &mut err).await;
+                    },
                     ("locations-jobs-create", Some(opt)) => {
                         call_result = self._projects_locations_jobs_create(opt, dry_run, &mut err).await;
                     },
@@ -2305,6 +2620,9 @@ where
                     },
                     ("locations-jobs-executions-delete", Some(opt)) => {
                         call_result = self._projects_locations_jobs_executions_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-jobs-executions-export-status", Some(opt)) => {
+                        call_result = self._projects_locations_jobs_executions_export_status(opt, dry_run, &mut err).await;
                     },
                     ("locations-jobs-executions-get", Some(opt)) => {
                         call_result = self._projects_locations_jobs_executions_get(opt, dry_run, &mut err).await;
@@ -2371,6 +2689,9 @@ where
                     },
                     ("locations-services-revisions-delete", Some(opt)) => {
                         call_result = self._projects_locations_services_revisions_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-services-revisions-export-status", Some(opt)) => {
+                        call_result = self._projects_locations_services_revisions_export_status(opt, dry_run, &mut err).await;
                     },
                     ("locations-services-revisions-get", Some(opt)) => {
                         call_result = self._projects_locations_services_revisions_get(opt, dry_run, &mut err).await;
@@ -2463,7 +2784,79 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-jobs-create', 'locations-jobs-delete', 'locations-jobs-executions-cancel', 'locations-jobs-executions-delete', 'locations-jobs-executions-get', 'locations-jobs-executions-list', 'locations-jobs-executions-tasks-get', 'locations-jobs-executions-tasks-list', 'locations-jobs-get', 'locations-jobs-get-iam-policy', 'locations-jobs-list', 'locations-jobs-patch', 'locations-jobs-run', 'locations-jobs-set-iam-policy', 'locations-jobs-test-iam-permissions', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-operations-wait', 'locations-services-create', 'locations-services-delete', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-patch', 'locations-services-revisions-delete', 'locations-services-revisions-get', 'locations-services-revisions-list', 'locations-services-set-iam-policy' and 'locations-services-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-export-image', 'locations-export-image-metadata', 'locations-export-metadata', 'locations-jobs-create', 'locations-jobs-delete', 'locations-jobs-executions-cancel', 'locations-jobs-executions-delete', 'locations-jobs-executions-export-status', 'locations-jobs-executions-get', 'locations-jobs-executions-list', 'locations-jobs-executions-tasks-get', 'locations-jobs-executions-tasks-list', 'locations-jobs-get', 'locations-jobs-get-iam-policy', 'locations-jobs-list', 'locations-jobs-patch', 'locations-jobs-run', 'locations-jobs-set-iam-policy', 'locations-jobs-test-iam-permissions', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-operations-wait', 'locations-services-create', 'locations-services-delete', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-patch', 'locations-services-revisions-delete', 'locations-services-revisions-export-status', 'locations-services-revisions-get', 'locations-services-revisions-list', 'locations-services-set-iam-policy' and 'locations-services-test-iam-permissions'", vec![
+            ("locations-export-image",
+                    Some(r##"Export image for a given resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-export-image",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the resource of which image metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-export-image-metadata",
+                    Some(r##"Export image metadata for a given resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-export-image-metadata",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the resource of which image metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-export-metadata",
+                    Some(r##"Export generated customer metadata for a given resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-export-metadata",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the resource of which metadata should be exported. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}` for Service `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-jobs-create",
                     Some(r##"Creates a Job."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-create",
@@ -2564,6 +2957,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-jobs-executions-export-status",
+                    Some(r##"Read the status of an image export operation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-executions-export-status",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the resource of which image export operation status has to be fetched. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"operation-id"##),
+                     None,
+                     Some(r##"Required. The operation id returned from ExportImage."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-jobs-executions-get",
                     Some(r##"Gets information about an Execution."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-executions-get",
@@ -2587,7 +3008,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-jobs-executions-list",
-                    Some(r##"Lists Executions from a Job."##),
+                    Some(r##"Lists Executions from a Job. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-executions-list",
                   vec![
                     (Some(r##"parent"##),
@@ -2697,7 +3118,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-jobs-list",
-                    Some(r##"Lists Jobs."##),
+                    Some(r##"Lists Jobs. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-jobs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -3019,7 +3440,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-list",
-                    Some(r##"Lists Services."##),
+                    Some(r##"Lists Services. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-services-list",
                   vec![
                     (Some(r##"parent"##),
@@ -3090,6 +3511,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-services-revisions-export-status",
+                    Some(r##"Read the status of an image export operation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-services-revisions-export-status",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the resource of which image export operation status has to be fetched. Format: `projects/{project_id_or_number}/locations/{location}/services/{service}/revisions/{revision}` for Revision `projects/{project_id_or_number}/locations/{location}/jobs/{job}/executions/{execution}` for Execution"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"operation-id"##),
+                     None,
+                     Some(r##"Required. The operation id returned from ExportImage."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-services-revisions-get",
                     Some(r##"Gets information about a Revision."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-services-revisions-get",
@@ -3113,7 +3562,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-revisions-list",
-                    Some(r##"Lists Revisions from a given Service, or from a given location."##),
+                    Some(r##"Lists Revisions from a given Service, or from a given location. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run2_cli/projects_locations-services-revisions-list",
                   vec![
                     (Some(r##"parent"##),
@@ -3196,7 +3645,7 @@ async fn main() {
     
     let mut app = App::new("run2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240225")
+           .version("5.0.5+20240621")
            .about("Deploy and manage user provided container images that scale automatically based on incoming requests. The Cloud Run Admin API v1 follows the Knative Serving API specification, while v2 is aligned with Google Cloud AIP-based API standards, as described in https://google.aip.dev/.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_run2_cli")
            .arg(Arg::with_name("url")
@@ -3260,6 +3709,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

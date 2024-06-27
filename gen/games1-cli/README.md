@@ -25,10 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Games* API at revision *20240228*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Games* API at revision *20240618*. The CLI is at version *5.0.5*.
 
 ```bash
 games1 [options]
+        accesstokens
+                generate-play-grouping-api-token [-p <v>]... [-o <out>]
+                generate-recall-play-grouping-api-token [-p <v>]... [-o <out>]
         achievement-definitions
                 list [-p <v>]... [-o <out>]
         achievements
@@ -59,6 +62,8 @@ games1 [options]
                 get-scoped-player-ids [-p <v>]... [-o <out>]
                 list <collection> [-p <v>]... [-o <out>]
         recall
+                games-player-tokens <session-id> [-p <v>]... [-o <out>]
+                last-token-from-all-developer-games <session-id> [-p <v>]... [-o <out>]
                 link-persona (-r <kv>)... [-p <v>]... [-o <out>]
                 reset-persona (-r <kv>)... [-p <v>]... [-o <out>]
                 retrieve-tokens <session-id> [-p <v>]... [-o <out>]

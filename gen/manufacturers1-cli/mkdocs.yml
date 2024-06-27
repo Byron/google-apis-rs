@@ -1,4 +1,4 @@
-site_name: Manufacturer Center v5.0.4+20240205
+site_name: Manufacturer Center v5.0.5+20240524
 site_url: http://byron.github.io/google-apis-rs/google-manufacturers1-cli
 site_description: A complete library to interact with Manufacturer Center (protocol v1)
 
@@ -21,5 +21,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

@@ -1,4 +1,4 @@
-site_name: autoscaler v5.0.4+20150629
+site_name: autoscaler v5.0.5+20150629
 site_url: http://byron.github.io/google-apis-rs/google-autoscaler1_beta2-cli
 site_description: A complete library to interact with autoscaler (protocol v1beta2)
 
@@ -25,5 +25,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

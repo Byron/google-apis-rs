@@ -55,7 +55,7 @@ use crate::{client, client::GetToken, client::serde_with};
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -103,7 +103,7 @@ impl<'a, S> MyBusinessVerifications<S> {
         MyBusinessVerifications {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://mybusinessverifications.googleapis.com/".to_string(),
             _root_url: "https://mybusinessverifications.googleapis.com/".to_string(),
         }
@@ -114,7 +114,7 @@ impl<'a, S> MyBusinessVerifications<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -146,6 +146,7 @@ impl<'a, S> MyBusinessVerifications<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AddressVerificationData {
@@ -172,6 +173,7 @@ impl client::Part for AddressVerificationData {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verifications complete locations](LocationVerificationCompleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompleteVerificationRequest {
@@ -191,6 +193,7 @@ impl client::RequestValue for CompleteVerificationRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verifications complete locations](LocationVerificationCompleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CompleteVerificationResponse {
@@ -206,6 +209,7 @@ impl client::ResponseResult for CompleteVerificationResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ComplyWithGuidelines {
@@ -222,6 +226,7 @@ impl client::Part for ComplyWithGuidelines {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EmailVerificationData {
@@ -248,6 +253,7 @@ impl client::Part for EmailVerificationData {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [fetch verification options locations](LocationFetchVerificationOptionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FetchVerificationOptionsRequest {
@@ -271,6 +277,7 @@ impl client::RequestValue for FetchVerificationOptionsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [fetch verification options locations](LocationFetchVerificationOptionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FetchVerificationOptionsResponse {
@@ -290,6 +297,7 @@ impl client::ResponseResult for FetchVerificationOptionsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verifications list locations](LocationVerificationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListVerificationsResponse {
@@ -309,6 +317,7 @@ impl client::ResponseResult for ListVerificationsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PostalAddress {
@@ -360,6 +369,7 @@ impl client::Part for PostalAddress {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResolveOwnershipConflict { _never_set: Option<bool> }
@@ -371,6 +381,7 @@ impl client::Part for ResolveOwnershipConflict {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceBusinessContext {
@@ -386,6 +397,7 @@ impl client::Part for ServiceBusinessContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Verification {
@@ -414,6 +426,7 @@ impl client::Part for Verification {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerificationOption {
@@ -445,6 +458,7 @@ impl client::Part for VerificationOption {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerificationToken {
@@ -461,6 +475,7 @@ impl client::Part for VerificationToken {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Verify {
@@ -481,6 +496,7 @@ impl client::Part for Verify {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify locations](LocationVerifyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyLocationRequest {
@@ -522,6 +538,7 @@ impl client::RequestValue for VerifyLocationRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify locations](LocationVerifyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyLocationResponse {
@@ -541,6 +558,7 @@ impl client::ResponseResult for VerifyLocationResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get voice of merchant state locations](LocationGetVoiceOfMerchantStateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VoiceOfMerchantState {
@@ -576,6 +594,7 @@ impl client::ResponseResult for VoiceOfMerchantState {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WaitForVoiceOfMerchant { _never_set: Option<bool> }
@@ -609,7 +628,7 @@ impl client::Part for WaitForVoiceOfMerchant {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `fetch_verification_options(...)`, `get_voice_of_merchant_state(...)`, `verifications_complete(...)`, `verifications_list(...)` and `verify(...)`
 /// // to build up your call.
@@ -746,7 +765,7 @@ impl<'a, S> LocationMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -992,7 +1011,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1089,6 +1108,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1234,7 +1254,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1480,7 +1500,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1567,6 +1587,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1698,7 +1719,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !

@@ -59,7 +59,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_networkconnectivity1 as networkconnectivity1;
-/// use networkconnectivity1::api::Hub;
+/// use networkconnectivity1::api::Group;
 /// use networkconnectivity1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
@@ -77,18 +77,18 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Hub::default();
+/// let mut req = Group::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_global_hubs_create(req, "parent")
-///              .request_id("sed")
-///              .hub_id("amet.")
+/// let result = hub.projects().locations_global_hubs_groups_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("At")
 ///              .doit().await;
 /// 
 /// match result {
@@ -127,7 +127,7 @@ impl<'a, S> Networkconnectivity<S> {
         Networkconnectivity {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://networkconnectivity.googleapis.com/".to_string(),
             _root_url: "https://networkconnectivity.googleapis.com/".to_string(),
         }
@@ -138,7 +138,7 @@ impl<'a, S> Networkconnectivity<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -174,6 +174,7 @@ impl<'a, S> Networkconnectivity<S> {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs accept spoke projects](ProjectLocationGlobalHubAcceptSpokeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AcceptHubSpokeRequest {
@@ -194,6 +195,7 @@ impl client::RequestValue for AcceptHubSpokeRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
@@ -213,6 +215,7 @@ impl client::Part for AuditConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
@@ -229,10 +232,28 @@ pub struct AuditLogConfig {
 impl client::Part for AuditLogConfig {}
 
 
+/// The auto-accept setting for a group controls whether proposed spokes are automatically attached to the hub. If auto-accept is enabled, the spoke immediately is attached to the hub and becomes part of the group. In this case, the new spoke is in the ACTIVE state. If auto-accept is disabled, the spoke goes to the INACTIVE state, and it must be reviewed and accepted by a hub administrator.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutoAccept {
+    /// A list of project ids or project numbers for which you want to enable auto-accept. The auto-accept setting is applied to spokes being created or updated in these projects.
+    #[serde(rename="autoAcceptProjects")]
+    
+    pub auto_accept_projects: Option<Vec<String>>,
+}
+
+impl client::Part for AutoAccept {}
+
+
 /// Associates `members`, or principals, with a `role`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Binding {
@@ -254,9 +275,14 @@ impl client::Part for Binding {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConsumerPscConfig {
+    /// Required. The project ID or project number of the consumer project. This project is the one that the consumer uses to interact with the producer instance. From the perspective of a consumer who's created a producer instance, this is the project of the producer instance. Format: 'projects/' Eg. 'projects/consumer-project' or 'projects/1234'
+    #[serde(rename="consumerInstanceProject")]
+    
+    pub consumer_instance_project: Option<String>,
     /// This is used in PSC consumer ForwardingRule to control whether the PSC endpoint can be accessed from another region.
     #[serde(rename="disableGlobalAccess")]
     
@@ -264,9 +290,17 @@ pub struct ConsumerPscConfig {
     /// The resource path of the consumer network where PSC connections are allowed to be created in. Note, this network does not need be in the ConsumerPscConfig.project in the case of SharedVPC. Example: projects/{projectNumOrId}/global/networks/{networkId}.
     
     pub network: Option<String>,
+    /// Immutable. An immutable identifier for the producer instance.
+    #[serde(rename="producerInstanceId")]
+    
+    pub producer_instance_id: Option<String>,
     /// The consumer project where PSC connections are allowed to be created in.
     
     pub project: Option<String>,
+    /// Output only. A map to store mapping between customer vip and target service attachment. Only service attachment with producer specified ip addresses are stored here.
+    #[serde(rename="serviceAttachmentIpAddressMap")]
+    
+    pub service_attachment_ip_address_map: Option<HashMap<String, String>>,
     /// Output only. Overall state of PSC Connections management for this consumer psc config.
     
     pub state: Option<String>,
@@ -279,6 +313,7 @@ impl client::Part for ConsumerPscConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConsumerPscConnection {
@@ -307,6 +342,10 @@ pub struct ConsumerPscConnection {
     /// The consumer network whose PSC forwarding rule is connected to the service attachments in this service connection map. Note that the network could be on a different project (shared VPC).
     
     pub network: Option<String>,
+    /// Immutable. An immutable identifier for the producer instance.
+    #[serde(rename="producerInstanceId")]
+    
+    pub producer_instance_id: Option<String>,
     /// The consumer project whose PSC forwarding rule is connected to the service attachments in this service connection map.
     
     pub project: Option<String>,
@@ -339,6 +378,7 @@ impl client::Part for ConsumerPscConnection {}
 /// 
 /// * [locations operations cancel projects](ProjectLocationOperationCancelCall) (response)
 /// * [locations operations delete projects](ProjectLocationOperationDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -350,6 +390,7 @@ impl client::ResponseResult for Empty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
@@ -374,6 +415,7 @@ impl client::Part for Expr {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Filter {
@@ -385,7 +427,7 @@ pub struct Filter {
     #[serde(rename="ipProtocol")]
     
     pub ip_protocol: Option<String>,
-    /// Required. Internet protocol versions this policy-based route applies to. For this version, only IPV4 is supported.
+    /// Required. Internet protocol versions this policy-based route applies to. For this version, only IPV4 is supported. IPV6 is supported in preview.
     #[serde(rename="protocolVersion")]
     
     pub protocol_version: Option<String>,
@@ -406,6 +448,7 @@ impl client::Part for Filter {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations operations cancel projects](ProjectLocationOperationCancelCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningCancelOperationRequest { _never_set: Option<bool> }
@@ -421,6 +464,7 @@ impl client::RequestValue for GoogleLongrunningCancelOperationRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations operations list projects](ProjectLocationOperationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningListOperationsResponse {
@@ -443,6 +487,7 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations global hubs groups patch projects](ProjectLocationGlobalHubGroupPatchCall) (response)
 /// * [locations global hubs accept spoke projects](ProjectLocationGlobalHubAcceptSpokeCall) (response)
 /// * [locations global hubs create projects](ProjectLocationGlobalHubCreateCall) (response)
 /// * [locations global hubs delete projects](ProjectLocationGlobalHubDeleteCall) (response)
@@ -454,6 +499,8 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// * [locations internal ranges delete projects](ProjectLocationInternalRangeDeleteCall) (response)
 /// * [locations internal ranges patch projects](ProjectLocationInternalRangePatchCall) (response)
 /// * [locations operations get projects](ProjectLocationOperationGetCall) (response)
+/// * [locations regional endpoints create projects](ProjectLocationRegionalEndpointCreateCall) (response)
+/// * [locations regional endpoints delete projects](ProjectLocationRegionalEndpointDeleteCall) (response)
 /// * [locations service classes delete projects](ProjectLocationServiceClassDeleteCall) (response)
 /// * [locations service classes patch projects](ProjectLocationServiceClassPatchCall) (response)
 /// * [locations service connection maps create projects](ProjectLocationServiceConnectionMapCreateCall) (response)
@@ -467,6 +514,7 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// * [locations spokes create projects](ProjectLocationSpokeCreateCall) (response)
 /// * [locations spokes delete projects](ProjectLocationSpokeDeleteCall) (response)
 /// * [locations spokes patch projects](ProjectLocationSpokePatchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningOperation {
@@ -494,13 +542,14 @@ impl client::ResponseResult for GoogleLongrunningOperation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpcErrorInfo {
     /// The logical grouping to which the "reason" belongs. The error domain is typically the registered service name of the tool or product that generates the error. Example: "pubsub.googleapis.com". If the error is generated by some common infrastructure, the error domain must be a globally unique value that identifies the infrastructure. For Google API infrastructure, the error domain is "googleapis.com".
     
     pub domain: Option<String>,
-    /// Additional structured details about this error. Keys should match /[a-zA-Z0-9-_]/ and be limited to 64 characters in length. When identifying the current value of an exceeded limit, the units should be contained in the key, not the value. For example, rather than {"instanceLimit": "100/request"}, should be returned as, {"instanceLimitPerRequest": "100"}, if the client exceeds the number of instances that can be created in a single (batch) request.
+    /// Additional structured details about this error. Keys must match /a-z+/ but should ideally be lowerCamelCase. Also they must be limited to 64 characters in length. When identifying the current value of an exceeded limit, the units should be contained in the key, not the value. For example, rather than {"instanceLimit": "100/request"}, should be returned as, {"instanceLimitPerRequest": "100"}, if the client exceeds the number of instances that can be created in a single (batch) request.
     
     pub metadata: Option<HashMap<String, String>>,
     /// The reason of the error. This is a constant value that identifies the proximate cause of the error. Error reasons are unique within a particular domain of errors. This should be at most 63 characters and match a regular expression of `A-Z+[A-Z0-9]`, which represents UPPER_SNAKE_CASE.
@@ -515,6 +564,7 @@ impl client::Part for GoogleRpcErrorInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpcStatus {
@@ -540,9 +590,15 @@ impl client::Part for GoogleRpcStatus {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs groups get projects](ProjectLocationGlobalHubGroupGetCall) (response)
+/// * [locations global hubs groups patch projects](ProjectLocationGlobalHubGroupPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Group {
+    /// Optional. The auto-accept setting for this group.
+    #[serde(rename="autoAccept")]
+    
+    pub auto_accept: Option<AutoAccept>,
     /// Output only. The time the group was created.
     #[serde(rename="createTime")]
     
@@ -556,6 +612,10 @@ pub struct Group {
     /// Immutable. The name of the group. Group names must be unique. They use the following form: `projects/{project_number}/locations/global/hubs/{hub}/groups/{group_id}`
     
     pub name: Option<String>,
+    /// Output only. The name of the route table that corresponds to this group. They use the following form: `projects/{project_number}/locations/global/hubs/{hub_id}/routeTables/{route_table_id}`
+    #[serde(rename="routeTable")]
+    
+    pub route_table: Option<String>,
     /// Output only. The current lifecycle state of this group.
     
     pub state: Option<String>,
@@ -568,6 +628,7 @@ pub struct Group {
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
 }
 
+impl client::RequestValue for Group {}
 impl client::ResponseResult for Group {}
 
 
@@ -581,6 +642,7 @@ impl client::ResponseResult for Group {}
 /// * [locations global hubs create projects](ProjectLocationGlobalHubCreateCall) (request)
 /// * [locations global hubs get projects](ProjectLocationGlobalHubGetCall) (response)
 /// * [locations global hubs patch projects](ProjectLocationGlobalHubPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Hub {
@@ -591,12 +653,24 @@ pub struct Hub {
     /// An optional description of the hub.
     
     pub description: Option<String>,
+    /// Optional. Whether Private Service Connect transitivity is enabled for the hub. If true, Private Service Connect endpoints in VPC spokes attached to the hub are made accessible to other VPC spokes attached to the hub. The default value is false.
+    #[serde(rename="exportPsc")]
+    
+    pub export_psc: Option<bool>,
     /// Optional labels in key-value pair format. For more information about labels, see [Requirements for labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements).
     
     pub labels: Option<HashMap<String, String>>,
     /// Immutable. The name of the hub. Hub names must be unique. They use the following form: `projects/{project_number}/locations/global/hubs/{hub_id}`
     
     pub name: Option<String>,
+    /// Optional. The policy mode of this hub. This field can be either PRESET or CUSTOM. If unspecified, the policy_mode defaults to PRESET.
+    #[serde(rename="policyMode")]
+    
+    pub policy_mode: Option<String>,
+    /// Optional. The topology implemented in this hub. Currently, this field is only used when policy_mode = PRESET. The available preset topologies are MESH and STAR. If preset_topology is unspecified and policy_mode = PRESET, the preset_topology defaults to MESH. When policy_mode = CUSTOM, the preset_topology is set to PRESET_TOPOLOGY_UNSPECIFIED.
+    #[serde(rename="presetTopology")]
+    
+    pub preset_topology: Option<String>,
     /// Output only. The route tables that belong to this hub. They use the following form: `projects/{project_number}/locations/global/hubs/{hub_id}/routeTables/{route_table_id}` This field is read-only. Network Connectivity Center automatically populates it based on the route tables nested under the hub.
     #[serde(rename="routeTables")]
     
@@ -630,6 +704,7 @@ impl client::ResponseResult for Hub {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InterconnectAttachment {
@@ -651,6 +726,7 @@ impl client::Part for InterconnectAttachment {}
 /// * [locations internal ranges create projects](ProjectLocationInternalRangeCreateCall) (request)
 /// * [locations internal ranges get projects](ProjectLocationInternalRangeGetCall) (response)
 /// * [locations internal ranges patch projects](ProjectLocationInternalRangePatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InternalRange {
@@ -671,7 +747,7 @@ pub struct InternalRange {
     /// Immutable. The name of an internal range. Format: projects/{project}/locations/{location}/internalRanges/{internal_range} See: https://google.aip.dev/122#fields-representing-resource-names
     
     pub name: Option<String>,
-    /// The URL or resource ID of the network in which to reserve the internal range. The network cannot be deleted if there are any reserved internal ranges referring to it. Legacy networks are not supported. This can only be specified for a global internal address. Example: - URL: /compute/v1/projects/{project}/global/networks/{resourceId} - ID: network123
+    /// The URL or resource ID of the network in which to reserve the internal range. The network cannot be deleted if there are any reserved internal ranges referring to it. Legacy networks are not supported. For example: https://www.googleapis.com/compute/v1/projects/{project}/locations/global/networks/{network} projects/{project}/locations/global/networks/{network} {network}
     
     pub network: Option<String>,
     /// Optional. Types of resources that are allowed to overlap with the current internal range.
@@ -708,9 +784,14 @@ impl client::ResponseResult for InternalRange {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkedInterconnectAttachments {
+    /// Optional. IP ranges allowed to be included during import from hub.(does not control transit connectivity) The only allowed value for now is "ALL_IPV4_RANGES".
+    #[serde(rename="includeImportRanges")]
+    
+    pub include_import_ranges: Option<Vec<String>>,
     /// A value that controls whether site-to-site data transfer is enabled for these resources. Data transfer is available only in [supported locations](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/locations).
     #[serde(rename="siteToSiteDataTransfer")]
     
@@ -731,9 +812,14 @@ impl client::Part for LinkedInterconnectAttachments {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkedRouterApplianceInstances {
+    /// Optional. IP ranges allowed to be included during import from hub.(does not control transit connectivity) The only allowed value for now is "ALL_IPV4_RANGES".
+    #[serde(rename="includeImportRanges")]
+    
+    pub include_import_ranges: Option<Vec<String>>,
     /// The list of router appliance instances.
     
     pub instances: Option<Vec<RouterApplianceInstance>>,
@@ -754,6 +840,7 @@ impl client::Part for LinkedRouterApplianceInstances {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkedVpcNetwork {
@@ -761,6 +848,10 @@ pub struct LinkedVpcNetwork {
     #[serde(rename="excludeExportRanges")]
     
     pub exclude_export_ranges: Option<Vec<String>>,
+    /// Optional. IP ranges allowed to be included from peering.
+    #[serde(rename="includeExportRanges")]
+    
+    pub include_export_ranges: Option<Vec<String>>,
     /// Required. The URI of the VPC network resource.
     
     pub uri: Option<String>,
@@ -773,9 +864,14 @@ impl client::Part for LinkedVpcNetwork {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkedVpnTunnels {
+    /// Optional. IP ranges allowed to be included during import from hub.(does not control transit connectivity) The only allowed value for now is "ALL_IPV4_RANGES".
+    #[serde(rename="includeImportRanges")]
+    
+    pub include_import_ranges: Option<Vec<String>>,
     /// A value that controls whether site-to-site data transfer is enabled for these resources. Data transfer is available only in [supported locations](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/locations).
     #[serde(rename="siteToSiteDataTransfer")]
     
@@ -800,6 +896,7 @@ impl client::Part for LinkedVpnTunnels {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs groups list projects](ProjectLocationGlobalHubGroupListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListGroupsResponse {
@@ -826,6 +923,7 @@ impl client::ResponseResult for ListGroupsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs list spokes projects](ProjectLocationGlobalHubListSpokeCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListHubSpokesResponse {
@@ -852,6 +950,7 @@ impl client::ResponseResult for ListHubSpokesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs list projects](ProjectLocationGlobalHubListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListHubsResponse {
@@ -878,6 +977,7 @@ impl client::ResponseResult for ListHubsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations internal ranges list projects](ProjectLocationInternalRangeListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListInternalRangesResponse {
@@ -905,6 +1005,7 @@ impl client::ResponseResult for ListInternalRangesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations list projects](ProjectLocationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListLocationsResponse {
@@ -928,6 +1029,7 @@ impl client::ResponseResult for ListLocationsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global policy based routes list projects](ProjectLocationGlobalPolicyBasedRouteListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListPolicyBasedRoutesResponse {
@@ -947,6 +1049,34 @@ pub struct ListPolicyBasedRoutesResponse {
 impl client::ResponseResult for ListPolicyBasedRoutesResponse {}
 
 
+/// Response for ListRegionalEndpoints.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations regional endpoints list projects](ProjectLocationRegionalEndpointListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListRegionalEndpointsResponse {
+    /// The next pagination token in the List response. It should be used as page_token for the following request. An empty value means no more result.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// Regional endpoints to be returned.
+    #[serde(rename="regionalEndpoints")]
+    
+    pub regional_endpoints: Option<Vec<RegionalEndpoint>>,
+    /// Locations that could not be reached.
+    
+    pub unreachable: Option<Vec<String>>,
+}
+
+impl client::ResponseResult for ListRegionalEndpointsResponse {}
+
+
 /// Response for HubService.ListRouteTables method.
 /// 
 /// # Activities
@@ -955,6 +1085,7 @@ impl client::ResponseResult for ListPolicyBasedRoutesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs route tables list projects](ProjectLocationGlobalHubRouteTableListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListRouteTablesResponse {
@@ -982,6 +1113,7 @@ impl client::ResponseResult for ListRouteTablesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs route tables routes list projects](ProjectLocationGlobalHubRouteTableRouteListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListRoutesResponse {
@@ -1008,6 +1140,7 @@ impl client::ResponseResult for ListRoutesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations service classes list projects](ProjectLocationServiceClassListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServiceClassesResponse {
@@ -1035,6 +1168,7 @@ impl client::ResponseResult for ListServiceClassesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations service connection maps list projects](ProjectLocationServiceConnectionMapListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServiceConnectionMapsResponse {
@@ -1062,6 +1196,7 @@ impl client::ResponseResult for ListServiceConnectionMapsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations service connection policies list projects](ProjectLocationServiceConnectionPolicyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServiceConnectionPoliciesResponse {
@@ -1089,6 +1224,7 @@ impl client::ResponseResult for ListServiceConnectionPoliciesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations service connection tokens list projects](ProjectLocationServiceConnectionTokenListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServiceConnectionTokensResponse {
@@ -1116,6 +1252,7 @@ impl client::ResponseResult for ListServiceConnectionTokensResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations spokes list projects](ProjectLocationSpokeListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListSpokesResponse {
@@ -1142,6 +1279,7 @@ impl client::ResponseResult for ListSpokesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations get projects](ProjectLocationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
@@ -1167,10 +1305,83 @@ pub struct Location {
 impl client::ResponseResult for Location {}
 
 
+/// A route next hop that leads to an interconnect attachment resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NextHopInterconnectAttachment {
+    /// Indicates whether site-to-site data transfer is allowed for this interconnect attachment resource. Data transfer is available only in [supported locations](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/locations).
+    #[serde(rename="siteToSiteDataTransfer")]
+    
+    pub site_to_site_data_transfer: Option<bool>,
+    /// The URI of the interconnect attachment resource.
+    
+    pub uri: Option<String>,
+    /// The VPC network where this interconnect attachment is located.
+    #[serde(rename="vpcNetwork")]
+    
+    pub vpc_network: Option<String>,
+}
+
+impl client::Part for NextHopInterconnectAttachment {}
+
+
+/// A route next hop that leads to a Router appliance instance.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NextHopRouterApplianceInstance {
+    /// Indicates whether site-to-site data transfer is allowed for this Router appliance instance resource. Data transfer is available only in [supported locations](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/locations).
+    #[serde(rename="siteToSiteDataTransfer")]
+    
+    pub site_to_site_data_transfer: Option<bool>,
+    /// The URI of the Router appliance instance.
+    
+    pub uri: Option<String>,
+    /// The VPC network where this VM is located.
+    #[serde(rename="vpcNetwork")]
+    
+    pub vpc_network: Option<String>,
+}
+
+impl client::Part for NextHopRouterApplianceInstance {}
+
+
+/// A route next hop that leads to a VPN tunnel resource.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NextHopVPNTunnel {
+    /// Indicates whether site-to-site data transfer is allowed for this VPN tunnel resource. Data transfer is available only in [supported locations](https://cloud.google.com/network-connectivity/docs/network-connectivity-center/concepts/locations).
+    #[serde(rename="siteToSiteDataTransfer")]
+    
+    pub site_to_site_data_transfer: Option<bool>,
+    /// The URI of the VPN tunnel resource.
+    
+    pub uri: Option<String>,
+    /// The VPC network where this VPN tunnel is located.
+    #[serde(rename="vpcNetwork")]
+    
+    pub vpc_network: Option<String>,
+}
+
+impl client::Part for NextHopVPNTunnel {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NextHopVpcNetwork {
@@ -1203,6 +1414,7 @@ impl client::Part for NextHopVpcNetwork {}
 /// * [locations service connection policies set iam policy projects](ProjectLocationServiceConnectionPolicySetIamPolicyCall) (response)
 /// * [locations spokes get iam policy projects](ProjectLocationSpokeGetIamPolicyCall) (response)
 /// * [locations spokes set iam policy projects](ProjectLocationSpokeSetIamPolicyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
@@ -1225,7 +1437,7 @@ pub struct Policy {
 impl client::ResponseResult for Policy {}
 
 
-/// Policy-based routes route L4 network traffic based on not just destination IP address, but also source IP address, protocol, and more. If a policy-based route conflicts with other types of routes, the policy-based route always take precedence.
+/// Policy-based routes route L4 network traffic based on not just destination IP address, but also source IP address, protocol, and more. If a policy-based route conflicts with other types of routes, the policy-based route always takes precedence.
 /// 
 /// # Activities
 /// 
@@ -1234,6 +1446,7 @@ impl client::ResponseResult for Policy {}
 /// 
 /// * [locations global policy based routes create projects](ProjectLocationGlobalPolicyBasedRouteCreateCall) (request)
 /// * [locations global policy based routes get projects](ProjectLocationGlobalPolicyBasedRouteGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolicyBasedRoute {
@@ -1282,7 +1495,7 @@ pub struct PolicyBasedRoute {
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Optional. VM instances to which this policy-based route applies to.
+    /// Optional. VM instances that this policy-based route applies to.
     #[serde(rename="virtualMachine")]
     
     pub virtual_machine: Option<VirtualMachine>,
@@ -1299,6 +1512,7 @@ impl client::ResponseResult for PolicyBasedRoute {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProducerPscConfig {
@@ -1315,13 +1529,22 @@ impl client::Part for ProducerPscConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PscConfig {
+    /// Optional. List of Projects, Folders, or Organizations from where the Producer instance can be within. For example, a network administrator can provide both 'organizations/foo' and 'projects/bar' as allowed_google_producers_resource_hierarchy_levels. This allowlists this network to connect with any Producer instance within the 'foo' organization or the 'bar' project. By default, allowed_google_producers_resource_hierarchy_level is empty. The format for each allowed_google_producers_resource_hierarchy_level is / where is one of 'projects', 'folders', or 'organizations' and is either the ID or the number of the resource type. Format for each allowed_google_producers_resource_hierarchy_level value: 'projects/' or 'folders/' or 'organizations/' Eg. [projects/my-project-id, projects/567, folders/891, organizations/123]
+    #[serde(rename="allowedGoogleProducersResourceHierarchyLevel")]
+    
+    pub allowed_google_producers_resource_hierarchy_level: Option<Vec<String>>,
     /// Optional. Max number of PSC connections for this policy.
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub limit: Option<i64>,
+    /// Required. ProducerInstanceLocation is used to specify which authorization mechanism to use to determine which projects the Producer instance can be within.
+    #[serde(rename="producerInstanceLocation")]
+    
+    pub producer_instance_location: Option<String>,
     /// The resource paths of subnetworks to use for IP address management. Example: projects/{projectNumOrId}/regions/{region}/subnetworks/{resourceId}.
     
     pub subnetworks: Option<Vec<String>>,
@@ -1334,6 +1557,7 @@ impl client::Part for PscConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PscConnection {
@@ -1364,6 +1588,10 @@ pub struct PscConnection {
     #[serde(rename="gceOperation")]
     
     pub gce_operation: Option<String>,
+    /// Immutable. An immutable identifier for the producer instance.
+    #[serde(rename="producerInstanceId")]
+    
+    pub producer_instance_id: Option<String>,
     /// The PSC connection id of the PSC forwarding rule.
     #[serde(rename="pscConnectionId")]
     
@@ -1380,6 +1608,67 @@ pub struct PscConnection {
 impl client::Part for PscConnection {}
 
 
+/// The RegionalEndpoint resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations regional endpoints create projects](ProjectLocationRegionalEndpointCreateCall) (request)
+/// * [locations regional endpoints get projects](ProjectLocationRegionalEndpointGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RegionalEndpoint {
+    /// Required. The access type of this regional endpoint. This field is reflected in the PSC Forwarding Rule configuration to enable global access.
+    #[serde(rename="accessType")]
+    
+    pub access_type: Option<String>,
+    /// Optional. The IP Address of the Regional Endpoint. When no address is provided, an IP from the subnetwork is allocated. Use one of the following formats: * IPv4 address as in `10.0.0.1` * Address resource URI as in `projects/{project}/regions/{region}/addresses/{address_name}`
+    
+    pub address: Option<String>,
+    /// Output only. Time when the RegionalEndpoint was created.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. A description of this resource.
+    
+    pub description: Option<String>,
+    /// Output only. The literal IP address of the PSC Forwarding Rule created on behalf of the customer. This field is deprecated. Use address instead.
+    #[serde(rename="ipAddress")]
+    
+    pub ip_address: Option<String>,
+    /// User-defined labels.
+    
+    pub labels: Option<HashMap<String, String>>,
+    /// Output only. The name of a RegionalEndpoint. Format: `projects/{project}/locations/{location}/regionalEndpoints/{regional_endpoint}`.
+    
+    pub name: Option<String>,
+    /// The name of the VPC network for this private regional endpoint. Format: `projects/{project}/global/networks/{network}`
+    
+    pub network: Option<String>,
+    /// Output only. The resource reference of the PSC Forwarding Rule created on behalf of the customer. Format: `//compute.googleapis.com/projects/{project}/regions/{region}/forwardingRules/{forwarding_rule_name}`
+    #[serde(rename="pscForwardingRule")]
+    
+    pub psc_forwarding_rule: Option<String>,
+    /// The name of the subnetwork from which the IP address will be allocated. Format: `projects/{project}/regions/{region}/subnetworks/{subnetwork}`
+    
+    pub subnetwork: Option<String>,
+    /// Required. The service endpoint this private regional endpoint connects to. Format: `{apiname}.{region}.p.rep.googleapis.com` Example: "cloudkms.us-central1.p.rep.googleapis.com".
+    #[serde(rename="targetGoogleApi")]
+    
+    pub target_google_api: Option<String>,
+    /// Output only. Time when the RegionalEndpoint was updated.
+    #[serde(rename="updateTime")]
+    
+    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::RequestValue for RegionalEndpoint {}
+impl client::ResponseResult for RegionalEndpoint {}
+
+
 /// The request for HubService.RejectHubSpoke.
 /// 
 /// # Activities
@@ -1388,6 +1677,7 @@ impl client::Part for PscConnection {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs reject spoke projects](ProjectLocationGlobalHubRejectSpokeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RejectHubSpokeRequest {
@@ -1415,6 +1705,7 @@ impl client::RequestValue for RejectHubSpokeRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs route tables routes get projects](ProjectLocationGlobalHubRouteTableRouteGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Route {
@@ -1432,16 +1723,32 @@ pub struct Route {
     /// Optional labels in key-value pair format. For more information about labels, see [Requirements for labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels#requirements).
     
     pub labels: Option<HashMap<String, String>>,
-    /// Output only. The location of the route. Uses the following form: "projects/{project}/locations/{location}" Example: projects/1234/locations/us-central1
+    /// Output only. The origin location of the route. Uses the following form: "projects/{project}/locations/{location}" Example: projects/1234/locations/us-central1
     
     pub location: Option<String>,
     /// Immutable. The name of the route. Route names must be unique. Route names use the following form: `projects/{project_number}/locations/global/hubs/{hub}/routeTables/{route_table_id}/routes/{route_id}`
     
     pub name: Option<String>,
+    /// Immutable. The next-hop VLAN attachment for packets on this route.
+    #[serde(rename="nextHopInterconnectAttachment")]
+    
+    pub next_hop_interconnect_attachment: Option<NextHopInterconnectAttachment>,
+    /// Immutable. The next-hop Router appliance instance for packets on this route.
+    #[serde(rename="nextHopRouterApplianceInstance")]
+    
+    pub next_hop_router_appliance_instance: Option<NextHopRouterApplianceInstance>,
     /// Immutable. The destination VPC network for packets on this route.
     #[serde(rename="nextHopVpcNetwork")]
     
     pub next_hop_vpc_network: Option<NextHopVpcNetwork>,
+    /// Immutable. The next-hop VPN tunnel for packets on this route.
+    #[serde(rename="nextHopVpnTunnel")]
+    
+    pub next_hop_vpn_tunnel: Option<NextHopVPNTunnel>,
+    /// Output only. The priority of this route. Priority is used to break ties in cases where a destination matches more than one route. In these cases the route with the lowest-numbered priority value wins.
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub priority: Option<i64>,
     /// Immutable. The spoke that this route leads to. Example: projects/12345/locations/global/spokes/SPOKE
     
     pub spoke: Option<String>,
@@ -1472,6 +1779,7 @@ impl client::ResponseResult for Route {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations global hubs route tables get projects](ProjectLocationGlobalHubRouteTableGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RouteTable {
@@ -1507,6 +1815,7 @@ impl client::ResponseResult for RouteTable {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RouterApplianceInstance {
@@ -1527,6 +1836,7 @@ impl client::Part for RouterApplianceInstance {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RoutingVPC {
@@ -1551,6 +1861,7 @@ impl client::Part for RoutingVPC {}
 /// 
 /// * [locations service classes get projects](ProjectLocationServiceClassGetCall) (response)
 /// * [locations service classes patch projects](ProjectLocationServiceClassPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceClass {
@@ -1594,6 +1905,7 @@ impl client::ResponseResult for ServiceClass {}
 /// * [locations service connection maps create projects](ProjectLocationServiceConnectionMapCreateCall) (request)
 /// * [locations service connection maps get projects](ProjectLocationServiceConnectionMapGetCall) (response)
 /// * [locations service connection maps patch projects](ProjectLocationServiceConnectionMapPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceConnectionMap {
@@ -1659,6 +1971,7 @@ impl client::ResponseResult for ServiceConnectionMap {}
 /// * [locations service connection policies create projects](ProjectLocationServiceConnectionPolicyCreateCall) (request)
 /// * [locations service connection policies get projects](ProjectLocationServiceConnectionPolicyGetCall) (response)
 /// * [locations service connection policies patch projects](ProjectLocationServiceConnectionPolicyPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceConnectionPolicy {
@@ -1715,6 +2028,7 @@ impl client::ResponseResult for ServiceConnectionPolicy {}
 /// 
 /// * [locations service connection tokens create projects](ProjectLocationServiceConnectionTokenCreateCall) (request)
 /// * [locations service connection tokens get projects](ProjectLocationServiceConnectionTokenGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceConnectionToken {
@@ -1768,6 +2082,7 @@ impl client::ResponseResult for ServiceConnectionToken {}
 /// * [locations service connection maps set iam policy projects](ProjectLocationServiceConnectionMapSetIamPolicyCall) (request)
 /// * [locations service connection policies set iam policy projects](ProjectLocationServiceConnectionPolicySetIamPolicyCall) (request)
 /// * [locations spokes set iam policy projects](ProjectLocationSpokeSetIamPolicyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
@@ -1793,6 +2108,7 @@ impl client::RequestValue for SetIamPolicyRequest {}
 /// * [locations spokes create projects](ProjectLocationSpokeCreateCall) (request)
 /// * [locations spokes get projects](ProjectLocationSpokeGetCall) (response)
 /// * [locations spokes patch projects](ProjectLocationSpokePatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Spoke {
@@ -1859,6 +2175,7 @@ impl client::ResponseResult for Spoke {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpokeStateCount {
@@ -1878,6 +2195,7 @@ impl client::Part for SpokeStateCount {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpokeStateReasonCount {
@@ -1898,6 +2216,7 @@ impl client::Part for SpokeStateReasonCount {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpokeSummary {
@@ -1922,6 +2241,7 @@ impl client::Part for SpokeSummary {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpokeTypeCount {
@@ -1942,6 +2262,7 @@ impl client::Part for SpokeTypeCount {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StateReason {
@@ -1974,6 +2295,7 @@ impl client::Part for StateReason {}
 /// * [locations service connection maps test iam permissions projects](ProjectLocationServiceConnectionMapTestIamPermissionCall) (request)
 /// * [locations service connection policies test iam permissions projects](ProjectLocationServiceConnectionPolicyTestIamPermissionCall) (request)
 /// * [locations spokes test iam permissions projects](ProjectLocationSpokeTestIamPermissionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
@@ -1999,6 +2321,7 @@ impl client::RequestValue for TestIamPermissionsRequest {}
 /// * [locations service connection maps test iam permissions projects](ProjectLocationServiceConnectionMapTestIamPermissionCall) (response)
 /// * [locations service connection policies test iam permissions projects](ProjectLocationServiceConnectionPolicyTestIamPermissionCall) (response)
 /// * [locations spokes test iam permissions projects](ProjectLocationSpokeTestIamPermissionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
@@ -2010,14 +2333,15 @@ pub struct TestIamPermissionsResponse {
 impl client::ResponseResult for TestIamPermissionsResponse {}
 
 
-/// VM instances to which this policy-based route applies to.
+/// VM instances that this policy-based route applies to.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VirtualMachine {
-    /// Optional. A list of VM instance tags the this policy-based route applies to. VM instances that have ANY of tags specified here will install this PBR.
+    /// Optional. A list of VM instance tags that this policy-based route applies to. VM instances that have ANY of tags specified here installs this PBR.
     
     pub tags: Option<Vec<String>>,
 }
@@ -2029,6 +2353,7 @@ impl client::Part for VirtualMachine {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Warnings {
@@ -2073,9 +2398,9 @@ impl client::Part for Warnings {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_get(...)`, `locations_global_hubs_accept_spoke(...)`, `locations_global_hubs_create(...)`, `locations_global_hubs_delete(...)`, `locations_global_hubs_get(...)`, `locations_global_hubs_get_iam_policy(...)`, `locations_global_hubs_groups_get(...)`, `locations_global_hubs_groups_get_iam_policy(...)`, `locations_global_hubs_groups_list(...)`, `locations_global_hubs_groups_set_iam_policy(...)`, `locations_global_hubs_groups_test_iam_permissions(...)`, `locations_global_hubs_list(...)`, `locations_global_hubs_list_spokes(...)`, `locations_global_hubs_patch(...)`, `locations_global_hubs_reject_spoke(...)`, `locations_global_hubs_route_tables_get(...)`, `locations_global_hubs_route_tables_list(...)`, `locations_global_hubs_route_tables_routes_get(...)`, `locations_global_hubs_route_tables_routes_list(...)`, `locations_global_hubs_set_iam_policy(...)`, `locations_global_hubs_test_iam_permissions(...)`, `locations_global_policy_based_routes_create(...)`, `locations_global_policy_based_routes_delete(...)`, `locations_global_policy_based_routes_get(...)`, `locations_global_policy_based_routes_get_iam_policy(...)`, `locations_global_policy_based_routes_list(...)`, `locations_global_policy_based_routes_set_iam_policy(...)`, `locations_global_policy_based_routes_test_iam_permissions(...)`, `locations_internal_ranges_create(...)`, `locations_internal_ranges_delete(...)`, `locations_internal_ranges_get(...)`, `locations_internal_ranges_list(...)`, `locations_internal_ranges_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_service_classes_delete(...)`, `locations_service_classes_get(...)`, `locations_service_classes_get_iam_policy(...)`, `locations_service_classes_list(...)`, `locations_service_classes_patch(...)`, `locations_service_classes_set_iam_policy(...)`, `locations_service_classes_test_iam_permissions(...)`, `locations_service_connection_maps_create(...)`, `locations_service_connection_maps_delete(...)`, `locations_service_connection_maps_get(...)`, `locations_service_connection_maps_get_iam_policy(...)`, `locations_service_connection_maps_list(...)`, `locations_service_connection_maps_patch(...)`, `locations_service_connection_maps_set_iam_policy(...)`, `locations_service_connection_maps_test_iam_permissions(...)`, `locations_service_connection_policies_create(...)`, `locations_service_connection_policies_delete(...)`, `locations_service_connection_policies_get(...)`, `locations_service_connection_policies_get_iam_policy(...)`, `locations_service_connection_policies_list(...)`, `locations_service_connection_policies_patch(...)`, `locations_service_connection_policies_set_iam_policy(...)`, `locations_service_connection_policies_test_iam_permissions(...)`, `locations_service_connection_tokens_create(...)`, `locations_service_connection_tokens_delete(...)`, `locations_service_connection_tokens_get(...)`, `locations_service_connection_tokens_list(...)`, `locations_spokes_create(...)`, `locations_spokes_delete(...)`, `locations_spokes_get(...)`, `locations_spokes_get_iam_policy(...)`, `locations_spokes_list(...)`, `locations_spokes_patch(...)`, `locations_spokes_set_iam_policy(...)` and `locations_spokes_test_iam_permissions(...)`
+/// // like `locations_get(...)`, `locations_global_hubs_accept_spoke(...)`, `locations_global_hubs_create(...)`, `locations_global_hubs_delete(...)`, `locations_global_hubs_get(...)`, `locations_global_hubs_get_iam_policy(...)`, `locations_global_hubs_groups_get(...)`, `locations_global_hubs_groups_get_iam_policy(...)`, `locations_global_hubs_groups_list(...)`, `locations_global_hubs_groups_patch(...)`, `locations_global_hubs_groups_set_iam_policy(...)`, `locations_global_hubs_groups_test_iam_permissions(...)`, `locations_global_hubs_list(...)`, `locations_global_hubs_list_spokes(...)`, `locations_global_hubs_patch(...)`, `locations_global_hubs_reject_spoke(...)`, `locations_global_hubs_route_tables_get(...)`, `locations_global_hubs_route_tables_list(...)`, `locations_global_hubs_route_tables_routes_get(...)`, `locations_global_hubs_route_tables_routes_list(...)`, `locations_global_hubs_set_iam_policy(...)`, `locations_global_hubs_test_iam_permissions(...)`, `locations_global_policy_based_routes_create(...)`, `locations_global_policy_based_routes_delete(...)`, `locations_global_policy_based_routes_get(...)`, `locations_global_policy_based_routes_get_iam_policy(...)`, `locations_global_policy_based_routes_list(...)`, `locations_global_policy_based_routes_set_iam_policy(...)`, `locations_global_policy_based_routes_test_iam_permissions(...)`, `locations_internal_ranges_create(...)`, `locations_internal_ranges_delete(...)`, `locations_internal_ranges_get(...)`, `locations_internal_ranges_list(...)`, `locations_internal_ranges_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_regional_endpoints_create(...)`, `locations_regional_endpoints_delete(...)`, `locations_regional_endpoints_get(...)`, `locations_regional_endpoints_list(...)`, `locations_service_classes_delete(...)`, `locations_service_classes_get(...)`, `locations_service_classes_get_iam_policy(...)`, `locations_service_classes_list(...)`, `locations_service_classes_patch(...)`, `locations_service_classes_set_iam_policy(...)`, `locations_service_classes_test_iam_permissions(...)`, `locations_service_connection_maps_create(...)`, `locations_service_connection_maps_delete(...)`, `locations_service_connection_maps_get(...)`, `locations_service_connection_maps_get_iam_policy(...)`, `locations_service_connection_maps_list(...)`, `locations_service_connection_maps_patch(...)`, `locations_service_connection_maps_set_iam_policy(...)`, `locations_service_connection_maps_test_iam_permissions(...)`, `locations_service_connection_policies_create(...)`, `locations_service_connection_policies_delete(...)`, `locations_service_connection_policies_get(...)`, `locations_service_connection_policies_get_iam_policy(...)`, `locations_service_connection_policies_list(...)`, `locations_service_connection_policies_patch(...)`, `locations_service_connection_policies_set_iam_policy(...)`, `locations_service_connection_policies_test_iam_permissions(...)`, `locations_service_connection_tokens_create(...)`, `locations_service_connection_tokens_delete(...)`, `locations_service_connection_tokens_get(...)`, `locations_service_connection_tokens_list(...)`, `locations_spokes_create(...)`, `locations_spokes_delete(...)`, `locations_spokes_get(...)`, `locations_spokes_get_iam_policy(...)`, `locations_spokes_list(...)`, `locations_spokes_patch(...)`, `locations_spokes_set_iam_policy(...)` and `locations_spokes_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2140,6 +2465,27 @@ impl<'a, S> ProjectMethods<'a, S> {
             _page_size: Default::default(),
             _order_by: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the parameters of a Network Connectivity Center group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Immutable. The name of the group. Group names must be unique. They use the following form: `projects/{project_number}/locations/global/hubs/{hub}/groups/{group_id}`
+    pub fn locations_global_hubs_groups_patch(&self, request: Group, name: &str) -> ProjectLocationGlobalHubGroupPatchCall<'a, S> {
+        ProjectLocationGlobalHubGroupPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _request_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2772,6 +3118,83 @@ impl<'a, S> ProjectMethods<'a, S> {
             _name: name.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new RegionalEndpoint in a given project and location.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource's name of the RegionalEndpoint.
+    pub fn locations_regional_endpoints_create(&self, request: RegionalEndpoint, parent: &str) -> ProjectLocationRegionalEndpointCreateCall<'a, S> {
+        ProjectLocationRegionalEndpointCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _request_id: Default::default(),
+            _regional_endpoint_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a single RegionalEndpoint.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the RegionalEndpoint to delete.
+    pub fn locations_regional_endpoints_delete(&self, name: &str) -> ProjectLocationRegionalEndpointDeleteCall<'a, S> {
+        ProjectLocationRegionalEndpointDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _request_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets details of a single RegionalEndpoint.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Name of the RegionalEndpoint resource to get. Format: `projects/{project}/locations/{location}/regionalEndpoints/{regional_endpoint}`
+    pub fn locations_regional_endpoints_get(&self, name: &str) -> ProjectLocationRegionalEndpointGetCall<'a, S> {
+        ProjectLocationRegionalEndpointGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists RegionalEndpoints in a given project and location.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent resource's name of the RegionalEndpoint.
+    pub fn locations_regional_endpoints_list(&self, parent: &str) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        ProjectLocationRegionalEndpointListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
             _filter: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -3523,7 +3946,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3621,6 +4044,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3785,12 +4209,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_groups_get_iam_policy("resource")
-///              .options_requested_policy_version(-20)
+///              .options_requested_policy_version(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3888,6 +4312,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4059,15 +4484,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_groups_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-51)
-///              .order_by("gubergren")
-///              .filter("eos")
+///              .page_token("amet.")
+///              .page_size(-20)
+///              .order_by("ipsum")
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4177,6 +4602,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4347,6 +4773,322 @@ where
 }
 
 
+/// Updates the parameters of a Network Connectivity Center group.
+///
+/// A builder for the *locations.global.hubs.groups.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkconnectivity1 as networkconnectivity1;
+/// use networkconnectivity1::api::Group;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use networkconnectivity1::{Networkconnectivity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Group::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_global_hubs_groups_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("gubergren")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGlobalHubGroupPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Networkconnectivity<S>,
+    _request: Group,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGlobalHubGroupPatchCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGlobalHubGroupPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "networkconnectivity.projects.locations.global.hubs.groups.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Group) -> ProjectLocationGlobalHubGroupPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Immutable. The name of the group. Group names must be unique. They use the following form: `projects/{project_number}/locations/global/hubs/{hub}/groups/{group_id}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGlobalHubGroupPatchCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. In the case of an update to an existing group, field mask is used to specify the fields to be overwritten. The fields specified in the update_mask are relative to the resource, not the full request. A field is overwritten if it is in the mask. If the user does not provide a mask, then all fields are overwritten.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationGlobalHubGroupPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server knows to ignore the request if it has already been completed. The server guarantees that a request doesn't result in creation of duplicate commitments for at least 60 minutes. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check to see whether the original operation was received. If it was, the server ignores the second request. This behavior prevents clients from mistakenly creating duplicate commitments. The request ID must be a valid UUID, with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationGlobalHubGroupPatchCall<'a, S> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGlobalHubGroupPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGlobalHubGroupPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGlobalHubGroupPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGlobalHubGroupPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGlobalHubGroupPatchCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors.
 ///
 /// A builder for the *locations.global.hubs.groups.setIamPolicy* method supported by a *project* resource.
@@ -4370,7 +5112,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4662,7 +5404,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4953,7 +5695,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5051,6 +5793,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5215,15 +5958,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_route_tables_routes_list("parent")
-///              .page_token("amet")
-///              .page_size(-20)
-///              .order_by("ipsum")
-///              .filter("sed")
+///              .page_token("invidunt")
+///              .page_size(-47)
+///              .order_by("duo")
+///              .filter("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5333,6 +6076,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5525,7 +6269,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5623,6 +6367,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5787,14 +6532,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_route_tables_list("parent")
-///              .page_token("rebum.")
-///              .page_size(-57)
-///              .order_by("ipsum")
+///              .page_token("gubergren")
+///              .page_size(-16)
+///              .order_by("est")
 ///              .filter("ipsum")
 ///              .doit().await;
 /// # }
@@ -5905,6 +6650,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6098,7 +6844,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6390,7 +7136,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6400,8 +7146,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_create(req, "parent")
-///              .request_id("ea")
-///              .hub_id("dolor")
+///              .request_id("gubergren")
+///              .hub_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6705,12 +7451,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_delete("name")
-///              .request_id("eos")
+///              .request_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6808,6 +7554,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6979,7 +7726,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7077,6 +7824,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7241,12 +7989,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_get_iam_policy("resource")
-///              .options_requested_policy_version(-70)
+///              .options_requested_policy_version(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7344,6 +8092,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7515,15 +8264,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_list("parent")
-///              .page_token("no")
-///              .page_size(-15)
-///              .order_by("kasd")
-///              .filter("et")
+///              .page_token("sed")
+///              .page_size(-61)
+///              .order_by("Stet")
+///              .filter("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7633,6 +8382,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7825,17 +8575,17 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_list_spokes("name")
-///              .view("et")
+///              .view("sed")
 ///              .add_spoke_locations("et")
-///              .page_token("vero")
-///              .page_size(-31)
-///              .order_by("sed")
-///              .filter("duo")
+///              .page_token("et")
+///              .page_size(-76)
+///              .order_by("erat")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7955,6 +8705,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8163,7 +8914,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8173,8 +8924,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_hubs_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .request_id("et")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8479,7 +9230,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8771,7 +9522,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9063,7 +9814,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9355,7 +10106,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9365,8 +10116,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_policy_based_routes_create(req, "parent")
-///              .request_id("dolor")
-///              .policy_based_route_id("et")
+///              .request_id("diam")
+///              .policy_based_route_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9558,7 +10309,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server knows to ignore the request if it has already been completed. The server guarantees that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationGlobalPolicyBasedRouteCreateCall<'a, S> {
@@ -9670,12 +10421,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_policy_based_routes_delete("name")
-///              .request_id("sadipscing")
+///              .request_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9773,6 +10524,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9839,7 +10591,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server knows to ignore the request if it has already been completed. The server guarantees that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
     pub fn request_id(mut self, new_value: &str) -> ProjectLocationGlobalPolicyBasedRouteDeleteCall<'a, S> {
@@ -9944,7 +10696,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10042,6 +10794,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10206,12 +10959,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_policy_based_routes_get_iam_policy("resource")
-///              .options_requested_policy_version(-20)
+///              .options_requested_policy_version(-99)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10309,6 +11062,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10480,15 +11234,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_global_policy_based_routes_list("parent")
 ///              .page_token("vero")
-///              .page_size(-88)
-///              .order_by("Stet")
-///              .filter("vero")
+///              .page_size(-76)
+///              .order_by("invidunt")
+///              .filter("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10598,6 +11352,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10791,7 +11546,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11083,7 +11838,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11375,7 +12130,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11385,8 +12140,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_internal_ranges_create(req, "parent")
-///              .request_id("no")
-///              .internal_range_id("ipsum")
+///              .request_id("diam")
+///              .internal_range_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11690,12 +12445,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_internal_ranges_delete("name")
-///              .request_id("takimata")
+///              .request_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11793,6 +12548,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11964,7 +12720,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12062,6 +12818,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12226,15 +12983,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_internal_ranges_list("parent")
-///              .page_token("et")
-///              .page_size(-31)
-///              .order_by("consetetur")
-///              .filter("amet.")
+///              .page_token("voluptua.")
+///              .page_size(-72)
+///              .order_by("erat")
+///              .filter("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12344,6 +13101,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12537,7 +13295,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12547,8 +13305,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_internal_ranges_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .request_id("takimata")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12853,7 +13611,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13144,7 +13902,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13242,6 +14000,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13406,7 +14165,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13504,6 +14263,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13668,13 +14428,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("voluptua.")
-///              .page_size(-34)
+///              .page_token("accusam")
+///              .page_size(-78)
 ///              .filter("dolore")
 ///              .doit().await;
 /// # }
@@ -13781,6 +14541,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13944,6 +14705,1171 @@ where
 }
 
 
+/// Creates a new RegionalEndpoint in a given project and location.
+///
+/// A builder for the *locations.regionalEndpoints.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkconnectivity1 as networkconnectivity1;
+/// use networkconnectivity1::api::RegionalEndpoint;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use networkconnectivity1::{Networkconnectivity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = RegionalEndpoint::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_regional_endpoints_create(req, "parent")
+///              .request_id("dolore")
+///              .regional_endpoint_id("voluptua.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRegionalEndpointCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Networkconnectivity<S>,
+    _request: RegionalEndpoint,
+    _parent: String,
+    _request_id: Option<String>,
+    _regional_endpoint_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRegionalEndpointCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRegionalEndpointCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "networkconnectivity.projects.locations.regionalEndpoints.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "requestId", "regionalEndpointId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+        if let Some(value) = self._regional_endpoint_id.as_ref() {
+            params.push("regionalEndpointId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/regionalEndpoints";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: RegionalEndpoint) -> ProjectLocationRegionalEndpointCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource's name of the RegionalEndpoint.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegionalEndpointCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server knows to ignore the request if it has already been completed. The server guarantees that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if the original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationRegionalEndpointCreateCall<'a, S> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// Required. Unique id of the Regional Endpoint to be created.
+    ///
+    /// Sets the *regional endpoint id* query property to the given value.
+    pub fn regional_endpoint_id(mut self, new_value: &str) -> ProjectLocationRegionalEndpointCreateCall<'a, S> {
+        self._regional_endpoint_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegionalEndpointCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegionalEndpointCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRegionalEndpointCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRegionalEndpointCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRegionalEndpointCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes a single RegionalEndpoint.
+///
+/// A builder for the *locations.regionalEndpoints.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkconnectivity1 as networkconnectivity1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use networkconnectivity1::{Networkconnectivity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_regional_endpoints_delete("name")
+///              .request_id("ea")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRegionalEndpointDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Networkconnectivity<S>,
+    _name: String,
+    _request_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRegionalEndpointDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRegionalEndpointDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "networkconnectivity.projects.locations.regionalEndpoints.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name", "requestId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._request_id.as_ref() {
+            params.push("requestId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the RegionalEndpoint to delete.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegionalEndpointDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server knows to ignore the request if it has already been completed. The server guarantees that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if the original operation with the same request ID was received, and if so, ignores the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
+    ///
+    /// Sets the *request id* query property to the given value.
+    pub fn request_id(mut self, new_value: &str) -> ProjectLocationRegionalEndpointDeleteCall<'a, S> {
+        self._request_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegionalEndpointDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegionalEndpointDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRegionalEndpointDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRegionalEndpointDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRegionalEndpointDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets details of a single RegionalEndpoint.
+///
+/// A builder for the *locations.regionalEndpoints.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkconnectivity1 as networkconnectivity1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use networkconnectivity1::{Networkconnectivity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_regional_endpoints_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRegionalEndpointGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Networkconnectivity<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRegionalEndpointGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRegionalEndpointGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RegionalEndpoint)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "networkconnectivity.projects.locations.regionalEndpoints.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Name of the RegionalEndpoint resource to get. Format: `projects/{project}/locations/{location}/regionalEndpoints/{regional_endpoint}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRegionalEndpointGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegionalEndpointGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegionalEndpointGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRegionalEndpointGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRegionalEndpointGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRegionalEndpointGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists RegionalEndpoints in a given project and location.
+///
+/// A builder for the *locations.regionalEndpoints.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_networkconnectivity1 as networkconnectivity1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use networkconnectivity1::{Networkconnectivity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_regional_endpoints_list("parent")
+///              .page_token("invidunt")
+///              .page_size(-11)
+///              .order_by("est")
+///              .filter("At")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRegionalEndpointListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Networkconnectivity<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRegionalEndpointListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRegionalEndpointListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListRegionalEndpointsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "networkconnectivity.projects.locations.regionalEndpoints.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/regionalEndpoints";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent resource's name of the RegionalEndpoint.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// A page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Requested page size. Server may return fewer items than requested. If unspecified, server will pick an appropriate default.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Sort the results by a certain order.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// A filter expression that filters the results listed in the response.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRegionalEndpointListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRegionalEndpointListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRegionalEndpointListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRegionalEndpointListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Deletes a single ServiceClass.
 ///
 /// A builder for the *locations.serviceClasses.delete* method supported by a *project* resource.
@@ -13966,13 +15892,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_classes_delete("name")
-///              .request_id("voluptua.")
-///              .etag("amet.")
+///              .request_id("sit")
+///              .etag("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14074,6 +16000,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14252,7 +16179,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14350,6 +16277,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14514,12 +16442,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_classes_get_iam_policy("resource")
-///              .options_requested_policy_version(-6)
+///              .options_requested_policy_version(-5)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14617,6 +16545,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14788,14 +16717,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_classes_list("parent")
-///              .page_token("no")
-///              .page_size(-7)
-///              .order_by("At")
+///              .page_token("sanctus")
+///              .page_size(-56)
+///              .order_by("est")
 ///              .filter("sed")
 ///              .doit().await;
 /// # }
@@ -14906,6 +16835,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15099,7 +17029,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15109,8 +17039,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_classes_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .request_id("et")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15415,7 +17345,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15707,7 +17637,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15999,7 +17929,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16009,8 +17939,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_maps_create(req, "parent")
-///              .service_connection_map_id("et")
-///              .request_id("sanctus")
+///              .service_connection_map_id("no")
+///              .request_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16314,13 +18244,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_maps_delete("name")
-///              .request_id("est")
-///              .etag("sed")
+///              .request_id("sed")
+///              .etag("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16422,6 +18352,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16600,7 +18531,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16698,6 +18629,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16862,12 +18794,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_maps_get_iam_policy("resource")
-///              .options_requested_policy_version(-69)
+///              .options_requested_policy_version(-45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16965,6 +18897,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17136,15 +19069,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_maps_list("parent")
-///              .page_token("sed")
-///              .page_size(-11)
-///              .order_by("et")
-///              .filter("elitr")
+///              .page_token("dolores")
+///              .page_size(-95)
+///              .order_by("erat")
+///              .filter("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17254,6 +19187,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17447,7 +19381,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17457,8 +19391,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_maps_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .request_id("no")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17763,7 +19697,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18055,7 +19989,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18347,7 +20281,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18357,8 +20291,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_policies_create(req, "parent")
-///              .service_connection_policy_id("aliquyam")
-///              .request_id("dolores")
+///              .service_connection_policy_id("consetetur")
+///              .request_id("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18662,13 +20596,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_policies_delete("name")
-///              .request_id("erat")
-///              .etag("aliquyam")
+///              .request_id("aliquyam")
+///              .etag("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18770,6 +20704,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18948,7 +20883,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19046,6 +20981,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19210,12 +21146,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_policies_get_iam_policy("resource")
-///              .options_requested_policy_version(-24)
+///              .options_requested_policy_version(-57)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19313,6 +21249,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19484,15 +21421,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_policies_list("parent")
-///              .page_token("consetetur")
-///              .page_size(-46)
-///              .order_by("Stet")
-///              .filter("est")
+///              .page_token("sed")
+///              .page_size(-75)
+///              .order_by("Lorem")
+///              .filter("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19602,6 +21539,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19795,7 +21733,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19805,8 +21743,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_policies_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .request_id("elitr")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20111,7 +22049,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20403,7 +22341,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20695,7 +22633,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20705,8 +22643,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_tokens_create(req, "parent")
-///              .service_connection_token_id("sit")
-///              .request_id("sed")
+///              .service_connection_token_id("et")
+///              .request_id("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21010,13 +22948,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_tokens_delete("name")
-///              .request_id("Lorem")
-///              .etag("ea")
+///              .request_id("eirmod")
+///              .etag("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21118,6 +23056,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21296,7 +23235,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21394,6 +23333,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21558,15 +23498,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_service_connection_tokens_list("parent")
-///              .page_token("eos")
-///              .page_size(-68)
-///              .order_by("sea")
-///              .filter("et")
+///              .page_token("erat")
+///              .page_size(-69)
+///              .order_by("erat")
+///              .filter("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21676,6 +23616,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21869,7 +23810,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21879,8 +23820,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_spokes_create(req, "parent")
-///              .spoke_id("dolore")
-///              .request_id("eirmod")
+///              .spoke_id("takimata")
+///              .request_id("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22184,12 +24125,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_spokes_delete("name")
-///              .request_id("accusam")
+///              .request_id("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22287,6 +24228,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22458,7 +24400,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22556,6 +24498,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22720,12 +24663,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_spokes_get_iam_policy("resource")
-///              .options_requested_policy_version(-69)
+///              .options_requested_policy_version(-48)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22823,6 +24766,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22994,15 +24938,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_spokes_list("parent")
-///              .page_token("accusam")
-///              .page_size(-10)
-///              .order_by("takimata")
-///              .filter("Lorem")
+///              .page_token("sea")
+///              .page_size(-41)
+///              .order_by("et")
+///              .filter("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23112,6 +25056,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -23305,7 +25250,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23315,8 +25260,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_spokes_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .request_id("At")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .request_id("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23621,7 +25566,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23913,7 +25858,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24204,7 +26149,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24302,6 +26247,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -24466,14 +26412,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("sea")
-///              .page_size(-41)
-///              .filter("et")
+///              .page_token("At")
+///              .page_size(-19)
+///              .filter("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24579,6 +26525,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await

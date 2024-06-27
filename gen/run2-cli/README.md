@@ -25,15 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20240225*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Run* API at revision *20240621*. The CLI is at version *5.0.5*.
 
 ```bash
 run2 [options]
         projects
+                locations-export-image <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-export-image-metadata <name> [-p <v>]... [-o <out>]
+                locations-export-metadata <name> [-p <v>]... [-o <out>]
                 locations-jobs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-jobs-delete <name> [-p <v>]... [-o <out>]
                 locations-jobs-executions-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-jobs-executions-delete <name> [-p <v>]... [-o <out>]
+                locations-jobs-executions-export-status <name> <operation-id> [-p <v>]... [-o <out>]
                 locations-jobs-executions-get <name> [-p <v>]... [-o <out>]
                 locations-jobs-executions-list <parent> [-p <v>]... [-o <out>]
                 locations-jobs-executions-tasks-get <name> [-p <v>]... [-o <out>]
@@ -56,6 +60,7 @@ run2 [options]
                 locations-services-list <parent> [-p <v>]... [-o <out>]
                 locations-services-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-services-revisions-delete <name> [-p <v>]... [-o <out>]
+                locations-services-revisions-export-status <name> <operation-id> [-p <v>]... [-o <out>]
                 locations-services-revisions-get <name> [-p <v>]... [-o <out>]
                 locations-services-revisions-list <parent> [-p <v>]... [-o <out>]
                 locations-services-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]

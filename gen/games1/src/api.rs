@@ -84,7 +84,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -129,12 +129,15 @@ impl<'a, S> Games<S> {
         Games {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://games.googleapis.com/".to_string(),
             _root_url: "https://games.googleapis.com/".to_string(),
         }
     }
 
+    pub fn accesstokens(&'a self) -> AccesstokenMethods<'a, S> {
+        AccesstokenMethods { hub: &self }
+    }
     pub fn achievement_definitions(&'a self) -> AchievementDefinitionMethods<'a, S> {
         AchievementDefinitionMethods { hub: &self }
     }
@@ -173,7 +176,7 @@ impl<'a, S> Games<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -209,6 +212,7 @@ impl<'a, S> Games<S> {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list achievement definitions](AchievementDefinitionListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementDefinition {
@@ -274,6 +278,7 @@ impl client::Resource for AchievementDefinition {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list achievement definitions](AchievementDefinitionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementDefinitionsListResponse {
@@ -300,6 +305,7 @@ impl client::ResponseResult for AchievementDefinitionsListResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [increment achievements](AchievementIncrementCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementIncrementResponse {
@@ -327,6 +333,7 @@ impl client::ResponseResult for AchievementIncrementResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [reveal achievements](AchievementRevealCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementRevealResponse {
@@ -350,6 +357,7 @@ impl client::ResponseResult for AchievementRevealResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [set steps at least achievements](AchievementSetStepsAtLeastCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementSetStepsAtLeastResponse {
@@ -377,6 +385,7 @@ impl client::ResponseResult for AchievementSetStepsAtLeastResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [unlock achievements](AchievementUnlockCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUnlockResponse {
@@ -400,6 +409,7 @@ impl client::ResponseResult for AchievementUnlockResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [update multiple achievements](AchievementUpdateMultipleCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUpdateMultipleRequest {
@@ -422,6 +432,7 @@ impl client::RequestValue for AchievementUpdateMultipleRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [update multiple achievements](AchievementUpdateMultipleCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUpdateMultipleResponse {
@@ -441,6 +452,7 @@ impl client::ResponseResult for AchievementUpdateMultipleResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUpdateRequest {
@@ -472,6 +484,7 @@ impl client::Part for AchievementUpdateRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AchievementUpdateResponse {
@@ -514,6 +527,7 @@ impl client::Part for AchievementUpdateResponse {}
 /// * [get end point applications](ApplicationGetEndPointCall) (none)
 /// * [played applications](ApplicationPlayedCall) (none)
 /// * [verify applications](ApplicationVerifyCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
@@ -570,6 +584,7 @@ impl client::ResponseResult for Application {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApplicationCategory {
@@ -591,6 +606,7 @@ impl client::Part for ApplicationCategory {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApplicationPlayerId {
@@ -615,6 +631,7 @@ impl client::Part for ApplicationPlayerId {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify applications](ApplicationVerifyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApplicationVerifyResponse {
@@ -636,6 +653,7 @@ impl client::ResponseResult for ApplicationVerifyResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Category {
@@ -663,6 +681,7 @@ impl client::Part for Category {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list categories by player metagame](MetagameListCategoriesByPlayerCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CategoryListResponse {
@@ -689,6 +708,7 @@ impl client::ResponseResult for CategoryListResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get end point applications](ApplicationGetEndPointCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EndPoint {
@@ -704,6 +724,7 @@ impl client::ResponseResult for EndPoint {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventBatchRecordFailure {
@@ -726,6 +747,7 @@ impl client::Part for EventBatchRecordFailure {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventChild {
@@ -745,6 +767,7 @@ impl client::Part for EventChild {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventDefinition {
@@ -789,6 +812,7 @@ impl client::Part for EventDefinition {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list definitions events](EventListDefinitionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventDefinitionListResponse {
@@ -811,6 +835,7 @@ impl client::ResponseResult for EventDefinitionListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventPeriodRange {
@@ -836,6 +861,7 @@ impl client::Part for EventPeriodRange {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventPeriodUpdate {
@@ -858,6 +884,7 @@ impl client::Part for EventPeriodUpdate {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventRecordFailure {
@@ -885,6 +912,7 @@ impl client::Part for EventRecordFailure {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [record events](EventRecordCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventRecordRequest {
@@ -914,6 +942,7 @@ impl client::RequestValue for EventRecordRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventUpdateRequest {
@@ -942,6 +971,7 @@ impl client::Part for EventUpdateRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [record events](EventRecordCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventUpdateResponse {
@@ -965,10 +995,31 @@ pub struct EventUpdateResponse {
 impl client::ResponseResult for EventUpdateResponse {}
 
 
+/// Recall tokens for a game.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GamePlayerToken {
+    /// The application that this player identifier is for.
+    #[serde(rename="applicationId")]
+    
+    pub application_id: Option<String>,
+    /// Recall token data.
+    
+    pub token: Option<Vec<RecallToken>>,
+}
+
+impl client::Part for GamePlayerToken {}
+
+
 /// The payload to request to increment an achievement.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GamesAchievementIncrement {
@@ -992,6 +1043,7 @@ impl client::Part for GamesAchievementIncrement {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GamesAchievementSetStepsAtLeast {
@@ -1006,6 +1058,46 @@ pub struct GamesAchievementSetStepsAtLeast {
 impl client::Part for GamesAchievementSetStepsAtLeast {}
 
 
+/// Response for the GeneratePlayGroupingApiToken RPC.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generate play grouping api token accesstokens](AccesstokenGeneratePlayGroupingApiTokenCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GeneratePlayGroupingApiTokenResponse {
+    /// Token for accessing the Play Grouping API.
+    
+    pub token: Option<PlayGroupingApiToken>,
+}
+
+impl client::ResponseResult for GeneratePlayGroupingApiTokenResponse {}
+
+
+/// Response for the GenerateRecallPlayGroupingApiToken RPC.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generate recall play grouping api token accesstokens](AccesstokenGenerateRecallPlayGroupingApiTokenCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GenerateRecallPlayGroupingApiTokenResponse {
+    /// Token for accessing the Play Grouping API.
+    
+    pub token: Option<PlayGroupingApiToken>,
+}
+
+impl client::ResponseResult for GenerateRecallPlayGroupingApiTokenResponse {}
+
+
 /// Response message for GetMultipleApplicationPlayerIds rpc.
 /// 
 /// # Activities
@@ -1014,6 +1106,7 @@ impl client::Part for GamesAchievementSetStepsAtLeast {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get multiple application player ids players](PlayerGetMultipleApplicationPlayerIdCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetMultipleApplicationPlayerIdsResponse {
@@ -1030,6 +1123,7 @@ impl client::ResponseResult for GetMultipleApplicationPlayerIdsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImageAsset {
@@ -1057,6 +1151,7 @@ impl client::Part for ImageAsset {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
@@ -1103,6 +1198,7 @@ impl client::Part for Instance {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceAndroidDetails {
@@ -1129,6 +1225,7 @@ impl client::Part for InstanceAndroidDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceIosDetails {
@@ -1168,6 +1265,7 @@ impl client::Part for InstanceIosDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceWebDetails {
@@ -1195,6 +1293,7 @@ impl client::Part for InstanceWebDetails {}
 /// 
 /// * [get leaderboards](LeaderboardGetCall) (response)
 /// * [list leaderboards](LeaderboardListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Leaderboard {
@@ -1228,6 +1327,7 @@ impl client::ResponseResult for Leaderboard {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardEntry {
@@ -1281,6 +1381,7 @@ impl client::Part for LeaderboardEntry {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list leaderboards](LeaderboardListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardListResponse {
@@ -1303,6 +1404,7 @@ impl client::ResponseResult for LeaderboardListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardScoreRank {
@@ -1340,6 +1442,7 @@ impl client::Part for LeaderboardScoreRank {}
 /// 
 /// * [list scores](ScoreListCall) (response)
 /// * [list window scores](ScoreListWindowCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LeaderboardScores {
@@ -1379,6 +1482,7 @@ impl client::ResponseResult for LeaderboardScores {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [link persona recall](RecallLinkPersonaCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkPersonaRequest {
@@ -1421,6 +1525,7 @@ impl client::RequestValue for LinkPersonaRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [link persona recall](RecallLinkPersonaCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LinkPersonaResponse {
@@ -1440,6 +1545,7 @@ impl client::ResponseResult for LinkPersonaResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get metagame config metagame](MetagameGetMetagameConfigCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetagameConfig {
@@ -1459,6 +1565,23 @@ pub struct MetagameConfig {
 impl client::ResponseResult for MetagameConfig {}
 
 
+/// Token data returned from GeneratePlayGroupingApiToken RPC.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PlayGroupingApiToken {
+    /// Value of the token.
+    #[serde(rename="tokenValue")]
+    
+    pub token_value: Option<String>,
+}
+
+impl client::Part for PlayGroupingApiToken {}
+
+
 /// A Player resource.
 /// 
 /// # Activities
@@ -1470,6 +1593,7 @@ impl client::ResponseResult for MetagameConfig {}
 /// * [get multiple application player ids players](PlayerGetMultipleApplicationPlayerIdCall) (none)
 /// * [get scoped player ids players](PlayerGetScopedPlayerIdCall) (none)
 /// * [list players](PlayerListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Player {
@@ -1532,6 +1656,7 @@ impl client::ResponseResult for Player {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerAchievement {
@@ -1576,6 +1701,7 @@ impl client::Part for PlayerAchievement {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list achievements](AchievementListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerAchievementListResponse {
@@ -1598,6 +1724,7 @@ impl client::ResponseResult for PlayerAchievementListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerEvent {
@@ -1634,6 +1761,7 @@ impl client::Part for PlayerEvent {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list by player events](EventListByPlayerCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerEventListResponse {
@@ -1656,6 +1784,7 @@ impl client::ResponseResult for PlayerEventListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerExperienceInfo {
@@ -1689,6 +1818,7 @@ impl client::Part for PlayerExperienceInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerLeaderboardScore {
@@ -1745,6 +1875,7 @@ impl client::Part for PlayerLeaderboardScore {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get scores](ScoreGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerLeaderboardScoreListResponse {
@@ -1770,6 +1901,7 @@ impl client::ResponseResult for PlayerLeaderboardScoreListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerLevel {
@@ -1802,6 +1934,7 @@ impl client::Part for PlayerLevel {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list players](PlayerListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerListResponse {
@@ -1824,6 +1957,7 @@ impl client::ResponseResult for PlayerListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScore {
@@ -1859,6 +1993,7 @@ impl client::Part for PlayerScore {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [submit multiple scores](ScoreSubmitMultipleCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScoreListResponse {
@@ -1882,6 +2017,7 @@ impl client::ResponseResult for PlayerScoreListResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [submit scores](ScoreSubmitCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScoreResponse {
@@ -1921,6 +2057,7 @@ impl client::ResponseResult for PlayerScoreResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [submit multiple scores](ScoreSubmitMultipleCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerScoreSubmissionList {
@@ -1939,6 +2076,7 @@ impl client::RequestValue for PlayerScoreSubmissionList {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProfileSettings {
@@ -1962,6 +2100,7 @@ impl client::Part for ProfileSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RecallToken {
@@ -1989,6 +2128,7 @@ impl client::Part for RecallToken {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [reset persona recall](RecallResetPersonaCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResetPersonaRequest {
@@ -2008,6 +2148,7 @@ impl client::RequestValue for ResetPersonaRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [reset persona recall](RecallResetPersonaCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResetPersonaResponse {
@@ -2019,6 +2160,47 @@ pub struct ResetPersonaResponse {
 impl client::ResponseResult for ResetPersonaResponse {}
 
 
+/// Recall token data returned from for the RetrieveDeveloperGamesLastPlayerToken RPC
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [last token from all developer games recall](RecallLastTokenFromAllDeveloperGameCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RetrieveDeveloperGamesLastPlayerTokenResponse {
+    /// The recall token associated with the requested PGS Player principal. It can be unset if there is no recall token associated with the requested principal.
+    
+    pub token: Option<RecallToken>,
+}
+
+impl client::ResponseResult for RetrieveDeveloperGamesLastPlayerTokenResponse {}
+
+
+/// A list of recall token data returned from the RetrieveGamesPlayerTokens RPC
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [games player tokens recall](RecallGamesPlayerTokenCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RetrieveGamesPlayerTokensResponse {
+    /// The requested applications along with the recall tokens for the player. If the player does not have recall tokens for an application, that application is not included in the response.
+    #[serde(rename="applicationRecallTokens")]
+    
+    pub application_recall_tokens: Option<Vec<GamePlayerToken>>,
+}
+
+impl client::ResponseResult for RetrieveGamesPlayerTokensResponse {}
+
+
 /// Response for the RetrievePlayerTokens RPC
 /// 
 /// # Activities
@@ -2027,6 +2209,7 @@ impl client::ResponseResult for ResetPersonaResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [retrieve tokens recall](RecallRetrieveTokenCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RetrievePlayerTokensResponse {
@@ -2046,6 +2229,7 @@ impl client::ResponseResult for RetrievePlayerTokensResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [check revisions](RevisionCheckCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RevisionCheckResponse {
@@ -2073,6 +2257,7 @@ impl client::ResponseResult for RevisionCheckResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get scoped player ids players](PlayerGetScopedPlayerIdCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ScopedPlayerIds {
@@ -2093,6 +2278,7 @@ impl client::ResponseResult for ScopedPlayerIds {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ScoreSubmission {
@@ -2128,6 +2314,7 @@ impl client::Part for ScoreSubmission {}
 /// 
 /// * [get snapshots](SnapshotGetCall) (response)
 /// * [list snapshots](SnapshotListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Snapshot {
@@ -2184,6 +2371,7 @@ impl client::ResponseResult for Snapshot {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SnapshotImage {
@@ -2215,6 +2403,7 @@ impl client::Part for SnapshotImage {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list snapshots](SnapshotListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SnapshotListResponse {
@@ -2241,6 +2430,7 @@ impl client::ResponseResult for SnapshotListResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get stats](StatGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StatsResponse {
@@ -2290,6 +2480,7 @@ impl client::ResponseResult for StatsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [unlink persona recall](RecallUnlinkPersonaCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnlinkPersonaRequest {
@@ -2316,6 +2507,7 @@ impl client::RequestValue for UnlinkPersonaRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [unlink persona recall](RecallUnlinkPersonaCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnlinkPersonaResponse {
@@ -2331,6 +2523,7 @@ impl client::ResponseResult for UnlinkPersonaResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlayerName {
@@ -2353,6 +2546,76 @@ impl client::Part for PlayerName {}
 // MethodBuilders ###
 // #################
 
+/// A builder providing access to all methods supported on *accesstoken* resources.
+/// It is not used directly, but through the [`Games`] hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_games1 as games1;
+/// 
+/// # async fn dox() {
+/// use std::default::Default;
+/// use games1::{Games, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `generate_play_grouping_api_token(...)` and `generate_recall_play_grouping_api_token(...)`
+/// // to build up your call.
+/// let rb = hub.accesstokens();
+/// # }
+/// ```
+pub struct AccesstokenMethods<'a, S>
+    where S: 'a {
+
+    hub: &'a Games<S>,
+}
+
+impl<'a, S> client::MethodsBuilder for AccesstokenMethods<'a, S> {}
+
+impl<'a, S> AccesstokenMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Generates a Play Grouping API token for the PGS user identified by the attached credential.
+    pub fn generate_play_grouping_api_token(&self) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S> {
+        AccesstokenGeneratePlayGroupingApiTokenCall {
+            hub: self.hub,
+            _persona: Default::default(),
+            _package_name: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Generates a Play Grouping API token for the PGS user identified by the Recall session ID provided in the request.
+    pub fn generate_recall_play_grouping_api_token(&self) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S> {
+        AccesstokenGenerateRecallPlayGroupingApiTokenCall {
+            hub: self.hub,
+            _recall_session_id: Default::default(),
+            _persona: Default::default(),
+            _package_name: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+
+
 /// A builder providing access to all methods supported on *achievementDefinition* resources.
 /// It is not used directly, but through the [`Games`] hub.
 ///
@@ -2374,7 +2637,7 @@ impl client::Part for PlayerName {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
@@ -2430,7 +2693,7 @@ impl<'a, S> AchievementDefinitionMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `increment(...)`, `list(...)`, `reveal(...)`, `set_steps_at_least(...)`, `unlock(...)` and `update_multiple(...)`
 /// // to build up your call.
@@ -2582,7 +2845,7 @@ impl<'a, S> AchievementMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `get_end_point(...)`, `played(...)` and `verify(...)`
 /// // to build up your call.
@@ -2685,7 +2948,7 @@ impl<'a, S> ApplicationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list_by_player(...)`, `list_definitions(...)` and `record(...)`
 /// // to build up your call.
@@ -2774,7 +3037,7 @@ impl<'a, S> EventMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
@@ -2848,7 +3111,7 @@ impl<'a, S> LeaderboardMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_metagame_config(...)` and `list_categories_by_player(...)`
 /// // to build up your call.
@@ -2923,7 +3186,7 @@ impl<'a, S> MetagameMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `get_multiple_application_player_ids(...)`, `get_scoped_player_ids(...)` and `list(...)`
 /// // to build up your call.
@@ -3028,9 +3291,9 @@ impl<'a, S> PlayerMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `link_persona(...)`, `reset_persona(...)`, `retrieve_tokens(...)` and `unlink_persona(...)`
+/// // like `games_player_tokens(...)`, `last_token_from_all_developer_games(...)`, `link_persona(...)`, `reset_persona(...)`, `retrieve_tokens(...)` and `unlink_persona(...)`
 /// // to build up your call.
 /// let rb = hub.recall();
 /// # }
@@ -3044,6 +3307,41 @@ pub struct RecallMethods<'a, S>
 impl<'a, S> client::MethodsBuilder for RecallMethods<'a, S> {}
 
 impl<'a, S> RecallMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieve the Recall tokens from all requested games that is associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have an active PGS Player profile.
+    /// 
+    /// # Arguments
+    ///
+    /// * `sessionId` - Required. Opaque server-generated string that encodes all the necessary information to identify the PGS player / Google user and application.
+    pub fn games_player_tokens(&self, session_id: &str) -> RecallGamesPlayerTokenCall<'a, S> {
+        RecallGamesPlayerTokenCall {
+            hub: self.hub,
+            _session_id: session_id.to_string(),
+            _application_ids: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieve the last Recall token from all developer games that is associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have active PGS Player profile.
+    /// 
+    /// # Arguments
+    ///
+    /// * `sessionId` - Required. Opaque server-generated string that encodes all the necessary information to identify the PGS player / Google user and application.
+    pub fn last_token_from_all_developer_games(&self, session_id: &str) -> RecallLastTokenFromAllDeveloperGameCall<'a, S> {
+        RecallLastTokenFromAllDeveloperGameCall {
+            hub: self.hub,
+            _session_id: session_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3081,7 +3379,7 @@ impl<'a, S> RecallMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve all Recall tokens associated with the PGS Player principal encoded in the provided recall session id. The API is only available for users that have active PGS Player profile.
+    /// Retrieve all Recall tokens associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have active PGS Player profile.
     /// 
     /// # Arguments
     ///
@@ -3137,7 +3435,7 @@ impl<'a, S> RecallMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `check(...)`
 /// // to build up your call.
@@ -3195,7 +3493,7 @@ impl<'a, S> RevisionMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `list(...)`, `list_window(...)`, `submit(...)` and `submit_multiple(...)`
 /// // to build up your call.
@@ -3350,7 +3648,7 @@ impl<'a, S> ScoreMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)` and `list(...)`
 /// // to build up your call.
@@ -3429,7 +3727,7 @@ impl<'a, S> SnapshotMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
@@ -3467,6 +3765,554 @@ impl<'a, S> StatMethods<'a, S> {
 // CallBuilders   ###
 // #################
 
+/// Generates a Play Grouping API token for the PGS user identified by the attached credential.
+///
+/// A builder for the *generatePlayGroupingApiToken* method supported by a *accesstoken* resource.
+/// It is not used directly, but through a [`AccesstokenMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_games1 as games1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use games1::{Games, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accesstokens().generate_play_grouping_api_token()
+///              .persona("takimata")
+///              .package_name("amet.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AccesstokenGeneratePlayGroupingApiTokenCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Games<S>,
+    _persona: Option<String>,
+    _package_name: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for AccesstokenGeneratePlayGroupingApiTokenCall<'a, S> {}
+
+impl<'a, S> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GeneratePlayGroupingApiTokenResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "games.accesstokens.generatePlayGroupingApiToken",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "persona", "packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._persona.as_ref() {
+            params.push("persona", value);
+        }
+        if let Some(value) = self._package_name.as_ref() {
+            params.push("packageName", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "games/v1/accesstokens/generatePlayGroupingApiToken";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Persona to associate with the token. Persona is a developer-provided stable identifier of the user. Must be deterministically generated (e.g. as a one-way hash) from the user account ID and user profile ID (if the app has the concept), according to the developer's own user identity system.
+    ///
+    /// Sets the *persona* query property to the given value.
+    pub fn persona(mut self, new_value: &str) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S> {
+        self._persona = Some(new_value.to_string());
+        self
+    }
+    /// Required. App package name to generate the token for (e.g. com.example.mygame).
+    ///
+    /// Sets the *package name* query property to the given value.
+    pub fn package_name(mut self, new_value: &str) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S> {
+        self._package_name = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccesstokenGeneratePlayGroupingApiTokenCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Generates a Play Grouping API token for the PGS user identified by the Recall session ID provided in the request.
+///
+/// A builder for the *generateRecallPlayGroupingApiToken* method supported by a *accesstoken* resource.
+/// It is not used directly, but through a [`AccesstokenMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_games1 as games1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use games1::{Games, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accesstokens().generate_recall_play_grouping_api_token()
+///              .recall_session_id("duo")
+///              .persona("ipsum")
+///              .package_name("gubergren")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Games<S>,
+    _recall_session_id: Option<String>,
+    _persona: Option<String>,
+    _package_name: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S> {}
+
+impl<'a, S> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GenerateRecallPlayGroupingApiTokenResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "games.accesstokens.generateRecallPlayGroupingApiToken",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "recallSessionId", "persona", "packageName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        if let Some(value) = self._recall_session_id.as_ref() {
+            params.push("recallSessionId", value);
+        }
+        if let Some(value) = self._persona.as_ref() {
+            params.push("persona", value);
+        }
+        if let Some(value) = self._package_name.as_ref() {
+            params.push("packageName", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "games/v1/accesstokens/generateRecallPlayGroupingApiToken";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string());
+        }
+
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Opaque server-generated string that encodes all the necessary information to identify the PGS player / Google user and application. See https://developer.android.com/games/pgs/recall/recall-setup on how to integrate with Recall and get session ID.
+    ///
+    /// Sets the *recall session id* query property to the given value.
+    pub fn recall_session_id(mut self, new_value: &str) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S> {
+        self._recall_session_id = Some(new_value.to_string());
+        self
+    }
+    /// Required. Persona to associate with the token. Persona is a developer-provided stable identifier of the user. Must be deterministically generated (e.g. as a one-way hash) from the user account ID and user profile ID (if the app has the concept), according to the developer's own user identity system.
+    ///
+    /// Sets the *persona* query property to the given value.
+    pub fn persona(mut self, new_value: &str) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S> {
+        self._persona = Some(new_value.to_string());
+        self
+    }
+    /// Required. App package name to generate the token for (e.g. com.example.mygame).
+    ///
+    /// Sets the *package name* query property to the given value.
+    pub fn package_name(mut self, new_value: &str) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S> {
+        self._package_name = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Androidpublisher`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccesstokenGenerateRecallPlayGroupingApiTokenCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Lists all the achievement definitions for your application.
 ///
 /// A builder for the *list* method supported by a *achievementDefinition* resource.
@@ -3489,14 +4335,14 @@ impl<'a, S> StatMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievement_definitions().list()
-///              .page_token("takimata")
-///              .max_results(-52)
-///              .language("duo")
+///              .page_token("Lorem")
+///              .max_results(-12)
+///              .language("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3593,6 +4439,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3768,12 +4615,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().increment("achievementId", -62)
-///              .request_id(-51)
+/// let result = hub.achievements().increment("achievementId", -17)
+///              .request_id(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3873,6 +4720,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4054,15 +4902,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().list("playerId")
-///              .state("eos")
-///              .page_token("dolor")
-///              .max_results(-17)
-///              .language("ipsum")
+///              .state("amet")
+///              .page_token("duo")
+///              .max_results(-50)
+///              .language("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4172,6 +5020,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4364,7 +5213,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4462,6 +5311,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4626,11 +5476,11 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().set_steps_at_least("achievementId", -20)
+/// let result = hub.achievements().set_steps_at_least("achievementId", -16)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4726,6 +5576,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4900,7 +5751,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4998,6 +5849,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5163,7 +6015,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5435,13 +6287,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get("applicationId")
-///              .platform_type("ut")
-///              .language("gubergren")
+///              .platform_type("ipsum")
+///              .language("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5543,6 +6395,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5721,13 +6574,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get_end_point()
-///              .end_point_type("rebum.")
-///              .application_id("est")
+///              .end_point_type("gubergren")
+///              .application_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5820,6 +6673,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5988,7 +6842,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6076,6 +6930,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6220,7 +7075,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6318,6 +7173,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6482,14 +7338,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_by_player()
-///              .page_token("ipsum")
-///              .max_results(-7)
-///              .language("gubergren")
+///              .page_token("Lorem")
+///              .max_results(-25)
+///              .language("labore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6586,6 +7442,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6761,14 +7618,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_definitions()
-///              .page_token("ea")
-///              .max_results(-99)
-///              .language("Lorem")
+///              .page_token("sed")
+///              .max_results(-70)
+///              .language("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6865,6 +7722,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7041,7 +7899,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7051,7 +7909,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().record(req)
-///              .language("eos")
+///              .language("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7325,12 +8183,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().get("leaderboardId")
-///              .language("sed")
+///              .language("kasd")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7428,6 +8286,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7599,14 +8458,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().list()
-///              .page_token("duo")
-///              .max_results(-80)
-///              .language("no")
+///              .page_token("et")
+///              .max_results(-43)
+///              .language("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7703,6 +8562,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7878,7 +8738,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7967,6 +8827,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8121,14 +8982,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.metagame().list_categories_by_player("playerId", "collection")
-///              .page_token("et")
-///              .max_results(-43)
-///              .language("et")
+///              .page_token("erat")
+///              .max_results(-93)
+///              .language("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8236,6 +9097,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8431,13 +9293,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().get("playerId")
-///              .player_id_consistency_token("vero")
-///              .language("erat")
+///              .player_id_consistency_token("et")
+///              .language("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8539,6 +9401,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8717,12 +9580,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().get_multiple_application_player_ids()
-///              .add_application_ids("sed")
+///              .add_application_ids("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8813,6 +9676,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8975,7 +9839,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9064,6 +9928,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9218,14 +10083,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().list("collection")
-///              .page_token("dolore")
-///              .max_results(-22)
-///              .language("voluptua.")
+///              .page_token("diam")
+///              .max_results(-49)
+///              .language("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9331,6 +10196,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9494,6 +10360,547 @@ where
 }
 
 
+/// Retrieve the Recall tokens from all requested games that is associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have an active PGS Player profile.
+///
+/// A builder for the *gamesPlayerTokens* method supported by a *recall* resource.
+/// It is not used directly, but through a [`RecallMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_games1 as games1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use games1::{Games, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.recall().games_player_tokens("sessionId")
+///              .add_application_ids("sadipscing")
+///              .doit().await;
+/// # }
+/// ```
+pub struct RecallGamesPlayerTokenCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Games<S>,
+    _session_id: String,
+    _application_ids: Vec<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for RecallGamesPlayerTokenCall<'a, S> {}
+
+impl<'a, S> RecallGamesPlayerTokenCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RetrieveGamesPlayerTokensResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "games.recall.gamesPlayerTokens",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "sessionId", "applicationIds"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("sessionId", self._session_id);
+        if self._application_ids.len() > 0 {
+            for f in self._application_ids.iter() {
+                params.push("applicationIds", f);
+            }
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "games/v1/recall/gamesPlayerTokens/{sessionId}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{sessionId}", "sessionId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["sessionId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Opaque server-generated string that encodes all the necessary information to identify the PGS player / Google user and application.
+    ///
+    /// Sets the *session id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn session_id(mut self, new_value: &str) -> RecallGamesPlayerTokenCall<'a, S> {
+        self._session_id = new_value.to_string();
+        self
+    }
+    /// Required. The application IDs from the Google Play developer console for the games to return scoped ids for.
+    ///
+    /// Append the given value to the *application ids* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_application_ids(mut self, new_value: &str) -> RecallGamesPlayerTokenCall<'a, S> {
+        self._application_ids.push(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RecallGamesPlayerTokenCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RecallGamesPlayerTokenCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Androidpublisher`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RecallGamesPlayerTokenCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RecallGamesPlayerTokenCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RecallGamesPlayerTokenCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Retrieve the last Recall token from all developer games that is associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have active PGS Player profile.
+///
+/// A builder for the *lastTokenFromAllDeveloperGames* method supported by a *recall* resource.
+/// It is not used directly, but through a [`RecallMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_games1 as games1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use games1::{Games, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.recall().last_token_from_all_developer_games("sessionId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct RecallLastTokenFromAllDeveloperGameCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Games<S>,
+    _session_id: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for RecallLastTokenFromAllDeveloperGameCall<'a, S> {}
+
+impl<'a, S> RecallLastTokenFromAllDeveloperGameCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RetrieveDeveloperGamesLastPlayerTokenResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "games.recall.lastTokenFromAllDeveloperGames",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "sessionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("sessionId", self._session_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "games/v1/recall/developerGamesLastPlayerToken/{sessionId}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Androidpublisher.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{sessionId}", "sessionId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["sessionId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Opaque server-generated string that encodes all the necessary information to identify the PGS player / Google user and application.
+    ///
+    /// Sets the *session id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn session_id(mut self, new_value: &str) -> RecallLastTokenFromAllDeveloperGameCall<'a, S> {
+        self._session_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RecallLastTokenFromAllDeveloperGameCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> RecallLastTokenFromAllDeveloperGameCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Androidpublisher`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> RecallLastTokenFromAllDeveloperGameCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> RecallLastTokenFromAllDeveloperGameCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> RecallLastTokenFromAllDeveloperGameCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Associate the PGS Player principal encoded in the provided recall session id with an in-game account
 ///
 /// A builder for the *linkPersona* method supported by a *recall* resource.
@@ -9517,7 +10924,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9790,7 +11197,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10040,7 +11447,7 @@ where
 }
 
 
-/// Retrieve all Recall tokens associated with the PGS Player principal encoded in the provided recall session id. The API is only available for users that have active PGS Player profile.
+/// Retrieve all Recall tokens associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have active PGS Player profile.
 ///
 /// A builder for the *retrieveTokens* method supported by a *recall* resource.
 /// It is not used directly, but through a [`RecallMethods`] instance.
@@ -10062,7 +11469,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10160,6 +11567,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10325,7 +11733,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10597,7 +12005,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10688,6 +12096,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10852,15 +12261,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().get("playerId", "leaderboardId", "timeSpan")
-///              .page_token("et")
-///              .max_results(-95)
-///              .language("Stet")
-///              .include_rank_type("dolor")
+///              .page_token("Stet")
+///              .max_results(-76)
+///              .language("elitr")
+///              .include_rank_type("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10974,6 +12383,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11186,14 +12596,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().list("leaderboardId", "collection", "timeSpan")
-///              .page_token("invidunt")
-///              .max_results(-65)
-///              .language("vero")
+///              .page_token("accusam")
+///              .max_results(-59)
+///              .language("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11303,6 +12713,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11508,16 +12919,16 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().list_window("leaderboardId", "collection", "timeSpan")
-///              .return_top_if_absent(true)
-///              .results_above(-100)
-///              .page_token("accusam")
-///              .max_results(-59)
-///              .language("consetetur")
+///              .return_top_if_absent(false)
+///              .results_above(-2)
+///              .page_token("sed")
+///              .max_results(-9)
+///              .language("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11635,6 +13046,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11854,13 +13266,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.scores().submit("leaderboardId", -72)
-///              .score_tag("erat")
-///              .language("consetetur")
+/// let result = hub.scores().submit("leaderboardId", -74)
+///              .score_tag("accusam")
+///              .language("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11964,6 +13376,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12153,7 +13566,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12163,7 +13576,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().submit_multiple(req)
-///              .language("amet.")
+///              .language("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12437,12 +13850,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().get("snapshotId")
-///              .language("takimata")
+///              .language("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12540,6 +13953,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12711,14 +14125,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().list("playerId")
-///              .page_token("gubergren")
-///              .max_results(-74)
-///              .language("accusam")
+///              .page_token("amet.")
+///              .max_results(-17)
+///              .language("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12824,6 +14238,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13009,7 +14424,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Games::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13098,6 +14513,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await

@@ -1,4 +1,4 @@
-site_name: Cloud Natural Language v5.0.4+20220218
+site_name: Cloud Natural Language v5.0.5+20220218
 site_url: http://byron.github.io/google-apis-rs/google-language1_beta1-cli
 site_description: A complete library to interact with Cloud Natural Language (protocol v1beta1)
 
@@ -17,5 +17,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

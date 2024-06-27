@@ -672,8 +672,9 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "token", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -922,8 +923,9 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "token"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "token", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4319,7 +4321,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -4347,7 +4349,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -4375,7 +4377,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -4403,7 +4405,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -4700,7 +4702,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -4728,7 +4730,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -4784,7 +4786,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -4980,7 +4982,7 @@ async fn main() {
                   vec![
                     (Some(r##"app"##),
                      None,
-                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
+                     Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
         
@@ -5424,7 +5426,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform)"##),
+                     Some(r##"Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform) * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
         
@@ -5496,7 +5498,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent project name and the service, in the format ``` projects/{project_number}/services/{service_id} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails."##),
+                     Some(r##"Required. The parent service name, in the format ``` projects/{project_number}/services/{service_id} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
         
@@ -5524,7 +5526,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The relative resource name of the parent service in which the specified ResourcePolicy will be created, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)"##),
+                     Some(r##"Required. The relative resource name of the parent Service in which the specified ResourcePolicy will be created, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
         
@@ -5552,7 +5554,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the ResourcePolicy to delete, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_name} ```"##),
+                     Some(r##"Required. The relative resource name of the ResourcePolicy to delete, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ```"##),
                      Some(true),
                      Some(false)),
         
@@ -5574,7 +5576,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative resource name of the ResourcePolicy to retrieve, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID used as the resource ID for the policy."##),
+                     Some(r##"Required. The relative resource name of the ResourcePolicy to retrieve, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
         
@@ -5596,7 +5598,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The relative resource name of the parent project and service for which to list each associated ResourcePolicy, in the format: ``` projects/{project_number}/services/{service_name} ```"##),
+                     Some(r##"Required. The relative resource name of the parent Service for which to list each associated ResourcePolicy, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
         
@@ -5618,7 +5620,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The relative name of the resource configuration object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID used as the resource ID for the policy."##),
+                     Some(r##"Required. Identifier. The relative name of the resource policy object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID."##),
                      Some(true),
                      Some(false)),
         
@@ -5674,7 +5676,7 @@ async fn main() {
     
     let mut app = App::new("firebaseappcheck1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240226")
+           .version("5.0.5+20240617")
            .about("Firebase App Check works alongside other Firebase services to help protect your backend resources from abuse, such as billing fraud or phishing.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebaseappcheck1_beta_cli")
            .arg(Arg::with_name("url")
@@ -5738,6 +5740,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

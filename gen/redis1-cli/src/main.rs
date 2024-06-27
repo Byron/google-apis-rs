@@ -75,7 +75,15 @@ where
                 match &temp_cursor.to_string()[..] {
                     "authorization-mode" => Some(("authorizationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deletion-protection-enabled" => Some(("deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-type" => Some(("nodeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.aof-config.append-fsync" => Some(("persistenceConfig.aofConfig.appendFsync", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.mode" => Some(("persistenceConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.rdb-config.rdb-snapshot-period" => Some(("persistenceConfig.rdbConfig.rdbSnapshotPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.rdb-config.rdb-snapshot-start-time" => Some(("persistenceConfig.rdbConfig.rdbSnapshotStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "precise-size-gb" => Some(("preciseSizeGb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "redis-configs" => Some(("redisConfigs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "replica-count" => Some(("replicaCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "shard-count" => Some(("shardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "size-gb" => Some(("sizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -84,8 +92,10 @@ where
                     "state-info.update-info.target-shard-count" => Some(("stateInfo.updateInfo.targetShardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transit-encryption-mode" => Some(("transitEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-distribution-config.mode" => Some(("zoneDistributionConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-distribution-config.zone" => Some(("zoneDistributionConfig.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorization-mode", "create-time", "name", "replica-count", "shard-count", "size-gb", "state", "state-info", "target-replica-count", "target-shard-count", "transit-encryption-mode", "uid", "update-info"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aof-config", "append-fsync", "authorization-mode", "create-time", "deletion-protection-enabled", "mode", "name", "node-type", "persistence-config", "precise-size-gb", "rdb-config", "rdb-snapshot-period", "rdb-snapshot-start-time", "redis-configs", "replica-count", "shard-count", "size-gb", "state", "state-info", "target-replica-count", "target-shard-count", "transit-encryption-mode", "uid", "update-info", "zone", "zone-distribution-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -396,7 +406,15 @@ where
                 match &temp_cursor.to_string()[..] {
                     "authorization-mode" => Some(("authorizationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deletion-protection-enabled" => Some(("deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-type" => Some(("nodeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.aof-config.append-fsync" => Some(("persistenceConfig.aofConfig.appendFsync", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.mode" => Some(("persistenceConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.rdb-config.rdb-snapshot-period" => Some(("persistenceConfig.rdbConfig.rdbSnapshotPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "persistence-config.rdb-config.rdb-snapshot-start-time" => Some(("persistenceConfig.rdbConfig.rdbSnapshotStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "precise-size-gb" => Some(("preciseSizeGb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "redis-configs" => Some(("redisConfigs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "replica-count" => Some(("replicaCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "shard-count" => Some(("shardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "size-gb" => Some(("sizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -405,8 +423,10 @@ where
                     "state-info.update-info.target-shard-count" => Some(("stateInfo.updateInfo.targetShardCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transit-encryption-mode" => Some(("transitEncryptionMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-distribution-config.mode" => Some(("zoneDistributionConfig.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-distribution-config.zone" => Some(("zoneDistributionConfig.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorization-mode", "create-time", "name", "replica-count", "shard-count", "size-gb", "state", "state-info", "target-replica-count", "target-shard-count", "transit-encryption-mode", "uid", "update-info"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aof-config", "append-fsync", "authorization-mode", "create-time", "deletion-protection-enabled", "mode", "name", "node-type", "persistence-config", "precise-size-gb", "rdb-config", "rdb-snapshot-period", "rdb-snapshot-start-time", "redis-configs", "replica-count", "shard-count", "size-gb", "state", "state-info", "target-replica-count", "target-shard-count", "transit-encryption-mode", "uid", "update-info", "zone", "zone-distribution-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1986,7 +2006,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Unique name of the resource in this scope including project and location using the form: `projects/{project_id}/locations/{location_id}/clusters/{cluster_id}`"##),
+                     Some(r##"Required. Identifier. Unique name of the resource in this scope including project and location using the form: `projects/{project_id}/locations/{location_id}/clusters/{cluster_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2430,7 +2450,7 @@ async fn main() {
     
     let mut app = App::new("redis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240226")
+           .version("5.0.5+20240613")
            .about("Creates and manages Redis instances on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_redis1_cli")
            .arg(Arg::with_name("url")
@@ -2494,6 +2514,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

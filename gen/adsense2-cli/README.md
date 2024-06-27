@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *adsense* API at revision *20240305*. The CLI is at version *5.0.4*.
+This documentation was generated from the *adsense* API at revision *20240626*. The CLI is at version *5.0.5*.
 
 ```bash
 adsense2 [options]
@@ -53,6 +53,8 @@ adsense2 [options]
                 list [-p <v>]... [-o <out>]
                 list-child-accounts <parent> [-p <v>]... [-o <out>]
                 payments-list <parent> [-p <v>]... [-o <out>]
+                policy-issues-get <name> [-p <v>]... [-o <out>]
+                policy-issues-list <parent> [-p <v>]... [-o <out>]
                 reports-generate <account> [-p <v>]... [-o <out>]
                 reports-generate-csv <account> [-p <v>]... [-o <out>]
                 reports-get-saved <name> [-p <v>]... [-o <out>]

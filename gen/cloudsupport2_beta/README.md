@@ -5,29 +5,29 @@ DO NOT EDIT !
 -->
 The `google-cloudsupport2_beta` library allows access to all features of the *Google Cloud Support* service.
 
-This documentation was generated from *Cloud Support* crate version *5.0.4+20240304*, where *20240304* is the exact revision of the *cloudsupport:v2beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+This documentation was generated from *Cloud Support* crate version *5.0.5+20240624*, where *20240624* is the exact revision of the *cloudsupport:v2beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 
 Everything else about the *Cloud Support* *v2_beta* API can be found at the
 [official documentation site](https://cloud.google.com/support/docs/apis).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/CloudSupport) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/CloudSupport) ... 
 
-* [case classifications](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseClassification)
- * [*search*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseClassificationSearchCall)
-* [cases](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::Case)
- * [*attachments list*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseAttachmentListCall), [*close*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseCloseCall), [*comments create*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseCommentCreateCall), [*comments list*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseCommentListCall), [*create*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseCreateCall), [*escalate*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseEscalateCall), [*get*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseGetCall), [*list*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseListCall), [*patch*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CasePatchCall) and [*search*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::CaseSearchCall)
-* [media](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::Media)
- * [*download*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::MediaDownloadCall) and [*upload*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::MediaUploadCall)
+* [case classifications](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseClassification)
+ * [*search*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseClassificationSearchCall)
+* [cases](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::Case)
+ * [*attachments list*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseAttachmentListCall), [*close*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseCloseCall), [*comments create*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseCommentCreateCall), [*comments list*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseCommentListCall), [*create*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseCreateCall), [*escalate*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseEscalateCall), [*get*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseGetCall), [*list*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseListCall), [*patch*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CasePatchCall), [*search*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseSearchCall) and [*show feed*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::CaseShowFeedCall)
+* [media](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::Media)
+ * [*download*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::MediaDownloadCall) and [*upload*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::MediaUploadCall)
 
 
 Upload supported by ...
 
-* [*upload media*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::MediaUploadCall)
+* [*upload media*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::MediaUploadCall)
 
 Download supported by ...
 
-* [*download media*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/api::MediaDownloadCall)
+* [*download media*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/api::MediaDownloadCall)
 
 
 
@@ -35,17 +35,17 @@ Download supported by ...
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/CloudSupport)**
+* **[Hub](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/CloudSupport)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::CallBuilder)
-* **[Resources](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::CallBuilder)
+* **[Resources](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Part)**
+    * **[Parts](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -69,6 +69,7 @@ let r = hub.cases().get(...).doit().await
 let r = hub.cases().list(...).doit().await
 let r = hub.cases().patch(...).doit().await
 let r = hub.cases().search(...).doit().await
+let r = hub.cases().show_feed(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -111,7 +112,7 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
@@ -143,17 +144,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -163,35 +164,42 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::RequestValue) and 
-[decodable](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::RequestValue) and 
+[decodable](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-cloudsupport2_beta/5.0.4+20240304/google_cloudsupport2_beta/client::RequestValue) are moved
+* [request values](https://docs.rs/google-cloudsupport2_beta/5.0.5+20240624/google_cloudsupport2_beta/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
 [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
+
+## Cargo Features
+
+* `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+generated `openapi` spec would be invalid.
+
 
 # License
 The **cloudsupport2_beta** library was generated by Sebastian Thiel, and is placed 

@@ -1,4 +1,4 @@
-site_name: Cloud Support v5.0.4+20240304
+site_name: Cloud Support v5.0.5+20240624
 site_url: http://byron.github.io/google-apis-rs/google-cloudsupport2_beta-cli
 site_description: A complete library to interact with Cloud Support (protocol v2beta)
 
@@ -22,11 +22,12 @@ nav:
     - 'List': 'cases_list.md'
     - 'Patch': 'cases_patch.md'
     - 'Search': 'cases_search.md'
+    - 'Show Feed': 'cases_show-feed.md'
 - 'Media':
     - 'Download': 'media_download.md'
     - 'Upload': 'media_upload.md'
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

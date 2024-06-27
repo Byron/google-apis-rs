@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Domains* crate version *5.0.4+20240221*, where *20240221* is the exact revision of the *domains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *Cloud Domains* crate version *5.0.5+20240610*, where *20240610* is the exact revision of the *domains:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *Cloud Domains* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/domains/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudDomains) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations registrations configure contact settings*](api::ProjectLocationRegistrationConfigureContactSettingCall), [*locations registrations configure dns settings*](api::ProjectLocationRegistrationConfigureDnsSettingCall), [*locations registrations configure management settings*](api::ProjectLocationRegistrationConfigureManagementSettingCall), [*locations registrations delete*](api::ProjectLocationRegistrationDeleteCall), [*locations registrations export*](api::ProjectLocationRegistrationExportCall), [*locations registrations get*](api::ProjectLocationRegistrationGetCall), [*locations registrations get iam policy*](api::ProjectLocationRegistrationGetIamPolicyCall), [*locations registrations import*](api::ProjectLocationRegistrationImportCall), [*locations registrations list*](api::ProjectLocationRegistrationListCall), [*locations registrations patch*](api::ProjectLocationRegistrationPatchCall), [*locations registrations register*](api::ProjectLocationRegistrationRegisterCall), [*locations registrations reset authorization code*](api::ProjectLocationRegistrationResetAuthorizationCodeCall), [*locations registrations retrieve authorization code*](api::ProjectLocationRegistrationRetrieveAuthorizationCodeCall), [*locations registrations retrieve importable domains*](api::ProjectLocationRegistrationRetrieveImportableDomainCall), [*locations registrations retrieve register parameters*](api::ProjectLocationRegistrationRetrieveRegisterParameterCall), [*locations registrations retrieve transfer parameters*](api::ProjectLocationRegistrationRetrieveTransferParameterCall), [*locations registrations search domains*](api::ProjectLocationRegistrationSearchDomainCall), [*locations registrations set iam policy*](api::ProjectLocationRegistrationSetIamPolicyCall), [*locations registrations test iam permissions*](api::ProjectLocationRegistrationTestIamPermissionCall) and [*locations registrations transfer*](api::ProjectLocationRegistrationTransferCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations registrations configure contact settings*](api::ProjectLocationRegistrationConfigureContactSettingCall), [*locations registrations configure dns settings*](api::ProjectLocationRegistrationConfigureDnsSettingCall), [*locations registrations configure management settings*](api::ProjectLocationRegistrationConfigureManagementSettingCall), [*locations registrations delete*](api::ProjectLocationRegistrationDeleteCall), [*locations registrations export*](api::ProjectLocationRegistrationExportCall), [*locations registrations get*](api::ProjectLocationRegistrationGetCall), [*locations registrations get iam policy*](api::ProjectLocationRegistrationGetIamPolicyCall), [*locations registrations import*](api::ProjectLocationRegistrationImportCall), [*locations registrations initiate push transfer*](api::ProjectLocationRegistrationInitiatePushTransferCall), [*locations registrations list*](api::ProjectLocationRegistrationListCall), [*locations registrations patch*](api::ProjectLocationRegistrationPatchCall), [*locations registrations register*](api::ProjectLocationRegistrationRegisterCall), [*locations registrations renew domain*](api::ProjectLocationRegistrationRenewDomainCall), [*locations registrations reset authorization code*](api::ProjectLocationRegistrationResetAuthorizationCodeCall), [*locations registrations retrieve authorization code*](api::ProjectLocationRegistrationRetrieveAuthorizationCodeCall), [*locations registrations retrieve google domains dns records*](api::ProjectLocationRegistrationRetrieveGoogleDomainsDnsRecordCall), [*locations registrations retrieve google domains forwarding config*](api::ProjectLocationRegistrationRetrieveGoogleDomainsForwardingConfigCall), [*locations registrations retrieve importable domains*](api::ProjectLocationRegistrationRetrieveImportableDomainCall), [*locations registrations retrieve register parameters*](api::ProjectLocationRegistrationRetrieveRegisterParameterCall), [*locations registrations retrieve transfer parameters*](api::ProjectLocationRegistrationRetrieveTransferParameterCall), [*locations registrations search domains*](api::ProjectLocationRegistrationSearchDomainCall), [*locations registrations set iam policy*](api::ProjectLocationRegistrationSetIamPolicyCall), [*locations registrations test iam permissions*](api::ProjectLocationRegistrationTestIamPermissionCall) and [*locations registrations transfer*](api::ProjectLocationRegistrationTransferCall)
 //! 
 //! 
 //! 
@@ -54,8 +54,10 @@
 //! let r = hub.projects().locations_registrations_delete(...).doit().await
 //! let r = hub.projects().locations_registrations_export(...).doit().await
 //! let r = hub.projects().locations_registrations_import(...).doit().await
+//! let r = hub.projects().locations_registrations_initiate_push_transfer(...).doit().await
 //! let r = hub.projects().locations_registrations_patch(...).doit().await
 //! let r = hub.projects().locations_registrations_register(...).doit().await
+//! let r = hub.projects().locations_registrations_renew_domain(...).doit().await
 //! let r = hub.projects().locations_registrations_transfer(...).doit().await
 //! ```
 //! 
@@ -101,7 +103,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = CloudDomains::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = CloudDomains::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -111,7 +113,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().locations_registrations_patch(req, "name")
-//!              .update_mask(&Default::default())
+//!              .update_mask(FieldMask::new::<&str>(&[]))
 //!              .doit().await;
 //! 
 //! match result {
@@ -184,6 +186,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

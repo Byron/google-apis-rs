@@ -50,6 +50,488 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _projects_locations_notes_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_notes_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_notes_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_notes_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_notes_occurrences_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_notes_occurrences_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_occurrences_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_occurrences_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_occurrences_get_notes(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_occurrences_get_notes(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_occurrences_get_vulnerability_summary(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_occurrences_get_vulnerability_summary(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_occurrences_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_occurrences_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_resources_export_sbom(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ExportSBOMRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_resources_export_sbom(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_notes_batch_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -162,6 +644,7 @@ where
                     "compliance.cis-benchmark.profile-level" => Some(("compliance.cisBenchmark.profileLevel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliance.cis-benchmark.severity" => Some(("compliance.cisBenchmark.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.description" => Some(("compliance.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.impact" => Some(("compliance.impact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.rationale" => Some(("compliance.rationale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.remediation" => Some(("compliance.remediation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.scan-instructions" => Some(("compliance.scanInstructions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -258,7 +741,7 @@ where
                     "vulnerability-assessment.short-description" => Some(("vulnerabilityAssessment.shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability-assessment.title" => Some(("vulnerabilityAssessment.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "architecture", "assessment", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "comments", "compliance", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvss-score", "cvss-v2", "cvss-v3", "cvss-version", "deployment", "description", "details", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "expression", "fingerprint", "format", "full-name", "generic-uri", "hint", "human-readable-name", "id", "identity", "image", "impact-score", "impacts", "inclusive", "integrity-impact", "issuing-authority", "justification", "justification-type", "kb-article-ids", "kind", "language-code", "last-published-timestamp", "license", "long-description", "maintainer", "name", "package", "package-type", "privileges-required", "product", "profile-level", "publisher", "publisher-namespace", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "sbom-reference", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "state", "support-url", "title", "update-id", "update-time", "upgrade", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "vulnerability-assessment", "vulnerability-id", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "architecture", "assessment", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "comments", "compliance", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvss-score", "cvss-v2", "cvss-v3", "cvss-version", "deployment", "description", "details", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "expression", "fingerprint", "format", "full-name", "generic-uri", "hint", "human-readable-name", "id", "identity", "image", "impact", "impact-score", "impacts", "inclusive", "integrity-impact", "issuing-authority", "justification", "justification-type", "kb-article-ids", "kind", "language-code", "last-published-timestamp", "license", "long-description", "maintainer", "name", "package", "package-type", "privileges-required", "product", "profile-level", "publisher", "publisher-namespace", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "sbom-reference", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "state", "support-url", "title", "update-id", "update-time", "upgrade", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "vulnerability-assessment", "vulnerability-id", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -663,6 +1146,7 @@ where
                     "compliance.cis-benchmark.profile-level" => Some(("compliance.cisBenchmark.profileLevel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliance.cis-benchmark.severity" => Some(("compliance.cisBenchmark.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.description" => Some(("compliance.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.impact" => Some(("compliance.impact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.rationale" => Some(("compliance.rationale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.remediation" => Some(("compliance.remediation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.scan-instructions" => Some(("compliance.scanInstructions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -759,7 +1243,7 @@ where
                     "vulnerability-assessment.short-description" => Some(("vulnerabilityAssessment.shortDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability-assessment.title" => Some(("vulnerabilityAssessment.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "architecture", "assessment", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "comments", "compliance", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvss-score", "cvss-v2", "cvss-v3", "cvss-version", "deployment", "description", "details", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "expression", "fingerprint", "format", "full-name", "generic-uri", "hint", "human-readable-name", "id", "identity", "image", "impact-score", "impacts", "inclusive", "integrity-impact", "issuing-authority", "justification", "justification-type", "kb-article-ids", "kind", "language-code", "last-published-timestamp", "license", "long-description", "maintainer", "name", "package", "package-type", "privileges-required", "product", "profile-level", "publisher", "publisher-namespace", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "sbom-reference", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "state", "support-url", "title", "update-id", "update-time", "upgrade", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "vulnerability-assessment", "vulnerability-id", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-kind", "architecture", "assessment", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-score", "build", "builder-version", "cis-benchmark", "comments", "compliance", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvss-score", "cvss-v2", "cvss-v3", "cvss-version", "deployment", "description", "details", "discovery", "dsse-attestation", "epoch", "expiration-time", "exploitability-score", "expression", "fingerprint", "format", "full-name", "generic-uri", "hint", "human-readable-name", "id", "identity", "image", "impact", "impact-score", "impacts", "inclusive", "integrity-impact", "issuing-authority", "justification", "justification-type", "kb-article-ids", "kind", "language-code", "last-published-timestamp", "license", "long-description", "maintainer", "name", "package", "package-type", "privileges-required", "product", "profile-level", "publisher", "publisher-namespace", "rationale", "related-note-names", "remediation", "resource-uri", "resource-url", "revision", "sbom-reference", "scan-instructions", "scope", "severity", "short-description", "source-update-time", "state", "support-url", "title", "update-id", "update-time", "upgrade", "url", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vulnerability", "vulnerability-assessment", "vulnerability-id", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1186,6 +1670,9 @@ where
                     "build.provenance.trigger-id" => Some(("build.provenance.triggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.provenance-bytes" => Some(("build.provenanceBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.non-compliance-reason" => Some(("compliance.nonComplianceReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.version.benchmark-document" => Some(("compliance.version.benchmarkDocument", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.version.cpe-uri" => Some(("compliance.version.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.version.version" => Some(("compliance.version.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.address" => Some(("deployment.address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.config" => Some(("deployment.config", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1204,6 +1691,9 @@ where
                     "discovery.last-scan-time" => Some(("discovery.lastScanTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.sbom-status.error" => Some(("discovery.sbomStatus.error", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.sbom-status.sbom-state" => Some(("discovery.sbomStatus.sbomState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.vulnerability-attestation.error" => Some(("discovery.vulnerabilityAttestation.error", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.vulnerability-attestation.last-attempt-time" => Some(("discovery.vulnerabilityAttestation.lastAttemptTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.vulnerability-attestation.state" => Some(("discovery.vulnerabilityAttestation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.envelope.payload" => Some(("dsseAttestation.envelope.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.envelope.payload-type" => Some(("dsseAttestation.envelope.payloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.statement.-type" => Some(("dsseAttestation.statement._type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1334,7 +1824,7 @@ where
                     "vulnerability.vex-assessment.state" => Some(("vulnerability.vexAssessment.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.vex-assessment.vulnerability-id" => Some(("vulnerability.vexAssessment.vulnerabilityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "build", "build-definition", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "build-type", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "comments", "completeness", "compliance", "confidentiality-impact", "config", "config-source", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvss-v2", "cvss-version", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "details", "digest", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "error", "exploitability-score", "expression", "extra-details", "fingerprint", "finished-on", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "impacts", "in-toto-slsa-provenance-v1", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "invocation", "invocation-id", "justification", "justification-type", "kb-article-ids", "kind", "labels", "last-published-timestamp", "last-scan-time", "license", "location", "logs-uri", "long-description", "materials", "message", "metadata", "mime-type", "name", "non-compliance-reason", "note-name", "package", "package-type", "parameters", "parsed-version", "payload", "payload-type", "platform", "predicate", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "referrer-id", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "run-details", "sbom-reference", "sbom-state", "sbom-status", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "slsa-provenance-zero-two", "source-provenance", "start-time", "started-on", "state", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "uri", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vex-assessment", "vulnerability", "vulnerability-id", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "benchmark-document", "build", "build-definition", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "build-type", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "comments", "completeness", "compliance", "confidentiality-impact", "config", "config-source", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvss-v2", "cvss-version", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "details", "digest", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "error", "exploitability-score", "expression", "extra-details", "fingerprint", "finished-on", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "impacts", "in-toto-slsa-provenance-v1", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "invocation", "invocation-id", "justification", "justification-type", "kb-article-ids", "kind", "labels", "last-attempt-time", "last-published-timestamp", "last-scan-time", "license", "location", "logs-uri", "long-description", "materials", "message", "metadata", "mime-type", "name", "non-compliance-reason", "note-name", "package", "package-type", "parameters", "parsed-version", "payload", "payload-type", "platform", "predicate", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "referrer-id", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "run-details", "sbom-reference", "sbom-state", "sbom-status", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "slsa-provenance-zero-two", "source-provenance", "start-time", "started-on", "state", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "uri", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vex-assessment", "vulnerability", "vulnerability-attestation", "vulnerability-id", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1861,6 +2351,9 @@ where
                     "build.provenance.trigger-id" => Some(("build.provenance.triggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "build.provenance-bytes" => Some(("build.provenanceBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance.non-compliance-reason" => Some(("compliance.nonComplianceReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.version.benchmark-document" => Some(("compliance.version.benchmarkDocument", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.version.cpe-uri" => Some(("compliance.version.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance.version.version" => Some(("compliance.version.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.address" => Some(("deployment.address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.config" => Some(("deployment.config", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1879,6 +2372,9 @@ where
                     "discovery.last-scan-time" => Some(("discovery.lastScanTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.sbom-status.error" => Some(("discovery.sbomStatus.error", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "discovery.sbom-status.sbom-state" => Some(("discovery.sbomStatus.sbomState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.vulnerability-attestation.error" => Some(("discovery.vulnerabilityAttestation.error", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.vulnerability-attestation.last-attempt-time" => Some(("discovery.vulnerabilityAttestation.lastAttemptTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "discovery.vulnerability-attestation.state" => Some(("discovery.vulnerabilityAttestation.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.envelope.payload" => Some(("dsseAttestation.envelope.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.envelope.payload-type" => Some(("dsseAttestation.envelope.payloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dsse-attestation.statement.-type" => Some(("dsseAttestation.statement._type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2009,7 +2505,7 @@ where
                     "vulnerability.vex-assessment.state" => Some(("vulnerability.vexAssessment.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.vex-assessment.vulnerability-id" => Some(("vulnerability.vexAssessment.vulnerabilityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "build", "build-definition", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "build-type", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "comments", "completeness", "compliance", "confidentiality-impact", "config", "config-source", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvss-v2", "cvss-version", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "details", "digest", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "error", "exploitability-score", "expression", "extra-details", "fingerprint", "finished-on", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "impacts", "in-toto-slsa-provenance-v1", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "invocation", "invocation-id", "justification", "justification-type", "kb-article-ids", "kind", "labels", "last-published-timestamp", "last-scan-time", "license", "location", "logs-uri", "long-description", "materials", "message", "metadata", "mime-type", "name", "non-compliance-reason", "note-name", "package", "package-type", "parameters", "parsed-version", "payload", "payload-type", "platform", "predicate", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "referrer-id", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "run-details", "sbom-reference", "sbom-state", "sbom-status", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "slsa-provenance-zero-two", "source-provenance", "start-time", "started-on", "state", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "uri", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vex-assessment", "vulnerability", "vulnerability-id", "windows-update"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-type", "address", "alias-context", "analysis-completed", "analysis-status", "analysis-status-error", "analysis-type", "architecture", "archive-time", "arguments", "artifact-storage-source-uri", "attack-complexity", "attack-vector", "attestation", "authentication", "availability-impact", "base-resource-url", "base-score", "benchmark-document", "build", "build-definition", "build-finished-on", "build-invocation-id", "build-options", "build-started-on", "build-type", "builder", "builder-config", "builder-version", "classification", "cloud-repo", "code", "comments", "completeness", "compliance", "confidentiality-impact", "config", "config-source", "context", "continuous-analysis", "cpe", "cpe-uri", "create-time", "creator", "cve", "cvss-score", "cvss-v2", "cvss-version", "cvssv3", "defined-in-material", "deploy-time", "deployment", "description", "details", "digest", "discovery", "distance", "distribution", "dsse-attestation", "effective-severity", "end-time", "entry-point", "envelope", "environment", "epoch", "error", "exploitability-score", "expression", "extra-details", "fingerprint", "finished-on", "fix-available", "full-name", "gerrit", "gerrit-project", "git", "host-uri", "id", "identity", "image", "impact-score", "impacts", "in-toto-slsa-provenance-v1", "inclusive", "integrity-impact", "intoto-provenance", "intoto-statement", "invocation", "invocation-id", "justification", "justification-type", "kb-article-ids", "kind", "labels", "last-attempt-time", "last-published-timestamp", "last-scan-time", "license", "location", "logs-uri", "long-description", "materials", "message", "metadata", "mime-type", "name", "non-compliance-reason", "note-name", "package", "package-type", "parameters", "parsed-version", "payload", "payload-type", "platform", "predicate", "predicate-type", "privileges-required", "project-id", "project-repo-id", "provenance", "provenance-bytes", "recipe", "referrer-id", "remediation", "repo-id", "repo-name", "reproducible", "resource-uri", "revision", "revision-id", "run-details", "sbom-reference", "sbom-state", "sbom-status", "scope", "serialized-payload", "severity", "short-description", "slsa-provenance", "slsa-provenance-zero-two", "source-provenance", "start-time", "started-on", "state", "statement", "support-url", "title", "trigger-id", "type", "uid", "undeploy-time", "update-id", "update-time", "upgrade", "uri", "url", "user-email", "user-interaction", "v1-name", "v2-blob", "v2-name", "version", "vex-assessment", "vulnerability", "vulnerability-attestation", "vulnerability-id", "windows-update"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2335,6 +2831,30 @@ where
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-notes-get", Some(opt)) => {
+                        call_result = self._projects_locations_notes_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-notes-list", Some(opt)) => {
+                        call_result = self._projects_locations_notes_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-notes-occurrences-list", Some(opt)) => {
+                        call_result = self._projects_locations_notes_occurrences_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-occurrences-get", Some(opt)) => {
+                        call_result = self._projects_locations_occurrences_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-occurrences-get-notes", Some(opt)) => {
+                        call_result = self._projects_locations_occurrences_get_notes(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-occurrences-get-vulnerability-summary", Some(opt)) => {
+                        call_result = self._projects_locations_occurrences_get_vulnerability_summary(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-occurrences-list", Some(opt)) => {
+                        call_result = self._projects_locations_occurrences_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-resources-export-sbom", Some(opt)) => {
+                        call_result = self._projects_locations_resources_export_sbom(opt, dry_run, &mut err).await;
+                    },
                     ("notes-batch-create", Some(opt)) => {
                         call_result = self._projects_notes_batch_create(opt, dry_run, &mut err).await;
                     },
@@ -2480,7 +3000,189 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'notes-batch-create', 'notes-create', 'notes-delete', 'notes-get', 'notes-get-iam-policy', 'notes-list', 'notes-occurrences-list', 'notes-patch', 'notes-set-iam-policy', 'notes-test-iam-permissions', 'occurrences-batch-create', 'occurrences-create', 'occurrences-delete', 'occurrences-get', 'occurrences-get-iam-policy', 'occurrences-get-notes', 'occurrences-get-vulnerability-summary', 'occurrences-list', 'occurrences-patch', 'occurrences-set-iam-policy', 'occurrences-test-iam-permissions' and 'resources-export-sbom'", vec![
+        ("projects", "methods: 'locations-notes-get', 'locations-notes-list', 'locations-notes-occurrences-list', 'locations-occurrences-get', 'locations-occurrences-get-notes', 'locations-occurrences-get-vulnerability-summary', 'locations-occurrences-list', 'locations-resources-export-sbom', 'notes-batch-create', 'notes-create', 'notes-delete', 'notes-get', 'notes-get-iam-policy', 'notes-list', 'notes-occurrences-list', 'notes-patch', 'notes-set-iam-policy', 'notes-test-iam-permissions', 'occurrences-batch-create', 'occurrences-create', 'occurrences-delete', 'occurrences-get', 'occurrences-get-iam-policy', 'occurrences-get-notes', 'occurrences-get-vulnerability-summary', 'occurrences-list', 'occurrences-patch', 'occurrences-set-iam-policy', 'occurrences-test-iam-permissions' and 'resources-export-sbom'", vec![
+            ("locations-notes-get",
+                    Some(r##"Gets the specified note."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-notes-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the note in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-notes-list",
+                    Some(r##"Lists notes for the specified project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-notes-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the project to list notes for in the form of `projects/[PROJECT_ID]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-notes-occurrences-list",
+                    Some(r##"Lists occurrences referencing the specified note. Provider projects can use this method to get all occurrences across consumer projects referencing the specified note."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-notes-occurrences-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the note to list occurrences for in the form of `projects/[PROVIDER_ID]/notes/[NOTE_ID]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-occurrences-get",
+                    Some(r##"Gets the specified occurrence."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-occurrences-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the occurrence in the form of `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-occurrences-get-notes",
+                    Some(r##"Gets the note attached to the specified occurrence. Consumer projects can use this method to get a note that belongs to a provider project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-occurrences-get-notes",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the occurrence in the form of `projects/[PROJECT_ID]/occurrences/[OCCURRENCE_ID]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-occurrences-get-vulnerability-summary",
+                    Some(r##"Gets a summary of the number and severity of occurrences."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-occurrences-get-vulnerability-summary",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the project to get a vulnerability summary for in the form of `projects/[PROJECT_ID]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-occurrences-list",
+                    Some(r##"Lists occurrences for the specified project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-occurrences-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the project to list occurrences for in the form of `projects/[PROJECT_ID]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-resources-export-sbom",
+                    Some(r##"Generates an SBOM for the given resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_locations-resources-export-sbom",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the resource in the form of `projects/[PROJECT_ID]/resources/[RESOURCE_URL]`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("notes-batch-create",
                     Some(r##"Creates new notes in batch."##),
                     "Details at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli/projects_notes-batch-create",
@@ -3049,7 +3751,7 @@ async fn main() {
     
     let mut app = App::new("containeranalysis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240625")
            .about("This API is a prerequisite for leveraging Artifact Analysis scanning capabilities in both Artifact Registry and with Advanced Vulnerability Insights (runtime scanning) in GKE. In addition, the Container Analysis API is an implementation of the Grafeas API, which enables storing, querying, and retrieval of critical metadata about all of your software artifacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_containeranalysis1_cli")
            .arg(Arg::with_name("url")
@@ -3113,6 +3815,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

@@ -245,11 +245,12 @@ where
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "size-bytes" => Some(("sizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "format", "kms-key-name", "labels", "name", "satisfies-pzs", "size-bytes", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "format", "kms-key-name", "labels", "name", "satisfies-pzi", "satisfies-pzs", "size-bytes", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1361,11 +1362,12 @@ where
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "size-bytes" => Some(("sizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "format", "kms-key-name", "labels", "name", "satisfies-pzs", "size-bytes", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "format", "kms-key-name", "labels", "name", "satisfies-pzi", "satisfies-pzs", "size-bytes", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2245,7 +2247,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`."##),
+                     Some(r##"The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`. For each location in a project, repository names must be unique."##),
                      Some(true),
                      Some(false)),
         
@@ -2329,7 +2331,7 @@ async fn main() {
     
     let mut app = App::new("artifactregistry1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240213")
+           .version("5.0.5+20240608")
            .about("Store and manage build artifacts in a scalable and integrated service built on Google infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_artifactregistry1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -2393,6 +2395,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

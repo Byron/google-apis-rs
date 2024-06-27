@@ -1,4 +1,4 @@
-site_name: Workflow Executions v5.0.4+20240220
+site_name: Workflow Executions v5.0.5+20240617
 site_url: http://byron.github.io/google-apis-rs/google-workflowexecutions1-cli
 site_description: A complete library to interact with Workflow Executions (protocol v1)
 
@@ -22,5 +22,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

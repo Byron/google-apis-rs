@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pagespeedonline* crate version *5.0.4+20191206*, where *20191206* is the exact revision of the *pagespeedonline:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *pagespeedonline* crate version *5.0.5+20191206*, where *20191206* is the exact revision of the *pagespeedonline:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *pagespeedonline* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v4/getting-started).
@@ -91,7 +91,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = Pagespeedonline::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
@@ -176,6 +176,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

@@ -3064,6 +3064,65 @@ where
         }
     }
 
+    async fn _live_chat_messages_transition(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.live_chat_messages().transition();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "status" => {
+                    call = call.status(value.unwrap_or(""));
+                },
+                "id" => {
+                    call = call.id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["id", "status"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _live_chat_moderators_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.live_chat_moderators().delete(opt.value_of("id").unwrap_or(""));
@@ -7131,6 +7190,9 @@ where
                     ("list", Some(opt)) => {
                         call_result = self._live_chat_messages_list(opt, dry_run, &mut err).await;
                     },
+                    ("transition", Some(opt)) => {
+                        call_result = self._live_chat_messages_transition(opt, dry_run, &mut err).await;
+                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("live-chat-messages".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -8269,7 +8331,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("live-chat-messages", "methods: 'delete', 'insert' and 'list'", vec![
+        ("live-chat-messages", "methods: 'delete', 'insert', 'list' and 'transition'", vec![
             ("delete",
                     Some(r##"Deletes a chat message."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-messages_delete",
@@ -8324,6 +8386,22 @@ async fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("transition",
+                    Some(r##"Transition a durable chat event."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-chat-messages_transition",
+                  vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -9334,7 +9412,7 @@ async fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240303")
+           .version("5.0.5+20240626")
            .about("The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists, and channels.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")
@@ -9409,6 +9487,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

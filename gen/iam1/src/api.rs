@@ -77,7 +77,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -126,7 +126,7 @@ impl<'a, S> Iam<S> {
         Iam {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://iam.googleapis.com/".to_string(),
             _root_url: "https://iam.googleapis.com/".to_string(),
         }
@@ -152,7 +152,7 @@ impl<'a, S> Iam<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -184,6 +184,7 @@ impl<'a, S> Iam<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessRestrictions {
@@ -204,6 +205,7 @@ impl client::Part for AccessRestrictions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
@@ -223,6 +225,7 @@ impl client::Part for AuditConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditLogConfig {
@@ -243,10 +246,11 @@ impl client::Part for AuditLogConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditableService {
-    /// Public name of the service. For example, the service name for Cloud IAM is 'iam.googleapis.com'.
+    /// Public name of the service. For example, the service name for IAM is 'iam.googleapis.com'.
     
     pub name: Option<String>,
 }
@@ -258,6 +262,7 @@ impl client::Part for AuditableService {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Aws {
@@ -274,6 +279,7 @@ impl client::Part for Aws {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Binding {
@@ -300,6 +306,7 @@ impl client::Part for Binding {}
 /// 
 /// * [roles create organizations](OrganizationRoleCreateCall) (request)
 /// * [roles create projects](ProjectRoleCreateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateRoleRequest {
@@ -323,6 +330,7 @@ impl client::RequestValue for CreateRoleRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts keys create projects](ProjectServiceAccountKeyCreateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateServiceAccountKeyRequest {
@@ -347,6 +355,7 @@ impl client::RequestValue for CreateServiceAccountKeyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts create projects](ProjectServiceAccountCreateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateServiceAccountRequest {
@@ -371,9 +380,19 @@ impl client::RequestValue for CreateServiceAccountRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts keys disable projects](ProjectServiceAccountKeyDisableCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DisableServiceAccountKeyRequest { _never_set: Option<bool> }
+pub struct DisableServiceAccountKeyRequest {
+    /// Optional. Usable by internal google services only. An extended_status_message can be used to include additional information about the key, such as its private key data being exposed on a public repository like GitHub.
+    #[serde(rename="extendedStatusMessage")]
+    
+    pub extended_status_message: Option<String>,
+    /// Optional. Describes the reason this key is being disabled. If unspecified, the default value of SERVICE_ACCOUNT_KEY_DISABLE_REASON_USER_INITIATED will be used.
+    #[serde(rename="serviceAccountKeyDisableReason")]
+    
+    pub service_account_key_disable_reason: Option<String>,
+}
 
 impl client::RequestValue for DisableServiceAccountKeyRequest {}
 
@@ -386,6 +405,7 @@ impl client::RequestValue for DisableServiceAccountKeyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts disable projects](ProjectServiceAccountDisableCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DisableServiceAccountRequest { _never_set: Option<bool> }
@@ -400,12 +420,14 @@ impl client::RequestValue for DisableServiceAccountRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations oauth clients credentials delete projects](ProjectLocationOauthClientCredentialDeleteCall) (response)
 /// * [service accounts keys delete projects](ProjectServiceAccountKeyDeleteCall) (response)
 /// * [service accounts keys disable projects](ProjectServiceAccountKeyDisableCall) (response)
 /// * [service accounts keys enable projects](ProjectServiceAccountKeyEnableCall) (response)
 /// * [service accounts delete projects](ProjectServiceAccountDeleteCall) (response)
 /// * [service accounts disable projects](ProjectServiceAccountDisableCall) (response)
 /// * [service accounts enable projects](ProjectServiceAccountEnableCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -421,6 +443,7 @@ impl client::ResponseResult for Empty {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts keys enable projects](ProjectServiceAccountKeyEnableCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnableServiceAccountKeyRequest { _never_set: Option<bool> }
@@ -436,6 +459,7 @@ impl client::RequestValue for EnableServiceAccountKeyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts enable projects](ProjectServiceAccountEnableCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnableServiceAccountRequest { _never_set: Option<bool> }
@@ -447,6 +471,7 @@ impl client::RequestValue for EnableServiceAccountRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
@@ -467,6 +492,25 @@ pub struct Expr {
 impl client::Part for Expr {}
 
 
+/// Extended status can store additional metadata. For example, for keys disabled due to their private key data being expoesed we may include a message with more information about the exposure.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExtendedStatus {
+    /// The key for this extended status.
+    
+    pub key: Option<String>,
+    /// The value for the extended status.
+    
+    pub value: Option<String>,
+}
+
+impl client::Part for ExtendedStatus {}
+
+
 /// Request message for `GetIamPolicy` method.
 /// 
 /// # Activities
@@ -475,6 +519,7 @@ impl client::Part for Expr {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools get iam policy locations](LocationWorkforcePoolGetIamPolicyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
@@ -490,6 +535,7 @@ impl client::RequestValue for GetIamPolicyRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetPolicyOptions {
@@ -502,10 +548,60 @@ pub struct GetPolicyOptions {
 impl client::Part for GetPolicyOptions {}
 
 
+/// Represents the OAuth 2.0 client credential configuration for retrieving additional user attributes that are not present in the initial authentication credentials from the identity provider, e.g. groups. See https://datatracker.ietf.org/doc/html/rfc6749#section-4.4 for more details on client credentials grant flow.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleIamAdminV1WorkforcePoolProviderExtraAttributesOAuth2Client {
+    /// Required. Represents the IdP and type of claims that should be fetched.
+    #[serde(rename="attributesType")]
+    
+    pub attributes_type: Option<String>,
+    /// Required. The OAuth 2.0 client ID for retrieving extra attributes from the identity provider. Required to get the Access Token using client credentials grant flow.
+    #[serde(rename="clientId")]
+    
+    pub client_id: Option<String>,
+    /// Required. The OAuth 2.0 client secret for retrieving extra attributes from the identity provider. Required to get the Access Token using client credentials grant flow.
+    #[serde(rename="clientSecret")]
+    
+    pub client_secret: Option<GoogleIamAdminV1WorkforcePoolProviderOidcClientSecret>,
+    /// Required. The OIDC identity provider's issuer URI. Must be a valid URI using the `https` scheme. Required to get the OIDC discovery document.
+    #[serde(rename="issuerUri")]
+    
+    pub issuer_uri: Option<String>,
+    /// Optional. Represents the parameters to control which claims are fetched from an IdP.
+    #[serde(rename="queryParameters")]
+    
+    pub query_parameters: Option<GoogleIamAdminV1WorkforcePoolProviderExtraAttributesOAuth2ClientQueryParameters>,
+}
+
+impl client::Part for GoogleIamAdminV1WorkforcePoolProviderExtraAttributesOAuth2Client {}
+
+
+/// Represents the parameters to control which claims are fetched from an IdP.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleIamAdminV1WorkforcePoolProviderExtraAttributesOAuth2ClientQueryParameters {
+    /// Optional. The filter used to request specific records from IdP. In case of attributes type as AZURE_AD_GROUPS_MAIL, it represents the filter used to request specific groups for users from IdP. By default, all of the groups associated with the user are fetched. The groups should be mail enabled and security enabled. See https://learn.microsoft.com/en-us/graph/search-query-parameter for more details.
+    
+    pub filter: Option<String>,
+}
+
+impl client::Part for GoogleIamAdminV1WorkforcePoolProviderExtraAttributesOAuth2ClientQueryParameters {}
+
+
 /// Represents an OpenId Connect 1.0 identity provider.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamAdminV1WorkforcePoolProviderOidc {
@@ -517,7 +613,7 @@ pub struct GoogleIamAdminV1WorkforcePoolProviderOidc {
     #[serde(rename="clientSecret")]
     
     pub client_secret: Option<GoogleIamAdminV1WorkforcePoolProviderOidcClientSecret>,
-    /// Required. The OIDC issuer URI. Must be a valid URI using the 'https' scheme.
+    /// Required. The OIDC issuer URI. Must be a valid URI using the `https` scheme.
     #[serde(rename="issuerUri")]
     
     pub issuer_uri: Option<String>,
@@ -538,6 +634,7 @@ impl client::Part for GoogleIamAdminV1WorkforcePoolProviderOidc {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamAdminV1WorkforcePoolProviderOidcClientSecret {
@@ -553,6 +650,7 @@ impl client::Part for GoogleIamAdminV1WorkforcePoolProviderOidcClientSecret {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamAdminV1WorkforcePoolProviderOidcClientSecretValue {
@@ -572,6 +670,7 @@ impl client::Part for GoogleIamAdminV1WorkforcePoolProviderOidcClientSecretValue
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamAdminV1WorkforcePoolProviderOidcWebSsoConfig {
@@ -596,10 +695,11 @@ impl client::Part for GoogleIamAdminV1WorkforcePoolProviderOidcWebSsoConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamAdminV1WorkforcePoolProviderSaml {
-    /// Required. SAML Identity provider configuration metadata xml doc. The xml document should comply with [SAML 2.0 specification](https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf). The max size of the acceptable xml document will be bounded to 128k characters. The metadata xml document should satisfy the following constraints: 1) Must contain an Identity Provider Entity ID. 2) Must contain at least one non-expired signing key certificate. 3) For each signing key: a) Valid from should be no more than 7 days from now. b) Valid to should be no more than 15 years in the future. 4) Up to 3 IdP signing keys are allowed in the metadata xml. When updating the provider's metadata xml, at least one non-expired signing key must overlap with the existing metadata. This requirement is skipped if there are no non-expired signing keys present in the existing metadata.
+    /// Required. SAML Identity provider configuration metadata xml doc. The xml document should comply with [SAML 2.0 specification](https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf). The max size of the acceptable xml document will be bounded to 128k characters. The metadata xml document should satisfy the following constraints: 1) Must contain an Identity Provider Entity ID. 2) Must contain at least one non-expired signing key certificate. 3) For each signing key: a) Valid from should be no more than 7 days from now. b) Valid to should be no more than 20 years in the future. 4) Up to 3 IdP signing keys are allowed in the metadata xml. When updating the provider's metadata xml, at least one non-expired signing key must overlap with the existing metadata. This requirement is skipped if there are no non-expired signing keys present in the existing metadata.
     #[serde(rename="idpMetadataXml")]
     
     pub idp_metadata_xml: Option<String>,
@@ -612,6 +712,7 @@ impl client::Part for GoogleIamAdminV1WorkforcePoolProviderSaml {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct KeyData {
@@ -638,7 +739,7 @@ pub struct KeyData {
 impl client::Part for KeyData {}
 
 
-/// The request to lint a Cloud IAM policy object.
+/// The request to lint an IAM policy object.
 /// 
 /// # Activities
 /// 
@@ -646,13 +747,14 @@ impl client::Part for KeyData {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [lint policy iam policies](IamPolicyLintPolicyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LintPolicyRequest {
     /// google.iam.v1.Binding.condition object to be linted.
     
     pub condition: Option<Expr>,
-    /// The full resource name of the policy this lint request is about. The name follows the Google Cloud format for full resource names. For example, a Cloud project with ID `my-project` will be named `//cloudresourcemanager.googleapis.com/projects/my-project`. The resource name is not used to read a policy from IAM. Only the data in the request object is linted.
+    /// The full resource name of the policy this lint request is about. The name follows the Google Cloud format for full resource names. For example, a Google Cloud project with ID `my-project` will be named `//cloudresourcemanager.googleapis.com/projects/my-project`. The resource name is not used to read a policy from IAM. Only the data in the request object is linted.
     #[serde(rename="fullResourceName")]
     
     pub full_resource_name: Option<String>,
@@ -669,6 +771,7 @@ impl client::RequestValue for LintPolicyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [lint policy iam policies](IamPolicyLintPolicyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LintPolicyResponse {
@@ -685,6 +788,7 @@ impl client::ResponseResult for LintPolicyResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LintResult {
@@ -715,6 +819,52 @@ pub struct LintResult {
 impl client::Part for LintResult {}
 
 
+/// Response message for ListOauthClientCredentials.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations oauth clients credentials list projects](ProjectLocationOauthClientCredentialListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOauthClientCredentialsResponse {
+    /// A list of OauthClientCredentials.
+    #[serde(rename="oauthClientCredentials")]
+    
+    pub oauth_client_credentials: Option<Vec<OauthClientCredential>>,
+}
+
+impl client::ResponseResult for ListOauthClientCredentialsResponse {}
+
+
+/// Response message for ListOauthClients.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations oauth clients list projects](ProjectLocationOauthClientListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOauthClientsResponse {
+    /// Optional. A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// A list of OauthClients.
+    #[serde(rename="oauthClients")]
+    
+    pub oauth_clients: Option<Vec<OauthClient>>,
+}
+
+impl client::ResponseResult for ListOauthClientsResponse {}
+
+
 /// The response containing the roles defined under a resource.
 /// 
 /// # Activities
@@ -725,6 +875,7 @@ impl client::Part for LintResult {}
 /// * [roles list organizations](OrganizationRoleListCall) (response)
 /// * [roles list projects](ProjectRoleListCall) (response)
 /// * [list roles](RoleListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListRolesResponse {
@@ -748,6 +899,7 @@ impl client::ResponseResult for ListRolesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts keys list projects](ProjectServiceAccountKeyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServiceAccountKeysResponse {
@@ -767,6 +919,7 @@ impl client::ResponseResult for ListServiceAccountKeysResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts list projects](ProjectServiceAccountListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServiceAccountsResponse {
@@ -790,6 +943,7 @@ impl client::ResponseResult for ListServiceAccountsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools providers keys list locations](LocationWorkforcePoolProviderKeyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListWorkforcePoolProviderKeysResponse {
@@ -814,6 +968,7 @@ impl client::ResponseResult for ListWorkforcePoolProviderKeysResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools providers list locations](LocationWorkforcePoolProviderListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListWorkforcePoolProvidersResponse {
@@ -838,6 +993,7 @@ impl client::ResponseResult for ListWorkforcePoolProvidersResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools list locations](LocationWorkforcePoolListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListWorkforcePoolsResponse {
@@ -862,6 +1018,7 @@ impl client::ResponseResult for ListWorkforcePoolsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations workload identity pools providers keys list projects](ProjectLocationWorkloadIdentityPoolProviderKeyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListWorkloadIdentityPoolProviderKeysResponse {
@@ -886,6 +1043,7 @@ impl client::ResponseResult for ListWorkloadIdentityPoolProviderKeysResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations workload identity pools providers list projects](ProjectLocationWorkloadIdentityPoolProviderListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListWorkloadIdentityPoolProvidersResponse {
@@ -910,6 +1068,7 @@ impl client::ResponseResult for ListWorkloadIdentityPoolProvidersResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations workload identity pools list projects](ProjectLocationWorkloadIdentityPoolListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListWorkloadIdentityPoolsResponse {
@@ -926,10 +1085,107 @@ pub struct ListWorkloadIdentityPoolsResponse {
 impl client::ResponseResult for ListWorkloadIdentityPoolsResponse {}
 
 
+/// Represents an OauthClient. Used to access Google Cloud resources on behalf of a Workforce Identity Federation user by using OAuth 2.0 Protocol to obtain an access token from Google Cloud.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations oauth clients create projects](ProjectLocationOauthClientCreateCall) (request|response)
+/// * [locations oauth clients delete projects](ProjectLocationOauthClientDeleteCall) (response)
+/// * [locations oauth clients get projects](ProjectLocationOauthClientGetCall) (response)
+/// * [locations oauth clients patch projects](ProjectLocationOauthClientPatchCall) (request|response)
+/// * [locations oauth clients undelete projects](ProjectLocationOauthClientUndeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OauthClient {
+    /// Required. The list of OAuth grant types is allowed for the OauthClient.
+    #[serde(rename="allowedGrantTypes")]
+    
+    pub allowed_grant_types: Option<Vec<String>>,
+    /// Required. The list of redirect uris that is allowed to redirect back when authorization process is completed.
+    #[serde(rename="allowedRedirectUris")]
+    
+    pub allowed_redirect_uris: Option<Vec<String>>,
+    /// Required. The list of scopes that the OauthClient is allowed to request during OAuth flows. The following scopes are supported: * `https://www.googleapis.com/auth/cloud-platform`: See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
+    #[serde(rename="allowedScopes")]
+    
+    pub allowed_scopes: Option<Vec<String>>,
+    /// Output only. The system-generated OauthClient id.
+    #[serde(rename="clientId")]
+    
+    pub client_id: Option<String>,
+    /// Immutable. The type of OauthClient. Either public or private. For private clients, the client secret can be managed using the dedicated OauthClientCredential resource.
+    #[serde(rename="clientType")]
+    
+    pub client_type: Option<String>,
+    /// Optional. A user-specified description of the OauthClient. Cannot exceed 256 characters.
+    
+    pub description: Option<String>,
+    /// Optional. Whether the OauthClient is disabled. You cannot use a disabled OAuth client.
+    
+    pub disabled: Option<bool>,
+    /// Optional. A user-specified display name of the OauthClient. Cannot exceed 32 characters.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Output only. Time after which the OauthClient will be permanently purged and cannot be recovered.
+    #[serde(rename="expireTime")]
+    
+    pub expire_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Immutable. The resource name of the OauthClient. Format:`projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    
+    pub name: Option<String>,
+    /// Output only. The state of the OauthClient.
+    
+    pub state: Option<String>,
+}
+
+impl client::RequestValue for OauthClient {}
+impl client::ResponseResult for OauthClient {}
+
+
+/// Represents an OauthClientCredential. Used to authenticate an OauthClient while accessing Google Cloud resources on behalf of a user by using OAuth 2.0 Protocol.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations oauth clients credentials create projects](ProjectLocationOauthClientCredentialCreateCall) (request|response)
+/// * [locations oauth clients credentials get projects](ProjectLocationOauthClientCredentialGetCall) (response)
+/// * [locations oauth clients credentials patch projects](ProjectLocationOauthClientCredentialPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OauthClientCredential {
+    /// Output only. The system-generated OAuth client secret. The client secret must be stored securely. If the client secret is leaked, you must delete and re-create the client credential. To learn more, see [OAuth client and credential security risks and mitigations](https://cloud.google.com/iam/docs/workforce-oauth-app#security)
+    #[serde(rename="clientSecret")]
+    
+    pub client_secret: Option<String>,
+    /// Optional. Whether the OauthClientCredential is disabled. You cannot use a disabled OauthClientCredential.
+    
+    pub disabled: Option<bool>,
+    /// Optional. A user-specified display name of the OauthClientCredential. Cannot exceed 32 characters.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Immutable. The resource name of the OauthClientCredential. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}/credentials/{credential}`
+    
+    pub name: Option<String>,
+}
+
+impl client::RequestValue for OauthClientCredential {}
+impl client::ResponseResult for OauthClientCredential {}
+
+
 /// Represents an OpenId Connect 1.0 identity provider.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Oidc {
@@ -991,6 +1247,7 @@ impl client::Part for Oidc {}
 /// * [locations workload identity pools delete projects](ProjectLocationWorkloadIdentityPoolDeleteCall) (response)
 /// * [locations workload identity pools patch projects](ProjectLocationWorkloadIdentityPoolPatchCall) (response)
 /// * [locations workload identity pools undelete projects](ProjectLocationWorkloadIdentityPoolUndeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
@@ -1014,6 +1271,31 @@ pub struct Operation {
 impl client::ResponseResult for Operation {}
 
 
+/// The service account key patch request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts keys patch projects](ProjectServiceAccountKeyPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PatchServiceAccountKeyRequest {
+    /// Required. The service account key to update.
+    #[serde(rename="serviceAccountKey")]
+    
+    pub service_account_key: Option<ServiceAccountKey>,
+    /// Required. The update mask to apply to the service account key. Only the following fields are eligible for patching: - contact - description
+    #[serde(rename="updateMask")]
+    
+    pub update_mask: Option<client::FieldMask>,
+}
+
+impl client::RequestValue for PatchServiceAccountKeyRequest {}
+
+
 /// The service account patch request. You can patch only the `display_name` and `description` fields. You must use the `update_mask` field to specify which of these fields you want to patch. Only the fields specified in the request are guaranteed to be returned in the response. Other fields may be empty in the response.
 /// 
 /// # Activities
@@ -1022,6 +1304,7 @@ impl client::ResponseResult for Operation {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts patch projects](ProjectServiceAccountPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PatchServiceAccountRequest {
@@ -1046,6 +1329,7 @@ impl client::RequestValue for PatchServiceAccountRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query testable permissions permissions](PermissionQueryTestablePermissionCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
@@ -1093,6 +1377,7 @@ impl client::Resource for Permission {}
 /// * [workforce pools set iam policy locations](LocationWorkforcePoolSetIamPolicyCall) (response)
 /// * [service accounts get iam policy projects](ProjectServiceAccountGetIamPolicyCall) (response)
 /// * [service accounts set iam policy projects](ProjectServiceAccountSetIamPolicyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
@@ -1123,6 +1408,7 @@ impl client::ResponseResult for Policy {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query auditable services iam policies](IamPolicyQueryAuditableServiceCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryAuditableServicesRequest {
@@ -1143,6 +1429,7 @@ impl client::RequestValue for QueryAuditableServicesRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query auditable services iam policies](IamPolicyQueryAuditableServiceCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryAuditableServicesResponse {
@@ -1162,6 +1449,7 @@ impl client::ResponseResult for QueryAuditableServicesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query grantable roles roles](RoleQueryGrantableRoleCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryGrantableRolesRequest {
@@ -1193,6 +1481,7 @@ impl client::RequestValue for QueryGrantableRolesRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query grantable roles roles](RoleQueryGrantableRoleCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryGrantableRolesResponse {
@@ -1216,6 +1505,7 @@ impl client::ResponseResult for QueryGrantableRolesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query testable permissions permissions](PermissionQueryTestablePermissionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryTestablePermissionsRequest {
@@ -1244,6 +1534,7 @@ impl client::RequestValue for QueryTestablePermissionsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query testable permissions permissions](PermissionQueryTestablePermissionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryTestablePermissionsResponse {
@@ -1279,6 +1570,7 @@ impl client::ResponseResult for QueryTestablePermissionsResponse {}
 /// * [get roles](RoleGetCall) (response)
 /// * [list roles](RoleListCall) (none)
 /// * [query grantable roles roles](RoleQueryGrantableRoleCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Role {
@@ -1296,7 +1588,7 @@ pub struct Role {
     #[serde(rename="includedPermissions")]
     
     pub included_permissions: Option<Vec<String>>,
-    /// The name of the role. When `Role` is used in `CreateRole`, the role name must not be set. When `Role` is used in output and other input such as `UpdateRole`, the role name is the complete path. For example, `roles/logging.viewer` for predefined roles, `organizations/{ORGANIZATION_ID}/roles/my-role` for organization-level custom roles, and `projects/{PROJECT_ID}/roles/my-role` for project-level custom roles.
+    /// The name of the role. When `Role` is used in `CreateRole`, the role name must not be set. When `Role` is used in output and other input such as `UpdateRole`, the role name is the complete path. For example, `roles/logging.viewer` for predefined roles, `organizations/{ORGANIZATION_ID}/roles/myRole` for organization-level custom roles, and `projects/{PROJECT_ID}/roles/myRole` for project-level custom roles.
     
     pub name: Option<String>,
     /// The current launch stage of the role. If the `ALPHA` launch stage has been selected for a role, the `stage` field will not be included in the returned definition for the role.
@@ -1316,10 +1608,11 @@ impl client::ResponseResult for Role {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Saml {
-    /// Required. SAML Identity provider configuration metadata xml doc. The xml document should comply with [SAML 2.0 specification](https://www.oasis-open.org/committees/download.php/56785/sstc-saml-metadata-errata-2.0-wd-05.pdf). The max size of the acceptable xml document will be bounded to 128k characters. The metadata xml document should satisfy the following constraints: 1) Must contain an Identity Provider Entity ID. 2) Must contain at least one non-expired signing key certificate. 3) For each signing key: a) Valid from should be no more than 7 days from now. b) Valid to should be no more than 15 years in the future. 4) Upto 3 IdP signing keys are allowed in the metadata xml. When updating the provider's metadata xml, at lease one non-expired signing key must overlap with the existing metadata. This requirement is skipped if there are no non-expired signing keys present in the existing metadata
+    /// Required. SAML identity provider (IdP) configuration metadata XML doc. The XML document must comply with the [SAML 2.0 specification](https://docs.oasis-open.org/security/saml/v2.0/saml-metadata-2.0-os.pdf). The maximum size of an acceptable XML document is 128K characters. The SAML metadata XML document must satisfy the following constraints: * Must contain an IdP Entity ID. * Must contain at least one non-expired signing certificate. * For each signing certificate, the expiration must be: * From no more than 7 days in the future. * To no more than 20 years in the future. * Up to three IdP signing keys are allowed. When updating the provider's metadata XML, at least one non-expired signing key must overlap with the existing metadata. This requirement is skipped if there are no non-expired signing keys present in the existing metadata.
     #[serde(rename="idpMetadataXml")]
     
     pub idp_metadata_xml: Option<String>,
@@ -1339,6 +1632,7 @@ impl client::Part for Saml {}
 /// * [service accounts get projects](ProjectServiceAccountGetCall) (response)
 /// * [service accounts patch projects](ProjectServiceAccountPatchCall) (response)
 /// * [service accounts update projects](ProjectServiceAccountUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
@@ -1389,13 +1683,32 @@ impl client::ResponseResult for ServiceAccount {}
 /// 
 /// * [service accounts keys create projects](ProjectServiceAccountKeyCreateCall) (response)
 /// * [service accounts keys get projects](ProjectServiceAccountKeyGetCall) (response)
+/// * [service accounts keys patch projects](ProjectServiceAccountKeyPatchCall) (response)
 /// * [service accounts keys upload projects](ProjectServiceAccountKeyUploadCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccountKey {
+    /// Optional. A user provided email address as the point of contact for this service account key. Must be an email address. Limit 64 characters.
+    
+    pub contact: Option<String>,
+    /// Output only. The cloud identity that created this service account key. Populated automatically when the key is created and not editable by the user.
+    
+    pub creator: Option<String>,
+    /// Optional. A user provided description of this service account key.
+    
+    pub description: Option<String>,
+    /// Output only. optional. If the key is disabled, it may have a DisableReason describing why it was disabled.
+    #[serde(rename="disableReason")]
+    
+    pub disable_reason: Option<String>,
     /// The key status.
     
     pub disabled: Option<bool>,
+    /// Output only. Extended Status provides permanent information about a service account key. For example, if this key was detected as exposed or compromised, that information will remain for the lifetime of the key in the extended_status.
+    #[serde(rename="extendedStatus")]
+    
+    pub extended_status: Option<Vec<ExtendedStatus>>,
     /// Specifies the algorithm (and possibly key size) for the key.
     #[serde(rename="keyAlgorithm")]
     
@@ -1442,6 +1755,7 @@ impl client::ResponseResult for ServiceAccountKey {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceConfig {
@@ -1462,6 +1776,7 @@ impl client::Part for ServiceConfig {}
 /// 
 /// * [workforce pools set iam policy locations](LocationWorkforcePoolSetIamPolicyCall) (request)
 /// * [service accounts set iam policy projects](ProjectServiceAccountSetIamPolicyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
@@ -1485,6 +1800,7 @@ impl client::RequestValue for SetIamPolicyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts sign blob projects](ProjectServiceAccountSignBlobCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignBlobRequest {
@@ -1506,6 +1822,7 @@ impl client::RequestValue for SignBlobRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts sign blob projects](ProjectServiceAccountSignBlobCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignBlobResponse {
@@ -1530,6 +1847,7 @@ impl client::ResponseResult for SignBlobResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts sign jwt projects](ProjectServiceAccountSignJwtCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignJwtRequest {
@@ -1549,6 +1867,7 @@ impl client::RequestValue for SignJwtRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts sign jwt projects](ProjectServiceAccountSignJwtCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignJwtResponse {
@@ -1569,6 +1888,7 @@ impl client::ResponseResult for SignJwtResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Status {
@@ -1595,6 +1915,7 @@ impl client::Part for Status {}
 /// 
 /// * [workforce pools test iam permissions locations](LocationWorkforcePoolTestIamPermissionCall) (request)
 /// * [service accounts test iam permissions projects](ProjectServiceAccountTestIamPermissionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
@@ -1615,6 +1936,7 @@ impl client::RequestValue for TestIamPermissionsRequest {}
 /// 
 /// * [workforce pools test iam permissions locations](LocationWorkforcePoolTestIamPermissionCall) (response)
 /// * [service accounts test iam permissions projects](ProjectServiceAccountTestIamPermissionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
@@ -1626,6 +1948,22 @@ pub struct TestIamPermissionsResponse {
 impl client::ResponseResult for TestIamPermissionsResponse {}
 
 
+/// Request message for UndeleteOauthClient.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations oauth clients undelete projects](ProjectLocationOauthClientUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UndeleteOauthClientRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for UndeleteOauthClientRequest {}
+
+
 /// The request to undelete an existing role.
 /// 
 /// # Activities
@@ -1635,6 +1973,7 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 /// 
 /// * [roles undelete organizations](OrganizationRoleUndeleteCall) (request)
 /// * [roles undelete projects](ProjectRoleUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteRoleRequest {
@@ -1655,6 +1994,7 @@ impl client::RequestValue for UndeleteRoleRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts undelete projects](ProjectServiceAccountUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteServiceAccountRequest { _never_set: Option<bool> }
@@ -1670,6 +2010,7 @@ impl client::RequestValue for UndeleteServiceAccountRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts undelete projects](ProjectServiceAccountUndeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteServiceAccountResponse {
@@ -1690,6 +2031,7 @@ impl client::ResponseResult for UndeleteServiceAccountResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools providers keys undelete locations](LocationWorkforcePoolProviderKeyUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteWorkforcePoolProviderKeyRequest { _never_set: Option<bool> }
@@ -1705,6 +2047,7 @@ impl client::RequestValue for UndeleteWorkforcePoolProviderKeyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools providers undelete locations](LocationWorkforcePoolProviderUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteWorkforcePoolProviderRequest { _never_set: Option<bool> }
@@ -1720,6 +2063,7 @@ impl client::RequestValue for UndeleteWorkforcePoolProviderRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools undelete locations](LocationWorkforcePoolUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteWorkforcePoolRequest { _never_set: Option<bool> }
@@ -1735,6 +2079,7 @@ impl client::RequestValue for UndeleteWorkforcePoolRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [workforce pools subjects undelete locations](LocationWorkforcePoolSubjectUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteWorkforcePoolSubjectRequest { _never_set: Option<bool> }
@@ -1750,6 +2095,7 @@ impl client::RequestValue for UndeleteWorkforcePoolSubjectRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations workload identity pools providers keys undelete projects](ProjectLocationWorkloadIdentityPoolProviderKeyUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteWorkloadIdentityPoolProviderKeyRequest { _never_set: Option<bool> }
@@ -1765,6 +2111,7 @@ impl client::RequestValue for UndeleteWorkloadIdentityPoolProviderKeyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations workload identity pools providers undelete projects](ProjectLocationWorkloadIdentityPoolProviderUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteWorkloadIdentityPoolProviderRequest { _never_set: Option<bool> }
@@ -1780,6 +2127,7 @@ impl client::RequestValue for UndeleteWorkloadIdentityPoolProviderRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations workload identity pools undelete projects](ProjectLocationWorkloadIdentityPoolUndeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UndeleteWorkloadIdentityPoolRequest { _never_set: Option<bool> }
@@ -1795,6 +2143,7 @@ impl client::RequestValue for UndeleteWorkloadIdentityPoolRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service accounts keys upload projects](ProjectServiceAccountKeyUploadCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UploadServiceAccountKeyRequest {
@@ -1818,6 +2167,7 @@ impl client::RequestValue for UploadServiceAccountKeyRequest {}
 /// * [workforce pools create locations](LocationWorkforcePoolCreateCall) (request)
 /// * [workforce pools get locations](LocationWorkforcePoolGetCall) (response)
 /// * [workforce pools patch locations](LocationWorkforcePoolPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkforcePool {
@@ -1869,6 +2219,7 @@ impl client::ResponseResult for WorkforcePool {}
 /// * [workforce pools providers create locations](LocationWorkforcePoolProviderCreateCall) (request)
 /// * [workforce pools providers get locations](LocationWorkforcePoolProviderGetCall) (response)
 /// * [workforce pools providers patch locations](LocationWorkforcePoolProviderPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkforcePoolProvider {
@@ -1876,7 +2227,7 @@ pub struct WorkforcePoolProvider {
     #[serde(rename="attributeCondition")]
     
     pub attribute_condition: Option<String>,
-    /// Required. Maps attributes from the authentication credentials issued by an external identity provider to Google Cloud attributes, such as `subject` and `segment`. Each key must be a string specifying the Google Cloud IAM attribute to map to. The following keys are supported: * `google.subject`: The principal IAM is authenticating. You can reference this value in IAM bindings. This is also the subject that appears in Cloud Logging logs. This is a required field and the mapped subject cannot exceed 127 bytes. * `google.groups`: Groups the authenticating user belongs to. You can grant groups access to resources using an IAM `principalSet` binding; access applies to all members of the group. * `google.display_name`: The name of the authenticated user. This is an optional field and the mapped display name cannot exceed 100 bytes. If not set, `google.subject` will be displayed instead. This attribute cannot be referenced in IAM bindings. * `google.profile_photo`: The URL that specifies the authenticated user's thumbnail photo. This is an optional field. When set, the image will be visible as the user's profile picture. If not set, a generic user icon will be displayed instead. This attribute cannot be referenced in IAM bindings. * `google.posix_username`: The linux username used by OS login. This is an optional field and the mapped posix username cannot exceed 32 characters, The key must match the regex "^a-zA-Z0-9._{0,31}$". This attribute cannot be referenced in IAM bindings. You can also provide custom attributes by specifying `attribute.{custom_attribute}`, where {custom_attribute} is the name of the custom attribute to be mapped. You can define a maximum of 50 custom attributes. The maximum length of a mapped attribute key is 100 characters, and the key may only contain the characters [a-z0-9_]. You can reference these attributes in IAM policies to define fine-grained access for a workforce pool to Google Cloud resources. For example: * `google.subject`: `principal://iam.googleapis.com/locations/global/workforcePools/{pool}/subject/{value}` * `google.groups`: `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool}/group/{value}` * `attribute.{custom_attribute}`: `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool}/attribute.{custom_attribute}/{value}` Each value must be a [Common Expression Language] (https://opensource.google/projects/cel) function that maps an identity provider credential to the normalized attribute specified by the corresponding map key. You can use the `assertion` keyword in the expression to access a JSON representation of the authentication credential issued by the provider. The maximum length of an attribute mapping expression is 2048 characters. When evaluated, the total size of all mapped attributes must not exceed 4KB. For OIDC providers, you must supply a custom mapping that includes the `google.subject` attribute. For example, the following maps the `sub` claim of the incoming credential to the `subject` attribute on a Google token: ``` {"google.subject": "assertion.sub"} ```
+    /// Required. Maps attributes from the authentication credentials issued by an external identity provider to Google Cloud attributes, such as `subject` and `segment`. Each key must be a string specifying the Google Cloud IAM attribute to map to. The following keys are supported: * `google.subject`: The principal IAM is authenticating. You can reference this value in IAM bindings. This is also the subject that appears in Cloud Logging logs. This is a required field and the mapped subject cannot exceed 127 bytes. * `google.groups`: Groups the authenticating user belongs to. You can grant groups access to resources using an IAM `principalSet` binding; access applies to all members of the group. * `google.display_name`: The name of the authenticated user. This is an optional field and the mapped display name cannot exceed 100 bytes. If not set, `google.subject` will be displayed instead. This attribute cannot be referenced in IAM bindings. * `google.profile_photo`: The URL that specifies the authenticated user's thumbnail photo. This is an optional field. When set, the image will be visible as the user's profile picture. If not set, a generic user icon will be displayed instead. This attribute cannot be referenced in IAM bindings. * `google.posix_username`: The Linux username used by OS Login. This is an optional field and the mapped POSIX username cannot exceed 32 characters, The key must match the regex "^a-zA-Z0-9._{0,31}$". This attribute cannot be referenced in IAM bindings. You can also provide custom attributes by specifying `attribute.{custom_attribute}`, where {custom_attribute} is the name of the custom attribute to be mapped. You can define a maximum of 50 custom attributes. The maximum length of a mapped attribute key is 100 characters, and the key may only contain the characters [a-z0-9_]. You can reference these attributes in IAM policies to define fine-grained access for a workforce pool to Google Cloud resources. For example: * `google.subject`: `principal://iam.googleapis.com/locations/global/workforcePools/{pool}/subject/{value}` * `google.groups`: `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool}/group/{value}` * `attribute.{custom_attribute}`: `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool}/attribute.{custom_attribute}/{value}` Each value must be a [Common Expression Language] (https://opensource.google/projects/cel) function that maps an identity provider credential to the normalized attribute specified by the corresponding map key. You can use the `assertion` keyword in the expression to access a JSON representation of the authentication credential issued by the provider. The maximum length of an attribute mapping expression is 2048 characters. When evaluated, the total size of all mapped attributes must not exceed 4KB. For OIDC providers, you must supply a custom mapping that includes the `google.subject` attribute. For example, the following maps the `sub` claim of the incoming credential to the `subject` attribute on a Google token: ``` {"google.subject": "assertion.sub"} ```
     #[serde(rename="attributeMapping")]
     
     pub attribute_mapping: Option<HashMap<String, String>>,
@@ -1894,6 +2245,10 @@ pub struct WorkforcePoolProvider {
     #[serde(rename="expireTime")]
     
     pub expire_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. The configuration for OAuth 2.0 client used to get the additional user attributes. This should be used when users can't get the desired claims in authentication credentials. Currently this configuration is only supported with OIDC protocol.
+    #[serde(rename="extraAttributesOauth2Client")]
+    
+    pub extra_attributes_oauth2_client: Option<GoogleIamAdminV1WorkforcePoolProviderExtraAttributesOAuth2Client>,
     /// Output only. The resource name of the provider. Format: `locations/{location}/workforcePools/{workforce_pool_id}/providers/{provider_id}`
     
     pub name: Option<String>,
@@ -1921,6 +2276,7 @@ impl client::ResponseResult for WorkforcePoolProvider {}
 /// 
 /// * [workforce pools providers keys create locations](LocationWorkforcePoolProviderKeyCreateCall) (request)
 /// * [workforce pools providers keys get locations](LocationWorkforcePoolProviderKeyGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkforcePoolProviderKey {
@@ -1958,6 +2314,7 @@ impl client::ResponseResult for WorkforcePoolProviderKey {}
 /// * [locations workload identity pools create projects](ProjectLocationWorkloadIdentityPoolCreateCall) (request)
 /// * [locations workload identity pools get projects](ProjectLocationWorkloadIdentityPoolGetCall) (response)
 /// * [locations workload identity pools patch projects](ProjectLocationWorkloadIdentityPoolPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkloadIdentityPool {
@@ -1997,6 +2354,7 @@ impl client::ResponseResult for WorkloadIdentityPool {}
 /// * [locations workload identity pools providers create projects](ProjectLocationWorkloadIdentityPoolProviderCreateCall) (request)
 /// * [locations workload identity pools providers get projects](ProjectLocationWorkloadIdentityPoolProviderGetCall) (response)
 /// * [locations workload identity pools providers patch projects](ProjectLocationWorkloadIdentityPoolProviderPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkloadIdentityPoolProvider {
@@ -2052,6 +2410,7 @@ impl client::ResponseResult for WorkloadIdentityPoolProvider {}
 /// 
 /// * [locations workload identity pools providers keys create projects](ProjectLocationWorkloadIdentityPoolProviderKeyCreateCall) (request)
 /// * [locations workload identity pools providers keys get projects](ProjectLocationWorkloadIdentityPoolProviderKeyGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WorkloadIdentityPoolProviderKey {
@@ -2105,7 +2464,7 @@ impl client::ResponseResult for WorkloadIdentityPoolProviderKey {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `lint_policy(...)` and `query_auditable_services(...)`
 /// // to build up your call.
@@ -2180,7 +2539,7 @@ impl<'a, S> IamPolicyMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `workforce_pools_create(...)`, `workforce_pools_delete(...)`, `workforce_pools_get(...)`, `workforce_pools_get_iam_policy(...)`, `workforce_pools_list(...)`, `workforce_pools_operations_get(...)`, `workforce_pools_patch(...)`, `workforce_pools_providers_create(...)`, `workforce_pools_providers_delete(...)`, `workforce_pools_providers_get(...)`, `workforce_pools_providers_keys_create(...)`, `workforce_pools_providers_keys_delete(...)`, `workforce_pools_providers_keys_get(...)`, `workforce_pools_providers_keys_list(...)`, `workforce_pools_providers_keys_operations_get(...)`, `workforce_pools_providers_keys_undelete(...)`, `workforce_pools_providers_list(...)`, `workforce_pools_providers_operations_get(...)`, `workforce_pools_providers_patch(...)`, `workforce_pools_providers_undelete(...)`, `workforce_pools_set_iam_policy(...)`, `workforce_pools_subjects_delete(...)`, `workforce_pools_subjects_operations_get(...)`, `workforce_pools_subjects_undelete(...)`, `workforce_pools_test_iam_permissions(...)` and `workforce_pools_undelete(...)`
 /// // to build up your call.
@@ -2363,7 +2722,7 @@ impl<'a, S> LocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a WorkforcePoolProvider. Deleting a provider does not revoke credentials that have already been\ issued; they continue to grant access. You can undelete a provider for 30 days. After 30 days, deletion is permanent. You cannot update deleted providers. However, you can view and list them.
+    /// Deletes a WorkforcePoolProvider. Deleting a provider does not revoke credentials that have already been issued; they continue to grant access. You can undelete a provider for 30 days. After 30 days, deletion is permanent. You cannot update deleted providers. However, you can view and list them.
     /// 
     /// # Arguments
     ///
@@ -2473,11 +2832,11 @@ impl<'a, S> LocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a WorkforcePoolSubject. Subject must not already be in a deleted state. A WorkforcePoolSubject is automatically created the first time an external credential is exchanged for a Google Cloud credential with a mapped `google.subject` attribute. There is no path to manually create WorkforcePoolSubjects. Once deleted, the WorkforcePoolSubject may not be used for 30 days. After 30 days, the WorkforcePoolSubject will be deleted forever and can be reused in token exchanges with Google Cloud STS. This will automatically create a new WorkforcePoolSubject that is independent of the previously deleted WorkforcePoolSubject with the same google.subject value.
+    /// Deletes a WorkforcePoolSubject. Subject must not already be in a deleted state. A WorkforcePoolSubject is automatically created the first time an external credential is exchanged for a Google Cloud credential using a mapped `google.subject` attribute. There is no endpoint to manually create a WorkforcePoolSubject. For 30 days after a WorkforcePoolSubject is deleted, using the same `google.subject` attribute in token exchanges with Google Cloud STS fails. Call UndeleteWorkforcePoolSubject to undelete a WorkforcePoolSubject that has been deleted, within within 30 days of deleting it. After 30 days, the WorkforcePoolSubject is permanently deleted. At this point, a token exchange with Google Cloud STS that uses the same mapped `google.subject` attribute automatically creates a new WorkforcePoolSubject that is unrelated to the previously deleted WorkforcePoolSubject but has the same `google.subject` value.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The resource name of the WorkforcePoolSubject. Special characters, like '/' and ':', must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
+    /// * `name` - Required. The resource name of the WorkforcePoolSubject. Special characters, like `/` and `:`, must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
     pub fn workforce_pools_subjects_delete(&self, name: &str) -> LocationWorkforcePoolSubjectDeleteCall<'a, S> {
         LocationWorkforcePoolSubjectDeleteCall {
             hub: self.hub,
@@ -2495,7 +2854,7 @@ impl<'a, S> LocationMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The resource name of the WorkforcePoolSubject. Special characters, like '/' and ':', must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
+    /// * `name` - Required. The resource name of the WorkforcePoolSubject. Special characters, like `/` and `:`, must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
     pub fn workforce_pools_subjects_undelete(&self, request: UndeleteWorkforcePoolSubjectRequest, name: &str) -> LocationWorkforcePoolSubjectUndeleteCall<'a, S> {
         LocationWorkforcePoolSubjectUndeleteCall {
             hub: self.hub,
@@ -2642,7 +3001,7 @@ impl<'a, S> LocationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the caller's permissions on the WorkforcePool. If the pool does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error.
+    /// Returns the caller's permissions on the WorkforcePool. If the pool doesn't exist, this call returns an empty set of permissions. It doesn't return a `NOT_FOUND` error.
     /// 
     /// # Arguments
     ///
@@ -2702,7 +3061,7 @@ impl<'a, S> LocationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `roles_create(...)`, `roles_delete(...)`, `roles_get(...)`, `roles_list(...)`, `roles_patch(...)` and `roles_undelete(...)`
 /// // to build up your call.
@@ -2726,7 +3085,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`projects.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [projects.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_create(&self, request: CreateRoleRequest, parent: &str) -> OrganizationRoleCreateCall<'a, S> {
         OrganizationRoleCreateCall {
             hub: self.hub,
@@ -2744,7 +3103,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_delete(&self, name: &str) -> OrganizationRoleDeleteCall<'a, S> {
         OrganizationRoleDeleteCall {
             hub: self.hub,
@@ -2762,7 +3121,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`roles.get()`](https://cloud.google.com/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [`projects.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [projects.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_get(&self, name: &str) -> OrganizationRoleGetCall<'a, S> {
         OrganizationRoleGetCall {
             hub: self.hub,
@@ -2779,7 +3138,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`roles.list()`](https://cloud.google.com/iam/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [`projects.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [projects.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_list(&self, parent: &str) -> OrganizationRoleListCall<'a, S> {
         OrganizationRoleListCall {
             hub: self.hub,
@@ -2801,7 +3160,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_patch(&self, request: Role, name: &str) -> OrganizationRolePatchCall<'a, S> {
         OrganizationRolePatchCall {
             hub: self.hub,
@@ -2821,7 +3180,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_undelete(&self, request: UndeleteRoleRequest, name: &str) -> OrganizationRoleUndeleteCall<'a, S> {
         OrganizationRoleUndeleteCall {
             hub: self.hub,
@@ -2857,7 +3216,7 @@ impl<'a, S> OrganizationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `query_testable_permissions(...)`
 /// // to build up your call.
@@ -2915,9 +3274,9 @@ impl<'a, S> PermissionMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_workload_identity_pools_create(...)`, `locations_workload_identity_pools_delete(...)`, `locations_workload_identity_pools_get(...)`, `locations_workload_identity_pools_list(...)`, `locations_workload_identity_pools_namespaces_managed_identities_operations_get(...)`, `locations_workload_identity_pools_namespaces_managed_identities_workload_sources_operations_get(...)`, `locations_workload_identity_pools_namespaces_operations_get(...)`, `locations_workload_identity_pools_operations_get(...)`, `locations_workload_identity_pools_patch(...)`, `locations_workload_identity_pools_providers_create(...)`, `locations_workload_identity_pools_providers_delete(...)`, `locations_workload_identity_pools_providers_get(...)`, `locations_workload_identity_pools_providers_keys_create(...)`, `locations_workload_identity_pools_providers_keys_delete(...)`, `locations_workload_identity_pools_providers_keys_get(...)`, `locations_workload_identity_pools_providers_keys_list(...)`, `locations_workload_identity_pools_providers_keys_operations_get(...)`, `locations_workload_identity_pools_providers_keys_undelete(...)`, `locations_workload_identity_pools_providers_list(...)`, `locations_workload_identity_pools_providers_operations_get(...)`, `locations_workload_identity_pools_providers_patch(...)`, `locations_workload_identity_pools_providers_undelete(...)`, `locations_workload_identity_pools_undelete(...)`, `roles_create(...)`, `roles_delete(...)`, `roles_get(...)`, `roles_list(...)`, `roles_patch(...)`, `roles_undelete(...)`, `service_accounts_create(...)`, `service_accounts_delete(...)`, `service_accounts_disable(...)`, `service_accounts_enable(...)`, `service_accounts_get(...)`, `service_accounts_get_iam_policy(...)`, `service_accounts_keys_create(...)`, `service_accounts_keys_delete(...)`, `service_accounts_keys_disable(...)`, `service_accounts_keys_enable(...)`, `service_accounts_keys_get(...)`, `service_accounts_keys_list(...)`, `service_accounts_keys_upload(...)`, `service_accounts_list(...)`, `service_accounts_patch(...)`, `service_accounts_set_iam_policy(...)`, `service_accounts_sign_blob(...)`, `service_accounts_sign_jwt(...)`, `service_accounts_test_iam_permissions(...)`, `service_accounts_undelete(...)` and `service_accounts_update(...)`
+/// // like `locations_oauth_clients_create(...)`, `locations_oauth_clients_credentials_create(...)`, `locations_oauth_clients_credentials_delete(...)`, `locations_oauth_clients_credentials_get(...)`, `locations_oauth_clients_credentials_list(...)`, `locations_oauth_clients_credentials_patch(...)`, `locations_oauth_clients_delete(...)`, `locations_oauth_clients_get(...)`, `locations_oauth_clients_list(...)`, `locations_oauth_clients_patch(...)`, `locations_oauth_clients_undelete(...)`, `locations_workload_identity_pools_create(...)`, `locations_workload_identity_pools_delete(...)`, `locations_workload_identity_pools_get(...)`, `locations_workload_identity_pools_list(...)`, `locations_workload_identity_pools_namespaces_managed_identities_operations_get(...)`, `locations_workload_identity_pools_namespaces_managed_identities_workload_sources_operations_get(...)`, `locations_workload_identity_pools_namespaces_operations_get(...)`, `locations_workload_identity_pools_operations_get(...)`, `locations_workload_identity_pools_patch(...)`, `locations_workload_identity_pools_providers_create(...)`, `locations_workload_identity_pools_providers_delete(...)`, `locations_workload_identity_pools_providers_get(...)`, `locations_workload_identity_pools_providers_keys_create(...)`, `locations_workload_identity_pools_providers_keys_delete(...)`, `locations_workload_identity_pools_providers_keys_get(...)`, `locations_workload_identity_pools_providers_keys_list(...)`, `locations_workload_identity_pools_providers_keys_operations_get(...)`, `locations_workload_identity_pools_providers_keys_undelete(...)`, `locations_workload_identity_pools_providers_list(...)`, `locations_workload_identity_pools_providers_operations_get(...)`, `locations_workload_identity_pools_providers_patch(...)`, `locations_workload_identity_pools_providers_undelete(...)`, `locations_workload_identity_pools_undelete(...)`, `roles_create(...)`, `roles_delete(...)`, `roles_get(...)`, `roles_list(...)`, `roles_patch(...)`, `roles_undelete(...)`, `service_accounts_create(...)`, `service_accounts_delete(...)`, `service_accounts_disable(...)`, `service_accounts_enable(...)`, `service_accounts_get(...)`, `service_accounts_get_iam_policy(...)`, `service_accounts_keys_create(...)`, `service_accounts_keys_delete(...)`, `service_accounts_keys_disable(...)`, `service_accounts_keys_enable(...)`, `service_accounts_keys_get(...)`, `service_accounts_keys_list(...)`, `service_accounts_keys_patch(...)`, `service_accounts_keys_upload(...)`, `service_accounts_list(...)`, `service_accounts_patch(...)`, `service_accounts_set_iam_policy(...)`, `service_accounts_sign_blob(...)`, `service_accounts_sign_jwt(...)`, `service_accounts_test_iam_permissions(...)`, `service_accounts_undelete(...)` and `service_accounts_update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2931,6 +3290,210 @@ pub struct ProjectMethods<'a, S>
 impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
 
 impl<'a, S> ProjectMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new OauthClientCredential.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource to create the OauthClientCredential in.
+    pub fn locations_oauth_clients_credentials_create(&self, request: OauthClientCredential, parent: &str) -> ProjectLocationOauthClientCredentialCreateCall<'a, S> {
+        ProjectLocationOauthClientCredentialCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _oauth_client_credential_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an OauthClientCredential. Before deleting an OauthClientCredential, it should first be disabled.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the OauthClientCredential to delete. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}/credentials/{credential}`.
+    pub fn locations_oauth_clients_credentials_delete(&self, name: &str) -> ProjectLocationOauthClientCredentialDeleteCall<'a, S> {
+        ProjectLocationOauthClientCredentialDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets an individual OauthClientCredential.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the OauthClientCredential to retrieve. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}/credentials/{credential}`.
+    pub fn locations_oauth_clients_credentials_get(&self, name: &str) -> ProjectLocationOauthClientCredentialGetCall<'a, S> {
+        ProjectLocationOauthClientCredentialGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all OauthClientCredentials in an OauthClient.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent to list OauthClientCredentials for.
+    pub fn locations_oauth_clients_credentials_list(&self, parent: &str) -> ProjectLocationOauthClientCredentialListCall<'a, S> {
+        ProjectLocationOauthClientCredentialListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an existing OauthClientCredential.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Immutable. The resource name of the OauthClientCredential. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}/credentials/{credential}`
+    pub fn locations_oauth_clients_credentials_patch(&self, request: OauthClientCredential, name: &str) -> ProjectLocationOauthClientCredentialPatchCall<'a, S> {
+        ProjectLocationOauthClientCredentialPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a new OauthClient. You cannot reuse the name of a deleted OauthClient until 30 days after deletion.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource to create the OauthClient in. The only supported location is `global`.
+    pub fn locations_oauth_clients_create(&self, request: OauthClient, parent: &str) -> ProjectLocationOauthClientCreateCall<'a, S> {
+        ProjectLocationOauthClientCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _oauth_client_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an OauthClient. You cannot use a deleted OauthClient. However, deletion does not revoke access tokens that have already been issued. They continue to grant access. Deletion does revoke refresh tokens that have already been issued. They cannot be used to renew an access token. If the OauthClient is undeleted, and the refresh tokens are not expired, they are valid for token exchange again. You can undelete an OauthClient for 30 days. After 30 days, deletion is permanent. You cannot update deleted OauthClients. However, you can view and list them.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the OauthClient to delete. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    pub fn locations_oauth_clients_delete(&self, name: &str) -> ProjectLocationOauthClientDeleteCall<'a, S> {
+        ProjectLocationOauthClientDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets an individual OauthClient.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the OauthClient to retrieve. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    pub fn locations_oauth_clients_get(&self, name: &str) -> ProjectLocationOauthClientGetCall<'a, S> {
+        ProjectLocationOauthClientGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists all non-deleted OauthClients in a project. If `show_deleted` is set to `true`, then deleted OauthClients are also listed.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The parent to list OauthClients for.
+    pub fn locations_oauth_clients_list(&self, parent: &str) -> ProjectLocationOauthClientListCall<'a, S> {
+        ProjectLocationOauthClientListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _show_deleted: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an existing OauthClient.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Immutable. The resource name of the OauthClient. Format:`projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    pub fn locations_oauth_clients_patch(&self, request: OauthClient, name: &str) -> ProjectLocationOauthClientPatchCall<'a, S> {
+        ProjectLocationOauthClientPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Undeletes an OauthClient, as long as it was deleted fewer than 30 days ago.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the OauthClient to undelete. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    pub fn locations_oauth_clients_undelete(&self, request: UndeleteOauthClientRequest, name: &str) -> ProjectLocationOauthClientUndeleteCall<'a, S> {
+        ProjectLocationOauthClientUndeleteCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3360,7 +3923,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`projects.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [projects.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_create(&self, request: CreateRoleRequest, parent: &str) -> ProjectRoleCreateCall<'a, S> {
         ProjectRoleCreateCall {
             hub: self.hub,
@@ -3378,7 +3941,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_delete(&self, name: &str) -> ProjectRoleDeleteCall<'a, S> {
         ProjectRoleDeleteCall {
             hub: self.hub,
@@ -3396,7 +3959,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`roles.get()`](https://cloud.google.com/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [`projects.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [projects.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_get(&self, name: &str) -> ProjectRoleGetCall<'a, S> {
         ProjectRoleGetCall {
             hub: self.hub,
@@ -3413,7 +3976,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`roles.list()`](https://cloud.google.com/iam/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [`projects.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `parent` - The `parent` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [projects.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_list(&self, parent: &str) -> ProjectRoleListCall<'a, S> {
         ProjectRoleListCall {
             hub: self.hub,
@@ -3435,7 +3998,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_patch(&self, request: Role, name: &str) -> ProjectRolePatchCall<'a, S> {
         ProjectRolePatchCall {
             hub: self.hub,
@@ -3455,7 +4018,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn roles_undelete(&self, request: UndeleteRoleRequest, name: &str) -> ProjectRoleUndeleteCall<'a, S> {
         ProjectRoleUndeleteCall {
             hub: self.hub,
@@ -3579,6 +4142,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Patches a ServiceAccountKey.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The resource name of the service account key in the following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+    pub fn service_accounts_keys_patch(&self, request: PatchServiceAccountKeyRequest, name: &str) -> ProjectServiceAccountKeyPatchCall<'a, S> {
+        ProjectServiceAccountKeyPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Uploads the public key portion of a key pair that you manage, and associates the public key with a ServiceAccount. After you upload the public key, you can use the private key from the key pair as a service account key.
     /// 
     /// # Arguments
@@ -3689,7 +4271,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the IAM policy that is attached to a ServiceAccount. This IAM policy specifies which principals have access to the service account. This method does not tell you whether the service account has been granted any roles on other resources. To check whether a service account has role grants on a resource, use the `getIamPolicy` method for that resource. For example, to view the role grants for a project, call the Resource Manager API's [`projects.getIamPolicy`](https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy) method.
+    /// Gets the IAM policy that is attached to a ServiceAccount. This IAM policy specifies which principals have access to the service account. This method does not tell you whether the service account has been granted any roles on other resources. To check whether a service account has role grants on a resource, use the `getIamPolicy` method for that resource. For example, to view the role grants for a project, call the Resource Manager API's [projects.getIamPolicy](https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy) method.
     /// 
     /// # Arguments
     ///
@@ -3764,7 +4346,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// **Note:** This method is deprecated. Use the [`signBlob`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signBlob) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a blob using the system-managed private key for a ServiceAccount.
+    /// **Note:** This method is deprecated. Use the [signBlob](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signBlob) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a blob using the system-managed private key for a ServiceAccount.
     /// 
     /// # Arguments
     ///
@@ -3783,7 +4365,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// **Note:** This method is deprecated. Use the [`signJwt`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signJwt) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a JSON Web Token (JWT) using the system-managed private key for a ServiceAccount.
+    /// **Note:** This method is deprecated. Use the [signJwt](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signJwt) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a JSON Web Token (JWT) using the system-managed private key for a ServiceAccount.
     /// 
     /// # Arguments
     ///
@@ -3881,7 +4463,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `list(...)` and `query_grantable_roles(...)`
 /// // to build up your call.
@@ -3904,7 +4486,7 @@ impl<'a, S> RoleMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`roles.get()`](https://cloud.google.com/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [`projects.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// * `name` - The `name` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [projects.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     pub fn get(&self, name: &str) -> RoleGetCall<'a, S> {
         RoleGetCall {
             hub: self.hub,
@@ -3981,7 +4563,7 @@ impl<'a, S> RoleMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4254,7 +4836,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4526,7 +5108,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4624,6 +5206,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4788,7 +5371,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4886,6 +5469,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5051,7 +5635,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5354,7 +5938,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5452,6 +6036,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5616,7 +6201,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5714,6 +6299,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5878,7 +6464,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5991,6 +6577,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6177,7 +6764,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6468,7 +7055,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6566,6 +7153,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6731,7 +7319,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7012,7 +7600,7 @@ where
 }
 
 
-/// Deletes a WorkforcePoolProvider. Deleting a provider does not revoke credentials that have already been\ issued; they continue to grant access. You can undelete a provider for 30 days. After 30 days, deletion is permanent. You cannot update deleted providers. However, you can view and list them.
+/// Deletes a WorkforcePoolProvider. Deleting a provider does not revoke credentials that have already been issued; they continue to grant access. You can undelete a provider for 30 days. After 30 days, deletion is permanent. You cannot update deleted providers. However, you can view and list them.
 ///
 /// A builder for the *workforcePools.providers.delete* method supported by a *location* resource.
 /// It is not used directly, but through a [`LocationMethods`] instance.
@@ -7034,7 +7622,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7132,6 +7720,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7296,7 +7885,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7394,6 +7983,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7558,7 +8148,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7671,6 +8261,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7857,7 +8448,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7867,7 +8458,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().workforce_pools_providers_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -8161,7 +8752,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8452,7 +9043,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8550,6 +9141,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8692,7 +9284,7 @@ where
 }
 
 
-/// Deletes a WorkforcePoolSubject. Subject must not already be in a deleted state. A WorkforcePoolSubject is automatically created the first time an external credential is exchanged for a Google Cloud credential with a mapped `google.subject` attribute. There is no path to manually create WorkforcePoolSubjects. Once deleted, the WorkforcePoolSubject may not be used for 30 days. After 30 days, the WorkforcePoolSubject will be deleted forever and can be reused in token exchanges with Google Cloud STS. This will automatically create a new WorkforcePoolSubject that is independent of the previously deleted WorkforcePoolSubject with the same google.subject value.
+/// Deletes a WorkforcePoolSubject. Subject must not already be in a deleted state. A WorkforcePoolSubject is automatically created the first time an external credential is exchanged for a Google Cloud credential using a mapped `google.subject` attribute. There is no endpoint to manually create a WorkforcePoolSubject. For 30 days after a WorkforcePoolSubject is deleted, using the same `google.subject` attribute in token exchanges with Google Cloud STS fails. Call UndeleteWorkforcePoolSubject to undelete a WorkforcePoolSubject that has been deleted, within within 30 days of deleting it. After 30 days, the WorkforcePoolSubject is permanently deleted. At this point, a token exchange with Google Cloud STS that uses the same mapped `google.subject` attribute automatically creates a new WorkforcePoolSubject that is unrelated to the previously deleted WorkforcePoolSubject but has the same `google.subject` value.
 ///
 /// A builder for the *workforcePools.subjects.delete* method supported by a *location* resource.
 /// It is not used directly, but through a [`LocationMethods`] instance.
@@ -8714,7 +9306,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8812,6 +9404,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8868,7 +9461,7 @@ where
     }
 
 
-    /// Required. The resource name of the WorkforcePoolSubject. Special characters, like '/' and ':', must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
+    /// Required. The resource name of the WorkforcePoolSubject. Special characters, like `/` and `:`, must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8977,7 +9570,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9160,7 +9753,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The resource name of the WorkforcePoolSubject. Special characters, like '/' and ':', must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
+    /// Required. The resource name of the WorkforcePoolSubject. Special characters, like `/` and `:`, must be escaped, because all URLs need to conform to the "When to Escape and Unescape" section of [RFC3986](https://www.ietf.org/rfc/rfc2396.txt). Format: `locations/{location}/workforcePools/{workforce_pool_id}/subjects/{subject_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -9269,7 +9862,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9572,7 +10165,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9670,6 +10263,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9834,7 +10428,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9932,6 +10526,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10097,7 +10692,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10388,7 +10983,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10506,6 +11101,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10699,7 +11295,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10709,7 +11305,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().workforce_pools_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -11003,7 +11599,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11272,7 +11868,7 @@ where
 }
 
 
-/// Returns the caller's permissions on the WorkforcePool. If the pool does not exist, this will return an empty set of permissions, not a `NOT_FOUND` error.
+/// Returns the caller's permissions on the WorkforcePool. If the pool doesn't exist, this call returns an empty set of permissions. It doesn't return a `NOT_FOUND` error.
 ///
 /// A builder for the *workforcePools.testIamPermissions* method supported by a *location* resource.
 /// It is not used directly, but through a [`LocationMethods`] instance.
@@ -11295,7 +11891,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11587,7 +12183,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11879,7 +12475,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12062,7 +12658,7 @@ where
         self._request = new_value;
         self
     }
-    /// The `parent` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`projects.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `parent` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [projects.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12170,7 +12766,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12273,6 +12869,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12329,7 +12926,7 @@ where
     }
 
 
-    /// The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12444,7 +13041,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12542,6 +13139,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12598,7 +13196,7 @@ where
     }
 
 
-    /// The `name` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`roles.get()`](https://cloud.google.com/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [`projects.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [projects.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12706,7 +13304,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12824,6 +13422,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12880,7 +13479,7 @@ where
     }
 
 
-    /// The `parent` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`roles.list()`](https://cloud.google.com/iam/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [`projects.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `parent` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [projects.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13017,7 +13616,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13027,7 +13626,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.organizations().roles_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -13205,7 +13804,7 @@ where
         self._request = new_value;
         self
     }
-    /// The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -13321,7 +13920,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13504,7 +14103,7 @@ where
         self._request = new_value;
         self
     }
-    /// The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -13613,7 +14212,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13863,6 +14462,3128 @@ where
 }
 
 
+/// Creates a new OauthClientCredential.
+///
+/// A builder for the *locations.oauthClients.credentials.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::api::OauthClientCredential;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OauthClientCredential::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_credentials_create(req, "parent")
+///              .oauth_client_credential_id("consetetur")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientCredentialCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _request: OauthClientCredential,
+    _parent: String,
+    _oauth_client_credential_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientCredentialCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientCredentialCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClientCredential)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.credentials.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "oauthClientCredentialId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._oauth_client_credential_id.as_ref() {
+            params.push("oauthClientCredentialId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/credentials";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OauthClientCredential) -> ProjectLocationOauthClientCredentialCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource to create the OauthClientCredential in.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationOauthClientCredentialCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. The ID to use for the OauthClientCredential, which becomes the final component of the resource name. This value should be 4-32 characters, and may contain the characters [a-z0-9-]. The prefix `gcp-` is reserved for use by Google, and may not be specified.
+    ///
+    /// Sets the *oauth client credential id* query property to the given value.
+    pub fn oauth_client_credential_id(mut self, new_value: &str) -> ProjectLocationOauthClientCredentialCreateCall<'a, S> {
+        self._oauth_client_credential_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientCredentialCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientCredentialCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientCredentialCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientCredentialCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientCredentialCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes an OauthClientCredential. Before deleting an OauthClientCredential, it should first be disabled.
+///
+/// A builder for the *locations.oauthClients.credentials.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_credentials_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientCredentialDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientCredentialDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientCredentialDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.credentials.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the OauthClientCredential to delete. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}/credentials/{credential}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOauthClientCredentialDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientCredentialDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientCredentialDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientCredentialDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientCredentialDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientCredentialDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets an individual OauthClientCredential.
+///
+/// A builder for the *locations.oauthClients.credentials.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_credentials_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientCredentialGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientCredentialGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientCredentialGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClientCredential)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.credentials.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the OauthClientCredential to retrieve. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}/credentials/{credential}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOauthClientCredentialGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientCredentialGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientCredentialGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientCredentialGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientCredentialGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientCredentialGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists all OauthClientCredentials in an OauthClient.
+///
+/// A builder for the *locations.oauthClients.credentials.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_credentials_list("parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientCredentialListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientCredentialListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientCredentialListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListOauthClientCredentialsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.credentials.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/credentials";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent to list OauthClientCredentials for.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationOauthClientCredentialListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientCredentialListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientCredentialListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientCredentialListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientCredentialListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientCredentialListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates an existing OauthClientCredential.
+///
+/// A builder for the *locations.oauthClients.credentials.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::api::OauthClientCredential;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OauthClientCredential::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_credentials_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientCredentialPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _request: OauthClientCredential,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientCredentialPatchCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientCredentialPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClientCredential)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.credentials.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OauthClientCredential) -> ProjectLocationOauthClientCredentialPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Immutable. The resource name of the OauthClientCredential. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}/credentials/{credential}`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOauthClientCredentialPatchCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. The list of fields to update.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationOauthClientCredentialPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientCredentialPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientCredentialPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientCredentialPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientCredentialPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientCredentialPatchCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Creates a new OauthClient. You cannot reuse the name of a deleted OauthClient until 30 days after deletion.
+///
+/// A builder for the *locations.oauthClients.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::api::OauthClient;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OauthClient::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_create(req, "parent")
+///              .oauth_client_id("Stet")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _request: OauthClient,
+    _parent: String,
+    _oauth_client_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClient)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "oauthClientId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._oauth_client_id.as_ref() {
+            params.push("oauthClientId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/oauthClients";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OauthClient) -> ProjectLocationOauthClientCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource to create the OauthClient in. The only supported location is `global`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationOauthClientCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. The ID to use for the OauthClient, which becomes the final component of the resource name. This value should be a string of 6 to 63 lowercase letters, digits, or hyphens. It must start with a letter, and cannot have a trailing hyphen. The prefix `gcp-` is reserved for use by Google, and may not be specified.
+    ///
+    /// Sets the *oauth client id* query property to the given value.
+    pub fn oauth_client_id(mut self, new_value: &str) -> ProjectLocationOauthClientCreateCall<'a, S> {
+        self._oauth_client_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes an OauthClient. You cannot use a deleted OauthClient. However, deletion does not revoke access tokens that have already been issued. They continue to grant access. Deletion does revoke refresh tokens that have already been issued. They cannot be used to renew an access token. If the OauthClient is undeleted, and the refresh tokens are not expired, they are valid for token exchange again. You can undelete an OauthClient for 30 days. After 30 days, deletion is permanent. You cannot update deleted OauthClients. However, you can view and list them.
+///
+/// A builder for the *locations.oauthClients.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClient)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the OauthClient to delete. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOauthClientDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets an individual OauthClient.
+///
+/// A builder for the *locations.oauthClients.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClient)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the OauthClient to retrieve. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOauthClientGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists all non-deleted OauthClients in a project. If `show_deleted` is set to `true`, then deleted OauthClients are also listed.
+///
+/// A builder for the *locations.oauthClients.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_list("parent")
+///              .show_deleted(false)
+///              .page_token("invidunt")
+///              .page_size(-65)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _parent: String,
+    _show_deleted: Option<bool>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListOauthClientsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "showDeleted", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._show_deleted.as_ref() {
+            params.push("showDeleted", value.to_string());
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/oauthClients";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The parent to list OauthClients for.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationOauthClientListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. Whether to return soft-deleted OauthClients.
+    ///
+    /// Sets the *show deleted* query property to the given value.
+    pub fn show_deleted(mut self, new_value: bool) -> ProjectLocationOauthClientListCall<'a, S> {
+        self._show_deleted = Some(new_value);
+        self
+    }
+    /// Optional. A page token, received from a previous `ListOauthClients` call. Provide this to retrieve the subsequent page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationOauthClientListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The maximum number of OauthClients to return. If unspecified, at most 50 OauthClients will be returned. The maximum value is 100; values above 100 are truncated to 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationOauthClientListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates an existing OauthClient.
+///
+/// A builder for the *locations.oauthClients.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::api::OauthClient;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OauthClient::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _request: OauthClient,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientPatchCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClient)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OauthClient) -> ProjectLocationOauthClientPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Immutable. The resource name of the OauthClient. Format:`projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOauthClientPatchCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. The list of fields to update.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationOauthClientPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientPatchCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Undeletes an OauthClient, as long as it was deleted fewer than 30 days ago.
+///
+/// A builder for the *locations.oauthClients.undelete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::api::UndeleteOauthClientRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UndeleteOauthClientRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_oauth_clients_undelete(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationOauthClientUndeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _request: UndeleteOauthClientRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationOauthClientUndeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationOauthClientUndeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, OauthClient)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.locations.oauthClients.undelete",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:undelete";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UndeleteOauthClientRequest) -> ProjectLocationOauthClientUndeleteCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the OauthClient to undelete. Format: `projects/{project}/locations/{location}/oauthClients/{oauth_client}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOauthClientUndeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOauthClientUndeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOauthClientUndeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationOauthClientUndeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationOauthClientUndeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationOauthClientUndeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
 ///
 /// A builder for the *locations.workloadIdentityPools.namespaces.managedIdentities.operations.get* method supported by a *project* resource.
@@ -13885,7 +17606,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13983,6 +17704,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14147,7 +17869,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14245,6 +17967,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14409,7 +18132,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14507,6 +18230,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14671,7 +18395,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14769,6 +18493,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14933,7 +18658,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15031,6 +18756,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15196,7 +18922,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15206,7 +18932,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_providers_keys_create(req, "parent")
-///              .workload_identity_pool_provider_key_id("sadipscing")
+///              .workload_identity_pool_provider_key_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15499,7 +19225,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15597,6 +19323,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15761,7 +19488,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15859,6 +19586,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16023,14 +19751,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_providers_keys_list("parent")
 ///              .show_deleted(false)
-///              .page_token("vero")
-///              .page_size(-88)
+///              .page_token("amet.")
+///              .page_size(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16136,6 +19864,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16322,7 +20051,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16613,7 +20342,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16711,6 +20440,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16876,7 +20606,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16886,7 +20616,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_providers_create(req, "parent")
-///              .workload_identity_pool_provider_id("Lorem")
+///              .workload_identity_pool_provider_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17179,7 +20909,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17277,6 +21007,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17441,7 +21172,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17539,6 +21270,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17703,14 +21435,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_providers_list("parent")
-///              .show_deleted(true)
-///              .page_token("consetetur")
-///              .page_size(-28)
+///              .show_deleted(false)
+///              .page_token("amet.")
+///              .page_size(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17816,6 +21548,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18002,7 +21735,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18012,7 +21745,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_providers_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -18306,7 +22039,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18598,7 +22331,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18608,7 +22341,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_create(req, "parent")
-///              .workload_identity_pool_id("amet.")
+///              .workload_identity_pool_id("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18901,7 +22634,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18999,6 +22732,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19163,7 +22897,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19261,6 +22995,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19425,14 +23160,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_list("parent")
-///              .show_deleted(true)
+///              .show_deleted(false)
 ///              .page_token("et")
-///              .page_size(-23)
+///              .page_size(-39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19538,6 +23273,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19724,7 +23460,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19734,7 +23470,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_workload_identity_pools_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -20028,7 +23764,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20320,7 +24056,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20503,7 +24239,7 @@ where
         self._request = new_value;
         self
     }
-    /// The `parent` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`projects.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.create()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `parent` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [projects.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/create): `projects/{PROJECT_ID}`. This method creates project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.create](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/create): `organizations/{ORGANIZATION_ID}`. This method creates organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -20611,7 +24347,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20714,6 +24450,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20770,7 +24507,7 @@ where
     }
 
 
-    /// The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.delete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/delete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.delete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/delete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method deletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -20885,7 +24622,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20983,6 +24720,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21039,7 +24777,7 @@ where
     }
 
 
-    /// The `name` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`roles.get()`](https://cloud.google.com/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [`projects.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [projects.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -21147,15 +24885,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().roles_list("parent")
-///              .view("ea")
-///              .show_deleted(false)
-///              .page_token("Lorem")
-///              .page_size(-38)
+///              .view("sed")
+///              .show_deleted(true)
+///              .page_token("et")
+///              .page_size(-93)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21265,6 +25003,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21321,7 +25060,7 @@ where
     }
 
 
-    /// The `parent` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`roles.list()`](https://cloud.google.com/iam/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [`projects.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `parent` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [projects.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -21458,7 +25197,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21468,7 +25207,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().roles_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -21646,7 +25385,7 @@ where
         self._request = new_value;
         self
     }
-    /// The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.patch()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/patch): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.patch](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/patch): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method updates only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -21762,7 +25501,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21945,7 +25684,7 @@ where
         self._request = new_value;
         self
     }
-    /// The `name` parameter's value depends on the target resource for the request, namely [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles) or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`projects.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.undelete()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles) or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [projects.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/undelete): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.undelete](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/undelete): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method undeletes only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -22054,7 +25793,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22345,7 +26084,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22443,6 +26182,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22608,7 +26348,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22900,7 +26640,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23191,12 +26931,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_keys_get("name")
-///              .public_key_type("aliquyam")
+///              .public_key_type("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23294,6 +27034,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -23465,12 +27206,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_keys_list("name")
-///              .add_key_types("et")
+///              .add_key_types("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23570,6 +27311,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -23720,6 +27462,298 @@ where
 }
 
 
+/// Patches a ServiceAccountKey.
+///
+/// A builder for the *serviceAccounts.keys.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::api::PatchServiceAccountKeyRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use iam1::{Iam, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = PatchServiceAccountKeyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().service_accounts_keys_patch(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectServiceAccountKeyPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Iam<S>,
+    _request: PatchServiceAccountKeyRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectServiceAccountKeyPatchCall<'a, S> {}
+
+impl<'a, S> ProjectServiceAccountKeyPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ServiceAccountKey)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "iam.projects.serviceAccounts.keys.patch",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:patch";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: PatchServiceAccountKeyRequest) -> ProjectServiceAccountKeyPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name of the service account key in the following format `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountKeyPatchCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountKeyPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectServiceAccountKeyPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectServiceAccountKeyPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectServiceAccountKeyPatchCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Uploads the public key portion of a key pair that you manage, and associates the public key with a ServiceAccount. After you upload the public key, you can use the private key from the key pair as a service account key.
 ///
 /// A builder for the *serviceAccounts.keys.upload* method supported by a *project* resource.
@@ -23743,7 +27777,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24035,7 +28069,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24326,7 +28360,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24424,6 +28458,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -24589,7 +28624,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24881,7 +28916,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25172,7 +29207,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25270,6 +29305,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -25412,7 +29448,7 @@ where
 }
 
 
-/// Gets the IAM policy that is attached to a ServiceAccount. This IAM policy specifies which principals have access to the service account. This method does not tell you whether the service account has been granted any roles on other resources. To check whether a service account has role grants on a resource, use the `getIamPolicy` method for that resource. For example, to view the role grants for a project, call the Resource Manager API's [`projects.getIamPolicy`](https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy) method.
+/// Gets the IAM policy that is attached to a ServiceAccount. This IAM policy specifies which principals have access to the service account. This method does not tell you whether the service account has been granted any roles on other resources. To check whether a service account has role grants on a resource, use the `getIamPolicy` method for that resource. For example, to view the role grants for a project, call the Resource Manager API's [projects.getIamPolicy](https://cloud.google.com/resource-manager/reference/rest/v1/projects/getIamPolicy) method.
 ///
 /// A builder for the *serviceAccounts.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -25434,12 +29470,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_get_iam_policy("resource")
-///              .options_requested_policy_version(-68)
+///              .options_requested_policy_version(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25537,6 +29573,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -25708,13 +29745,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_accounts_list("name")
-///              .page_token("no")
-///              .page_size(-85)
+///              .page_token("est")
+///              .page_size(-82)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25816,6 +29853,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -25995,7 +30033,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26287,7 +30325,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26556,7 +30594,7 @@ where
 }
 
 
-/// **Note:** This method is deprecated. Use the [`signBlob`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signBlob) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a blob using the system-managed private key for a ServiceAccount.
+/// **Note:** This method is deprecated. Use the [signBlob](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signBlob) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a blob using the system-managed private key for a ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.signBlob* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -26579,7 +30617,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26848,7 +30886,7 @@ where
 }
 
 
-/// **Note:** This method is deprecated. Use the [`signJwt`](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signJwt) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a JSON Web Token (JWT) using the system-managed private key for a ServiceAccount.
+/// **Note:** This method is deprecated. Use the [signJwt](https://cloud.google.com/iam/help/rest-credentials/v1/projects.serviceAccounts/signJwt) method in the IAM Service Account Credentials API instead. If you currently use this method, see the [migration guide](https://cloud.google.com/iam/help/credentials/migrate-api) for instructions. Signs a JSON Web Token (JWT) using the system-managed private key for a ServiceAccount.
 ///
 /// A builder for the *serviceAccounts.signJwt* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -26871,7 +30909,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27163,7 +31201,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27455,7 +31493,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27747,7 +31785,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28038,7 +32076,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28136,6 +32174,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -28192,7 +32231,7 @@ where
     }
 
 
-    /// The `name` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [`roles.get()`](https://cloud.google.com/iam/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [`projects.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [`organizations.roles.get()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `name` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `name` value format is described below: * [roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/roles/get): `roles/{ROLE_NAME}`. This method returns results from all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles/{ROLE_NAME}` * [projects.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/get): `projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the project level. Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles/{CUSTOM_ROLE_ID}` * [organizations.roles.get](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/get): `organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}`. This method returns only [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles) that have been created at the organization level. Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles/{CUSTOM_ROLE_ID}` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -28300,16 +32339,16 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.roles().list()
-///              .view("sadipscing")
-///              .show_deleted(false)
-///              .parent("amet")
-///              .page_token("est")
-///              .page_size(-24)
+///              .view("ea")
+///              .show_deleted(true)
+///              .parent("sea")
+///              .page_token("et")
+///              .page_size(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28414,6 +32453,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -28484,7 +32524,7 @@ where
         self._show_deleted = Some(new_value);
         self
     }
-    /// The `parent` parameter's value depends on the target resource for the request, namely [`roles`](https://cloud.google.com/iam/reference/rest/v1/roles), [`projects`](https://cloud.google.com/iam/reference/rest/v1/projects.roles), or [`organizations`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [`roles.list()`](https://cloud.google.com/iam/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in Cloud IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [`projects.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [`organizations.roles.list()`](https://cloud.google.com/iam/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
+    /// The `parent` parameter's value depends on the target resource for the request, namely [roles](https://cloud.google.com/iam/docs/reference/rest/v1/roles), [projects](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles), or [organizations](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles). Each resource type's `parent` value format is described below: * [roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/roles/list): An empty string. This method doesn't require a resource; it simply returns all [predefined roles](https://cloud.google.com/iam/docs/understanding-roles#predefined_roles) in IAM. Example request URL: `https://iam.googleapis.com/v1/roles` * [projects.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles/list): `projects/{PROJECT_ID}`. This method lists all project-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/projects/{PROJECT_ID}/roles` * [organizations.roles.list](https://cloud.google.com/iam/docs/reference/rest/v1/organizations.roles/list): `organizations/{ORGANIZATION_ID}`. This method lists all organization-level [custom roles](https://cloud.google.com/iam/docs/understanding-custom-roles). Example request URL: `https://iam.googleapis.com/v1/organizations/{ORGANIZATION_ID}/roles` Note: Wildcard (*) values are invalid; you must specify a complete project ID or organization ID.
     ///
     /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> RoleListCall<'a, S> {
@@ -28604,7 +32644,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Iam::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !

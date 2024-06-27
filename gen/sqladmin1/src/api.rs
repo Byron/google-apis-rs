@@ -81,7 +81,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -131,7 +131,7 @@ impl<'a, S> SQLAdmin<S> {
         SQLAdmin {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://sqladmin.googleapis.com/".to_string(),
             _root_url: "https://sqladmin.googleapis.com/".to_string(),
         }
@@ -169,7 +169,7 @@ impl<'a, S> SQLAdmin<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -201,6 +201,7 @@ impl<'a, S> SQLAdmin<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AclEntry {
@@ -222,10 +223,40 @@ pub struct AclEntry {
 impl client::Part for AclEntry {}
 
 
+/// Acquire SSRS lease context.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AcquireSsrsLeaseContext {
+    /// Lease duration needed for SSRS setup.
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub duration: Option<client::chrono::Duration>,
+    /// The report database to be used for SSRS setup.
+    #[serde(rename="reportDatabase")]
+    
+    pub report_database: Option<String>,
+    /// The username to be used as the service login to connect to the report database for SSRS setup.
+    #[serde(rename="serviceLogin")]
+    
+    pub service_login: Option<String>,
+    /// The username to be used as the setup login to connect to the database server for SSRS setup.
+    #[serde(rename="setupLogin")]
+    
+    pub setup_login: Option<String>,
+}
+
+impl client::Part for AcquireSsrsLeaseContext {}
+
+
 /// Specifies options for controlling advanced machine features.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AdvancedMachineFeatures {
@@ -242,6 +273,7 @@ impl client::Part for AdvancedMachineFeatures {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApiWarning {
@@ -259,10 +291,35 @@ pub struct ApiWarning {
 impl client::Part for ApiWarning {}
 
 
+/// An available database version. It can be a major or a minor version.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AvailableDatabaseVersion {
+    /// The database version's display name.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// The version's major version name.
+    #[serde(rename="majorVersion")]
+    
+    pub major_version: Option<String>,
+    /// The database version name. For MySQL 8.0, this string provides the database major and minor version.
+    
+    pub name: Option<String>,
+}
+
+impl client::Part for AvailableDatabaseVersion {}
+
+
 /// Database instance backup configuration.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupConfiguration {
@@ -299,6 +356,10 @@ pub struct BackupConfiguration {
     #[serde(rename="transactionLogRetentionDays")]
     
     pub transaction_log_retention_days: Option<i32>,
+    /// Output only. This value contains the storage location of transactional logs used to perform point-in-time recovery (PITR) for the database.
+    #[serde(rename="transactionalLogStorageState")]
+    
+    pub transactional_log_storage_state: Option<String>,
 }
 
 impl client::Part for BackupConfiguration {}
@@ -308,6 +369,7 @@ impl client::Part for BackupConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupContext {
@@ -328,6 +390,7 @@ impl client::Part for BackupContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupReencryptionConfig {
@@ -348,6 +411,7 @@ impl client::Part for BackupReencryptionConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupRetentionSettings {
@@ -375,6 +439,7 @@ impl client::Part for BackupRetentionSettings {}
 /// * [get backup runs](BackupRunGetCall) (response)
 /// * [insert backup runs](BackupRunInsertCall) (request)
 /// * [list backup runs](BackupRunListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupRun {
@@ -455,6 +520,7 @@ impl client::ResponseResult for BackupRun {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list backup runs](BackupRunListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BackupRunsListResponse {
@@ -477,6 +543,7 @@ impl client::ResponseResult for BackupRunsListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BinLogCoordinates {
@@ -501,6 +568,7 @@ impl client::Part for BinLogCoordinates {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloneContext {
@@ -532,7 +600,7 @@ pub struct CloneContext {
     #[serde(rename="pointInTime")]
     
     pub point_in_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Optional. (Point-in-time recovery for PostgreSQL only) Clone to an instance in the specified zone. If no zone is specified, clone to the same zone as the source instance.
+    /// Optional. Copy clone and point-in-time recovery clone of an instance to the specified zone. If no zone is specified, clone to the same primary zone as the source instance. This field applies to all DB types.
     #[serde(rename="preferredZone")]
     
     pub preferred_zone: Option<String>,
@@ -549,6 +617,7 @@ impl client::Part for CloneContext {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get connect](ConnectGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConnectSettings {
@@ -591,6 +660,7 @@ impl client::ResponseResult for ConnectSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataCacheConfig {
@@ -616,6 +686,7 @@ impl client::Part for DataCacheConfig {}
 /// * [list databases](DatabaseListCall) (none)
 /// * [patch databases](DatabasePatchCall) (request)
 /// * [update databases](DatabaseUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Database {
@@ -659,6 +730,7 @@ impl client::ResponseResult for Database {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseFlags {
@@ -684,6 +756,7 @@ impl client::Part for DatabaseFlags {}
 /// * [insert instances](InstanceInsertCall) (request)
 /// * [patch instances](InstancePatchCall) (request)
 /// * [update instances](InstanceUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseInstance {
@@ -739,6 +812,10 @@ pub struct DatabaseInstance {
     #[serde(rename="gceZone")]
     
     pub gce_zone: Option<String>,
+    /// Gemini instance configuration.
+    #[serde(rename="geminiConfig")]
+    
+    pub gemini_config: Option<GeminiInstanceConfig>,
     /// The instance type.
     #[serde(rename="instanceType")]
     
@@ -800,11 +877,15 @@ pub struct DatabaseInstance {
     #[serde(rename="replicaNames")]
     
     pub replica_names: Option<Vec<String>>,
+    /// Optional. A primary instance and disaster recovery (DR) replica pair. A DR replica is a cross-region replica that you designate for failover in the event that the primary instance experiences regional failure. Only applicable to MySQL.
+    #[serde(rename="replicationCluster")]
+    
+    pub replication_cluster: Option<ReplicationCluster>,
     /// Initial root password. Use only on creation. You must set root passwords before you can connect to PostgreSQL instances.
     #[serde(rename="rootPassword")]
     
     pub root_password: Option<String>,
-    /// The status indicating if instance satisfiesPzs. Reserved for future use.
+    /// This status indicates whether the instance satisfies PZS. The status is reserved for future use.
     #[serde(rename="satisfiesPzs")]
     
     pub satisfies_pzs: Option<bool>,
@@ -842,6 +923,10 @@ pub struct DatabaseInstance {
     #[serde(rename="suspensionReason")]
     
     pub suspension_reason: Option<Vec<String>>,
+    /// Output only. All database versions that are available for upgrade.
+    #[serde(rename="upgradableDatabaseVersions")]
+    
+    pub upgradable_database_versions: Option<Vec<AvailableDatabaseVersion>>,
     /// Output only. The dns name of the primary instance in a replication group.
     #[serde(rename="writeEndpoint")]
     
@@ -860,6 +945,7 @@ impl client::ResponseResult for DatabaseInstance {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list databases](DatabaseListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabasesListResponse {
@@ -878,6 +964,7 @@ impl client::ResponseResult for DatabasesListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DemoteContext {
@@ -897,6 +984,7 @@ impl client::Part for DemoteContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DemoteMasterConfiguration {
@@ -916,6 +1004,7 @@ impl client::Part for DemoteMasterConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DemoteMasterContext {
@@ -947,6 +1036,7 @@ impl client::Part for DemoteMasterContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DemoteMasterMySqlReplicaConfiguration {
@@ -980,6 +1070,7 @@ impl client::Part for DemoteMasterMySqlReplicaConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DenyMaintenancePeriod {
@@ -1003,6 +1094,7 @@ impl client::Part for DenyMaintenancePeriod {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiskEncryptionConfiguration {
@@ -1022,6 +1114,7 @@ impl client::Part for DiskEncryptionConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DiskEncryptionStatus {
@@ -1045,6 +1138,7 @@ impl client::Part for DiskEncryptionStatus {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [cancel operations](OperationCancelCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -1056,6 +1150,7 @@ impl client::ResponseResult for Empty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContext {
@@ -1096,6 +1191,7 @@ impl client::Part for ExportContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FailoverContext {
@@ -1120,6 +1216,7 @@ impl client::Part for FailoverContext {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list flags](FlagListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Flag {
@@ -1177,6 +1274,7 @@ impl client::Resource for Flag {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list flags](FlagListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FlagsListResponse {
@@ -1191,6 +1289,42 @@ pub struct FlagsListResponse {
 impl client::ResponseResult for FlagsListResponse {}
 
 
+/// Gemini instance configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GeminiInstanceConfig {
+    /// Output only. Whether the active query is enabled.
+    #[serde(rename="activeQueryEnabled")]
+    
+    pub active_query_enabled: Option<bool>,
+    /// Output only. Whether Gemini is enabled.
+    
+    pub entitled: Option<bool>,
+    /// Output only. Whether the flag recommender is enabled.
+    #[serde(rename="flagRecommenderEnabled")]
+    
+    pub flag_recommender_enabled: Option<bool>,
+    /// Output only. Whether the vacuum management is enabled.
+    #[serde(rename="googleVacuumMgmtEnabled")]
+    
+    pub google_vacuum_mgmt_enabled: Option<bool>,
+    /// Output only. Whether the index advisor is enabled.
+    #[serde(rename="indexAdvisorEnabled")]
+    
+    pub index_advisor_enabled: Option<bool>,
+    /// Output only. Whether canceling the out-of-memory (OOM) session is enabled.
+    #[serde(rename="oomSessionCancelEnabled")]
+    
+    pub oom_session_cancel_enabled: Option<bool>,
+}
+
+impl client::Part for GeminiInstanceConfig {}
+
+
 /// Ephemeral certificate creation request.
 /// 
 /// # Activities
@@ -1199,6 +1333,7 @@ impl client::ResponseResult for FlagsListResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [generate ephemeral connect](ConnectGenerateEphemeralCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GenerateEphemeralCertRequest {
@@ -1230,6 +1365,7 @@ impl client::RequestValue for GenerateEphemeralCertRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [generate ephemeral connect](ConnectGenerateEphemeralCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GenerateEphemeralCertResponse {
@@ -1246,6 +1382,7 @@ impl client::ResponseResult for GenerateEphemeralCertResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContext {
@@ -1271,6 +1408,10 @@ pub struct ImportContext {
     /// This is always `sql#importContext`.
     
     pub kind: Option<String>,
+    /// Optional. Options for importing data from SQL statements.
+    #[serde(rename="sqlImportOptions")]
+    
+    pub sql_import_options: Option<ImportContextSqlImportOptions>,
     /// Path to the import file in Cloud Storage, in the form `gs://bucketName/fileName`. Compressed gzip files (.gz) are supported when `fileType` is `SQL`. The instance must have write permissions to the bucket and read access to the file.
     
     pub uri: Option<String>,
@@ -1283,6 +1424,7 @@ impl client::Part for ImportContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InsightsConfig {
@@ -1315,6 +1457,7 @@ impl client::Part for InsightsConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstanceReference {
@@ -1332,6 +1475,27 @@ pub struct InstanceReference {
 impl client::Part for InstanceReference {}
 
 
+/// Request to acquire a lease for SSRS.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [acquire ssrs lease instances](InstanceAcquireSsrsLeaseCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InstancesAcquireSsrsLeaseRequest {
+    /// Contains details about the acquire SSRS lease operation.
+    #[serde(rename="acquireSsrsLeaseContext")]
+    
+    pub acquire_ssrs_lease_context: Option<AcquireSsrsLeaseContext>,
+}
+
+impl client::RequestValue for InstancesAcquireSsrsLeaseRequest {}
+
+
 /// Database instance clone request.
 /// 
 /// # Activities
@@ -1340,6 +1504,7 @@ impl client::Part for InstanceReference {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [clone instances](InstanceCloneCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesCloneRequest {
@@ -1360,6 +1525,7 @@ impl client::RequestValue for InstancesCloneRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [demote master instances](InstanceDemoteMasterCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesDemoteMasterRequest {
@@ -1380,6 +1546,7 @@ impl client::RequestValue for InstancesDemoteMasterRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [demote instances](InstanceDemoteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesDemoteRequest {
@@ -1400,6 +1567,7 @@ impl client::RequestValue for InstancesDemoteRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [export instances](InstanceExportCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesExportRequest {
@@ -1420,6 +1588,7 @@ impl client::RequestValue for InstancesExportRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [failover instances](InstanceFailoverCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesFailoverRequest {
@@ -1440,6 +1609,7 @@ impl client::RequestValue for InstancesFailoverRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [import instances](InstanceImportCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesImportRequest {
@@ -1460,6 +1630,7 @@ impl client::RequestValue for InstancesImportRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list instances](InstanceListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesListResponse {
@@ -1489,6 +1660,7 @@ impl client::ResponseResult for InstancesListResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list server cas instances](InstanceListServerCaCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesListServerCasResponse {
@@ -1515,6 +1687,7 @@ impl client::ResponseResult for InstancesListServerCasResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [reencrypt instances](InstanceReencryptCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesReencryptRequest {
@@ -1535,6 +1708,7 @@ impl client::RequestValue for InstancesReencryptRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [restore backup instances](InstanceRestoreBackupCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesRestoreBackupRequest {
@@ -1555,6 +1729,7 @@ impl client::RequestValue for InstancesRestoreBackupRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [rotate server ca instances](InstanceRotateServerCaCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesRotateServerCaRequest {
@@ -1575,6 +1750,7 @@ impl client::RequestValue for InstancesRotateServerCaRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [truncate log instances](InstanceTruncateLogCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct InstancesTruncateLogRequest {
@@ -1591,6 +1767,7 @@ impl client::RequestValue for InstancesTruncateLogRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpConfiguration {
@@ -1618,11 +1795,11 @@ pub struct IpConfiguration {
     #[serde(rename="pscConfig")]
     
     pub psc_config: Option<PscConfig>,
-    /// Use `ssl_mode` instead for MySQL and PostgreSQL. SQL Server uses this flag. Whether SSL/TLS connections over IP are enforced. If set to false, then allow both non-SSL/non-TLS and SSL/TLS connections. For SSL/TLS connections, the client certificate won't be verified. If set to true, then only allow connections encrypted with SSL/TLS and with valid client certificates. If you want to enforce SSL/TLS without enforcing the requirement for valid client certificates, then use the `ssl_mode` flag instead of the `require_ssl` flag.
+    /// Use `ssl_mode` instead. Whether SSL/TLS connections over IP are enforced. If set to false, then allow both non-SSL/non-TLS and SSL/TLS connections. For SSL/TLS connections, the client certificate won't be verified. If set to true, then only allow connections encrypted with SSL/TLS and with valid client certificates. If you want to enforce SSL/TLS without enforcing the requirement for valid client certificates, then use the `ssl_mode` flag instead of the `require_ssl` flag.
     #[serde(rename="requireSsl")]
     
     pub require_ssl: Option<bool>,
-    /// Specify how SSL/TLS is enforced in database connections. MySQL and PostgreSQL use the `ssl_mode` flag. If you must use the `require_ssl` flag for backward compatibility, then only the following value pairs are valid: * `ssl_mode=ALLOW_UNENCRYPTED_AND_ENCRYPTED` and `require_ssl=false` * `ssl_mode=ENCRYPTED_ONLY` and `require_ssl=false` * `ssl_mode=TRUSTED_CLIENT_CERTIFICATE_REQUIRED` and `require_ssl=true` The value of `ssl_mode` gets priority over the value of `require_ssl`. For example, for the pair `ssl_mode=ENCRYPTED_ONLY` and `require_ssl=false`, the `ssl_mode=ENCRYPTED_ONLY` means only accept SSL connections, while the `require_ssl=false` means accept both non-SSL and SSL connections. MySQL and PostgreSQL databases respect `ssl_mode` in this case and accept only SSL connections. SQL Server uses the `require_ssl` flag. You can set the value for this flag to `true` or `false`.
+    /// Specify how SSL/TLS is enforced in database connections. If you must use the `require_ssl` flag for backward compatibility, then only the following value pairs are valid: For PostgreSQL and MySQL: * `ssl_mode=ALLOW_UNENCRYPTED_AND_ENCRYPTED` and `require_ssl=false` * `ssl_mode=ENCRYPTED_ONLY` and `require_ssl=false` * `ssl_mode=TRUSTED_CLIENT_CERTIFICATE_REQUIRED` and `require_ssl=true` For SQL Server: * `ssl_mode=ALLOW_UNENCRYPTED_AND_ENCRYPTED` and `require_ssl=false` * `ssl_mode=ENCRYPTED_ONLY` and `require_ssl=true` The value of `ssl_mode` has priority over the value of `require_ssl`. For example, for the pair `ssl_mode=ENCRYPTED_ONLY` and `require_ssl=false`, `ssl_mode=ENCRYPTED_ONLY` means accept only SSL connections, while `require_ssl=false` means accept both non-SSL and SSL connections. In this case, MySQL and PostgreSQL databases respect `ssl_mode` and accepts only SSL connections.
     #[serde(rename="sslMode")]
     
     pub ssl_mode: Option<String>,
@@ -1635,6 +1812,7 @@ impl client::Part for IpConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IpMapping {
@@ -1659,6 +1837,7 @@ impl client::Part for IpMapping {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocationPreference {
@@ -1685,19 +1864,20 @@ impl client::Part for LocationPreference {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MaintenanceWindow {
-    /// day of week (1-7), starting on Monday.
+    /// Day of week - `MONDAY`, `TUESDAY`, `WEDNESDAY`, `THURSDAY`, `FRIDAY`, `SATURDAY`, or `SUNDAY`. Specify in the UTC time zone. Returned in output as an integer, 1 to 7, where `1` equals Monday.
     
     pub day: Option<i32>,
-    /// hour of day - 0 to 23.
+    /// Hour of day - 0 to 23. Specify in the UTC time zone.
     
     pub hour: Option<i32>,
     /// This is always `sql#maintenanceWindow`.
     
     pub kind: Option<String>,
-    /// Maintenance timing setting: `canary` (Earlier) or `stable` (Later). [Learn more](https://cloud.google.com/sql/docs/mysql/instance-settings#maintenance-timing-2ndgen).
+    /// Maintenance timing settings: `canary`, `stable`, or `week5`. For more information, see [About maintenance on Cloud SQL instances](https://cloud.google.com/sql/docs/mysql/maintenance).
     #[serde(rename="updateTrack")]
     
     pub update_track: Option<String>,
@@ -1710,6 +1890,7 @@ impl client::Part for MaintenanceWindow {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MySqlReplicaConfiguration {
@@ -1764,6 +1945,7 @@ impl client::Part for MySqlReplicaConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MySqlSyncConfig {
@@ -1780,6 +1962,7 @@ impl client::Part for MySqlSyncConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OnPremisesConfiguration {
@@ -1866,9 +2049,14 @@ impl client::Part for OnPremisesConfiguration {}
 /// * [delete users](UserDeleteCall) (response)
 /// * [insert users](UserInsertCall) (response)
 /// * [update users](UserUpdateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
+    /// The context for acquire SSRS lease operation, if applicable.
+    #[serde(rename="acquireSsrsLeaseContext")]
+    
+    pub acquire_ssrs_lease_context: Option<AcquireSsrsLeaseContext>,
     /// An Admin API warning message.
     #[serde(rename="apiWarning")]
     
@@ -1942,6 +2130,7 @@ impl client::ResponseResult for Operation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationError {
@@ -1963,6 +2152,7 @@ impl client::Part for OperationError {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationErrors {
@@ -1985,6 +2175,7 @@ impl client::Part for OperationErrors {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list operations](OperationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OperationsListResponse {
@@ -2007,6 +2198,7 @@ impl client::ResponseResult for OperationsListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PasswordStatus {
@@ -2026,6 +2218,7 @@ impl client::Part for PasswordStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PasswordValidationPolicy {
@@ -2070,6 +2263,7 @@ impl client::Part for PasswordValidationPolicy {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances perform disk shrink projects](ProjectInstancePerformDiskShrinkCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PerformDiskShrinkContext {
@@ -2087,6 +2281,7 @@ impl client::RequestValue for PerformDiskShrinkContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PscConfig {
@@ -2107,6 +2302,7 @@ impl client::Part for PscConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReplicaConfiguration {
@@ -2130,10 +2326,36 @@ pub struct ReplicaConfiguration {
 impl client::Part for ReplicaConfiguration {}
 
 
+/// A primary instance and disaster recovery (DR) replica pair. A DR replica is a cross-region replica that you designate for failover in the event that the primary instance experiences regional failure. Only applicable to MySQL.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplicationCluster {
+    /// Output only. Read-only field that indicates whether the replica is a DR replica. This field is not set if the instance is a primary instance.
+    #[serde(rename="drReplica")]
+    
+    pub dr_replica: Option<bool>,
+    /// Optional. If the instance is a primary instance, then this field identifies the disaster recovery (DR) replica. A DR replica is an optional configuration for Enterprise Plus edition instances. If the instance is a read replica, then the field is not set. Set this field to a replica name to designate a DR replica for a primary instance. Remove the replica name to remove the DR replica designation.
+    #[serde(rename="failoverDrReplicaName")]
+    
+    pub failover_dr_replica_name: Option<String>,
+    /// Output only. If set, it indicates this instance has a private service access (PSA) dns endpoint that is pointing to the primary instance of the cluster. If this instance is the primary, the dns should be pointing to this instance. After Switchover or Replica failover, this DNS endpoint points to the promoted instance. This is a read-only field, returned to the user as information. This field can exist even if a standalone instance does not yet have a replica, or had a DR replica that was deleted.
+    #[serde(rename="psaWriteEndpoint")]
+    
+    pub psa_write_endpoint: Option<String>,
+}
+
+impl client::Part for ReplicationCluster {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reschedule {
@@ -2154,6 +2376,7 @@ impl client::Part for Reschedule {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestoreBackupContext {
@@ -2181,6 +2404,7 @@ impl client::Part for RestoreBackupContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RotateServerCaContext {
@@ -2200,6 +2424,7 @@ impl client::Part for RotateServerCaContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
@@ -2211,7 +2436,7 @@ pub struct Settings {
     #[serde(rename="activeDirectoryConfig")]
     
     pub active_directory_config: Option<SqlActiveDirectoryConfig>,
-    /// Specifies advance machine configuration for the instance relevant only for SQL Server.
+    /// Specifies advanced machine configuration for the instances relevant only for SQL Server.
     #[serde(rename="advancedMachineFeatures")]
     
     pub advanced_machine_features: Option<AdvancedMachineFeatures>,
@@ -2270,6 +2495,14 @@ pub struct Settings {
     /// Optional. The edition of the instance.
     
     pub edition: Option<String>,
+    /// Optional. By default, Cloud SQL instances have schema extraction disabled for Dataplex. When this parameter is set to true, schema extraction for Dataplex on Cloud SQL instances is activated.
+    #[serde(rename="enableDataplexIntegration")]
+    
+    pub enable_dataplex_integration: Option<bool>,
+    /// Optional. When this parameter is set to true, Cloud SQL instances can connect to Vertex AI to pass requests for real-time predictions and insights to the AI. The default value is false. This applies only to Cloud SQL for PostgreSQL instances.
+    #[serde(rename="enableGoogleMlIntegration")]
+    
+    pub enable_google_ml_integration: Option<bool>,
     /// Insights configuration, for now relevant only for Postgres.
     #[serde(rename="insightsConfig")]
     
@@ -2339,6 +2572,7 @@ impl client::Part for Settings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlActiveDirectoryConfig {
@@ -2357,6 +2591,7 @@ impl client::Part for SqlActiveDirectoryConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlExternalSyncSettingError {
@@ -2375,6 +2610,27 @@ pub struct SqlExternalSyncSettingError {
 impl client::Part for SqlExternalSyncSettingError {}
 
 
+/// Response for the acquire SSRS lease request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [acquire ssrs lease instances](InstanceAcquireSsrsLeaseCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlInstancesAcquireSsrsLeaseResponse {
+    /// The unique identifier for this operation.
+    #[serde(rename="operationId")]
+    
+    pub operation_id: Option<String>,
+}
+
+impl client::ResponseResult for SqlInstancesAcquireSsrsLeaseResponse {}
+
+
 /// Instance get disk shrink config response.
 /// 
 /// # Activities
@@ -2383,6 +2639,7 @@ impl client::Part for SqlExternalSyncSettingError {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances get disk shrink config projects](ProjectInstanceGetDiskShrinkConfigCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlInstancesGetDiskShrinkConfigResponse {
@@ -2410,6 +2667,7 @@ impl client::ResponseResult for SqlInstancesGetDiskShrinkConfigResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances get latest recovery time projects](ProjectInstanceGetLatestRecoveryTimeCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlInstancesGetLatestRecoveryTimeResponse {
@@ -2425,6 +2683,27 @@ pub struct SqlInstancesGetLatestRecoveryTimeResponse {
 impl client::ResponseResult for SqlInstancesGetLatestRecoveryTimeResponse {}
 
 
+/// Response for the release SSRS lease request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [release ssrs lease instances](InstanceReleaseSsrsLeaseCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SqlInstancesReleaseSsrsLeaseResponse {
+    /// The unique identifier for this operation.
+    #[serde(rename="operationId")]
+    
+    pub operation_id: Option<String>,
+}
+
+impl client::ResponseResult for SqlInstancesReleaseSsrsLeaseResponse {}
+
+
 /// Reschedule options for maintenance windows.
 /// 
 /// # Activities
@@ -2433,6 +2712,7 @@ impl client::ResponseResult for SqlInstancesGetLatestRecoveryTimeResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances reschedule maintenance projects](ProjectInstanceRescheduleMaintenanceCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlInstancesRescheduleMaintenanceRequestBody {
@@ -2452,6 +2732,7 @@ impl client::RequestValue for SqlInstancesRescheduleMaintenanceRequestBody {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances reset replica size projects](ProjectInstanceResetReplicaSizeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlInstancesResetReplicaSizeRequest { _never_set: Option<bool> }
@@ -2467,9 +2748,14 @@ impl client::RequestValue for SqlInstancesResetReplicaSizeRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances start external sync projects](ProjectInstanceStartExternalSyncCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlInstancesStartExternalSyncRequest {
+    /// Optional. MigrationType configures the migration to use physical files or logical dump files. If not set, then the logical dump file configuration is used. Valid values are `LOGICAL` or `PHYSICAL`. Only applicable to MySQL.
+    #[serde(rename="migrationType")]
+    
+    pub migration_type: Option<String>,
     /// MySQL-specific settings for start external sync.
     #[serde(rename="mysqlSyncConfig")]
     
@@ -2499,9 +2785,14 @@ impl client::RequestValue for SqlInstancesStartExternalSyncRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances verify external sync settings projects](ProjectInstanceVerifyExternalSyncSettingCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlInstancesVerifyExternalSyncSettingsRequest {
+    /// Optional. MigrationType configures the migration to use physical files or logical dump files. If not set, then the logical dump file configuration is used. Valid values are `LOGICAL` or `PHYSICAL`. Only applicable to MySQL.
+    #[serde(rename="migrationType")]
+    
+    pub migration_type: Option<String>,
     /// Optional. MySQL-specific settings for start external sync.
     #[serde(rename="mysqlSyncConfig")]
     
@@ -2510,6 +2801,10 @@ pub struct SqlInstancesVerifyExternalSyncSettingsRequest {
     #[serde(rename="syncMode")]
     
     pub sync_mode: Option<String>,
+    /// Optional. Parallel level for initial data sync. Only applicable for PostgreSQL.
+    #[serde(rename="syncParallelLevel")]
+    
+    pub sync_parallel_level: Option<String>,
     /// Flag to enable verifying connection only
     #[serde(rename="verifyConnectionOnly")]
     
@@ -2531,6 +2826,7 @@ impl client::RequestValue for SqlInstancesVerifyExternalSyncSettingsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [instances verify external sync settings projects](ProjectInstanceVerifyExternalSyncSettingCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlInstancesVerifyExternalSyncSettingsResponse {
@@ -2552,6 +2848,7 @@ impl client::ResponseResult for SqlInstancesVerifyExternalSyncSettingsResponse {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlOutOfDiskReport {
@@ -2572,6 +2869,7 @@ impl client::Part for SqlOutOfDiskReport {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlScheduledMaintenance {
@@ -2600,6 +2898,7 @@ impl client::Part for SqlScheduledMaintenance {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlServerAuditConfig {
@@ -2628,6 +2927,7 @@ impl client::Part for SqlServerAuditConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlServerDatabaseDetails {
@@ -2648,6 +2948,7 @@ impl client::Part for SqlServerDatabaseDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SqlServerUserDetails {
@@ -2675,6 +2976,7 @@ impl client::Part for SqlServerUserDetails {}
 /// * [get ssl certs](SslCertGetCall) (response)
 /// * [insert ssl certs](SslCertInsertCall) (none)
 /// * [list ssl certs](SslCertListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCert {
@@ -2721,6 +3023,7 @@ impl client::ResponseResult for SslCert {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertDetail {
@@ -2745,6 +3048,7 @@ impl client::Part for SslCertDetail {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [create ephemeral ssl certs](SslCertCreateEphemeralCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsCreateEphemeralRequest {
@@ -2767,6 +3071,7 @@ impl client::RequestValue for SslCertsCreateEphemeralRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [insert ssl certs](SslCertInsertCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsInsertRequest {
@@ -2787,6 +3092,7 @@ impl client::RequestValue for SslCertsInsertRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [insert ssl certs](SslCertInsertCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsInsertResponse {
@@ -2817,6 +3123,7 @@ impl client::ResponseResult for SslCertsInsertResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list ssl certs](SslCertListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SslCertsListResponse {
@@ -2835,6 +3142,7 @@ impl client::ResponseResult for SslCertsListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SyncFlags {
@@ -2857,6 +3165,7 @@ impl client::Part for SyncFlags {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list tiers](TierListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tier {
@@ -2892,6 +3201,7 @@ impl client::Resource for Tier {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list tiers](TierListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TiersListResponse {
@@ -2910,6 +3220,7 @@ impl client::ResponseResult for TiersListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TruncateLogContext {
@@ -2937,6 +3248,7 @@ impl client::Part for TruncateLogContext {}
 /// * [insert users](UserInsertCall) (request)
 /// * [list users](UserListCall) (none)
 /// * [update users](UserUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
@@ -2988,6 +3300,7 @@ impl client::ResponseResult for User {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserPasswordValidationPolicy {
@@ -3024,6 +3337,7 @@ impl client::Part for UserPasswordValidationPolicy {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list users](UserListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersListResponse {
@@ -3046,6 +3360,7 @@ impl client::ResponseResult for UsersListResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatabaseInstanceFailoverReplica {
@@ -3065,6 +3380,7 @@ impl client::Part for DatabaseInstanceFailoverReplica {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextBakExportOptions {
@@ -3097,6 +3413,7 @@ impl client::Part for ExportContextBakExportOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextCsvExportOptions {
@@ -3130,6 +3447,7 @@ impl client::Part for ExportContextCsvExportOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextSqlExportOptions {
@@ -3160,6 +3478,7 @@ impl client::Part for ExportContextSqlExportOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportContextSqlExportOptionsMysqlExportOptions {
@@ -3177,6 +3496,7 @@ impl client::Part for ExportContextSqlExportOptionsMysqlExportOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContextBakImportOptions {
@@ -3217,6 +3537,7 @@ impl client::Part for ImportContextBakImportOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContextBakImportOptionsEncryptionOptions {
@@ -3242,6 +3563,7 @@ impl client::Part for ImportContextBakImportOptionsEncryptionOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportContextCsvImportOptions {
@@ -3273,6 +3595,26 @@ impl client::NestedType for ImportContextCsvImportOptions {}
 impl client::Part for ImportContextCsvImportOptions {}
 
 
+/// Optional. Options for importing data from SQL statements.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImportContextSqlImportOptions {
+    /// Optional. Whether or not the import should be parallel.
+    
+    pub parallel: Option<bool>,
+    /// Optional. The number of threads to use for parallel import.
+    
+    pub threads: Option<i32>,
+}
+
+impl client::NestedType for ImportContextSqlImportOptions {}
+impl client::Part for ImportContextSqlImportOptions {}
+
+
 
 // ###################
 // MethodBuilders ###
@@ -3299,7 +3641,7 @@ impl client::Part for ImportContextCsvImportOptions {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
@@ -3424,7 +3766,7 @@ impl<'a, S> BackupRunMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `generate_ephemeral(...)` and `get(...)`
 /// // to build up your call.
@@ -3506,7 +3848,7 @@ impl<'a, S> ConnectMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -3675,7 +4017,7 @@ impl<'a, S> DatabaseMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
@@ -3729,9 +4071,9 @@ impl<'a, S> FlagMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `add_server_ca(...)`, `clone(...)`, `delete(...)`, `demote(...)`, `demote_master(...)`, `export(...)`, `failover(...)`, `get(...)`, `import(...)`, `insert(...)`, `list(...)`, `list_server_cas(...)`, `patch(...)`, `promote_replica(...)`, `reencrypt(...)`, `reset_ssl_config(...)`, `restart(...)`, `restore_backup(...)`, `rotate_server_ca(...)`, `start_replica(...)`, `stop_replica(...)`, `switchover(...)`, `truncate_log(...)` and `update(...)`
+/// // like `acquire_ssrs_lease(...)`, `add_server_ca(...)`, `clone(...)`, `delete(...)`, `demote(...)`, `demote_master(...)`, `export(...)`, `failover(...)`, `get(...)`, `import(...)`, `insert(...)`, `list(...)`, `list_server_cas(...)`, `patch(...)`, `promote_replica(...)`, `reencrypt(...)`, `release_ssrs_lease(...)`, `reset_ssl_config(...)`, `restart(...)`, `restore_backup(...)`, `rotate_server_ca(...)`, `start_replica(...)`, `stop_replica(...)`, `switchover(...)`, `truncate_log(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.instances();
 /// # }
@@ -3745,6 +4087,27 @@ pub struct InstanceMethods<'a, S>
 impl<'a, S> client::MethodsBuilder for InstanceMethods<'a, S> {}
 
 impl<'a, S> InstanceMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Acquire a lease for the setup of SQL Server Reporting Services (SSRS).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Required. Project ID of the project that contains the instance (Example: project-id).
+    /// * `instance` - Required. Cloud SQL instance ID. This doesn't include the project ID. It's composed of lowercase letters, numbers, and hyphens, and it must start with a letter. The total length must be 98 characters or less (Example: instance-id).
+    pub fn acquire_ssrs_lease(&self, request: InstancesAcquireSsrsLeaseRequest, project: &str, instance: &str) -> InstanceAcquireSsrsLeaseCall<'a, S> {
+        InstanceAcquireSsrsLeaseCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -4010,7 +4373,7 @@ impl<'a, S> InstanceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Promotes the read replica instance to be a stand-alone Cloud SQL instance. Using this operation might cause your instance to restart.
+    /// Promotes the read replica instance to be an independent Cloud SQL primary instance. Using this operation might cause your instance to restart.
     /// 
     /// # Arguments
     ///
@@ -4041,6 +4404,25 @@ impl<'a, S> InstanceMethods<'a, S> {
         InstanceReencryptCall {
             hub: self.hub,
             _request: request,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Release a lease for the setup of SQL Server Reporting Services (SSRS).
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Required. The project ID that contains the instance.
+    /// * `instance` - Required. The Cloud SQL instance ID. This doesn't include the project ID. The instance ID contains lowercase letters, numbers, and hyphens, and it must start with a letter. This ID can have a maximum length of 98 characters.
+    pub fn release_ssrs_lease(&self, project: &str, instance: &str) -> InstanceReleaseSsrsLeaseCall<'a, S> {
+        InstanceReleaseSsrsLeaseCall {
+            hub: self.hub,
             _project: project.to_string(),
             _instance: instance.to_string(),
             _delegate: Default::default(),
@@ -4169,7 +4551,7 @@ impl<'a, S> InstanceMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Switches over from the primary instance to the replica instance.
+    /// Switches over from the primary instance to the designated DR replica instance.
     /// 
     /// # Arguments
     ///
@@ -4253,7 +4635,7 @@ impl<'a, S> InstanceMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `cancel(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
@@ -4352,7 +4734,7 @@ impl<'a, S> OperationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `instances_get_disk_shrink_config(...)`, `instances_get_latest_recovery_time(...)`, `instances_perform_disk_shrink(...)`, `instances_reschedule_maintenance(...)`, `instances_reset_replica_size(...)`, `instances_start_external_sync(...)` and `instances_verify_external_sync_settings(...)`
 /// // to build up your call.
@@ -4536,7 +4918,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create_ephemeral(...)`, `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
@@ -4680,7 +5062,7 @@ impl<'a, S> SslCertMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)`
 /// // to build up your call.
@@ -4738,7 +5120,7 @@ impl<'a, S> TierMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
@@ -4892,7 +5274,7 @@ impl<'a, S> UserMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4994,6 +5376,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5178,7 +5561,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5280,6 +5663,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5465,7 +5849,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5768,7 +6152,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5878,6 +6262,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6067,7 +6452,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6370,7 +6755,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6475,6 +6860,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6656,7 +7042,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6758,6 +7144,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6942,7 +7329,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7044,6 +7431,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7229,7 +7617,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7532,7 +7920,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7632,6 +8020,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7807,7 +8196,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8123,7 +8512,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8438,7 +8827,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8532,6 +8921,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8671,6 +9061,310 @@ where
 }
 
 
+/// Acquire a lease for the setup of SQL Server Reporting Services (SSRS).
+///
+/// A builder for the *acquireSsrsLease* method supported by a *instance* resource.
+/// It is not used directly, but through a [`InstanceMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_sqladmin1 as sqladmin1;
+/// use sqladmin1::api::InstancesAcquireSsrsLeaseRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use sqladmin1::{SQLAdmin, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = InstancesAcquireSsrsLeaseRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.instances().acquire_ssrs_lease(req, "project", "instance")
+///              .doit().await;
+/// # }
+/// ```
+pub struct InstanceAcquireSsrsLeaseCall<'a, S>
+    where S: 'a {
+
+    hub: &'a SQLAdmin<S>,
+    _request: InstancesAcquireSsrsLeaseRequest,
+    _project: String,
+    _instance: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for InstanceAcquireSsrsLeaseCall<'a, S> {}
+
+impl<'a, S> InstanceAcquireSsrsLeaseCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, SqlInstancesAcquireSsrsLeaseResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "sql.instances.acquireSsrsLease",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "project", "instance"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("project", self._project);
+        params.push("instance", self._instance);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/projects/{project}/instances/{instance}/acquireSsrsLease";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["instance", "project"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: InstancesAcquireSsrsLeaseRequest) -> InstanceAcquireSsrsLeaseCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Project ID of the project that contains the instance (Example: project-id).
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> InstanceAcquireSsrsLeaseCall<'a, S> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Required. Cloud SQL instance ID. This doesn't include the project ID. It's composed of lowercase letters, numbers, and hyphens, and it must start with a letter. The total length must be 98 characters or less (Example: instance-id).
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> InstanceAcquireSsrsLeaseCall<'a, S> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstanceAcquireSsrsLeaseCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceAcquireSsrsLeaseCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> InstanceAcquireSsrsLeaseCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InstanceAcquireSsrsLeaseCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InstanceAcquireSsrsLeaseCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Adds a new trusted Certificate Authority (CA) version for the specified instance. Required to prepare for a certificate rotation. If a CA version was previously added but never used in a certificate rotation, this operation replaces that version. There cannot be more than one CA version waiting to be rotated in.
 ///
 /// A builder for the *addServerCa* method supported by a *instance* resource.
@@ -8693,7 +9387,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8793,6 +9487,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8968,7 +9663,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9271,7 +9966,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9371,6 +10066,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9546,7 +10242,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9850,7 +10546,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10154,7 +10850,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10458,7 +11154,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10761,7 +11457,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10861,6 +11557,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11036,7 +11733,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11340,7 +12037,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11631,14 +12328,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().list("project")
-///              .page_token("vero")
-///              .max_results(25)
-///              .filter("invidunt")
+///              .page_token("invidunt")
+///              .max_results(36)
+///              .filter("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11744,6 +12441,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11929,7 +12627,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12029,6 +12727,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12204,7 +12903,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12485,7 +13184,7 @@ where
 }
 
 
-/// Promotes the read replica instance to be a stand-alone Cloud SQL instance. Using this operation might cause your instance to restart.
+/// Promotes the read replica instance to be an independent Cloud SQL primary instance. Using this operation might cause your instance to restart.
 ///
 /// A builder for the *promoteReplica* method supported by a *instance* resource.
 /// It is not used directly, but through a [`InstanceMethods`] instance.
@@ -12507,12 +13206,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().promote_replica("project", "instance")
-///              .failover(false)
+///              .failover(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12612,6 +13311,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12688,7 +13388,7 @@ where
         self._instance = new_value.to_string();
         self
     }
-    /// Set to true if the promote operation should attempt to re-add the original primary as a replica when it comes back online. Otherwise, if this value is false or not set, the original primary will be a standalone instance.
+    /// Set to true to invoke a replica failover to the designated DR replica. As part of replica failover, the promote operation attempts to add the original primary instance as a replica of the promoted DR replica when the original primary instance comes back online. If set to false or not specified, then the original primary instance becomes an independent Cloud SQL primary instance. Only applicable to MySQL.
     ///
     /// Sets the *failover* query property to the given value.
     pub fn failover(mut self, new_value: bool) -> InstancePromoteReplicaCall<'a, S> {
@@ -12794,7 +13494,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13075,6 +13775,281 @@ where
 }
 
 
+/// Release a lease for the setup of SQL Server Reporting Services (SSRS).
+///
+/// A builder for the *releaseSsrsLease* method supported by a *instance* resource.
+/// It is not used directly, but through a [`InstanceMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_sqladmin1 as sqladmin1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use sqladmin1::{SQLAdmin, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.instances().release_ssrs_lease("project", "instance")
+///              .doit().await;
+/// # }
+/// ```
+pub struct InstanceReleaseSsrsLeaseCall<'a, S>
+    where S: 'a {
+
+    hub: &'a SQLAdmin<S>,
+    _project: String,
+    _instance: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for InstanceReleaseSsrsLeaseCall<'a, S> {}
+
+impl<'a, S> InstanceReleaseSsrsLeaseCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, SqlInstancesReleaseSsrsLeaseResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "sql.instances.releaseSsrsLease",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "project", "instance"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("project", self._project);
+        params.push("instance", self._instance);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/projects/{project}/instances/{instance}/releaseSsrsLease";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["instance", "project"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The project ID that contains the instance.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> InstanceReleaseSsrsLeaseCall<'a, S> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Required. The Cloud SQL instance ID. This doesn't include the project ID. The instance ID contains lowercase letters, numbers, and hyphens, and it must start with a letter. This ID can have a maximum length of 98 characters.
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> InstanceReleaseSsrsLeaseCall<'a, S> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstanceReleaseSsrsLeaseCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceReleaseSsrsLeaseCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> InstanceReleaseSsrsLeaseCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> InstanceReleaseSsrsLeaseCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> InstanceReleaseSsrsLeaseCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Deletes all client certificates and generates a new server SSL certificate for the instance.
 ///
 /// A builder for the *resetSslConfig* method supported by a *instance* resource.
@@ -13097,7 +14072,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13197,6 +14172,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13371,7 +14347,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13471,6 +14447,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13646,7 +14623,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13950,7 +14927,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14253,7 +15230,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14353,6 +15330,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14527,7 +15505,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14627,6 +15605,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14779,7 +15758,7 @@ where
 }
 
 
-/// Switches over from the primary instance to the replica instance.
+/// Switches over from the primary instance to the designated DR replica instance.
 ///
 /// A builder for the *switchover* method supported by a *instance* resource.
 /// It is not used directly, but through a [`InstanceMethods`] instance.
@@ -14801,12 +15780,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().switchover("project", "instance")
-///              .db_timeout(chrono::Duration::seconds(8836791))
+///              .db_timeout(chrono::Duration::seconds(846145))
 ///              .doit().await;
 /// # }
 /// ```
@@ -14906,6 +15885,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15088,7 +16068,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15392,7 +16372,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15695,7 +16675,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15795,6 +16775,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15969,7 +16950,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16069,6 +17050,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16243,14 +17225,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.operations().list("project")
-///              .page_token("At")
-///              .max_results(58)
-///              .instance("sit")
+///              .page_token("aliquyam")
+///              .max_results(96)
+///              .instance("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16356,6 +17338,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16541,7 +17524,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16641,6 +17624,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16815,7 +17799,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16915,6 +17899,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17090,7 +18075,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17394,7 +18379,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17698,7 +18683,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18002,7 +18987,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18306,7 +19291,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18610,7 +19595,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18913,7 +19898,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19015,6 +20000,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19199,7 +20185,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19301,6 +20287,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19486,7 +20473,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19789,7 +20776,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19889,6 +20876,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20063,7 +21051,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20161,6 +21149,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20325,13 +21314,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().delete("project", "instance")
-///              .name("et")
-///              .host("sea")
+///              .name("est")
+///              .host("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20435,6 +21424,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20623,7 +21613,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20730,6 +21720,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20922,7 +21913,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21225,7 +22216,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21325,6 +22316,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21500,7 +22492,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = SQLAdmin::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21510,7 +22502,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().update(req, "project", "instance")
-///              .name("sed")
+///              .name("dolores")
 ///              .host("eos")
 ///              .doit().await;
 /// # }

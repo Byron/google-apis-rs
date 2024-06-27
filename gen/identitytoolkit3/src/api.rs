@@ -81,7 +81,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -129,7 +129,7 @@ impl<'a, S> IdentityToolkit<S> {
         IdentityToolkit {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://www.googleapis.com/identitytoolkit/v3/relyingparty/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -140,7 +140,7 @@ impl<'a, S> IdentityToolkit<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -176,6 +176,7 @@ impl<'a, S> IdentityToolkit<S> {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [create auth uri relyingparty](RelyingpartyCreateAuthUriCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateAuthUriResponse {
@@ -226,6 +227,7 @@ impl client::ResponseResult for CreateAuthUriResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete account relyingparty](RelyingpartyDeleteAccountCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeleteAccountResponse {
@@ -245,6 +247,7 @@ impl client::ResponseResult for DeleteAccountResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [download account relyingparty](RelyingpartyDownloadAccountCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadAccountResponse {
@@ -271,6 +274,7 @@ impl client::ResponseResult for DownloadAccountResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [email link signin relyingparty](RelyingpartyEmailLinkSigninCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EmailLinkSigninResponse {
@@ -310,6 +314,7 @@ impl client::ResponseResult for EmailLinkSigninResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EmailTemplate {
@@ -346,6 +351,7 @@ impl client::Part for EmailTemplate {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get account info relyingparty](RelyingpartyGetAccountInfoCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetAccountInfoResponse {
@@ -368,6 +374,7 @@ impl client::ResponseResult for GetAccountInfoResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get oob confirmation code relyingparty](RelyingpartyGetOobConfirmationCodeCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetOobConfirmationCodeResponse {
@@ -394,6 +401,7 @@ impl client::ResponseResult for GetOobConfirmationCodeResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get recaptcha param relyingparty](RelyingpartyGetRecaptchaParamCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetRecaptchaParamResponse {
@@ -421,6 +429,7 @@ impl client::ResponseResult for GetRecaptchaParamResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [create auth uri relyingparty](RelyingpartyCreateAuthUriCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyCreateAuthUriRequest {
@@ -500,6 +509,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyCreateAuthUriRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete account relyingparty](RelyingpartyDeleteAccountCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyDeleteAccountRequest {
@@ -529,6 +539,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyDeleteAccountRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [download account relyingparty](RelyingpartyDownloadAccountCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyDownloadAccountRequest {
@@ -562,6 +573,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyDownloadAccountRequest 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [email link signin relyingparty](RelyingpartyEmailLinkSigninCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyEmailLinkSigninRequest {
@@ -589,6 +601,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyEmailLinkSigninRequest 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get account info relyingparty](RelyingpartyGetAccountInfoCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyGetAccountInfoRequest {
@@ -625,6 +638,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyGetAccountInfoRequest {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get project config relyingparty](RelyingpartyGetProjectConfigCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyGetProjectConfigResponse {
@@ -689,6 +703,7 @@ impl client::ResponseResult for IdentitytoolkitRelyingpartyGetProjectConfigRespo
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get public keys relyingparty](RelyingpartyGetPublicKeyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyGetPublicKeysResponse(pub Option<HashMap<String, String>>);
@@ -704,6 +719,7 @@ impl client::ResponseResult for IdentitytoolkitRelyingpartyGetPublicKeysResponse
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [reset password relyingparty](RelyingpartyResetPasswordCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyResetPasswordRequest {
@@ -735,6 +751,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyResetPasswordRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [send verification code relyingparty](RelyingpartySendVerificationCodeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySendVerificationCodeRequest {
@@ -767,6 +784,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartySendVerificationCodeReq
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [send verification code relyingparty](RelyingpartySendVerificationCodeCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySendVerificationCodeResponse {
@@ -787,6 +805,7 @@ impl client::ResponseResult for IdentitytoolkitRelyingpartySendVerificationCodeR
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [set account info relyingparty](RelyingpartySetAccountInfoCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
@@ -896,6 +915,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartySetAccountInfoRequest {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [set project config relyingparty](RelyingpartySetProjectConfigCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySetProjectConfigRequest {
@@ -957,6 +977,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartySetProjectConfigRequest
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [set project config relyingparty](RelyingpartySetProjectConfigCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySetProjectConfigResponse {
@@ -977,6 +998,7 @@ impl client::ResponseResult for IdentitytoolkitRelyingpartySetProjectConfigRespo
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [sign out user relyingparty](RelyingpartySignOutUserCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySignOutUserRequest {
@@ -1001,6 +1023,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartySignOutUserRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [sign out user relyingparty](RelyingpartySignOutUserCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySignOutUserResponse {
@@ -1021,6 +1044,7 @@ impl client::ResponseResult for IdentitytoolkitRelyingpartySignOutUserResponse {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [signup new user relyingparty](RelyingpartySignupNewUserCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartySignupNewUserRequest {
@@ -1091,6 +1115,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartySignupNewUserRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [upload account relyingparty](RelyingpartyUploadAccountCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
@@ -1163,6 +1188,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyUploadAccountRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify assertion relyingparty](RelyingpartyVerifyAssertionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyAssertionRequest {
@@ -1233,6 +1259,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyVerifyAssertionRequest 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify custom token relyingparty](RelyingpartyVerifyCustomTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyCustomTokenRequest {
@@ -1265,6 +1292,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyVerifyCustomTokenReques
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify password relyingparty](RelyingpartyVerifyPasswordCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyPasswordRequest {
@@ -1325,6 +1353,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyVerifyPasswordRequest {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify phone number relyingparty](RelyingpartyVerifyPhoneNumberCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyPhoneNumberRequest {
@@ -1367,6 +1396,7 @@ impl client::RequestValue for IdentitytoolkitRelyingpartyVerifyPhoneNumberReques
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify phone number relyingparty](RelyingpartyVerifyPhoneNumberCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentitytoolkitRelyingpartyVerifyPhoneNumberResponse {
@@ -1422,6 +1452,7 @@ impl client::ResponseResult for IdentitytoolkitRelyingpartyVerifyPhoneNumberResp
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdpConfig {
@@ -1459,6 +1490,7 @@ impl client::Part for IdpConfig {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get oob confirmation code relyingparty](RelyingpartyGetOobConfirmationCodeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Relyingparty {
@@ -1532,6 +1564,7 @@ impl client::RequestValue for Relyingparty {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [reset password relyingparty](RelyingpartyResetPasswordCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResetPasswordResponse {
@@ -1562,6 +1595,7 @@ impl client::ResponseResult for ResetPasswordResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [set account info relyingparty](RelyingpartySetAccountInfoCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetAccountInfoResponse {
@@ -1626,6 +1660,7 @@ impl client::ResponseResult for SetAccountInfoResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [signup new user relyingparty](RelyingpartySignupNewUserCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignupNewUserResponse {
@@ -1669,6 +1704,7 @@ impl client::ResponseResult for SignupNewUserResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [upload account relyingparty](RelyingpartyUploadAccountCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UploadAccountResponse {
@@ -1687,6 +1723,7 @@ impl client::ResponseResult for UploadAccountResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserInfo {
@@ -1780,6 +1817,7 @@ impl client::Part for UserInfo {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify assertion relyingparty](RelyingpartyVerifyAssertionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyAssertionResponse {
@@ -1948,6 +1986,7 @@ impl client::ResponseResult for VerifyAssertionResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify custom token relyingparty](RelyingpartyVerifyCustomTokenCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyCustomTokenResponse {
@@ -1984,6 +2023,7 @@ impl client::ResponseResult for VerifyCustomTokenResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify password relyingparty](RelyingpartyVerifyPasswordCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyPasswordResponse {
@@ -2042,6 +2082,7 @@ impl client::ResponseResult for VerifyPasswordResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetAccountInfoResponseProviderUserInfo {
@@ -2071,6 +2112,7 @@ impl client::Part for SetAccountInfoResponseProviderUserInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UploadAccountResponseError {
@@ -2090,6 +2132,7 @@ impl client::Part for UploadAccountResponseError {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserInfoProviderUserInfo {
@@ -2156,7 +2199,7 @@ impl client::Part for UserInfoProviderUserInfo {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create_auth_uri(...)`, `delete_account(...)`, `download_account(...)`, `email_link_signin(...)`, `get_account_info(...)`, `get_oob_confirmation_code(...)`, `get_project_config(...)`, `get_public_keys(...)`, `get_recaptcha_param(...)`, `reset_password(...)`, `send_verification_code(...)`, `set_account_info(...)`, `set_project_config(...)`, `sign_out_user(...)`, `signup_new_user(...)`, `upload_account(...)`, `verify_assertion(...)`, `verify_custom_token(...)`, `verify_password(...)` and `verify_phone_number(...)`
 /// // to build up your call.
@@ -2532,7 +2575,7 @@ impl<'a, S> RelyingpartyMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2801,7 +2844,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3070,7 +3113,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3339,7 +3382,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3608,7 +3651,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3877,7 +3920,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4145,7 +4188,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4244,6 +4287,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4408,7 +4452,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4497,6 +4541,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4647,7 +4692,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4736,6 +4781,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4887,7 +4933,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5156,7 +5202,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5425,7 +5471,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5694,7 +5740,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5963,7 +6009,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6232,7 +6278,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6501,7 +6547,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6770,7 +6816,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7039,7 +7085,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7308,7 +7354,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7577,7 +7623,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = IdentityToolkit::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !

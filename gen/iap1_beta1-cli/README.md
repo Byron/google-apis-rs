@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud IAP* API at revision *20240224*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud IAP* API at revision *20240623*. The CLI is at version *5.0.5*.
 
 ```bash
 iap1-beta1 [options]

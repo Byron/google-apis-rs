@@ -59,9 +59,6 @@ where
                 "query" => {
                     call = call.query(value.unwrap_or(""));
                 },
-                "product-product-subline" => {
-                    call = call.product_product_subline(value.unwrap_or(""));
-                },
                 "product-product-line" => {
                     call = call.product_product_line(value.unwrap_or(""));
                 },
@@ -84,7 +81,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token", "product-product-line", "product-product-subline", "query"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "product-product-line", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -438,7 +435,6 @@ where
                     "classification.display-name" => Some(("classification.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "classification.id" => Some(("classification.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "classification.product.product-line" => Some(("classification.product.productLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "classification.product.product-subline" => Some(("classification.product.productSubline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.display-name" => Some(("creator.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -458,7 +454,7 @@ where
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "contact-email", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "product", "product-line", "product-subline", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "contact-email", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "product", "product-line", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -747,7 +743,6 @@ where
                     "classification.display-name" => Some(("classification.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "classification.id" => Some(("classification.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "classification.product.product-line" => Some(("classification.product.productLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "classification.product.product-subline" => Some(("classification.product.productSubline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.display-name" => Some(("creator.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -767,7 +762,7 @@ where
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "contact-email", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "product", "product-line", "product-subline", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "contact-email", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "product", "product-line", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -863,6 +858,68 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-size", "page-token", "parent", "query"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _cases_show_feed(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.cases().show_feed(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1102,6 +1159,9 @@ where
                     ("search", Some(opt)) => {
                         call_result = self._cases_search(opt, dry_run, &mut err).await;
                     },
+                    ("show-feed", Some(opt)) => {
+                        call_result = self._cases_show_feed(opt, dry_run, &mut err).await;
+                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("cases".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -1215,7 +1275,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("cases", "methods: 'attachments-list', 'close', 'comments-create', 'comments-list', 'create', 'escalate', 'get', 'list', 'patch' and 'search'", vec![
+        ("cases", "methods: 'attachments-list', 'close', 'comments-create', 'comments-list', 'create', 'escalate', 'get', 'list', 'patch', 'search' and 'show-feed'", vec![
             ("attachments-list",
                     Some(r##"List all the attachments associated with a support case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/23598314" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case/attachments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .attachments() .list(parent="projects/some-project/cases/43595344") ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_attachments-list",
@@ -1460,6 +1520,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("show-feed",
+                    Some(r##"Show items in the feed of this case, including case emails, attachments, and comments."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_show-feed",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The resource name of the case for which feed items should be listed."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
         ("media", "methods: 'download' and 'upload'", vec![
@@ -1525,7 +1607,7 @@ async fn main() {
     
     let mut app = App::new("cloudsupport2-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240304")
+           .version("5.0.5+20240624")
            .about("Manages Google Cloud technical support cases for Customer Care support offerings. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli")
            .arg(Arg::with_name("url")
@@ -1600,6 +1682,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

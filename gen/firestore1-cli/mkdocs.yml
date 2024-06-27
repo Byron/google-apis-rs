@@ -1,4 +1,4 @@
-site_name: Firestore v5.0.4+20240226
+site_name: Firestore v5.0.5+20240617
 site_url: http://byron.github.io/google-apis-rs/google-firestore1-cli
 site_description: A complete library to interact with Firestore (protocol v1)
 
@@ -15,6 +15,7 @@ nav:
     - 'Databases Backup Schedules Get': 'projects_databases-backup-schedules-get.md'
     - 'Databases Backup Schedules List': 'projects_databases-backup-schedules-list.md'
     - 'Databases Backup Schedules Patch': 'projects_databases-backup-schedules-patch.md'
+    - 'Databases Bulk Delete Documents': 'projects_databases-bulk-delete-documents.md'
     - 'Databases Collection Groups Fields Get': 'projects_databases-collection-groups-fields-get.md'
     - 'Databases Collection Groups Fields List': 'projects_databases-collection-groups-fields-list.md'
     - 'Databases Collection Groups Fields Patch': 'projects_databases-collection-groups-fields-patch.md'
@@ -59,5 +60,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

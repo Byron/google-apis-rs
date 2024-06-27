@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *5.0.4+20240229*, where *20240229* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *storage* crate version *5.0.5+20240621*, where *20240621* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -16,7 +16,7 @@
 //! * [bucket access controls](api::BucketAccessControl)
 //!  * [*delete*](api::BucketAccessControlDeleteCall), [*get*](api::BucketAccessControlGetCall), [*insert*](api::BucketAccessControlInsertCall), [*list*](api::BucketAccessControlListCall), [*patch*](api::BucketAccessControlPatchCall) and [*update*](api::BucketAccessControlUpdateCall)
 //! * [buckets](api::Bucket)
-//!  * [*delete*](api::BucketDeleteCall), [*get*](api::BucketGetCall), [*get iam policy*](api::BucketGetIamPolicyCall), [*insert*](api::BucketInsertCall), [*list*](api::BucketListCall), [*lock retention policy*](api::BucketLockRetentionPolicyCall), [*operations cancel*](api::BucketOperationCancelCall), [*operations get*](api::BucketOperationGetCall), [*operations list*](api::BucketOperationListCall), [*patch*](api::BucketPatchCall), [*set iam policy*](api::BucketSetIamPolicyCall), [*test iam permissions*](api::BucketTestIamPermissionCall) and [*update*](api::BucketUpdateCall)
+//!  * [*delete*](api::BucketDeleteCall), [*get*](api::BucketGetCall), [*get iam policy*](api::BucketGetIamPolicyCall), [*get storage layout*](api::BucketGetStorageLayoutCall), [*insert*](api::BucketInsertCall), [*list*](api::BucketListCall), [*lock retention policy*](api::BucketLockRetentionPolicyCall), [*operations cancel*](api::BucketOperationCancelCall), [*operations get*](api::BucketOperationGetCall), [*operations list*](api::BucketOperationListCall), [*patch*](api::BucketPatchCall), [*set iam policy*](api::BucketSetIamPolicyCall), [*test iam permissions*](api::BucketTestIamPermissionCall) and [*update*](api::BucketUpdateCall)
 //! * [channels](api::Channel)
 //!  * [*stop*](api::ChannelStopCall)
 //! * default object access controls
@@ -139,7 +139,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -236,6 +236,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

@@ -2699,10 +2699,11 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "encryption-spec.kms-key-name" => Some(("encryptionSpec.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["encryption-spec", "kms-key-name", "name", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9159,10 +9160,11 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "encryption-spec.kms-key-name" => Some(("encryptionSpec.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["encryption-spec", "kms-key-name", "name", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12761,7 +12763,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Identifier. Resource name of the FHIR store, of the form `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
+                     Some(r##"Output only. Identifier. Resource name of the FHIR store, of the form `projects/{project_id}/locations/{location}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -13595,7 +13597,7 @@ async fn main() {
     
     let mut app = App::new("healthcare1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240228")
+           .version("5.0.5+20240605")
            .about("Manage, store, and access healthcare data in Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_healthcare1_cli")
            .arg(Arg::with_name("url")
@@ -13659,6 +13661,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

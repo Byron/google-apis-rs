@@ -74,6 +74,8 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "analysis-result.call-analysis-metadata.issue-model-result.issue-model" => Some(("analysisResult.callAnalysisMetadata.issueModelResult.issueModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analysis-result.call-analysis-metadata.silence.silence-duration" => Some(("analysisResult.callAnalysisMetadata.silence.silenceDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analysis-result.call-analysis-metadata.silence.silence-percentage" => Some(("analysisResult.callAnalysisMetadata.silence.silencePercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "analysis-result.end-time" => Some(("analysisResult.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "annotator-selector.issue-models" => Some(("annotatorSelector.issueModels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "annotator-selector.phrase-matchers" => Some(("annotatorSelector.phraseMatchers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -91,7 +93,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-time" => Some(("requestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-result", "annotator-selector", "call-analysis-metadata", "conversation-profile", "create-time", "end-time", "issue-model", "issue-model-result", "issue-models", "name", "phrase-matchers", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "summarization-config", "summarization-model"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analysis-result", "annotator-selector", "call-analysis-metadata", "conversation-profile", "create-time", "end-time", "issue-model", "issue-model-result", "issue-models", "name", "phrase-matchers", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "silence", "silence-duration", "silence-percentage", "summarization-config", "summarization-model"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -596,6 +598,8 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.analysis-result.call-analysis-metadata.issue-model-result.issue-model" => Some(("latestAnalysis.analysisResult.callAnalysisMetadata.issueModelResult.issueModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-analysis.analysis-result.call-analysis-metadata.silence.silence-duration" => Some(("latestAnalysis.analysisResult.callAnalysisMetadata.silence.silenceDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-analysis.analysis-result.call-analysis-metadata.silence.silence-percentage" => Some(("latestAnalysis.analysisResult.callAnalysisMetadata.silence.silencePercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "latest-analysis.analysis-result.end-time" => Some(("latestAnalysis.analysisResult.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.annotator-selector.issue-models" => Some(("latestAnalysis.annotatorSelector.issueModels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "latest-analysis.annotator-selector.phrase-matchers" => Some(("latestAnalysis.annotatorSelector.phraseMatchers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -629,7 +633,7 @@ where
                     "turn-count" => Some(("turnCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "phrase-matchers", "quality-metadata", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "phrase-matchers", "quality-metadata", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "silence", "silence-duration", "silence-percentage", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -838,10 +842,11 @@ where
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redaction-config.deidentify-template" => Some(("redactionConfig.deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redaction-config.inspect-template" => Some(("redactionConfig.inspectTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sample-size" => Some(("sampleSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "speech-config.speech-recognizer" => Some(("speechConfig.speechRecognizer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transcript-object-config.medium" => Some(("transcriptObjectConfig.medium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "bucket-object-type", "bucket-uri", "conversation-config", "custom-metadata-keys", "customer-channel", "deidentify-template", "gcs-source", "inspect-template", "medium", "metadata-bucket-uri", "parent", "redaction-config", "speech-config", "speech-recognizer", "transcript-object-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "bucket-object-type", "bucket-uri", "conversation-config", "custom-metadata-keys", "customer-channel", "deidentify-template", "gcs-source", "inspect-template", "medium", "metadata-bucket-uri", "parent", "redaction-config", "sample-size", "speech-config", "speech-recognizer", "transcript-object-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1005,6 +1010,8 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.analysis-result.call-analysis-metadata.issue-model-result.issue-model" => Some(("latestAnalysis.analysisResult.callAnalysisMetadata.issueModelResult.issueModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-analysis.analysis-result.call-analysis-metadata.silence.silence-duration" => Some(("latestAnalysis.analysisResult.callAnalysisMetadata.silence.silenceDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-analysis.analysis-result.call-analysis-metadata.silence.silence-percentage" => Some(("latestAnalysis.analysisResult.callAnalysisMetadata.silence.silencePercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "latest-analysis.analysis-result.end-time" => Some(("latestAnalysis.analysisResult.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "latest-analysis.annotator-selector.issue-models" => Some(("latestAnalysis.annotatorSelector.issueModels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "latest-analysis.annotator-selector.phrase-matchers" => Some(("latestAnalysis.annotatorSelector.phraseMatchers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1038,7 +1045,7 @@ where
                     "turn-count" => Some(("turnCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "phrase-matchers", "quality-metadata", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "phrase-matchers", "quality-metadata", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "silence", "silence-duration", "silence-percentage", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1138,6 +1145,8 @@ where
                     "conversation.labels" => Some(("conversation.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "conversation.language-code" => Some(("conversation.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation.latest-analysis.analysis-result.call-analysis-metadata.issue-model-result.issue-model" => Some(("conversation.latestAnalysis.analysisResult.callAnalysisMetadata.issueModelResult.issueModel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.analysis-result.call-analysis-metadata.silence.silence-duration" => Some(("conversation.latestAnalysis.analysisResult.callAnalysisMetadata.silence.silenceDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation.latest-analysis.analysis-result.call-analysis-metadata.silence.silence-percentage" => Some(("conversation.latestAnalysis.analysisResult.callAnalysisMetadata.silence.silencePercentage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "conversation.latest-analysis.analysis-result.end-time" => Some(("conversation.latestAnalysis.analysisResult.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation.latest-analysis.annotator-selector.issue-models" => Some(("conversation.latestAnalysis.annotatorSelector.issueModels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "conversation.latest-analysis.annotator-selector.phrase-matchers" => Some(("conversation.latestAnalysis.annotatorSelector.phraseMatchers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1176,7 +1185,7 @@ where
                     "redaction-config.inspect-template" => Some(("redactionConfig.inspectTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "speech-config.speech-recognizer" => Some(("speechConfig.speechRecognizer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation", "conversation-id", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "deidentify-template", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "inspect-template", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "parent", "phrase-matchers", "quality-metadata", "redaction-config", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "speech-config", "speech-recognizer", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-channel", "agent-id", "analysis-result", "annotator-selector", "answer-record", "audio-uri", "call-analysis-metadata", "call-metadata", "confidence", "conversation", "conversation-id", "conversation-model", "conversation-profile", "create-time", "customer-channel", "customer-satisfaction-rating", "data-source", "deidentify-template", "dialogflow-conversation", "dialogflow-source", "duration", "end-time", "expire-time", "gcs-source", "inspect-template", "issue-model", "issue-model-result", "issue-models", "labels", "language-code", "latest-analysis", "latest-summary", "medium", "menu-path", "metadata", "name", "obfuscated-user-id", "parent", "phrase-matchers", "quality-metadata", "redaction-config", "request-time", "run-entity-annotator", "run-intent-annotator", "run-interruption-annotator", "run-issue-model-annotator", "run-phrase-matcher-annotator", "run-sentiment-annotator", "run-silence-annotator", "run-summarization-annotator", "silence", "silence-duration", "silence-percentage", "speech-config", "speech-recognizer", "start-time", "summarization-config", "summarization-model", "text", "text-sections", "transcript-uri", "ttl", "turn-count", "update-time", "wait-duration"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3749,7 +3758,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-conversations-create",
-                    Some(r##"Creates a conversation."##),
+                    Some(r##"Creates a conversation. Does not support audio transcription or DLP redaction. Use `conversations.upload` instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-conversations-create",
                   vec![
                     (Some(r##"parent"##),
@@ -3899,7 +3908,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-conversations-upload",
-                    Some(r##"Create a longrunning conversation upload operation. This method differs from CreateConversation by allowing audio transcription and optional DLP redaction."##),
+                    Some(r##"Create a long-running conversation upload operation. This method differs from `CreateConversation` by allowing audio transcription and optional DLP redaction."##),
                     "Details at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli/projects_locations-conversations-upload",
                   vec![
                     (Some(r##"parent"##),
@@ -4082,7 +4091,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The issue model to export"##),
+                     Some(r##"Required. The issue model to export."##),
                      Some(true),
                      Some(false)),
         
@@ -4670,7 +4679,7 @@ async fn main() {
     
     let mut app = App::new("contactcenterinsights1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240226")
+           .version("5.0.5+20240624")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_contactcenterinsights1_cli")
            .arg(Arg::with_name("url")
@@ -4734,6 +4743,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

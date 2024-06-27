@@ -3160,12 +3160,13 @@ where
                     "recurring-transaction.external-transaction-token" => Some(("recurringTransaction.externalTransactionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "recurring-transaction.initial-external-transaction-id" => Some(("recurringTransaction.initialExternalTransactionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "recurring-transaction.migrated-transaction-program" => Some(("recurringTransaction.migratedTransactionProgram", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction-program-code" => Some(("transactionProgramCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transaction-state" => Some(("transactionState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction-time" => Some(("transactionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-tax-address.administrative-area" => Some(("userTaxAddress.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-tax-address.region-code" => Some(("userTaxAddress.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["administrative-area", "create-time", "currency", "current-pre-tax-amount", "current-tax-amount", "external-subscription", "external-transaction-id", "external-transaction-token", "initial-external-transaction-id", "migrated-transaction-program", "one-time-transaction", "original-pre-tax-amount", "original-tax-amount", "package-name", "price-micros", "recurring-transaction", "region-code", "subscription-type", "transaction-state", "transaction-time", "user-tax-address"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["administrative-area", "create-time", "currency", "current-pre-tax-amount", "current-tax-amount", "external-subscription", "external-transaction-id", "external-transaction-token", "initial-external-transaction-id", "migrated-transaction-program", "one-time-transaction", "original-pre-tax-amount", "original-tax-amount", "package-name", "price-micros", "recurring-transaction", "region-code", "subscription-type", "transaction-program-code", "transaction-state", "transaction-time", "user-tax-address"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6113,10 +6114,11 @@ where
                     "archived" => Some(("archived", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restricted-payment-countries.region-codes" => Some(("restrictedPaymentCountries.regionCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tax-and-compliance-settings.eea-withdrawal-right-type" => Some(("taxAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tax-and-compliance-settings.is-tokenized-digital-asset" => Some(("taxAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "is-tokenized-digital-asset", "package-name", "product-id", "tax-and-compliance-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "is-tokenized-digital-asset", "package-name", "product-id", "region-codes", "restricted-payment-countries", "tax-and-compliance-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6367,10 +6369,11 @@ where
                     "archived" => Some(("archived", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "package-name" => Some(("packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restricted-payment-countries.region-codes" => Some(("restrictedPaymentCountries.regionCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tax-and-compliance-settings.eea-withdrawal-right-type" => Some(("taxAndComplianceSettings.eeaWithdrawalRightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tax-and-compliance-settings.is-tokenized-digital-asset" => Some(("taxAndComplianceSettings.isTokenizedDigitalAsset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "is-tokenized-digital-asset", "package-name", "product-id", "tax-and-compliance-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archived", "eea-withdrawal-right-type", "is-tokenized-digital-asset", "package-name", "product-id", "region-codes", "restricted-payment-countries", "tax-and-compliance-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7168,6 +7171,9 @@ where
                 "max-results" => {
                     call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
                 },
+                "include-quantity-based-partial-refund" => {
+                    call = call.include_quantity_based_partial_refund(        value.map(|v| arg_from_str(v, err, "include-quantity-based-partial-refund", "boolean")).unwrap_or(false));
+                },
                 "end-time" => {
                     call = call.end_time(        value.map(|v| arg_from_str(v, err, "end-time", "int64")).unwrap_or(-0));
                 },
@@ -7184,7 +7190,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["end-time", "max-results", "start-index", "start-time", "token", "type"].iter().map(|v|*v));
+                                                                           v.extend(["end-time", "include-quantity-based-partial-refund", "max-results", "start-index", "start-time", "token", "type"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -12175,7 +12181,7 @@ async fn main() {
     
     let mut app = App::new("androidpublisher3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240229")
+           .version("5.0.5+20240626")
            .about("Lets Android application developers access their Google Play accounts. At a high level, the expected workflow is to \"insert\" an Edit, make changes as necessary, and then \"commit\" it. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher3_cli")
            .arg(Arg::with_name("url")
@@ -12250,6 +12256,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

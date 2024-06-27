@@ -605,8 +605,10 @@ where
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prefer-no-broad-approval-requests" => Some(("preferNoBroadApprovalRequests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preferred-request-expiration-days" => Some(("preferredRequestExpirationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "request-scope-max-width-preference" => Some(("requestScopeMaxWidthPreference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "require-customer-visible-justification" => Some(("requireCustomerVisibleJustification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days", "request-scope-max-width-preference", "require-customer-visible-justification"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1225,8 +1227,10 @@ where
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prefer-no-broad-approval-requests" => Some(("preferNoBroadApprovalRequests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preferred-request-expiration-days" => Some(("preferredRequestExpirationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "request-scope-max-width-preference" => Some(("requestScopeMaxWidthPreference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "require-customer-visible-justification" => Some(("requireCustomerVisibleJustification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days", "request-scope-max-width-preference", "require-customer-visible-justification"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1845,8 +1849,10 @@ where
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "prefer-no-broad-approval-requests" => Some(("preferNoBroadApprovalRequests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "preferred-request-expiration-days" => Some(("preferredRequestExpirationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "request-scope-max-width-preference" => Some(("requestScopeMaxWidthPreference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "require-customer-visible-justification" => Some(("requireCustomerVisibleJustification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days", "request-scope-max-width-preference", "require-customer-visible-justification"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2772,7 +2778,7 @@ async fn main() {
     
     let mut app = App::new("accessapproval1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240621")
            .about("An API for controlling access to data by Google personnel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accessapproval1_cli")
            .arg(Arg::with_name("url")
@@ -2836,6 +2842,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

@@ -1,4 +1,4 @@
-site_name: Cloud Dataplex v5.0.4+20240224
+site_name: Cloud Dataplex v5.0.5+20240611
 site_url: http://byron.github.io/google-apis-rs/google-dataplex1-cli
 site_description: A complete library to interact with Cloud Dataplex (protocol v1)
 
@@ -10,7 +10,12 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Aspect Types Create': 'projects_locations-aspect-types-create.md'
+    - 'Locations Aspect Types Delete': 'projects_locations-aspect-types-delete.md'
+    - 'Locations Aspect Types Get': 'projects_locations-aspect-types-get.md'
     - 'Locations Aspect Types Get Iam Policy': 'projects_locations-aspect-types-get-iam-policy.md'
+    - 'Locations Aspect Types List': 'projects_locations-aspect-types-list.md'
+    - 'Locations Aspect Types Patch': 'projects_locations-aspect-types-patch.md'
     - 'Locations Aspect Types Set Iam Policy': 'projects_locations-aspect-types-set-iam-policy.md'
     - 'Locations Aspect Types Test Iam Permissions': 'projects_locations-aspect-types-test-iam-permissions.md'
     - 'Locations Data Attribute Bindings Create': 'projects_locations-data-attribute-bindings-create.md'
@@ -23,8 +28,10 @@ nav:
     - 'Locations Data Attribute Bindings Test Iam Permissions': 'projects_locations-data-attribute-bindings-test-iam-permissions.md'
     - 'Locations Data Scans Create': 'projects_locations-data-scans-create.md'
     - 'Locations Data Scans Delete': 'projects_locations-data-scans-delete.md'
+    - 'Locations Data Scans Generate Data Quality Rules': 'projects_locations-data-scans-generate-data-quality-rules.md'
     - 'Locations Data Scans Get': 'projects_locations-data-scans-get.md'
     - 'Locations Data Scans Get Iam Policy': 'projects_locations-data-scans-get-iam-policy.md'
+    - 'Locations Data Scans Jobs Generate Data Quality Rules': 'projects_locations-data-scans-jobs-generate-data-quality-rules.md'
     - 'Locations Data Scans Jobs Get': 'projects_locations-data-scans-jobs-get.md'
     - 'Locations Data Scans Jobs List': 'projects_locations-data-scans-jobs-list.md'
     - 'Locations Data Scans List': 'projects_locations-data-scans-list.md'
@@ -48,10 +55,25 @@ nav:
     - 'Locations Data Taxonomies Patch': 'projects_locations-data-taxonomies-patch.md'
     - 'Locations Data Taxonomies Set Iam Policy': 'projects_locations-data-taxonomies-set-iam-policy.md'
     - 'Locations Data Taxonomies Test Iam Permissions': 'projects_locations-data-taxonomies-test-iam-permissions.md'
+    - 'Locations Entry Groups Create': 'projects_locations-entry-groups-create.md'
+    - 'Locations Entry Groups Delete': 'projects_locations-entry-groups-delete.md'
+    - 'Locations Entry Groups Entries Create': 'projects_locations-entry-groups-entries-create.md'
+    - 'Locations Entry Groups Entries Delete': 'projects_locations-entry-groups-entries-delete.md'
+    - 'Locations Entry Groups Entries Get': 'projects_locations-entry-groups-entries-get.md'
+    - 'Locations Entry Groups Entries List': 'projects_locations-entry-groups-entries-list.md'
+    - 'Locations Entry Groups Entries Patch': 'projects_locations-entry-groups-entries-patch.md'
+    - 'Locations Entry Groups Get': 'projects_locations-entry-groups-get.md'
     - 'Locations Entry Groups Get Iam Policy': 'projects_locations-entry-groups-get-iam-policy.md'
+    - 'Locations Entry Groups List': 'projects_locations-entry-groups-list.md'
+    - 'Locations Entry Groups Patch': 'projects_locations-entry-groups-patch.md'
     - 'Locations Entry Groups Set Iam Policy': 'projects_locations-entry-groups-set-iam-policy.md'
     - 'Locations Entry Groups Test Iam Permissions': 'projects_locations-entry-groups-test-iam-permissions.md'
+    - 'Locations Entry Types Create': 'projects_locations-entry-types-create.md'
+    - 'Locations Entry Types Delete': 'projects_locations-entry-types-delete.md'
+    - 'Locations Entry Types Get': 'projects_locations-entry-types-get.md'
     - 'Locations Entry Types Get Iam Policy': 'projects_locations-entry-types-get-iam-policy.md'
+    - 'Locations Entry Types List': 'projects_locations-entry-types-list.md'
+    - 'Locations Entry Types Patch': 'projects_locations-entry-types-patch.md'
     - 'Locations Entry Types Set Iam Policy': 'projects_locations-entry-types-set-iam-policy.md'
     - 'Locations Entry Types Test Iam Permissions': 'projects_locations-entry-types-test-iam-permissions.md'
     - 'Locations Get': 'projects_locations-get.md'
@@ -132,12 +154,14 @@ nav:
     - 'Locations Lakes Zones Set Iam Policy': 'projects_locations-lakes-zones-set-iam-policy.md'
     - 'Locations Lakes Zones Test Iam Permissions': 'projects_locations-lakes-zones-test-iam-permissions.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Lookup Entry': 'projects_locations-lookup-entry.md'
     - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Search Entries': 'projects_locations-search-entries.md'
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

@@ -1,4 +1,4 @@
-site_name: storage v5.0.4+20240229
+site_name: storage v5.0.5+20240621
 site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
 site_description: A complete library to interact with storage (protocol v1)
 
@@ -28,6 +28,7 @@ nav:
     - 'Delete': 'buckets_delete.md'
     - 'Get': 'buckets_get.md'
     - 'Get Iam Policy': 'buckets_get-iam-policy.md'
+    - 'Get Storage Layout': 'buckets_get-storage-layout.md'
     - 'Insert': 'buckets_insert.md'
     - 'List': 'buckets_list.md'
     - 'Lock Retention Policy': 'buckets_lock-retention-policy.md'
@@ -99,5 +100,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

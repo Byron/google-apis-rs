@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *BigQuery Reservation* crate version *5.0.4+20240227*, where *20240227* is the exact revision of the *bigqueryreservation:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *BigQuery Reservation* crate version *5.0.5+20240611*, where *20240611* is the exact revision of the *bigqueryreservation:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *BigQuery Reservation* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](BigQueryReservation) ... 
 //! 
 //! * projects
-//!  * [*locations capacity commitments create*](api::ProjectLocationCapacityCommitmentCreateCall), [*locations capacity commitments delete*](api::ProjectLocationCapacityCommitmentDeleteCall), [*locations capacity commitments get*](api::ProjectLocationCapacityCommitmentGetCall), [*locations capacity commitments list*](api::ProjectLocationCapacityCommitmentListCall), [*locations capacity commitments merge*](api::ProjectLocationCapacityCommitmentMergeCall), [*locations capacity commitments patch*](api::ProjectLocationCapacityCommitmentPatchCall), [*locations capacity commitments split*](api::ProjectLocationCapacityCommitmentSplitCall), [*locations get bi reservation*](api::ProjectLocationGetBiReservationCall), [*locations reservations assignments create*](api::ProjectLocationReservationAssignmentCreateCall), [*locations reservations assignments delete*](api::ProjectLocationReservationAssignmentDeleteCall), [*locations reservations assignments list*](api::ProjectLocationReservationAssignmentListCall), [*locations reservations assignments move*](api::ProjectLocationReservationAssignmentMoveCall), [*locations reservations assignments patch*](api::ProjectLocationReservationAssignmentPatchCall), [*locations reservations create*](api::ProjectLocationReservationCreateCall), [*locations reservations delete*](api::ProjectLocationReservationDeleteCall), [*locations reservations get*](api::ProjectLocationReservationGetCall), [*locations reservations list*](api::ProjectLocationReservationListCall), [*locations reservations patch*](api::ProjectLocationReservationPatchCall), [*locations search all assignments*](api::ProjectLocationSearchAllAssignmentCall), [*locations search assignments*](api::ProjectLocationSearchAssignmentCall) and [*locations update bi reservation*](api::ProjectLocationUpdateBiReservationCall)
+//!  * [*locations capacity commitments create*](api::ProjectLocationCapacityCommitmentCreateCall), [*locations capacity commitments delete*](api::ProjectLocationCapacityCommitmentDeleteCall), [*locations capacity commitments get*](api::ProjectLocationCapacityCommitmentGetCall), [*locations capacity commitments list*](api::ProjectLocationCapacityCommitmentListCall), [*locations capacity commitments merge*](api::ProjectLocationCapacityCommitmentMergeCall), [*locations capacity commitments patch*](api::ProjectLocationCapacityCommitmentPatchCall), [*locations capacity commitments split*](api::ProjectLocationCapacityCommitmentSplitCall), [*locations get bi reservation*](api::ProjectLocationGetBiReservationCall), [*locations reservations assignments create*](api::ProjectLocationReservationAssignmentCreateCall), [*locations reservations assignments delete*](api::ProjectLocationReservationAssignmentDeleteCall), [*locations reservations assignments list*](api::ProjectLocationReservationAssignmentListCall), [*locations reservations assignments move*](api::ProjectLocationReservationAssignmentMoveCall), [*locations reservations assignments patch*](api::ProjectLocationReservationAssignmentPatchCall), [*locations reservations create*](api::ProjectLocationReservationCreateCall), [*locations reservations delete*](api::ProjectLocationReservationDeleteCall), [*locations reservations failover reservation*](api::ProjectLocationReservationFailoverReservationCall), [*locations reservations get*](api::ProjectLocationReservationGetCall), [*locations reservations list*](api::ProjectLocationReservationListCall), [*locations reservations patch*](api::ProjectLocationReservationPatchCall), [*locations search all assignments*](api::ProjectLocationSearchAllAssignmentCall), [*locations search assignments*](api::ProjectLocationSearchAssignmentCall) and [*locations update bi reservation*](api::ProjectLocationUpdateBiReservationCall)
 //! 
 //! 
 //! 
@@ -47,10 +47,10 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_capacity_commitments_create(...).doit().await
-//! let r = hub.projects().locations_capacity_commitments_get(...).doit().await
-//! let r = hub.projects().locations_capacity_commitments_merge(...).doit().await
-//! let r = hub.projects().locations_capacity_commitments_patch(...).doit().await
+//! let r = hub.projects().locations_reservations_create(...).doit().await
+//! let r = hub.projects().locations_reservations_failover_reservation(...).doit().await
+//! let r = hub.projects().locations_reservations_get(...).doit().await
+//! let r = hub.projects().locations_reservations_patch(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -77,7 +77,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_bigqueryreservation1 as bigqueryreservation1;
-//! use bigqueryreservation1::api::CapacityCommitment;
+//! use bigqueryreservation1::api::Reservation;
 //! use bigqueryreservation1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -95,18 +95,17 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = BigQueryReservation::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = CapacityCommitment::default();
+//! let mut req = Reservation::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_capacity_commitments_create(req, "parent")
-//!              .enforce_single_admin_project_per_org(false)
-//!              .capacity_commitment_id("amet.")
+//! let result = hub.projects().locations_reservations_create(req, "parent")
+//!              .reservation_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {
@@ -179,6 +178,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

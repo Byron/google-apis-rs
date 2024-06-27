@@ -766,13 +766,14 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "database-id" => Some(("databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "property-mask.paths" => Some(("propertyMask.paths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "read-options.new-transaction.read-only.read-time" => Some(("readOptions.newTransaction.readOnly.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.new-transaction.read-write.previous-transaction" => Some(("readOptions.newTransaction.readWrite.previousTransaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.read-time" => Some(("readOptions.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["database-id", "new-transaction", "previous-transaction", "read-consistency", "read-only", "read-options", "read-time", "read-write", "transaction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["database-id", "new-transaction", "paths", "previous-transaction", "property-mask", "read-consistency", "read-only", "read-options", "read-time", "read-write", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1269,6 +1270,7 @@ where
                     "aggregation-query.nested-query.offset" => Some(("aggregationQuery.nestedQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "aggregation-query.nested-query.start-cursor" => Some(("aggregationQuery.nestedQuery.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database-id" => Some(("databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "explain-options.analyze" => Some(("explainOptions.analyze", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gql-query.allow-literals" => Some(("gqlQuery.allowLiterals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gql-query.query-string" => Some(("gqlQuery.queryString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partition-id.database-id" => Some(("partitionId.databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1280,7 +1282,7 @@ where
                     "read-options.read-time" => Some(("readOptions.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-query", "allow-literals", "blob-value", "boolean-value", "composite-filter", "database-id", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "nested-query", "new-transaction", "null-value", "offset", "op", "partition-id", "previous-transaction", "project-id", "property", "property-filter", "query-string", "read-consistency", "read-only", "read-options", "read-time", "read-write", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-query", "allow-literals", "analyze", "blob-value", "boolean-value", "composite-filter", "database-id", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "explain-options", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "nested-query", "new-transaction", "null-value", "offset", "op", "partition-id", "previous-transaction", "project-id", "property", "property-filter", "query-string", "read-consistency", "read-only", "read-options", "read-time", "read-write", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1364,11 +1366,13 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "database-id" => Some(("databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "explain-options.analyze" => Some(("explainOptions.analyze", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gql-query.allow-literals" => Some(("gqlQuery.allowLiterals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gql-query.query-string" => Some(("gqlQuery.queryString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partition-id.database-id" => Some(("partitionId.databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partition-id.namespace-id" => Some(("partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partition-id.project-id" => Some(("partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "property-mask.paths" => Some(("propertyMask.paths", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query.end-cursor" => Some(("query.endCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.composite-filter.op" => Some(("query.filter.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.op" => Some(("query.filter.propertyFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1399,7 +1403,7 @@ where
                     "read-options.read-time" => Some(("readOptions.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-literals", "blob-value", "boolean-value", "composite-filter", "database-id", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "new-transaction", "null-value", "offset", "op", "partition-id", "previous-transaction", "project-id", "property", "property-filter", "query", "query-string", "read-consistency", "read-only", "read-options", "read-time", "read-write", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-literals", "analyze", "blob-value", "boolean-value", "composite-filter", "database-id", "double-value", "end-cursor", "entity-value", "exclude-from-indexes", "explain-options", "filter", "geo-point-value", "gql-query", "integer-value", "key", "key-value", "latitude", "limit", "longitude", "meaning", "name", "namespace-id", "new-transaction", "null-value", "offset", "op", "partition-id", "paths", "previous-transaction", "project-id", "property", "property-filter", "property-mask", "query", "query-string", "read-consistency", "read-only", "read-options", "read-time", "read-write", "start-cursor", "string-value", "timestamp-value", "transaction", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2080,7 +2084,7 @@ async fn main() {
     
     let mut app = App::new("datastore1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240226")
+           .version("5.0.5+20240617")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_cli")
            .arg(Arg::with_name("url")
@@ -2144,6 +2148,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

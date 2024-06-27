@@ -188,6 +188,90 @@ where
         }
     }
 
+    async fn _projects_locations_instances_disable_hyperthreading(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DisableHyperthreadingRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_disable_hyperthreading(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_instances_disable_interactive_serial_console(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -223,6 +307,90 @@ where
         }
         let mut request: api::DisableInteractiveSerialConsoleRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_instances_disable_interactive_serial_console(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_enable_hyperthreading(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EnableHyperthreadingRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_enable_hyperthreading(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -594,6 +762,93 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_instances_reimage(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kms-key-version" => Some(("kmsKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "os-image" => Some(("osImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ssh-keys" => Some(("sshKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kms-key-version", "os-image", "ssh-keys"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ReimageInstanceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_instances_reimage(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3626,8 +3881,14 @@ where
                     ("locations-instances-detach-lun", Some(opt)) => {
                         call_result = self._projects_locations_instances_detach_lun(opt, dry_run, &mut err).await;
                     },
+                    ("locations-instances-disable-hyperthreading", Some(opt)) => {
+                        call_result = self._projects_locations_instances_disable_hyperthreading(opt, dry_run, &mut err).await;
+                    },
                     ("locations-instances-disable-interactive-serial-console", Some(opt)) => {
                         call_result = self._projects_locations_instances_disable_interactive_serial_console(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-instances-enable-hyperthreading", Some(opt)) => {
+                        call_result = self._projects_locations_instances_enable_hyperthreading(opt, dry_run, &mut err).await;
                     },
                     ("locations-instances-enable-interactive-serial-console", Some(opt)) => {
                         call_result = self._projects_locations_instances_enable_interactive_serial_console(opt, dry_run, &mut err).await;
@@ -3643,6 +3904,9 @@ where
                     },
                     ("locations-instances-patch", Some(opt)) => {
                         call_result = self._projects_locations_instances_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-instances-reimage", Some(opt)) => {
+                        call_result = self._projects_locations_instances_reimage(opt, dry_run, &mut err).await;
                     },
                     ("locations-instances-rename", Some(opt)) => {
                         call_result = self._projects_locations_instances_rename(opt, dry_run, &mut err).await;
@@ -3846,7 +4110,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-instances-detach-lun', 'locations-instances-disable-interactive-serial-console', 'locations-instances-enable-interactive-serial-console', 'locations-instances-get', 'locations-instances-list', 'locations-instances-load-auth-info', 'locations-instances-patch', 'locations-instances-rename', 'locations-instances-reset', 'locations-instances-start', 'locations-instances-stop', 'locations-list', 'locations-networks-get', 'locations-networks-list', 'locations-networks-list-network-usage', 'locations-networks-patch', 'locations-networks-rename', 'locations-nfs-shares-create', 'locations-nfs-shares-delete', 'locations-nfs-shares-get', 'locations-nfs-shares-list', 'locations-nfs-shares-patch', 'locations-nfs-shares-rename', 'locations-operations-get', 'locations-os-images-get', 'locations-os-images-list', 'locations-provisioning-configs-create', 'locations-provisioning-configs-get', 'locations-provisioning-configs-patch', 'locations-provisioning-configs-submit', 'locations-provisioning-quotas-list', 'locations-ssh-keys-create', 'locations-ssh-keys-delete', 'locations-ssh-keys-list', 'locations-volumes-evict', 'locations-volumes-get', 'locations-volumes-list', 'locations-volumes-luns-evict', 'locations-volumes-luns-get', 'locations-volumes-luns-list', 'locations-volumes-patch', 'locations-volumes-rename', 'locations-volumes-resize', 'locations-volumes-snapshots-create', 'locations-volumes-snapshots-delete', 'locations-volumes-snapshots-get', 'locations-volumes-snapshots-list' and 'locations-volumes-snapshots-restore-volume-snapshot'", vec![
+        ("projects", "methods: 'locations-get', 'locations-instances-detach-lun', 'locations-instances-disable-hyperthreading', 'locations-instances-disable-interactive-serial-console', 'locations-instances-enable-hyperthreading', 'locations-instances-enable-interactive-serial-console', 'locations-instances-get', 'locations-instances-list', 'locations-instances-load-auth-info', 'locations-instances-patch', 'locations-instances-reimage', 'locations-instances-rename', 'locations-instances-reset', 'locations-instances-start', 'locations-instances-stop', 'locations-list', 'locations-networks-get', 'locations-networks-list', 'locations-networks-list-network-usage', 'locations-networks-patch', 'locations-networks-rename', 'locations-nfs-shares-create', 'locations-nfs-shares-delete', 'locations-nfs-shares-get', 'locations-nfs-shares-list', 'locations-nfs-shares-patch', 'locations-nfs-shares-rename', 'locations-operations-get', 'locations-os-images-get', 'locations-os-images-list', 'locations-provisioning-configs-create', 'locations-provisioning-configs-get', 'locations-provisioning-configs-patch', 'locations-provisioning-configs-submit', 'locations-provisioning-quotas-list', 'locations-ssh-keys-create', 'locations-ssh-keys-delete', 'locations-ssh-keys-list', 'locations-volumes-evict', 'locations-volumes-get', 'locations-volumes-list', 'locations-volumes-luns-evict', 'locations-volumes-luns-get', 'locations-volumes-luns-list', 'locations-volumes-patch', 'locations-volumes-rename', 'locations-volumes-resize', 'locations-volumes-snapshots-create', 'locations-volumes-snapshots-delete', 'locations-volumes-snapshots-get', 'locations-volumes-snapshots-list' and 'locations-volumes-snapshots-restore-volume-snapshot'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli/projects_locations-get",
@@ -3897,6 +4161,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-instances-disable-hyperthreading",
+                    Some(r##"Perform disable hyperthreading operation on a single server."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli/projects_locations-instances-disable-hyperthreading",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The `name` field is used to identify the instance. Format: projects/{project}/locations/{location}/instances/{instance}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-instances-disable-interactive-serial-console",
                     Some(r##"Disable the interactive serial console feature on an instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli/projects_locations-instances-disable-interactive-serial-console",
@@ -3904,6 +4196,34 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. Name of the resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-instances-enable-hyperthreading",
+                    Some(r##"Perform enable hyperthreading operation on a single server."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli/projects_locations-instances-enable-hyperthreading",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The `name` field is used to identify the instance. Format: projects/{project}/locations/{location}/instances/{instance}"##),
                      Some(true),
                      Some(false)),
         
@@ -4026,6 +4346,34 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Immutable. The resource name of this `Instance`. Resource names are schemeless URIs that follow the conventions in https://cloud.google.com/apis/design/resource_names. Format: `projects/{project}/locations/{location}/instances/{instance}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-instances-reimage",
+                    Some(r##"Perform reimage operation on a single server."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli/projects_locations-instances-reimage",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The `name` field is used to identify the instance. Format: projects/{project}/locations/{location}/instances/{instance}"##),
                      Some(true),
                      Some(false)),
         
@@ -5075,7 +5423,7 @@ async fn main() {
     
     let mut app = App::new("baremetalsolution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240228")
+           .version("5.0.5+20240617")
            .about("Provides ways to manage Bare Metal Solution hardware installed in a regional extension located near a Google Cloud data center.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_baremetalsolution2_cli")
            .arg(Arg::with_name("url")
@@ -5139,6 +5487,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

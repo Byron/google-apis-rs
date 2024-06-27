@@ -1,4 +1,4 @@
-site_name: Cloud Debugger v5.0.4+20230113
+site_name: Cloud Debugger v5.0.5+20230113
 site_url: http://byron.github.io/google-apis-rs/google-clouddebugger2-cli
 site_description: A complete library to interact with Cloud Debugger (protocol v2)
 
@@ -22,5 +22,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

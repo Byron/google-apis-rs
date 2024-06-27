@@ -1,4 +1,4 @@
-site_name: Cloud Filestore v5.0.4+20240126
+site_name: Cloud Filestore v5.0.5+20240619
 site_url: http://byron.github.io/google-apis-rs/google-file1_beta1-cli
 site_description: A complete library to interact with Cloud Filestore (protocol v1beta1)
 
@@ -21,6 +21,7 @@ nav:
     - 'Locations Instances Get': 'projects_locations-instances-get.md'
     - 'Locations Instances List': 'projects_locations-instances-list.md'
     - 'Locations Instances Patch': 'projects_locations-instances-patch.md'
+    - 'Locations Instances Promote Replica': 'projects_locations-instances-promote-replica.md'
     - 'Locations Instances Restore': 'projects_locations-instances-restore.md'
     - 'Locations Instances Revert': 'projects_locations-instances-revert.md'
     - 'Locations Instances Shares Create': 'projects_locations-instances-shares-create.md'
@@ -41,5 +42,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

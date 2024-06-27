@@ -81,7 +81,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -91,7 +91,7 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_knowledge_bases_documents_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// 
 /// match result {
@@ -130,7 +130,7 @@ impl<'a, S> Dialogflow<S> {
         Dialogflow {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://dialogflow.googleapis.com/".to_string(),
             _root_url: "https://dialogflow.googleapis.com/".to_string(),
         }
@@ -141,7 +141,7 @@ impl<'a, S> Dialogflow<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -180,6 +180,7 @@ impl<'a, S> Dialogflow<S> {
 /// * [locations set agent projects](ProjectLocationSetAgentCall) (request|response)
 /// * [get agent projects](ProjectGetAgentCall) (response)
 /// * [set agent projects](ProjectSetAgentCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Agent {
@@ -238,6 +239,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Agent {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AgentAssistantFeedback {
@@ -253,6 +255,10 @@ pub struct GoogleCloudDialogflowV2AgentAssistantFeedback {
     #[serde(rename="documentEfficiency")]
     
     pub document_efficiency: Option<String>,
+    /// Optional. Feedback for knowledge assist.
+    #[serde(rename="knowledgeAssistFeedback")]
+    
+    pub knowledge_assist_feedback: Option<GoogleCloudDialogflowV2AgentAssistantFeedbackKnowledgeAssistFeedback>,
     /// Optional. Feedback for knowledge search.
     #[serde(rename="knowledgeSearchFeedback")]
     
@@ -266,10 +272,32 @@ pub struct GoogleCloudDialogflowV2AgentAssistantFeedback {
 impl client::Part for GoogleCloudDialogflowV2AgentAssistantFeedback {}
 
 
+/// Feedback for knowledge assist.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2AgentAssistantFeedbackKnowledgeAssistFeedback {
+    /// Whether the suggested answer was copied by the human agent. If the value is set to be true, AnswerFeedback.clicked will be updated to be true.
+    #[serde(rename="answerCopied")]
+    
+    pub answer_copied: Option<bool>,
+    /// The URIs clicked by the human agent. The value is appended for each UpdateAnswerRecordRequest. If the value is not empty, AnswerFeedback.clicked will be updated to be true.
+    #[serde(rename="clickedUris")]
+    
+    pub clicked_uris: Option<Vec<String>>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2AgentAssistantFeedbackKnowledgeAssistFeedback {}
+
+
 /// Feedback for knowledge search.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AgentAssistantFeedbackKnowledgeSearchFeedback {
@@ -290,6 +318,7 @@ impl client::Part for GoogleCloudDialogflowV2AgentAssistantFeedbackKnowledgeSear
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AgentAssistantFeedbackSummarizationFeedback {
@@ -318,6 +347,7 @@ impl client::Part for GoogleCloudDialogflowV2AgentAssistantFeedbackSummarization
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AgentAssistantRecord {
@@ -347,6 +377,7 @@ impl client::Part for GoogleCloudDialogflowV2AgentAssistantRecord {}
 /// 
 /// * [conversations participants analyze content projects](ProjectConversationParticipantAnalyzeContentCall) (request)
 /// * [locations conversations participants analyze content projects](ProjectLocationConversationParticipantAnalyzeContentCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AnalyzeContentRequest {
@@ -396,6 +427,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2AnalyzeContentRequest {}
 /// 
 /// * [conversations participants analyze content projects](ProjectConversationParticipantAnalyzeContentCall) (response)
 /// * [locations conversations participants analyze content projects](ProjectLocationConversationParticipantAnalyzeContentCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AnalyzeContentResponse {
@@ -435,6 +467,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2AnalyzeContentResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AnnotatedMessagePart {
@@ -458,6 +491,7 @@ impl client::Part for GoogleCloudDialogflowV2AnnotatedMessagePart {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AnswerFeedback {
@@ -497,6 +531,7 @@ impl client::Part for GoogleCloudDialogflowV2AnswerFeedback {}
 /// 
 /// * [answer records patch projects](ProjectAnswerRecordPatchCall) (request|response)
 /// * [locations answer records patch projects](ProjectLocationAnswerRecordPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AnswerRecord {
@@ -521,6 +556,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2AnswerRecord {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ArticleAnswer {
@@ -552,6 +588,7 @@ impl client::Part for GoogleCloudDialogflowV2ArticleAnswer {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ArticleSuggestionModelMetadata {
@@ -568,6 +605,7 @@ impl client::Part for GoogleCloudDialogflowV2ArticleSuggestionModelMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AssistQueryParameters {
@@ -584,6 +622,7 @@ impl client::Part for GoogleCloudDialogflowV2AssistQueryParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AutomatedAgentConfig {
@@ -604,6 +643,7 @@ impl client::Part for GoogleCloudDialogflowV2AutomatedAgentConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2AutomatedAgentReply {
@@ -637,6 +677,7 @@ impl client::Part for GoogleCloudDialogflowV2AutomatedAgentReply {}
 /// 
 /// * [agent entity types entities batch create projects](ProjectAgentEntityTypeEntityBatchCreateCall) (request)
 /// * [locations agent entity types entities batch create projects](ProjectLocationAgentEntityTypeEntityBatchCreateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2BatchCreateEntitiesRequest {
@@ -661,6 +702,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2BatchCreateEntitiesRequest 
 /// 
 /// * [agent entity types entities batch delete projects](ProjectAgentEntityTypeEntityBatchDeleteCall) (request)
 /// * [locations agent entity types entities batch delete projects](ProjectLocationAgentEntityTypeEntityBatchDeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2BatchDeleteEntitiesRequest {
@@ -686,6 +728,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2BatchDeleteEntitiesRequest 
 /// 
 /// * [agent entity types batch delete projects](ProjectAgentEntityTypeBatchDeleteCall) (request)
 /// * [locations agent entity types batch delete projects](ProjectLocationAgentEntityTypeBatchDeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2BatchDeleteEntityTypesRequest {
@@ -707,6 +750,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2BatchDeleteEntityTypesReque
 /// 
 /// * [agent intents batch delete projects](ProjectAgentIntentBatchDeleteCall) (request)
 /// * [locations agent intents batch delete projects](ProjectLocationAgentIntentBatchDeleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2BatchDeleteIntentsRequest {
@@ -727,6 +771,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2BatchDeleteIntentsRequest {
 /// 
 /// * [agent entity types entities batch update projects](ProjectAgentEntityTypeEntityBatchUpdateCall) (request)
 /// * [locations agent entity types entities batch update projects](ProjectLocationAgentEntityTypeEntityBatchUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2BatchUpdateEntitiesRequest {
@@ -755,6 +800,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2BatchUpdateEntitiesRequest 
 /// 
 /// * [agent entity types batch update projects](ProjectAgentEntityTypeBatchUpdateCall) (request)
 /// * [locations agent entity types batch update projects](ProjectLocationAgentEntityTypeBatchUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2BatchUpdateEntityTypesRequest {
@@ -788,6 +834,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2BatchUpdateEntityTypesReque
 /// 
 /// * [agent intents batch update projects](ProjectAgentIntentBatchUpdateCall) (request)
 /// * [locations agent intents batch update projects](ProjectLocationAgentIntentBatchUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2BatchUpdateIntentsRequest {
@@ -825,6 +872,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2BatchUpdateIntentsRequest {
 /// 
 /// * [conversation profiles clear suggestion feature config projects](ProjectConversationProfileClearSuggestionFeatureConfigCall) (request)
 /// * [locations conversation profiles clear suggestion feature config projects](ProjectLocationConversationProfileClearSuggestionFeatureConfigCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ClearSuggestionFeatureConfigRequest {
@@ -850,6 +898,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2ClearSuggestionFeatureConfi
 /// 
 /// * [conversations complete projects](ProjectConversationCompleteCall) (request)
 /// * [locations conversations complete projects](ProjectLocationConversationCompleteCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2CompleteConversationRequest { _never_set: Option<bool> }
@@ -876,6 +925,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2CompleteConversationRequest
 /// * [locations agent sessions contexts create projects](ProjectLocationAgentSessionContextCreateCall) (request|response)
 /// * [locations agent sessions contexts get projects](ProjectLocationAgentSessionContextGetCall) (response)
 /// * [locations agent sessions contexts patch projects](ProjectLocationAgentSessionContextPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Context {
@@ -908,6 +958,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Context {}
 /// * [locations conversations complete projects](ProjectLocationConversationCompleteCall) (response)
 /// * [locations conversations create projects](ProjectLocationConversationCreateCall) (request|response)
 /// * [locations conversations get projects](ProjectLocationConversationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Conversation {
@@ -915,7 +966,7 @@ pub struct GoogleCloudDialogflowV2Conversation {
     #[serde(rename="conversationProfile")]
     
     pub conversation_profile: Option<String>,
-    /// The stage of a conversation. It indicates whether the virtual agent or a human agent is handling the conversation. If the conversation is created with the conversation profile that has Dialogflow config set, defaults to ConversationStage.VIRTUAL_AGENT_STAGE; Otherwise, defaults to ConversationStage.HUMAN_ASSIST_STAGE. If the conversation is created with the conversation profile that has Dialogflow config set but explicitly sets conversation_stage to ConversationStage.HUMAN_ASSIST_STAGE, it skips ConversationStage.VIRTUAL_AGENT_STAGE stage and directly goes to ConversationStage.HUMAN_ASSIST_STAGE.
+    /// Optional. The stage of a conversation. It indicates whether the virtual agent or a human agent is handling the conversation. If the conversation is created with the conversation profile that has Dialogflow config set, defaults to ConversationStage.VIRTUAL_AGENT_STAGE; Otherwise, defaults to ConversationStage.HUMAN_ASSIST_STAGE. If the conversation is created with the conversation profile that has Dialogflow config set but explicitly sets conversation_stage to ConversationStage.HUMAN_ASSIST_STAGE, it skips ConversationStage.VIRTUAL_AGENT_STAGE stage and directly goes to ConversationStage.HUMAN_ASSIST_STAGE.
     #[serde(rename="conversationStage")]
     
     pub conversation_stage: Option<String>,
@@ -927,7 +978,7 @@ pub struct GoogleCloudDialogflowV2Conversation {
     #[serde(rename="lifecycleState")]
     
     pub lifecycle_state: Option<String>,
-    /// Output only. The unique identifier of this conversation. Format: `projects//locations//conversations/`.
+    /// Output only. Identifier. The unique identifier of this conversation. Format: `projects//locations//conversations/`.
     
     pub name: Option<String>,
     /// Output only. It will not be empty if the conversation is to be connected over telephony.
@@ -944,6 +995,23 @@ impl client::RequestValue for GoogleCloudDialogflowV2Conversation {}
 impl client::ResponseResult for GoogleCloudDialogflowV2Conversation {}
 
 
+/// Context of the conversation, including transcripts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2ConversationContext {
+    /// Optional. List of message transcripts in the conversation.
+    #[serde(rename="messageEntries")]
+    
+    pub message_entries: Option<Vec<GoogleCloudDialogflowV2MessageEntry>>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2ConversationContext {}
+
+
 /// Represents a conversation dataset that a user imports raw data into. The data inside ConversationDataset can not be changed after ImportConversationData finishes (and calling ImportConversationData on a dataset that already has data is not allowed).
 /// 
 /// # Activities
@@ -954,6 +1022,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Conversation {}
 /// * [conversation datasets get projects](ProjectConversationDatasetGetCall) (response)
 /// * [locations conversation datasets create projects](ProjectLocationConversationDatasetCreateCall) (request)
 /// * [locations conversation datasets get projects](ProjectLocationConversationDatasetGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ConversationDataset {
@@ -994,6 +1063,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ConversationDataset {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ConversationInfo {
@@ -1017,6 +1087,7 @@ impl client::Part for GoogleCloudDialogflowV2ConversationInfo {}
 /// * [conversation models get projects](ProjectConversationModelGetCall) (response)
 /// * [locations conversation models create projects](ProjectLocationConversationModelCreateCall) (request)
 /// * [locations conversation models get projects](ProjectLocationConversationModelGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ConversationModel {
@@ -1064,6 +1135,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ConversationModel {}
 /// 
 /// * [conversation models evaluations get projects](ProjectConversationModelEvaluationGetCall) (response)
 /// * [locations conversation models evaluations get projects](ProjectLocationConversationModelEvaluationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ConversationModelEvaluation {
@@ -1099,6 +1171,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ConversationModelEvaluati
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ConversationPhoneNumber {
@@ -1124,6 +1197,7 @@ impl client::Part for GoogleCloudDialogflowV2ConversationPhoneNumber {}
 /// * [locations conversation profiles create projects](ProjectLocationConversationProfileCreateCall) (request|response)
 /// * [locations conversation profiles get projects](ProjectLocationConversationProfileGetCall) (response)
 /// * [locations conversation profiles patch projects](ProjectLocationConversationProfilePatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ConversationProfile {
@@ -1200,6 +1274,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ConversationProfile {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations conversation models evaluations create projects](ProjectLocationConversationModelEvaluationCreateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2CreateConversationModelEvaluationRequest {
@@ -1221,6 +1296,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2CreateConversationModelEval
 /// 
 /// * [conversation models deploy projects](ProjectConversationModelDeployCall) (request)
 /// * [locations conversation models deploy projects](ProjectLocationConversationModelDeployCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2DeployConversationModelRequest { _never_set: Option<bool> }
@@ -1239,6 +1315,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2DeployConversationModelRequ
 /// * [agent sessions detect intent projects](ProjectAgentSessionDetectIntentCall) (request)
 /// * [locations agent environments users sessions detect intent projects](ProjectLocationAgentEnvironmentUserSessionDetectIntentCall) (request)
 /// * [locations agent sessions detect intent projects](ProjectLocationAgentSessionDetectIntentCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2DetectIntentRequest {
@@ -1279,6 +1356,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2DetectIntentRequest {}
 /// * [agent sessions detect intent projects](ProjectAgentSessionDetectIntentCall) (response)
 /// * [locations agent environments users sessions detect intent projects](ProjectLocationAgentEnvironmentUserSessionDetectIntentCall) (response)
 /// * [locations agent sessions detect intent projects](ProjectLocationAgentSessionDetectIntentCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2DetectIntentResponse {
@@ -1312,6 +1390,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2DetectIntentResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2DialogflowAssistAnswer {
@@ -1348,6 +1427,7 @@ impl client::Part for GoogleCloudDialogflowV2DialogflowAssistAnswer {}
 /// * [locations knowledge bases documents create projects](ProjectLocationKnowledgeBaseDocumentCreateCall) (request)
 /// * [locations knowledge bases documents get projects](ProjectLocationKnowledgeBaseDocumentGetCall) (response)
 /// * [locations knowledge bases documents patch projects](ProjectLocationKnowledgeBaseDocumentPatchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Document {
@@ -1399,6 +1479,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Document {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2DocumentReloadStatus {
@@ -1417,6 +1498,7 @@ impl client::Part for GoogleCloudDialogflowV2DocumentReloadStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2DtmfParameters {
@@ -1442,6 +1524,7 @@ impl client::Part for GoogleCloudDialogflowV2DtmfParameters {}
 /// * [locations agent entity types create projects](ProjectLocationAgentEntityTypeCreateCall) (request|response)
 /// * [locations agent entity types get projects](ProjectLocationAgentEntityTypeGetCall) (response)
 /// * [locations agent entity types patch projects](ProjectLocationAgentEntityTypePatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EntityType {
@@ -1476,6 +1559,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2EntityType {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EntityTypeBatch {
@@ -1492,6 +1576,7 @@ impl client::Part for GoogleCloudDialogflowV2EntityTypeBatch {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EntityTypeEntity {
@@ -1519,6 +1604,7 @@ impl client::Part for GoogleCloudDialogflowV2EntityTypeEntity {}
 /// * [locations agent environments create projects](ProjectLocationAgentEnvironmentCreateCall) (request|response)
 /// * [locations agent environments get projects](ProjectLocationAgentEnvironmentGetCall) (response)
 /// * [locations agent environments patch projects](ProjectLocationAgentEnvironmentPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Environment {
@@ -1561,6 +1647,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Environment {}
 /// 
 /// * [agent environments get history projects](ProjectAgentEnvironmentGetHistoryCall) (response)
 /// * [locations agent environments get history projects](ProjectLocationAgentEnvironmentGetHistoryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EnvironmentHistory {
@@ -1583,6 +1670,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2EnvironmentHistory {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EnvironmentHistoryEntry {
@@ -1606,6 +1694,7 @@ impl client::Part for GoogleCloudDialogflowV2EnvironmentHistoryEntry {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EvaluationConfig {
@@ -1629,6 +1718,7 @@ impl client::Part for GoogleCloudDialogflowV2EvaluationConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EvaluationConfigSmartComposeConfig {
@@ -1649,6 +1739,7 @@ impl client::Part for GoogleCloudDialogflowV2EvaluationConfigSmartComposeConfig 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EvaluationConfigSmartReplyConfig {
@@ -1669,6 +1760,7 @@ impl client::Part for GoogleCloudDialogflowV2EvaluationConfigSmartReplyConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2EventInput {
@@ -1696,6 +1788,7 @@ impl client::Part for GoogleCloudDialogflowV2EventInput {}
 /// 
 /// * [agent export projects](ProjectAgentExportCall) (request)
 /// * [locations agent export projects](ProjectLocationAgentExportCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ExportAgentRequest {
@@ -1717,6 +1810,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2ExportAgentRequest {}
 /// 
 /// * [knowledge bases documents export projects](ProjectKnowledgeBaseDocumentExportCall) (request)
 /// * [locations knowledge bases documents export projects](ProjectLocationKnowledgeBaseDocumentExportCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ExportDocumentRequest {
@@ -1741,6 +1835,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2ExportDocumentRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2FaqAnswer {
@@ -1768,6 +1863,34 @@ pub struct GoogleCloudDialogflowV2FaqAnswer {
 impl client::Part for GoogleCloudDialogflowV2FaqAnswer {}
 
 
+/// Providing examples in the generator (i.e. building a few-shot generator) helps convey the desired format of the LLM response. NEXT_ID: 10
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2FewShotExample {
+    /// Optional. Conversation transcripts.
+    #[serde(rename="conversationContext")]
+    
+    pub conversation_context: Option<GoogleCloudDialogflowV2ConversationContext>,
+    /// Optional. Key is the placeholder field name in input, value is the value of the placeholder. E.g. instruction contains "@price", and ingested data has <"price", "10">
+    #[serde(rename="extraInfo")]
+    
+    pub extra_info: Option<HashMap<String, String>>,
+    /// Required. Example output of the model.
+    
+    pub output: Option<GoogleCloudDialogflowV2GeneratorSuggestion>,
+    /// Summarization sections.
+    #[serde(rename="summarizationSectionList")]
+    
+    pub summarization_section_list: Option<GoogleCloudDialogflowV2SummarizationSectionList>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2FewShotExample {}
+
+
 /// By default, your agent responds to a matched intent with a static response. As an alternative, you can provide a more dynamic response by using fulfillment. When you enable fulfillment for an intent, Dialogflow responds to that intent by calling a service that you define. For example, if an end-user wants to schedule a haircut on Friday, your service can check your database and respond to the end-user with availability information for Friday. For more information, see the [fulfillment guide](https://cloud.google.com/dialogflow/docs/fulfillment-overview).
 /// 
 /// # Activities
@@ -1779,6 +1902,7 @@ impl client::Part for GoogleCloudDialogflowV2FaqAnswer {}
 /// * [agent update fulfillment projects](ProjectAgentUpdateFulfillmentCall) (request|response)
 /// * [locations agent get fulfillment projects](ProjectLocationAgentGetFulfillmentCall) (response)
 /// * [locations agent update fulfillment projects](ProjectLocationAgentUpdateFulfillmentCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Fulfillment {
@@ -1809,6 +1933,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Fulfillment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2FulfillmentFeature {
@@ -1825,6 +1950,7 @@ impl client::Part for GoogleCloudDialogflowV2FulfillmentFeature {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2FulfillmentGenericWebService {
@@ -1854,6 +1980,7 @@ impl client::Part for GoogleCloudDialogflowV2FulfillmentGenericWebService {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2GcsDestination {
@@ -1869,6 +1996,7 @@ impl client::Part for GoogleCloudDialogflowV2GcsDestination {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2GcsSources {
@@ -1880,6 +2008,59 @@ pub struct GoogleCloudDialogflowV2GcsSources {
 impl client::Part for GoogleCloudDialogflowV2GcsSources {}
 
 
+/// The request message for Conversations.GenerateStatelessSuggestion.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations stateless suggestion generate projects](ProjectLocationStatelessSuggestionGenerateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2GenerateStatelessSuggestionRequest {
+    /// Optional. Context of the conversation, including transcripts.
+    #[serde(rename="conversationContext")]
+    
+    pub conversation_context: Option<GoogleCloudDialogflowV2ConversationContext>,
+    /// Uncreated generator. It should be a complete generator that includes all information about the generator.
+    
+    pub generator: Option<GoogleCloudDialogflowV2Generator>,
+    /// The resource name of the existing created generator. Format: `projects//locations//generators/`
+    #[serde(rename="generatorName")]
+    
+    pub generator_name: Option<String>,
+    /// Optional. A list of trigger events. Generator will be triggered only if it's trigger event is included here.
+    #[serde(rename="triggerEvents")]
+    
+    pub trigger_events: Option<Vec<String>>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowV2GenerateStatelessSuggestionRequest {}
+
+
+/// The response message for Conversations.GenerateStatelessSuggestion.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations stateless suggestion generate projects](ProjectLocationStatelessSuggestionGenerateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2GenerateStatelessSuggestionResponse {
+    /// Required. Generated suggestion for a conversation.
+    #[serde(rename="generatorSuggestion")]
+    
+    pub generator_suggestion: Option<GoogleCloudDialogflowV2GeneratorSuggestion>,
+}
+
+impl client::ResponseResult for GoogleCloudDialogflowV2GenerateStatelessSuggestionResponse {}
+
+
 /// The request message for Conversations.GenerateStatelessSummary.
 /// 
 /// # Activities
@@ -1889,6 +2070,7 @@ impl client::Part for GoogleCloudDialogflowV2GcsSources {}
 /// 
 /// * [locations suggestions generate stateless summary projects](ProjectLocationSuggestionGenerateStatelessSummaryCall) (request)
 /// * [suggestions generate stateless summary projects](ProjectSuggestionGenerateStatelessSummaryCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2GenerateStatelessSummaryRequest {
@@ -1896,11 +2078,11 @@ pub struct GoogleCloudDialogflowV2GenerateStatelessSummaryRequest {
     #[serde(rename="conversationProfile")]
     
     pub conversation_profile: Option<GoogleCloudDialogflowV2ConversationProfile>,
-    /// The name of the latest conversation message used as context for generating a Summary. If empty, the latest message of the conversation will be used. The format is specific to the user and the names of the messages provided.
+    /// Optional. The name of the latest conversation message used as context for generating a Summary. If empty, the latest message of the conversation will be used. The format is specific to the user and the names of the messages provided.
     #[serde(rename="latestMessage")]
     
     pub latest_message: Option<String>,
-    /// Max number of messages prior to and including [latest_message] to use as context when compiling the suggestion. By default 500 and at most 1000.
+    /// Optional. Max number of messages prior to and including [latest_message] to use as context when compiling the suggestion. By default 500 and at most 1000.
     #[serde(rename="maxContextSize")]
     
     pub max_context_size: Option<i32>,
@@ -1917,6 +2099,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2GenerateStatelessSummaryReq
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2GenerateStatelessSummaryRequestMinimalConversation {
@@ -1937,6 +2120,7 @@ impl client::Part for GoogleCloudDialogflowV2GenerateStatelessSummaryRequestMini
 /// 
 /// * [locations suggestions generate stateless summary projects](ProjectLocationSuggestionGenerateStatelessSummaryCall) (response)
 /// * [suggestions generate stateless summary projects](ProjectSuggestionGenerateStatelessSummaryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2GenerateStatelessSummaryResponse {
@@ -1960,6 +2144,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2GenerateStatelessSummaryR
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2GenerateStatelessSummaryResponseSummary {
@@ -1979,10 +2164,75 @@ pub struct GoogleCloudDialogflowV2GenerateStatelessSummaryResponseSummary {
 impl client::Part for GoogleCloudDialogflowV2GenerateStatelessSummaryResponseSummary {}
 
 
+/// LLM generator.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generators create projects](ProjectGeneratorCreateCall) (request|response)
+/// * [locations generators create projects](ProjectLocationGeneratorCreateCall) (request|response)
+/// * [locations generators get projects](ProjectLocationGeneratorGetCall) (response)
+/// * [locations generators patch projects](ProjectLocationGeneratorPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2Generator {
+    /// Output only. Creation time of this generator.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. Human readable description of the generator.
+    
+    pub description: Option<String>,
+    /// Optional. Inference parameters for this generator.
+    #[serde(rename="inferenceParameter")]
+    
+    pub inference_parameter: Option<GoogleCloudDialogflowV2InferenceParameter>,
+    /// Output only. Identifier. The resource name of the generator. Format: `projects//locations//generators/`
+    
+    pub name: Option<String>,
+    /// Input of prebuilt Summarization feature.
+    #[serde(rename="summarizationContext")]
+    
+    pub summarization_context: Option<GoogleCloudDialogflowV2SummarizationContext>,
+    /// Optional. The trigger event of the generator. It defines when the generator is triggered in a conversation.
+    #[serde(rename="triggerEvent")]
+    
+    pub trigger_event: Option<String>,
+    /// Output only. Update time of this generator.
+    #[serde(rename="updateTime")]
+    
+    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowV2Generator {}
+impl client::ResponseResult for GoogleCloudDialogflowV2Generator {}
+
+
+/// Suggestion generated using a Generator.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2GeneratorSuggestion {
+    /// Optional. Suggested summary.
+    #[serde(rename="summarySuggestion")]
+    
+    pub summary_suggestion: Option<GoogleCloudDialogflowV2SummarySuggestion>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2GeneratorSuggestion {}
+
+
 /// Defines the Human Agent Assist to connect to a conversation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfig {
@@ -2011,6 +2261,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigConversationModelConfig {
@@ -2030,6 +2281,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigConversati
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigConversationProcessConfig {
@@ -2046,6 +2298,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigConversati
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigMessageAnalysisConfig {
@@ -2066,13 +2319,21 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigMessageAna
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionConfig {
+    /// Optional. When disable_high_latency_features_sync_delivery is true and using the AnalyzeContent API, we will not deliver the responses from high latency features in the API response. The human_agent_assistant_config.notification_config must be configured and enable_event_based_suggestion must be set to true to receive the responses from high latency features in Pub/Sub. High latency feature(s): KNOWLEDGE_ASSIST
+    #[serde(rename="disableHighLatencyFeaturesSyncDelivery")]
+    
+    pub disable_high_latency_features_sync_delivery: Option<bool>,
     /// Configuration of different suggestion features. One feature can have only one config.
     #[serde(rename="featureConfigs")]
     
     pub feature_configs: Option<Vec<GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionFeatureConfig>>,
+    /// Optional. List of various generator resource names used in the conversation profile.
+    
+    pub generators: Option<Vec<String>>,
     /// If `group_suggestion_responses` is false, and there are multiple `feature_configs` in `event based suggestion` or StreamingAnalyzeContent, we will try to deliver suggestions to customers as soon as we get new suggestion. Different type of suggestions based on the same context will be in separate Pub/Sub event or `StreamingAnalyzeContentResponse`. If `group_suggestion_responses` set to true. All the suggestions to the same participant based on the same context will be grouped into a single Pub/Sub event or StreamingAnalyzeContentResponse.
     #[serde(rename="groupSuggestionResponses")]
     
@@ -2086,6 +2347,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionFeatureConfig {
@@ -2109,6 +2371,14 @@ pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionFeatureConf
     #[serde(rename="enableEventBasedSuggestion")]
     
     pub enable_event_based_suggestion: Option<bool>,
+    /// Optional. Enable query suggestion only. Supported features: KNOWLEDGE_ASSIST
+    #[serde(rename="enableQuerySuggestionOnly")]
+    
+    pub enable_query_suggestion_only: Option<bool>,
+    /// Optional. Enable query suggestion even if we can't find its answer. By default, queries are suggested only if we find its answer. Supported features: KNOWLEDGE_ASSIST
+    #[serde(rename="enableQuerySuggestionWhenNoAnswer")]
+    
+    pub enable_query_suggestion_when_no_answer: Option<bool>,
     /// Configs of query.
     #[serde(rename="queryConfig")]
     
@@ -2130,6 +2400,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionQueryConfig {
@@ -2169,6 +2440,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionQueryConfigContextFilterSettings {
@@ -2193,6 +2465,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionQueryConfigDialogflowQuerySource {
@@ -2212,6 +2485,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionQueryConfigDialogflowQuerySourceHumanAgentSideConfig {
@@ -2227,6 +2501,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionQueryConfigDocumentQuerySource {
@@ -2242,6 +2517,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionQueryConfigKnowledgeBaseQuerySource {
@@ -2258,6 +2534,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionQueryConfigSections {
@@ -2274,6 +2551,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestionTriggerSettings {
@@ -2294,10 +2572,11 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentAssistantConfigSuggestion
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentHandoffConfig {
-    /// Uses LivePerson (https://www.liveperson.com).
+    /// Uses [LivePerson](https://www.liveperson.com).
     #[serde(rename="livePersonConfig")]
     
     pub live_person_config: Option<GoogleCloudDialogflowV2HumanAgentHandoffConfigLivePersonConfig>,
@@ -2310,10 +2589,11 @@ pub struct GoogleCloudDialogflowV2HumanAgentHandoffConfig {
 impl client::Part for GoogleCloudDialogflowV2HumanAgentHandoffConfig {}
 
 
-/// Configuration specific to LivePerson (https://www.liveperson.com).
+/// Configuration specific to [LivePerson](https://www.liveperson.com).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentHandoffConfigLivePersonConfig {
@@ -2330,6 +2610,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentHandoffConfigLivePersonCo
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2HumanAgentHandoffConfigSalesforceLiveAgentConfig {
@@ -2363,6 +2644,7 @@ impl client::Part for GoogleCloudDialogflowV2HumanAgentHandoffConfigSalesforceLi
 /// 
 /// * [agent import projects](ProjectAgentImportCall) (request)
 /// * [locations agent import projects](ProjectLocationAgentImportCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ImportAgentRequest {
@@ -2389,6 +2671,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2ImportAgentRequest {}
 /// 
 /// * [conversation datasets import conversation data projects](ProjectConversationDatasetImportConversationDataCall) (request)
 /// * [locations conversation datasets import conversation data projects](ProjectLocationConversationDatasetImportConversationDataCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ImportConversationDataRequest {
@@ -2405,6 +2688,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2ImportConversationDataReque
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ImportDocumentTemplate {
@@ -2433,6 +2717,7 @@ impl client::Part for GoogleCloudDialogflowV2ImportDocumentTemplate {}
 /// 
 /// * [knowledge bases documents import projects](ProjectKnowledgeBaseDocumentImportCall) (request)
 /// * [locations knowledge bases documents import projects](ProjectLocationKnowledgeBaseDocumentImportCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ImportDocumentsRequest {
@@ -2453,10 +2738,39 @@ pub struct GoogleCloudDialogflowV2ImportDocumentsRequest {
 impl client::RequestValue for GoogleCloudDialogflowV2ImportDocumentsRequest {}
 
 
+/// The parameters of inference.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2InferenceParameter {
+    /// Optional. Maximum number of the output tokens for the generator.
+    #[serde(rename="maxOutputTokens")]
+    
+    pub max_output_tokens: Option<i32>,
+    /// Optional. Controls the randomness of LLM predictions. Low temperature = less random. High temperature = more random. If unset (or 0), uses a default value of 0.
+    
+    pub temperature: Option<f64>,
+    /// Optional. Top-k changes how the model selects tokens for output. A top-k of 1 means the selected token is the most probable among all tokens in the model's vocabulary (also called greedy decoding), while a top-k of 3 means that the next token is selected from among the 3 most probable tokens (using temperature). For each token selection step, the top K tokens with the highest probabilities are sampled. Then tokens are further filtered based on topP with the final token selected using temperature sampling. Specify a lower value for less random responses and a higher value for more random responses. Acceptable value is [1, 40], default to 40.
+    #[serde(rename="topK")]
+    
+    pub top_k: Option<i32>,
+    /// Optional. Top-p changes how the model selects tokens for output. Tokens are selected from most K (see topK parameter) probable to least until the sum of their probabilities equals the top-p value. For example, if tokens A, B, and C have a probability of 0.3, 0.2, and 0.1 and the top-p value is 0.5, then the model will select either A or B as the next token (using temperature) and doesn't consider C. The default top-p value is 0.95. Specify a lower value for less random responses and a higher value for more random responses. Acceptable value is [0.0, 1.0], default to 0.95.
+    #[serde(rename="topP")]
+    
+    pub top_p: Option<f64>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2InferenceParameter {}
+
+
 /// Instructs the speech recognizer how to process the audio content.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2InputAudioConfig {
@@ -2516,6 +2830,7 @@ impl client::Part for GoogleCloudDialogflowV2InputAudioConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2InputConfig {
@@ -2532,6 +2847,7 @@ impl client::Part for GoogleCloudDialogflowV2InputConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2InputDataset {
@@ -2556,6 +2872,7 @@ impl client::Part for GoogleCloudDialogflowV2InputDataset {}
 /// * [locations agent intents create projects](ProjectLocationAgentIntentCreateCall) (request|response)
 /// * [locations agent intents get projects](ProjectLocationAgentIntentGetCall) (response)
 /// * [locations agent intents patch projects](ProjectLocationAgentIntentPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Intent {
@@ -2643,6 +2960,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Intent {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentBatch {
@@ -2658,6 +2976,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentBatch {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentFollowupIntentInfo {
@@ -2678,6 +2997,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentFollowupIntentInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessage {
@@ -2744,6 +3064,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageBasicCard {
@@ -2772,6 +3093,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageBasicCard {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageBasicCardButton {
@@ -2791,6 +3113,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageBasicCardButton {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageBasicCardButtonOpenUriAction {
@@ -2806,6 +3129,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageBasicCardButtonOpenUri
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard {
@@ -2825,6 +3149,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageBrowseCarouselCard {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItem {
@@ -2853,6 +3178,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrow
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrowseCarouselCardItemOpenUrlAction {
@@ -2872,6 +3198,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageBrowseCarouselCardBrow
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageCard {
@@ -2897,6 +3224,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageCard {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageCardButton {
@@ -2915,6 +3243,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageCardButton {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageCarouselSelect {
@@ -2930,6 +3259,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageCarouselSelect {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageCarouselSelectItem {
@@ -2954,6 +3284,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageCarouselSelectItem {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageColumnProperties {
@@ -2973,6 +3304,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageColumnProperties {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageImage {
@@ -2993,6 +3325,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageLinkOutSuggestion {
@@ -3012,6 +3345,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageLinkOutSuggestion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageListSelect {
@@ -3033,6 +3367,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageListSelect {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageListSelectItem {
@@ -3057,6 +3392,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageListSelectItem {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageMediaContent {
@@ -3077,6 +3413,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageMediaContent {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageMediaContentResponseMediaObject {
@@ -3106,6 +3443,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageMediaContentResponseMe
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageQuickReplies {
@@ -3125,6 +3463,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageQuickReplies {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageSelectItemInfo {
@@ -3143,6 +3482,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageSelectItemInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageSimpleResponse {
@@ -3166,6 +3506,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageSimpleResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageSimpleResponses {
@@ -3182,6 +3523,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageSimpleResponses {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageSuggestion {
@@ -3197,6 +3539,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageSuggestion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageSuggestions {
@@ -3212,6 +3555,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageSuggestions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageTableCard {
@@ -3243,6 +3587,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageTableCard {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageTableCardCell {
@@ -3258,6 +3603,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageTableCardCell {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageTableCardRow {
@@ -3277,6 +3623,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageTableCardRow {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentMessageText {
@@ -3292,6 +3639,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentMessageText {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentParameter {
@@ -3332,6 +3680,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentParameter {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentSuggestion {
@@ -3355,6 +3704,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentSuggestion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentTrainingPhrase {
@@ -3381,6 +3731,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentTrainingPhrase {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2IntentTrainingPhrasePart {
@@ -3403,6 +3754,127 @@ pub struct GoogleCloudDialogflowV2IntentTrainingPhrasePart {
 impl client::Part for GoogleCloudDialogflowV2IntentTrainingPhrasePart {}
 
 
+/// Represents a Knowledge Assist answer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2KnowledgeAssistAnswer {
+    /// The name of the answer record. Format: `projects//locations//answer Records/`.
+    #[serde(rename="answerRecord")]
+    
+    pub answer_record: Option<String>,
+    /// The query suggested based on the context. Suggestion is made only if it is different from the previous suggestion.
+    #[serde(rename="suggestedQuery")]
+    
+    pub suggested_query: Option<GoogleCloudDialogflowV2KnowledgeAssistAnswerSuggestedQuery>,
+    /// The answer generated for the suggested query. Whether or not an answer is generated depends on how confident we are about the generated query.
+    #[serde(rename="suggestedQueryAnswer")]
+    
+    pub suggested_query_answer: Option<GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswer>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2KnowledgeAssistAnswer {}
+
+
+/// Represents an answer from Knowledge. Currently supports FAQ and Generative answers.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswer {
+    /// The piece of text from the `source` that answers this suggested query.
+    #[serde(rename="answerText")]
+    
+    pub answer_text: Option<String>,
+    /// Populated if the prediction came from FAQ.
+    #[serde(rename="faqSource")]
+    
+    pub faq_source: Option<GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerFaqSource>,
+    /// Populated if the prediction was Generative.
+    #[serde(rename="generativeSource")]
+    
+    pub generative_source: Option<GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerGenerativeSource>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswer {}
+
+
+/// Details about source of FAQ answer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerFaqSource {
+    /// The corresponding FAQ question.
+    
+    pub question: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerFaqSource {}
+
+
+/// Details about source of Generative answer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerGenerativeSource {
+    /// All snippets used for this Generative Prediction, with their source URI and data.
+    
+    pub snippets: Option<Vec<GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerGenerativeSourceSnippet>>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerGenerativeSource {}
+
+
+/// Snippet Source for a Generative Prediction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerGenerativeSourceSnippet {
+    /// Text taken from that URI.
+    
+    pub text: Option<String>,
+    /// Title of the document.
+    
+    pub title: Option<String>,
+    /// URI the data is sourced from.
+    
+    pub uri: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2KnowledgeAssistAnswerKnowledgeAnswerGenerativeSourceSnippet {}
+
+
+/// Represents a suggested query.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2KnowledgeAssistAnswerSuggestedQuery {
+    /// Suggested query text.
+    #[serde(rename="queryText")]
+    
+    pub query_text: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2KnowledgeAssistAnswerSuggestedQuery {}
+
+
 /// A knowledge base represents a collection of knowledge documents that you provide to Dialogflow. Your knowledge documents contain information that may be useful during conversations with end-users. Some Dialogflow features use knowledge bases when looking for a response to an end-user input. For more information, see the [knowledge base guide](https://cloud.google.com/dialogflow/docs/how/knowledge-bases). Note: The `projects.agent.knowledgeBases` resource is deprecated; only use `projects.knowledgeBases`.
 /// 
 /// # Activities
@@ -3419,6 +3891,7 @@ impl client::Part for GoogleCloudDialogflowV2IntentTrainingPhrasePart {}
 /// * [locations knowledge bases create projects](ProjectLocationKnowledgeBaseCreateCall) (request|response)
 /// * [locations knowledge bases get projects](ProjectLocationKnowledgeBaseGetCall) (response)
 /// * [locations knowledge bases patch projects](ProjectLocationKnowledgeBasePatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2KnowledgeBase {
@@ -3448,6 +3921,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2KnowledgeBase {}
 /// 
 /// * [answer records list projects](ProjectAnswerRecordListCall) (response)
 /// * [locations answer records list projects](ProjectLocationAnswerRecordListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListAnswerRecordsResponse {
@@ -3475,6 +3949,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListAnswerRecordsResponse
 /// * [agent sessions contexts list projects](ProjectAgentSessionContextListCall) (response)
 /// * [locations agent environments users sessions contexts list projects](ProjectLocationAgentEnvironmentUserSessionContextListCall) (response)
 /// * [locations agent sessions contexts list projects](ProjectLocationAgentSessionContextListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListContextsResponse {
@@ -3499,6 +3974,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListContextsResponse {}
 /// 
 /// * [conversation datasets list projects](ProjectConversationDatasetListCall) (response)
 /// * [locations conversation datasets list projects](ProjectLocationConversationDatasetListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListConversationDatasetsResponse {
@@ -3524,6 +4000,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListConversationDatasetsR
 /// 
 /// * [conversation models evaluations list projects](ProjectConversationModelEvaluationListCall) (response)
 /// * [locations conversation models evaluations list projects](ProjectLocationConversationModelEvaluationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListConversationModelEvaluationsResponse {
@@ -3549,6 +4026,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListConversationModelEval
 /// 
 /// * [conversation models list projects](ProjectConversationModelListCall) (response)
 /// * [locations conversation models list projects](ProjectLocationConversationModelListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListConversationModelsResponse {
@@ -3574,6 +4052,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListConversationModelsRes
 /// 
 /// * [conversation profiles list projects](ProjectConversationProfileListCall) (response)
 /// * [locations conversation profiles list projects](ProjectLocationConversationProfileListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListConversationProfilesResponse {
@@ -3599,6 +4078,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListConversationProfilesR
 /// 
 /// * [conversations list projects](ProjectConversationListCall) (response)
 /// * [locations conversations list projects](ProjectLocationConversationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListConversationsResponse {
@@ -3624,6 +4104,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListConversationsResponse
 /// * [agent knowledge bases documents list projects](ProjectAgentKnowledgeBaseDocumentListCall) (response)
 /// * [knowledge bases documents list projects](ProjectKnowledgeBaseDocumentListCall) (response)
 /// * [locations knowledge bases documents list projects](ProjectLocationKnowledgeBaseDocumentListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListDocumentsResponse {
@@ -3648,6 +4129,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListDocumentsResponse {}
 /// 
 /// * [agent entity types list projects](ProjectAgentEntityTypeListCall) (response)
 /// * [locations agent entity types list projects](ProjectLocationAgentEntityTypeListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListEntityTypesResponse {
@@ -3673,6 +4155,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListEntityTypesResponse {
 /// 
 /// * [agent environments list projects](ProjectAgentEnvironmentListCall) (response)
 /// * [locations agent environments list projects](ProjectLocationAgentEnvironmentListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListEnvironmentsResponse {
@@ -3688,6 +4171,31 @@ pub struct GoogleCloudDialogflowV2ListEnvironmentsResponse {
 impl client::ResponseResult for GoogleCloudDialogflowV2ListEnvironmentsResponse {}
 
 
+/// Response of ListGenerators.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generators list projects](ProjectGeneratorListCall) (response)
+/// * [locations generators list projects](ProjectLocationGeneratorListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2ListGeneratorsResponse {
+    /// List of generators retrieved.
+    
+    pub generators: Option<Vec<GoogleCloudDialogflowV2Generator>>,
+    /// Token to retrieve the next page of results, or empty if there are no more results in the list.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for GoogleCloudDialogflowV2ListGeneratorsResponse {}
+
+
 /// The response message for Intents.ListIntents.
 /// 
 /// # Activities
@@ -3699,6 +4207,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListEnvironmentsResponse 
 /// * [agent intents list projects](ProjectAgentIntentListCall) (response)
 /// * [locations agent environments intents list projects](ProjectLocationAgentEnvironmentIntentListCall) (response)
 /// * [locations agent intents list projects](ProjectLocationAgentIntentListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListIntentsResponse {
@@ -3724,6 +4233,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListIntentsResponse {}
 /// * [agent knowledge bases list projects](ProjectAgentKnowledgeBaseListCall) (response)
 /// * [knowledge bases list projects](ProjectKnowledgeBaseListCall) (response)
 /// * [locations knowledge bases list projects](ProjectLocationKnowledgeBaseListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListKnowledgeBasesResponse {
@@ -3749,6 +4259,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListKnowledgeBasesRespons
 /// 
 /// * [conversations messages list projects](ProjectConversationMessageListCall) (response)
 /// * [locations conversations messages list projects](ProjectLocationConversationMessageListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListMessagesResponse {
@@ -3773,6 +4284,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListMessagesResponse {}
 /// 
 /// * [conversations participants list projects](ProjectConversationParticipantListCall) (response)
 /// * [locations conversations participants list projects](ProjectLocationConversationParticipantListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListParticipantsResponse {
@@ -3799,6 +4311,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListParticipantsResponse 
 /// * [agent sessions entity types list projects](ProjectAgentSessionEntityTypeListCall) (response)
 /// * [locations agent environments users sessions entity types list projects](ProjectLocationAgentEnvironmentUserSessionEntityTypeListCall) (response)
 /// * [locations agent sessions entity types list projects](ProjectLocationAgentSessionEntityTypeListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListSessionEntityTypesResponse {
@@ -3824,6 +4337,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListSessionEntityTypesRes
 /// 
 /// * [agent versions list projects](ProjectAgentVersionListCall) (response)
 /// * [locations agent versions list projects](ProjectLocationAgentVersionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ListVersionsResponse {
@@ -3843,6 +4357,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ListVersionsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2LoggingConfig {
@@ -3859,6 +4374,7 @@ impl client::Part for GoogleCloudDialogflowV2LoggingConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Message {
@@ -3904,6 +4420,7 @@ impl client::Part for GoogleCloudDialogflowV2Message {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2MessageAnnotation {
@@ -3919,10 +4436,38 @@ pub struct GoogleCloudDialogflowV2MessageAnnotation {
 impl client::Part for GoogleCloudDialogflowV2MessageAnnotation {}
 
 
+/// Represents a message entry of a conversation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2MessageEntry {
+    /// Optional. Create time of the message entry.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Optional. The language of the text. See [Language Support](https://cloud.google.com/dialogflow/docs/reference/language) for a list of the currently supported language codes.
+    #[serde(rename="languageCode")]
+    
+    pub language_code: Option<String>,
+    /// Optional. Participant role of the message.
+    
+    pub role: Option<String>,
+    /// Optional. Transcript content of the message.
+    
+    pub text: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2MessageEntry {}
+
+
 /// Defines notification behavior.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2NotificationConfig {
@@ -3942,6 +4487,7 @@ impl client::Part for GoogleCloudDialogflowV2NotificationConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2OutputAudio {
@@ -3961,6 +4507,7 @@ impl client::Part for GoogleCloudDialogflowV2OutputAudio {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2OutputAudioConfig {
@@ -3994,6 +4541,7 @@ impl client::Part for GoogleCloudDialogflowV2OutputAudioConfig {}
 /// * [locations conversations participants create projects](ProjectLocationConversationParticipantCreateCall) (request|response)
 /// * [locations conversations participants get projects](ProjectLocationConversationParticipantGetCall) (response)
 /// * [locations conversations participants patch projects](ProjectLocationConversationParticipantPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Participant {
@@ -4025,6 +4573,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Participant {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2QueryInput {
@@ -4047,6 +4596,7 @@ impl client::Part for GoogleCloudDialogflowV2QueryInput {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2QueryParameters {
@@ -4092,6 +4642,7 @@ impl client::Part for GoogleCloudDialogflowV2QueryParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2QueryResult {
@@ -4171,6 +4722,7 @@ impl client::Part for GoogleCloudDialogflowV2QueryResult {}
 /// * [agent knowledge bases documents reload projects](ProjectAgentKnowledgeBaseDocumentReloadCall) (request)
 /// * [knowledge bases documents reload projects](ProjectKnowledgeBaseDocumentReloadCall) (request)
 /// * [locations knowledge bases documents reload projects](ProjectLocationKnowledgeBaseDocumentReloadCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ReloadDocumentRequest {
@@ -4200,6 +4752,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2ReloadDocumentRequest {}
 /// 
 /// * [agent restore projects](ProjectAgentRestoreCall) (request)
 /// * [locations agent restore projects](ProjectLocationAgentRestoreCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2RestoreAgentRequest {
@@ -4226,6 +4779,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2RestoreAgentRequest {}
 /// 
 /// * [agent search projects](ProjectAgentSearchCall) (response)
 /// * [locations agent search projects](ProjectLocationAgentSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SearchAgentsResponse {
@@ -4245,6 +4799,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2SearchAgentsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SearchKnowledgeAnswer {
@@ -4272,6 +4827,7 @@ impl client::Part for GoogleCloudDialogflowV2SearchKnowledgeAnswer {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SearchKnowledgeAnswerAnswerSource {
@@ -4300,27 +4856,28 @@ impl client::Part for GoogleCloudDialogflowV2SearchKnowledgeAnswerAnswerSource {
 /// * [locations conversations suggestions search knowledge projects](ProjectLocationConversationSuggestionSearchKnowledgeCall) (request)
 /// * [locations suggestions search knowledge projects](ProjectLocationSuggestionSearchKnowledgeCall) (request)
 /// * [suggestions search knowledge projects](ProjectSuggestionSearchKnowledgeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SearchKnowledgeRequest {
-    /// The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
+    /// Optional. The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
     
     pub conversation: Option<String>,
     /// Required. The conversation profile used to configure the search. Format: `projects//locations//conversationProfiles/`.
     #[serde(rename="conversationProfile")]
     
     pub conversation_profile: Option<String>,
-    /// The name of the latest conversation message when the request is triggered. Format: `projects//locations//conversations//messages/`.
+    /// Optional. The name of the latest conversation message when the request is triggered. Format: `projects//locations//conversations//messages/`.
     #[serde(rename="latestMessage")]
     
     pub latest_message: Option<String>,
-    /// The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
+    /// Required. The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
     
     pub parent: Option<String>,
     /// Required. The natural language text query for knowledge search.
     
     pub query: Option<GoogleCloudDialogflowV2TextInput>,
-    /// The ID of the search session. The session_id can be combined with Dialogflow V3 Agent ID retrieved from conversation profile or on its own to identify a search session. The search history of the same session will impact the search result. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length must not exceed 36 characters.
+    /// Optional. The ID of the search session. The session_id can be combined with Dialogflow V3 Agent ID retrieved from conversation profile or on its own to identify a search session. The search history of the same session will impact the search result. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length must not exceed 36 characters.
     #[serde(rename="sessionId")]
     
     pub session_id: Option<String>,
@@ -4340,6 +4897,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2SearchKnowledgeRequest {}
 /// * [locations conversations suggestions search knowledge projects](ProjectLocationConversationSuggestionSearchKnowledgeCall) (response)
 /// * [locations suggestions search knowledge projects](ProjectLocationSuggestionSearchKnowledgeCall) (response)
 /// * [suggestions search knowledge projects](ProjectSuggestionSearchKnowledgeCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SearchKnowledgeResponse {
@@ -4359,6 +4917,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2SearchKnowledgeResponse {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Sentiment {
@@ -4377,6 +4936,7 @@ impl client::Part for GoogleCloudDialogflowV2Sentiment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SentimentAnalysisRequestConfig {
@@ -4393,6 +4953,7 @@ impl client::Part for GoogleCloudDialogflowV2SentimentAnalysisRequestConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SentimentAnalysisResult {
@@ -4424,6 +4985,7 @@ impl client::Part for GoogleCloudDialogflowV2SentimentAnalysisResult {}
 /// * [locations agent sessions entity types create projects](ProjectLocationAgentSessionEntityTypeCreateCall) (request|response)
 /// * [locations agent sessions entity types get projects](ProjectLocationAgentSessionEntityTypeGetCall) (response)
 /// * [locations agent sessions entity types patch projects](ProjectLocationAgentSessionEntityTypePatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SessionEntityType {
@@ -4452,6 +5014,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2SessionEntityType {}
 /// 
 /// * [conversation profiles set suggestion feature config projects](ProjectConversationProfileSetSuggestionFeatureConfigCall) (request)
 /// * [locations conversation profiles set suggestion feature config projects](ProjectLocationConversationProfileSetSuggestionFeatureConfigCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SetSuggestionFeatureConfigRequest {
@@ -4472,6 +5035,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2SetSuggestionFeatureConfigR
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SmartReplyAnswer {
@@ -4494,6 +5058,7 @@ impl client::Part for GoogleCloudDialogflowV2SmartReplyAnswer {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SmartReplyMetrics {
@@ -4519,6 +5084,7 @@ impl client::Part for GoogleCloudDialogflowV2SmartReplyMetrics {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SmartReplyMetricsTopNMetrics {
@@ -4537,6 +5103,7 @@ impl client::Part for GoogleCloudDialogflowV2SmartReplyMetricsTopNMetrics {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SmartReplyModelMetadata {
@@ -4553,6 +5120,7 @@ impl client::Part for GoogleCloudDialogflowV2SmartReplyModelMetadata {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SpeechContext {
@@ -4571,6 +5139,7 @@ impl client::Part for GoogleCloudDialogflowV2SpeechContext {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SpeechToTextConfig {
@@ -4599,6 +5168,7 @@ impl client::Part for GoogleCloudDialogflowV2SpeechToTextConfig {}
 /// 
 /// * [conversations participants suggestions suggest articles projects](ProjectConversationParticipantSuggestionSuggestArticleCall) (request)
 /// * [locations conversations participants suggestions suggest articles projects](ProjectLocationConversationParticipantSuggestionSuggestArticleCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestArticlesRequest {
@@ -4628,6 +5198,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2SuggestArticlesRequest {}
 /// 
 /// * [conversations participants suggestions suggest articles projects](ProjectConversationParticipantSuggestionSuggestArticleCall) (response)
 /// * [locations conversations participants suggestions suggest articles projects](ProjectLocationConversationParticipantSuggestionSuggestArticleCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestArticlesResponse {
@@ -4657,18 +5228,19 @@ impl client::ResponseResult for GoogleCloudDialogflowV2SuggestArticlesResponse {
 /// 
 /// * [conversations suggestions suggest conversation summary projects](ProjectConversationSuggestionSuggestConversationSummaryCall) (request)
 /// * [locations conversations suggestions suggest conversation summary projects](ProjectLocationConversationSuggestionSuggestConversationSummaryCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestConversationSummaryRequest {
-    /// Parameters for a human assist query. Only used for POC/demo purpose.
+    /// Optional. Parameters for a human assist query. Only used for POC/demo purpose.
     #[serde(rename="assistQueryParams")]
     
     pub assist_query_params: Option<GoogleCloudDialogflowV2AssistQueryParameters>,
-    /// Max number of messages prior to and including [latest_message] to use as context when compiling the suggestion. By default 500 and at most 1000.
+    /// Optional. Max number of messages prior to and including [latest_message] to use as context when compiling the suggestion. By default 500 and at most 1000.
     #[serde(rename="contextSize")]
     
     pub context_size: Option<i32>,
-    /// The name of the latest conversation message used as context for compiling suggestion. If empty, the latest message of the conversation will be used. Format: `projects//locations//conversations//messages/`.
+    /// Optional. The name of the latest conversation message used as context for compiling suggestion. If empty, the latest message of the conversation will be used. Format: `projects//locations//conversations//messages/`.
     #[serde(rename="latestMessage")]
     
     pub latest_message: Option<String>,
@@ -4686,6 +5258,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2SuggestConversationSummaryR
 /// 
 /// * [conversations suggestions suggest conversation summary projects](ProjectConversationSuggestionSuggestConversationSummaryCall) (response)
 /// * [locations conversations suggestions suggest conversation summary projects](ProjectLocationConversationSuggestionSuggestConversationSummaryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestConversationSummaryResponse {
@@ -4709,6 +5282,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2SuggestConversationSummar
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestConversationSummaryResponseSummary {
@@ -4741,6 +5315,7 @@ impl client::Part for GoogleCloudDialogflowV2SuggestConversationSummaryResponseS
 /// 
 /// * [conversations participants suggestions suggest faq answers projects](ProjectConversationParticipantSuggestionSuggestFaqAnswerCall) (request)
 /// * [locations conversations participants suggestions suggest faq answers projects](ProjectLocationConversationParticipantSuggestionSuggestFaqAnswerCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestFaqAnswersRequest {
@@ -4770,6 +5345,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2SuggestFaqAnswersRequest {}
 /// 
 /// * [conversations participants suggestions suggest faq answers projects](ProjectConversationParticipantSuggestionSuggestFaqAnswerCall) (response)
 /// * [locations conversations participants suggestions suggest faq answers projects](ProjectLocationConversationParticipantSuggestionSuggestFaqAnswerCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestFaqAnswersResponse {
@@ -4790,6 +5366,66 @@ pub struct GoogleCloudDialogflowV2SuggestFaqAnswersResponse {
 impl client::ResponseResult for GoogleCloudDialogflowV2SuggestFaqAnswersResponse {}
 
 
+/// The request message for Participants.SuggestKnowledgeAssist.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [conversations participants suggestions suggest knowledge assist projects](ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall) (request)
+/// * [locations conversations participants suggestions suggest knowledge assist projects](ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest {
+    /// Optional. Max number of messages prior to and including latest_message to use as context when compiling the suggestion. The context size is by default 100 and at most 100.
+    #[serde(rename="contextSize")]
+    
+    pub context_size: Option<i32>,
+    /// Optional. The name of the latest conversation message to compile suggestions for. If empty, it will be the latest message of the conversation. Format: `projects//locations//conversations//messages/`.
+    #[serde(rename="latestMessage")]
+    
+    pub latest_message: Option<String>,
+    /// Optional. The previously suggested query for the given conversation. This helps identify whether the next suggestion we generate is resonably different from the previous one. This is useful to avoid similar suggestions within the conversation.
+    #[serde(rename="previousSuggestedQuery")]
+    
+    pub previous_suggested_query: Option<String>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest {}
+
+
+/// The response message for Participants.SuggestKnowledgeAssist.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [conversations participants suggestions suggest knowledge assist projects](ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall) (response)
+/// * [locations conversations participants suggestions suggest knowledge assist projects](ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SuggestKnowledgeAssistResponse {
+    /// Number of messages prior to and including latest_message to compile the suggestion. It may be smaller than the SuggestKnowledgeAssistRequest.context_size field in the request if there are fewer messages in the conversation.
+    #[serde(rename="contextSize")]
+    
+    pub context_size: Option<i32>,
+    /// Output only. Knowledge Assist suggestion.
+    #[serde(rename="knowledgeAssistAnswer")]
+    
+    pub knowledge_assist_answer: Option<GoogleCloudDialogflowV2KnowledgeAssistAnswer>,
+    /// The name of the latest conversation message used to compile suggestion for. Format: `projects//locations//conversations//messages/`.
+    #[serde(rename="latestMessage")]
+    
+    pub latest_message: Option<String>,
+}
+
+impl client::ResponseResult for GoogleCloudDialogflowV2SuggestKnowledgeAssistResponse {}
+
+
 /// The request message for Participants.SuggestSmartReplies.
 /// 
 /// # Activities
@@ -4799,6 +5435,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2SuggestFaqAnswersResponse
 /// 
 /// * [conversations participants suggestions suggest smart replies projects](ProjectConversationParticipantSuggestionSuggestSmartReplyCall) (request)
 /// * [locations conversations participants suggestions suggest smart replies projects](ProjectLocationConversationParticipantSuggestionSuggestSmartReplyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestSmartRepliesRequest {
@@ -4828,6 +5465,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2SuggestSmartRepliesRequest 
 /// 
 /// * [conversations participants suggestions suggest smart replies projects](ProjectConversationParticipantSuggestionSuggestSmartReplyCall) (response)
 /// * [locations conversations participants suggestions suggest smart replies projects](ProjectLocationConversationParticipantSuggestionSuggestSmartReplyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestSmartRepliesResponse {
@@ -4852,6 +5490,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2SuggestSmartRepliesRespon
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestionFeature {
@@ -4868,6 +5507,7 @@ impl client::Part for GoogleCloudDialogflowV2SuggestionFeature {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestionInput {
@@ -4884,6 +5524,7 @@ impl client::Part for GoogleCloudDialogflowV2SuggestionInput {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SuggestionResult {
@@ -4898,6 +5539,10 @@ pub struct GoogleCloudDialogflowV2SuggestionResult {
     #[serde(rename="suggestFaqAnswersResponse")]
     
     pub suggest_faq_answers_response: Option<GoogleCloudDialogflowV2SuggestFaqAnswersResponse>,
+    /// SuggestKnowledgeAssistResponse if request is for KNOWLEDGE_ASSIST.
+    #[serde(rename="suggestKnowledgeAssistResponse")]
+    
+    pub suggest_knowledge_assist_response: Option<GoogleCloudDialogflowV2SuggestKnowledgeAssistResponse>,
     /// SuggestSmartRepliesResponse if request is for SMART_REPLY.
     #[serde(rename="suggestSmartRepliesResponse")]
     
@@ -4907,10 +5552,115 @@ pub struct GoogleCloudDialogflowV2SuggestionResult {
 impl client::Part for GoogleCloudDialogflowV2SuggestionResult {}
 
 
+/// Summarization context that customer can configure.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SummarizationContext {
+    /// Optional. List of few shot examples.
+    #[serde(rename="fewShotExamples")]
+    
+    pub few_shot_examples: Option<Vec<GoogleCloudDialogflowV2FewShotExample>>,
+    /// Optional. The target language of the generated summary. The language code for conversation will be used if this field is empty. Supported 2.0 and later versions.
+    #[serde(rename="outputLanguageCode")]
+    
+    pub output_language_code: Option<String>,
+    /// Optional. List of sections. Note it contains both predefined section sand customer defined sections.
+    #[serde(rename="summarizationSections")]
+    
+    pub summarization_sections: Option<Vec<GoogleCloudDialogflowV2SummarizationSection>>,
+    /// Optional. Version of the feature. If not set, default to latest version. Current candidates are ["1.0"].
+    
+    pub version: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2SummarizationContext {}
+
+
+/// Represents the section of summarization.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SummarizationSection {
+    /// Optional. Definition of the section, for example, "what the customer needs help with or has question about."
+    
+    pub definition: Option<String>,
+    /// Optional. Name of the section, for example, "situation".
+    
+    pub key: Option<String>,
+    /// Optional. Type of the summarization section.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2SummarizationSection {}
+
+
+/// List of summarization sections.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SummarizationSectionList {
+    /// Optional. Summarization sections.
+    #[serde(rename="summarizationSections")]
+    
+    pub summarization_sections: Option<Vec<GoogleCloudDialogflowV2SummarizationSection>>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2SummarizationSectionList {}
+
+
+/// Suggested summary of the conversation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SummarySuggestion {
+    /// Required. All the parts of generated summary.
+    #[serde(rename="summarySections")]
+    
+    pub summary_sections: Option<Vec<GoogleCloudDialogflowV2SummarySuggestionSummarySection>>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2SummarySuggestion {}
+
+
+/// A component of the generated summary.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowV2SummarySuggestionSummarySection {
+    /// Required. Name of the section.
+    
+    pub section: Option<String>,
+    /// Required. Summary text for the section.
+    
+    pub summary: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowV2SummarySuggestionSummarySection {}
+
+
 /// Configuration of how speech should be synthesized.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2SynthesizeSpeechConfig {
@@ -4941,6 +5691,7 @@ impl client::Part for GoogleCloudDialogflowV2SynthesizeSpeechConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2TextInput {
@@ -4960,6 +5711,7 @@ impl client::Part for GoogleCloudDialogflowV2TextInput {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2TextToSpeechSettings {
@@ -4993,6 +5745,7 @@ impl client::Part for GoogleCloudDialogflowV2TextToSpeechSettings {}
 /// 
 /// * [agent train projects](ProjectAgentTrainCall) (request)
 /// * [locations agent train projects](ProjectLocationAgentTrainCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2TrainAgentRequest { _never_set: Option<bool> }
@@ -5009,6 +5762,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2TrainAgentRequest {}
 /// 
 /// * [conversation models undeploy projects](ProjectConversationModelUndeployCall) (request)
 /// * [locations conversation models undeploy projects](ProjectLocationConversationModelUndeployCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2UndeployConversationModelRequest { _never_set: Option<bool> }
@@ -5020,6 +5774,7 @@ impl client::RequestValue for GoogleCloudDialogflowV2UndeployConversationModelRe
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ValidationError {
@@ -5047,6 +5802,7 @@ impl client::Part for GoogleCloudDialogflowV2ValidationError {}
 /// 
 /// * [agent get validation result projects](ProjectAgentGetValidationResultCall) (response)
 /// * [locations agent get validation result projects](ProjectLocationAgentGetValidationResultCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2ValidationResult {
@@ -5072,6 +5828,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2ValidationResult {}
 /// * [locations agent versions create projects](ProjectLocationAgentVersionCreateCall) (request|response)
 /// * [locations agent versions get projects](ProjectLocationAgentVersionGetCall) (response)
 /// * [locations agent versions patch projects](ProjectLocationAgentVersionPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2Version {
@@ -5102,6 +5859,7 @@ impl client::ResponseResult for GoogleCloudDialogflowV2Version {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowV2VoiceSelectionParams {
@@ -5125,6 +5883,7 @@ impl client::Part for GoogleCloudDialogflowV2VoiceSelectionParams {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations list projects](ProjectLocationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudLocationListLocationsResponse {
@@ -5148,6 +5907,7 @@ impl client::ResponseResult for GoogleCloudLocationListLocationsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations get projects](ProjectLocationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudLocationLocation {
@@ -5182,6 +5942,7 @@ impl client::ResponseResult for GoogleCloudLocationLocation {}
 /// 
 /// * [locations operations list projects](ProjectLocationOperationListCall) (response)
 /// * [operations list projects](ProjectOperationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningListOperationsResponse {
@@ -5261,6 +6022,7 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// * [locations knowledge bases documents reload projects](ProjectLocationKnowledgeBaseDocumentReloadCall) (response)
 /// * [locations operations get projects](ProjectLocationOperationGetCall) (response)
 /// * [operations get projects](ProjectOperationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningOperation {
@@ -5315,11 +6077,13 @@ impl client::ResponseResult for GoogleLongrunningOperation {}
 /// * [locations agent sessions delete contexts projects](ProjectLocationAgentSessionDeleteContextCall) (response)
 /// * [locations agent versions delete projects](ProjectLocationAgentVersionDeleteCall) (response)
 /// * [locations conversation profiles delete projects](ProjectLocationConversationProfileDeleteCall) (response)
+/// * [locations generators delete projects](ProjectLocationGeneratorDeleteCall) (response)
 /// * [locations knowledge bases delete projects](ProjectLocationKnowledgeBaseDeleteCall) (response)
 /// * [locations operations cancel projects](ProjectLocationOperationCancelCall) (response)
 /// * [locations delete agent projects](ProjectLocationDeleteAgentCall) (response)
 /// * [operations cancel projects](ProjectOperationCancelCall) (response)
 /// * [delete agent projects](ProjectDeleteAgentCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
@@ -5331,6 +6095,7 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpcStatus {
@@ -5352,6 +6117,7 @@ impl client::Part for GoogleRpcStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeLatLng {
@@ -5392,9 +6158,9 @@ impl client::Part for GoogleTypeLatLng {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_environments_create(...)`, `agent_environments_delete(...)`, `agent_environments_get(...)`, `agent_environments_get_history(...)`, `agent_environments_intents_list(...)`, `agent_environments_list(...)`, `agent_environments_patch(...)`, `agent_environments_users_sessions_contexts_create(...)`, `agent_environments_users_sessions_contexts_delete(...)`, `agent_environments_users_sessions_contexts_get(...)`, `agent_environments_users_sessions_contexts_list(...)`, `agent_environments_users_sessions_contexts_patch(...)`, `agent_environments_users_sessions_delete_contexts(...)`, `agent_environments_users_sessions_detect_intent(...)`, `agent_environments_users_sessions_entity_types_create(...)`, `agent_environments_users_sessions_entity_types_delete(...)`, `agent_environments_users_sessions_entity_types_get(...)`, `agent_environments_users_sessions_entity_types_list(...)`, `agent_environments_users_sessions_entity_types_patch(...)`, `agent_export(...)`, `agent_get_fulfillment(...)`, `agent_get_validation_result(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_knowledge_bases_create(...)`, `agent_knowledge_bases_delete(...)`, `agent_knowledge_bases_documents_create(...)`, `agent_knowledge_bases_documents_delete(...)`, `agent_knowledge_bases_documents_get(...)`, `agent_knowledge_bases_documents_list(...)`, `agent_knowledge_bases_documents_patch(...)`, `agent_knowledge_bases_documents_reload(...)`, `agent_knowledge_bases_get(...)`, `agent_knowledge_bases_list(...)`, `agent_knowledge_bases_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `agent_update_fulfillment(...)`, `agent_versions_create(...)`, `agent_versions_delete(...)`, `agent_versions_get(...)`, `agent_versions_list(...)`, `agent_versions_patch(...)`, `answer_records_list(...)`, `answer_records_patch(...)`, `conversation_datasets_get(...)`, `conversation_datasets_import_conversation_data(...)`, `conversation_datasets_list(...)`, `conversation_models_create(...)`, `conversation_models_delete(...)`, `conversation_models_deploy(...)`, `conversation_models_evaluations_get(...)`, `conversation_models_evaluations_list(...)`, `conversation_models_get(...)`, `conversation_models_list(...)`, `conversation_models_undeploy(...)`, `conversation_profiles_clear_suggestion_feature_config(...)`, `conversation_profiles_create(...)`, `conversation_profiles_delete(...)`, `conversation_profiles_get(...)`, `conversation_profiles_list(...)`, `conversation_profiles_patch(...)`, `conversation_profiles_set_suggestion_feature_config(...)`, `conversations_complete(...)`, `conversations_create(...)`, `conversations_get(...)`, `conversations_list(...)`, `conversations_messages_list(...)`, `conversations_participants_analyze_content(...)`, `conversations_participants_create(...)`, `conversations_participants_get(...)`, `conversations_participants_list(...)`, `conversations_participants_patch(...)`, `conversations_participants_suggestions_suggest_articles(...)`, `conversations_participants_suggestions_suggest_faq_answers(...)`, `conversations_participants_suggestions_suggest_smart_replies(...)`, `conversations_suggestions_search_knowledge(...)`, `conversations_suggestions_suggest_conversation_summary(...)`, `delete_agent(...)`, `get_agent(...)`, `knowledge_bases_create(...)`, `knowledge_bases_delete(...)`, `knowledge_bases_documents_create(...)`, `knowledge_bases_documents_delete(...)`, `knowledge_bases_documents_export(...)`, `knowledge_bases_documents_get(...)`, `knowledge_bases_documents_import(...)`, `knowledge_bases_documents_list(...)`, `knowledge_bases_documents_patch(...)`, `knowledge_bases_documents_reload(...)`, `knowledge_bases_get(...)`, `knowledge_bases_list(...)`, `knowledge_bases_patch(...)`, `locations_agent_entity_types_batch_delete(...)`, `locations_agent_entity_types_batch_update(...)`, `locations_agent_entity_types_create(...)`, `locations_agent_entity_types_delete(...)`, `locations_agent_entity_types_entities_batch_create(...)`, `locations_agent_entity_types_entities_batch_delete(...)`, `locations_agent_entity_types_entities_batch_update(...)`, `locations_agent_entity_types_get(...)`, `locations_agent_entity_types_list(...)`, `locations_agent_entity_types_patch(...)`, `locations_agent_environments_create(...)`, `locations_agent_environments_delete(...)`, `locations_agent_environments_get(...)`, `locations_agent_environments_get_history(...)`, `locations_agent_environments_intents_list(...)`, `locations_agent_environments_list(...)`, `locations_agent_environments_patch(...)`, `locations_agent_environments_users_sessions_contexts_create(...)`, `locations_agent_environments_users_sessions_contexts_delete(...)`, `locations_agent_environments_users_sessions_contexts_get(...)`, `locations_agent_environments_users_sessions_contexts_list(...)`, `locations_agent_environments_users_sessions_contexts_patch(...)`, `locations_agent_environments_users_sessions_delete_contexts(...)`, `locations_agent_environments_users_sessions_detect_intent(...)`, `locations_agent_environments_users_sessions_entity_types_create(...)`, `locations_agent_environments_users_sessions_entity_types_delete(...)`, `locations_agent_environments_users_sessions_entity_types_get(...)`, `locations_agent_environments_users_sessions_entity_types_list(...)`, `locations_agent_environments_users_sessions_entity_types_patch(...)`, `locations_agent_export(...)`, `locations_agent_get_fulfillment(...)`, `locations_agent_get_validation_result(...)`, `locations_agent_import(...)`, `locations_agent_intents_batch_delete(...)`, `locations_agent_intents_batch_update(...)`, `locations_agent_intents_create(...)`, `locations_agent_intents_delete(...)`, `locations_agent_intents_get(...)`, `locations_agent_intents_list(...)`, `locations_agent_intents_patch(...)`, `locations_agent_restore(...)`, `locations_agent_search(...)`, `locations_agent_sessions_contexts_create(...)`, `locations_agent_sessions_contexts_delete(...)`, `locations_agent_sessions_contexts_get(...)`, `locations_agent_sessions_contexts_list(...)`, `locations_agent_sessions_contexts_patch(...)`, `locations_agent_sessions_delete_contexts(...)`, `locations_agent_sessions_detect_intent(...)`, `locations_agent_sessions_entity_types_create(...)`, `locations_agent_sessions_entity_types_delete(...)`, `locations_agent_sessions_entity_types_get(...)`, `locations_agent_sessions_entity_types_list(...)`, `locations_agent_sessions_entity_types_patch(...)`, `locations_agent_train(...)`, `locations_agent_update_fulfillment(...)`, `locations_agent_versions_create(...)`, `locations_agent_versions_delete(...)`, `locations_agent_versions_get(...)`, `locations_agent_versions_list(...)`, `locations_agent_versions_patch(...)`, `locations_answer_records_list(...)`, `locations_answer_records_patch(...)`, `locations_conversation_datasets_create(...)`, `locations_conversation_datasets_delete(...)`, `locations_conversation_datasets_get(...)`, `locations_conversation_datasets_import_conversation_data(...)`, `locations_conversation_datasets_list(...)`, `locations_conversation_models_create(...)`, `locations_conversation_models_delete(...)`, `locations_conversation_models_deploy(...)`, `locations_conversation_models_evaluations_create(...)`, `locations_conversation_models_evaluations_get(...)`, `locations_conversation_models_evaluations_list(...)`, `locations_conversation_models_get(...)`, `locations_conversation_models_list(...)`, `locations_conversation_models_undeploy(...)`, `locations_conversation_profiles_clear_suggestion_feature_config(...)`, `locations_conversation_profiles_create(...)`, `locations_conversation_profiles_delete(...)`, `locations_conversation_profiles_get(...)`, `locations_conversation_profiles_list(...)`, `locations_conversation_profiles_patch(...)`, `locations_conversation_profiles_set_suggestion_feature_config(...)`, `locations_conversations_complete(...)`, `locations_conversations_create(...)`, `locations_conversations_get(...)`, `locations_conversations_list(...)`, `locations_conversations_messages_list(...)`, `locations_conversations_participants_analyze_content(...)`, `locations_conversations_participants_create(...)`, `locations_conversations_participants_get(...)`, `locations_conversations_participants_list(...)`, `locations_conversations_participants_patch(...)`, `locations_conversations_participants_suggestions_suggest_articles(...)`, `locations_conversations_participants_suggestions_suggest_faq_answers(...)`, `locations_conversations_participants_suggestions_suggest_smart_replies(...)`, `locations_conversations_suggestions_search_knowledge(...)`, `locations_conversations_suggestions_suggest_conversation_summary(...)`, `locations_delete_agent(...)`, `locations_get(...)`, `locations_get_agent(...)`, `locations_knowledge_bases_create(...)`, `locations_knowledge_bases_delete(...)`, `locations_knowledge_bases_documents_create(...)`, `locations_knowledge_bases_documents_delete(...)`, `locations_knowledge_bases_documents_export(...)`, `locations_knowledge_bases_documents_get(...)`, `locations_knowledge_bases_documents_import(...)`, `locations_knowledge_bases_documents_list(...)`, `locations_knowledge_bases_documents_patch(...)`, `locations_knowledge_bases_documents_reload(...)`, `locations_knowledge_bases_get(...)`, `locations_knowledge_bases_list(...)`, `locations_knowledge_bases_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_set_agent(...)`, `locations_suggestions_generate_stateless_summary(...)`, `locations_suggestions_search_knowledge(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)`, `set_agent(...)`, `suggestions_generate_stateless_summary(...)` and `suggestions_search_knowledge(...)`
+/// // like `agent_entity_types_batch_delete(...)`, `agent_entity_types_batch_update(...)`, `agent_entity_types_create(...)`, `agent_entity_types_delete(...)`, `agent_entity_types_entities_batch_create(...)`, `agent_entity_types_entities_batch_delete(...)`, `agent_entity_types_entities_batch_update(...)`, `agent_entity_types_get(...)`, `agent_entity_types_list(...)`, `agent_entity_types_patch(...)`, `agent_environments_create(...)`, `agent_environments_delete(...)`, `agent_environments_get(...)`, `agent_environments_get_history(...)`, `agent_environments_intents_list(...)`, `agent_environments_list(...)`, `agent_environments_patch(...)`, `agent_environments_users_sessions_contexts_create(...)`, `agent_environments_users_sessions_contexts_delete(...)`, `agent_environments_users_sessions_contexts_get(...)`, `agent_environments_users_sessions_contexts_list(...)`, `agent_environments_users_sessions_contexts_patch(...)`, `agent_environments_users_sessions_delete_contexts(...)`, `agent_environments_users_sessions_detect_intent(...)`, `agent_environments_users_sessions_entity_types_create(...)`, `agent_environments_users_sessions_entity_types_delete(...)`, `agent_environments_users_sessions_entity_types_get(...)`, `agent_environments_users_sessions_entity_types_list(...)`, `agent_environments_users_sessions_entity_types_patch(...)`, `agent_export(...)`, `agent_get_fulfillment(...)`, `agent_get_validation_result(...)`, `agent_import(...)`, `agent_intents_batch_delete(...)`, `agent_intents_batch_update(...)`, `agent_intents_create(...)`, `agent_intents_delete(...)`, `agent_intents_get(...)`, `agent_intents_list(...)`, `agent_intents_patch(...)`, `agent_knowledge_bases_create(...)`, `agent_knowledge_bases_delete(...)`, `agent_knowledge_bases_documents_create(...)`, `agent_knowledge_bases_documents_delete(...)`, `agent_knowledge_bases_documents_get(...)`, `agent_knowledge_bases_documents_list(...)`, `agent_knowledge_bases_documents_patch(...)`, `agent_knowledge_bases_documents_reload(...)`, `agent_knowledge_bases_get(...)`, `agent_knowledge_bases_list(...)`, `agent_knowledge_bases_patch(...)`, `agent_restore(...)`, `agent_search(...)`, `agent_sessions_contexts_create(...)`, `agent_sessions_contexts_delete(...)`, `agent_sessions_contexts_get(...)`, `agent_sessions_contexts_list(...)`, `agent_sessions_contexts_patch(...)`, `agent_sessions_delete_contexts(...)`, `agent_sessions_detect_intent(...)`, `agent_sessions_entity_types_create(...)`, `agent_sessions_entity_types_delete(...)`, `agent_sessions_entity_types_get(...)`, `agent_sessions_entity_types_list(...)`, `agent_sessions_entity_types_patch(...)`, `agent_train(...)`, `agent_update_fulfillment(...)`, `agent_versions_create(...)`, `agent_versions_delete(...)`, `agent_versions_get(...)`, `agent_versions_list(...)`, `agent_versions_patch(...)`, `answer_records_list(...)`, `answer_records_patch(...)`, `conversation_datasets_get(...)`, `conversation_datasets_import_conversation_data(...)`, `conversation_datasets_list(...)`, `conversation_models_create(...)`, `conversation_models_delete(...)`, `conversation_models_deploy(...)`, `conversation_models_evaluations_get(...)`, `conversation_models_evaluations_list(...)`, `conversation_models_get(...)`, `conversation_models_list(...)`, `conversation_models_undeploy(...)`, `conversation_profiles_clear_suggestion_feature_config(...)`, `conversation_profiles_create(...)`, `conversation_profiles_delete(...)`, `conversation_profiles_get(...)`, `conversation_profiles_list(...)`, `conversation_profiles_patch(...)`, `conversation_profiles_set_suggestion_feature_config(...)`, `conversations_complete(...)`, `conversations_create(...)`, `conversations_get(...)`, `conversations_list(...)`, `conversations_messages_list(...)`, `conversations_participants_analyze_content(...)`, `conversations_participants_create(...)`, `conversations_participants_get(...)`, `conversations_participants_list(...)`, `conversations_participants_patch(...)`, `conversations_participants_suggestions_suggest_articles(...)`, `conversations_participants_suggestions_suggest_faq_answers(...)`, `conversations_participants_suggestions_suggest_knowledge_assist(...)`, `conversations_participants_suggestions_suggest_smart_replies(...)`, `conversations_suggestions_search_knowledge(...)`, `conversations_suggestions_suggest_conversation_summary(...)`, `delete_agent(...)`, `generators_create(...)`, `generators_list(...)`, `get_agent(...)`, `knowledge_bases_create(...)`, `knowledge_bases_delete(...)`, `knowledge_bases_documents_create(...)`, `knowledge_bases_documents_delete(...)`, `knowledge_bases_documents_export(...)`, `knowledge_bases_documents_get(...)`, `knowledge_bases_documents_import(...)`, `knowledge_bases_documents_list(...)`, `knowledge_bases_documents_patch(...)`, `knowledge_bases_documents_reload(...)`, `knowledge_bases_get(...)`, `knowledge_bases_list(...)`, `knowledge_bases_patch(...)`, `locations_agent_entity_types_batch_delete(...)`, `locations_agent_entity_types_batch_update(...)`, `locations_agent_entity_types_create(...)`, `locations_agent_entity_types_delete(...)`, `locations_agent_entity_types_entities_batch_create(...)`, `locations_agent_entity_types_entities_batch_delete(...)`, `locations_agent_entity_types_entities_batch_update(...)`, `locations_agent_entity_types_get(...)`, `locations_agent_entity_types_list(...)`, `locations_agent_entity_types_patch(...)`, `locations_agent_environments_create(...)`, `locations_agent_environments_delete(...)`, `locations_agent_environments_get(...)`, `locations_agent_environments_get_history(...)`, `locations_agent_environments_intents_list(...)`, `locations_agent_environments_list(...)`, `locations_agent_environments_patch(...)`, `locations_agent_environments_users_sessions_contexts_create(...)`, `locations_agent_environments_users_sessions_contexts_delete(...)`, `locations_agent_environments_users_sessions_contexts_get(...)`, `locations_agent_environments_users_sessions_contexts_list(...)`, `locations_agent_environments_users_sessions_contexts_patch(...)`, `locations_agent_environments_users_sessions_delete_contexts(...)`, `locations_agent_environments_users_sessions_detect_intent(...)`, `locations_agent_environments_users_sessions_entity_types_create(...)`, `locations_agent_environments_users_sessions_entity_types_delete(...)`, `locations_agent_environments_users_sessions_entity_types_get(...)`, `locations_agent_environments_users_sessions_entity_types_list(...)`, `locations_agent_environments_users_sessions_entity_types_patch(...)`, `locations_agent_export(...)`, `locations_agent_get_fulfillment(...)`, `locations_agent_get_validation_result(...)`, `locations_agent_import(...)`, `locations_agent_intents_batch_delete(...)`, `locations_agent_intents_batch_update(...)`, `locations_agent_intents_create(...)`, `locations_agent_intents_delete(...)`, `locations_agent_intents_get(...)`, `locations_agent_intents_list(...)`, `locations_agent_intents_patch(...)`, `locations_agent_restore(...)`, `locations_agent_search(...)`, `locations_agent_sessions_contexts_create(...)`, `locations_agent_sessions_contexts_delete(...)`, `locations_agent_sessions_contexts_get(...)`, `locations_agent_sessions_contexts_list(...)`, `locations_agent_sessions_contexts_patch(...)`, `locations_agent_sessions_delete_contexts(...)`, `locations_agent_sessions_detect_intent(...)`, `locations_agent_sessions_entity_types_create(...)`, `locations_agent_sessions_entity_types_delete(...)`, `locations_agent_sessions_entity_types_get(...)`, `locations_agent_sessions_entity_types_list(...)`, `locations_agent_sessions_entity_types_patch(...)`, `locations_agent_train(...)`, `locations_agent_update_fulfillment(...)`, `locations_agent_versions_create(...)`, `locations_agent_versions_delete(...)`, `locations_agent_versions_get(...)`, `locations_agent_versions_list(...)`, `locations_agent_versions_patch(...)`, `locations_answer_records_list(...)`, `locations_answer_records_patch(...)`, `locations_conversation_datasets_create(...)`, `locations_conversation_datasets_delete(...)`, `locations_conversation_datasets_get(...)`, `locations_conversation_datasets_import_conversation_data(...)`, `locations_conversation_datasets_list(...)`, `locations_conversation_models_create(...)`, `locations_conversation_models_delete(...)`, `locations_conversation_models_deploy(...)`, `locations_conversation_models_evaluations_create(...)`, `locations_conversation_models_evaluations_get(...)`, `locations_conversation_models_evaluations_list(...)`, `locations_conversation_models_get(...)`, `locations_conversation_models_list(...)`, `locations_conversation_models_undeploy(...)`, `locations_conversation_profiles_clear_suggestion_feature_config(...)`, `locations_conversation_profiles_create(...)`, `locations_conversation_profiles_delete(...)`, `locations_conversation_profiles_get(...)`, `locations_conversation_profiles_list(...)`, `locations_conversation_profiles_patch(...)`, `locations_conversation_profiles_set_suggestion_feature_config(...)`, `locations_conversations_complete(...)`, `locations_conversations_create(...)`, `locations_conversations_get(...)`, `locations_conversations_list(...)`, `locations_conversations_messages_list(...)`, `locations_conversations_participants_analyze_content(...)`, `locations_conversations_participants_create(...)`, `locations_conversations_participants_get(...)`, `locations_conversations_participants_list(...)`, `locations_conversations_participants_patch(...)`, `locations_conversations_participants_suggestions_suggest_articles(...)`, `locations_conversations_participants_suggestions_suggest_faq_answers(...)`, `locations_conversations_participants_suggestions_suggest_knowledge_assist(...)`, `locations_conversations_participants_suggestions_suggest_smart_replies(...)`, `locations_conversations_suggestions_search_knowledge(...)`, `locations_conversations_suggestions_suggest_conversation_summary(...)`, `locations_delete_agent(...)`, `locations_generators_create(...)`, `locations_generators_delete(...)`, `locations_generators_get(...)`, `locations_generators_list(...)`, `locations_generators_patch(...)`, `locations_get(...)`, `locations_get_agent(...)`, `locations_knowledge_bases_create(...)`, `locations_knowledge_bases_delete(...)`, `locations_knowledge_bases_documents_create(...)`, `locations_knowledge_bases_documents_delete(...)`, `locations_knowledge_bases_documents_export(...)`, `locations_knowledge_bases_documents_get(...)`, `locations_knowledge_bases_documents_import(...)`, `locations_knowledge_bases_documents_list(...)`, `locations_knowledge_bases_documents_patch(...)`, `locations_knowledge_bases_documents_reload(...)`, `locations_knowledge_bases_get(...)`, `locations_knowledge_bases_list(...)`, `locations_knowledge_bases_patch(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_set_agent(...)`, `locations_stateless_suggestion_generate(...)`, `locations_suggestions_generate_stateless_summary(...)`, `locations_suggestions_search_knowledge(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)`, `set_agent(...)`, `suggestions_generate_stateless_summary(...)` and `suggestions_search_knowledge(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -7191,6 +7957,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets knowledge assist suggestions based on historical messages.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the participant to fetch suggestions for. Format: `projects//locations//conversations//participants/`.
+    pub fn conversations_participants_suggestions_suggest_knowledge_assist(&self, request: GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest, parent: &str) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets smart replies for a participant based on specific historical messages.
     /// 
     /// # Arguments
@@ -7309,7 +8094,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `conversation` - The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
+    /// * `conversation` - Optional. The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
     pub fn conversations_suggestions_search_knowledge(&self, request: GoogleCloudDialogflowV2SearchKnowledgeRequest, conversation: &str) -> ProjectConversationSuggestionSearchKnowledgeCall<'a, S> {
         ProjectConversationSuggestionSearchKnowledgeCall {
             hub: self.hub,
@@ -7410,6 +8195,45 @@ impl<'a, S> ProjectMethods<'a, S> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a generator.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The project/location to create generator for. Format: `projects//locations/`
+    pub fn generators_create(&self, request: GoogleCloudDialogflowV2Generator, parent: &str) -> ProjectGeneratorCreateCall<'a, S> {
+        ProjectGeneratorCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _generator_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists generators.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project/location to list generators for. Format: `projects//locations/`
+    pub fn generators_list(&self, parent: &str) -> ProjectGeneratorListCall<'a, S> {
+        ProjectGeneratorListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -9291,6 +10115,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets knowledge assist suggestions based on historical messages.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the participant to fetch suggestions for. Format: `projects//locations//conversations//participants/`.
+    pub fn locations_conversations_participants_suggestions_suggest_knowledge_assist(&self, request: GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest, parent: &str) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets smart replies for a participant based on specific historical messages.
     /// 
     /// # Arguments
@@ -9409,7 +10252,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `conversation` - The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
+    /// * `conversation` - Optional. The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
     pub fn locations_conversations_suggestions_search_knowledge(&self, request: GoogleCloudDialogflowV2SearchKnowledgeRequest, conversation: &str) -> ProjectLocationConversationSuggestionSearchKnowledgeCall<'a, S> {
         ProjectLocationConversationSuggestionSearchKnowledgeCall {
             hub: self.hub,
@@ -9510,6 +10353,99 @@ impl<'a, S> ProjectMethods<'a, S> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a generator.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The project/location to create generator for. Format: `projects//locations/`
+    pub fn locations_generators_create(&self, request: GoogleCloudDialogflowV2Generator, parent: &str) -> ProjectLocationGeneratorCreateCall<'a, S> {
+        ProjectLocationGeneratorCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _generator_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a generator.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The generator resource name to delete. Format: `projects//locations//generators/`
+    pub fn locations_generators_delete(&self, name: &str) -> ProjectLocationGeneratorDeleteCall<'a, S> {
+        ProjectLocationGeneratorDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves a generator.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The generator resource name to retrieve. Format: `projects//locations/`/generators/`
+    pub fn locations_generators_get(&self, name: &str) -> ProjectLocationGeneratorGetCall<'a, S> {
+        ProjectLocationGeneratorGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists generators.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The project/location to list generators for. Format: `projects//locations/`
+    pub fn locations_generators_list(&self, parent: &str) -> ProjectLocationGeneratorListCall<'a, S> {
+        ProjectLocationGeneratorListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates a generator.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Output only. Identifier. The resource name of the generator. Format: `projects//locations//generators/`
+    pub fn locations_generators_patch(&self, request: GoogleCloudDialogflowV2Generator, name: &str) -> ProjectLocationGeneratorPatchCall<'a, S> {
+        ProjectLocationGeneratorPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -9816,6 +10752,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Generates and returns a suggestion for a conversation that does not have a resource created for it.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The parent resource to charge for the Suggestion's generation. Format: `projects//locations/`.
+    pub fn locations_stateless_suggestion_generate(&self, request: GoogleCloudDialogflowV2GenerateStatelessSuggestionRequest, parent: &str) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S> {
+        ProjectLocationStatelessSuggestionGenerateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Generates and returns a summary for a conversation that does not have a resource created for it.
     /// 
     /// # Arguments
@@ -9840,7 +10795,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
+    /// * `parent` - Required. The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
     pub fn locations_suggestions_search_knowledge(&self, request: GoogleCloudDialogflowV2SearchKnowledgeRequest, parent: &str) -> ProjectLocationSuggestionSearchKnowledgeCall<'a, S> {
         ProjectLocationSuggestionSearchKnowledgeCall {
             hub: self.hub,
@@ -10023,7 +10978,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
+    /// * `parent` - Required. The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
     pub fn suggestions_search_knowledge(&self, request: GoogleCloudDialogflowV2SearchKnowledgeRequest, parent: &str) -> ProjectSuggestionSearchKnowledgeCall<'a, S> {
         ProjectSuggestionSearchKnowledgeCall {
             hub: self.hub,
@@ -10121,7 +11076,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10413,7 +11368,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10705,7 +11660,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10997,7 +11952,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11289,7 +12244,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11581,7 +12536,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11884,7 +12839,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11982,6 +12937,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12146,7 +13102,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12249,6 +13205,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12420,7 +13377,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12533,6 +13490,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12719,7 +13677,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12729,7 +13687,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_entity_types_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .language_code("ea")
 ///              .doit().await;
 /// # }
@@ -13034,7 +13992,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13152,6 +14110,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13345,7 +14304,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13636,7 +14595,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13734,6 +14693,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13898,7 +14858,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13996,6 +14956,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14160,7 +15121,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14268,6 +15229,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14447,7 +15409,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14457,7 +15419,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_environments_users_sessions_contexts_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -14751,7 +15713,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15042,7 +16004,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15140,6 +16102,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15304,7 +16267,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15402,6 +16365,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15566,7 +16530,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15674,6 +16638,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15853,7 +16818,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15863,7 +16828,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_environments_users_sessions_entity_types_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -16156,7 +17121,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16254,6 +17219,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16419,7 +17385,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16711,7 +17677,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17014,7 +17980,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17112,6 +18078,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17276,7 +18243,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17374,6 +18341,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17538,7 +18506,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17646,6 +18614,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17824,7 +18793,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17932,6 +18901,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18111,7 +19081,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18121,7 +19091,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_environments_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .allow_load_to_draft_and_discard_changes(false)
 ///              .doit().await;
 /// # }
@@ -18427,7 +19397,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18719,7 +19689,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19011,7 +19981,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19326,7 +20296,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19424,6 +20394,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19588,7 +20559,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19696,6 +20667,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19874,7 +20846,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19992,6 +20964,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20185,7 +21158,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20195,7 +21168,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_intents_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .language_code("diam")
 ///              .intent_view("no")
 ///              .doit().await;
@@ -20513,7 +21486,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20804,7 +21777,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20902,6 +21875,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21066,7 +22040,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21164,6 +22138,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21328,7 +22303,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -21441,6 +22416,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -21627,7 +22603,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21637,7 +22613,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_knowledge_bases_documents_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -21931,7 +22907,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22223,7 +23199,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22514,7 +23490,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22617,6 +23593,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22788,7 +23765,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -22886,6 +23863,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -23050,7 +24028,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -23163,6 +24141,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -23349,7 +24328,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23359,7 +24338,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_knowledge_bases_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -23653,7 +24632,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23944,7 +24923,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24042,6 +25021,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -24206,7 +25186,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24304,6 +25284,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -24468,7 +25449,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -24576,6 +25557,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -24755,7 +25737,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24765,7 +25747,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_contexts_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -25059,7 +26041,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25350,7 +26332,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25448,6 +26430,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -25612,7 +26595,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25710,6 +26693,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -25874,7 +26858,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -25982,6 +26966,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -26161,7 +27146,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26171,7 +27156,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_sessions_entity_types_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -26464,7 +27449,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -26562,6 +27547,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -26727,7 +27713,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27019,7 +28005,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27310,7 +28296,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27408,6 +28394,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -27572,7 +28559,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27670,6 +28657,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -27834,7 +28822,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -27942,6 +28930,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -28121,7 +29110,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28131,7 +29120,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_versions_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -28425,7 +29414,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -28716,7 +29705,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -28814,6 +29803,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -28978,7 +29968,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29081,6 +30071,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -29253,7 +30244,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29545,7 +30536,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -29836,7 +30827,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -29944,6 +30935,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -30123,7 +31115,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -30415,7 +31407,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -30425,7 +31417,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().agent_update_fulfillment(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -30718,7 +31710,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -30831,6 +31823,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -31017,7 +32010,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -31027,7 +32020,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().answer_records_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -31320,7 +32313,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31418,6 +32411,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -31583,7 +32577,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -31874,7 +32868,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -31982,6 +32976,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -32160,7 +33155,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32258,6 +33253,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -32422,7 +33418,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -32530,6 +33526,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -32709,7 +33706,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -33000,7 +33997,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33098,6 +34095,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -33263,7 +34261,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -33554,7 +34552,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33652,6 +34650,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -33816,7 +34815,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -33924,6 +34923,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -34103,7 +35103,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -34395,7 +35395,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -34687,7 +35687,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -34978,7 +35978,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -35076,6 +36076,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -35240,7 +36241,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -35338,6 +36339,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -35502,7 +36504,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -35610,6 +36612,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -35789,7 +36792,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -35799,7 +36802,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().conversation_profiles_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -36093,7 +37096,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -36384,7 +37387,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -36497,6 +37500,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -36683,7 +37687,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -36975,7 +37979,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -37244,6 +38248,298 @@ where
 }
 
 
+/// Gets knowledge assist suggestions based on historical messages.
+///
+/// A builder for the *conversations.participants.suggestions.suggestKnowledgeAssist* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// use dialogflow2::api::GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().conversations_participants_suggestions_suggest_knowledge_assist(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {}
+
+impl<'a, S> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2SuggestKnowledgeAssistResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.conversations.participants.suggestions.suggestKnowledgeAssist",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/suggestions:suggestKnowledgeAssist";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the participant to fetch suggestions for. Format: `projects//locations//conversations//participants/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets smart replies for a participant based on specific historical messages.
 ///
 /// A builder for the *conversations.participants.suggestions.suggestSmartReplies* method supported by a *project* resource.
@@ -37267,7 +38563,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -37559,7 +38855,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -37851,7 +39147,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -38142,7 +39438,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -38240,6 +39536,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -38404,13 +39701,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().conversations_participants_list("parent")
-///              .page_token("At")
-///              .page_size(-4)
+///              .page_token("dolor")
+///              .page_size(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38512,6 +39809,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -38691,7 +39989,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -38701,7 +39999,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().conversations_participants_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -38995,7 +40293,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -39178,7 +40476,7 @@ where
         self._request = new_value;
         self
     }
-    /// The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
+    /// Optional. The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
     ///
     /// Sets the *conversation* path property to the given value.
     ///
@@ -39287,7 +40585,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -39579,7 +40877,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -39871,7 +41169,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -39881,7 +41179,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().conversations_create(req, "parent")
-///              .conversation_id("et")
+///              .conversation_id("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -40174,7 +41472,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -40272,6 +41570,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -40436,14 +41735,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().conversations_list("parent")
-///              .page_token("sea")
-///              .page_size(-96)
-///              .filter("sit")
+///              .page_token("consetetur")
+///              .page_size(-98)
+///              .filter("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -40549,6 +41848,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -40629,7 +41929,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// A filter expression that filters conversations listed in the response. In general, the expression must specify the field name, a comparison operator, and the value to use for filtering: - The value must be a string, a number, or a boolean. - The comparison operator must be either `=`,`!=`, `>`, or `<`. - To filter on multiple expressions, separate the expressions with `AND` or `OR` (omitting both implies `AND`). - For clarity, expressions can be enclosed in parentheses. Only `lifecycle_state` can be filtered on in this way. For example, the following expression only returns `COMPLETED` conversations: `lifecycle_state = "COMPLETED"` For more information about filtering, see [API Filtering](https://aip.dev/160).
+    /// Optional. A filter expression that filters conversations listed in the response. Only `lifecycle_state` can be filtered on in this way. For example, the following expression only returns `COMPLETED` conversations: `lifecycle_state = "COMPLETED"` For more information about filtering, see [API Filtering](https://aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectConversationListCall<'a, S> {
@@ -40712,6 +42012,597 @@ where
 }
 
 
+/// Creates a generator.
+///
+/// A builder for the *generators.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// use dialogflow2::api::GoogleCloudDialogflowV2Generator;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2Generator::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().generators_create(req, "parent")
+///              .generator_id("At")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectGeneratorCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowV2Generator,
+    _parent: String,
+    _generator_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectGeneratorCreateCall<'a, S> {}
+
+impl<'a, S> ProjectGeneratorCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2Generator)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.generators.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "generatorId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._generator_id.as_ref() {
+            params.push("generatorId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/generators";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2Generator) -> ProjectGeneratorCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project/location to create generator for. Format: `projects//locations/`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectGeneratorCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The ID to use for the generator, which will become the final component of the generator's resource name. The generator ID must be compliant with the regression fomula `a-zA-Z*` with the characters length in range of [3,64]. If the field is not provided, an Id will be auto-generated. If the field is provided, the caller is resposible for 1. the uniqueness of the ID, otherwise the request will be rejected. 2. the consistency for whether to use custom ID or not under a project to better ensure uniqueness.
+    ///
+    /// Sets the *generator id* query property to the given value.
+    pub fn generator_id(mut self, new_value: &str) -> ProjectGeneratorCreateCall<'a, S> {
+        self._generator_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGeneratorCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGeneratorCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectGeneratorCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectGeneratorCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectGeneratorCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists generators.
+///
+/// A builder for the *generators.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().generators_list("parent")
+///              .page_token("consetetur")
+///              .page_size(-62)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectGeneratorListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectGeneratorListCall<'a, S> {}
+
+impl<'a, S> ProjectGeneratorListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2ListGeneratorsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.generators.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/generators";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The project/location to list generators for. Format: `projects//locations/`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectGeneratorListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectGeneratorListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of conversation models to return in a single page. Default to 10.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectGeneratorListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGeneratorListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGeneratorListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectGeneratorListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectGeneratorListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectGeneratorListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates a new document. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: KnowledgeOperationMetadata - `response`: Document
 ///
 /// A builder for the *knowledgeBases.documents.create* method supported by a *project* resource.
@@ -40735,7 +42626,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -41026,7 +42917,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -41124,6 +43015,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -41289,7 +43181,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -41580,7 +43472,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -41678,6 +43570,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -41843,7 +43736,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -42134,14 +44027,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_documents_list("parent")
-///              .page_token("dolor")
-///              .page_size(-32)
-///              .filter("no")
+///              .page_token("accusam")
+///              .page_size(-62)
+///              .filter("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -42247,6 +44140,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -42433,7 +44327,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -42443,7 +44337,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_documents_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -42737,7 +44631,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -43029,7 +44923,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -43320,12 +45214,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_delete("name")
-///              .force(true)
+///              .force(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43423,6 +45317,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -43594,7 +45489,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -43692,6 +45587,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -43856,14 +45752,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_list("parent")
-///              .page_token("sit")
-///              .page_size(-20)
-///              .filter("sit")
+///              .page_token("dolor")
+///              .page_size(-6)
+///              .filter("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -43969,6 +45865,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -44155,7 +46052,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -44165,7 +46062,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().knowledge_bases_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -44459,7 +46356,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -44751,7 +46648,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -45043,7 +46940,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -45335,7 +47232,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -45627,7 +47524,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -45919,7 +47816,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -45929,7 +47826,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_entity_types_create(req, "parent")
-///              .language_code("no")
+///              .language_code("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -46222,7 +48119,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -46320,6 +48217,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -46484,12 +48382,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_entity_types_get("name")
-///              .language_code("kasd")
+///              .language_code("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -46587,6 +48485,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -46758,14 +48657,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_entity_types_list("parent")
-///              .page_token("sanctus")
-///              .page_size(-91)
-///              .language_code("rebum.")
+///              .page_token("amet.")
+///              .page_size(-84)
+///              .language_code("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -46871,6 +48770,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -47057,7 +48957,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -47067,8 +48967,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_entity_types_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .language_code("dolore")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .language_code("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -47372,14 +49272,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_intents_list("parent")
-///              .page_token("amet.")
-///              .page_size(-84)
-///              .language_code("amet")
+///              .page_token("vero")
+///              .page_size(-20)
+///              .language_code("sadipscing")
 ///              .intent_view("ut")
 ///              .doit().await;
 /// # }
@@ -47490,6 +49390,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -47683,7 +49584,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -47974,7 +49875,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -48072,6 +49973,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -48236,7 +50138,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -48334,6 +50236,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -48498,13 +50401,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_users_sessions_contexts_list("parent")
-///              .page_token("sadipscing")
-///              .page_size(-87)
+///              .page_token("tempor")
+///              .page_size(-10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -48606,6 +50509,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -48785,7 +50689,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -48795,7 +50699,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_users_sessions_contexts_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -49089,7 +50993,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -49380,7 +51284,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -49478,6 +51382,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -49642,7 +51547,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -49740,6 +51645,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -49904,13 +51810,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_users_sessions_entity_types_list("parent")
-///              .page_token("sea")
-///              .page_size(-74)
+///              .page_token("At")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -50012,6 +51918,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -50191,7 +52098,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -50201,7 +52108,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_users_sessions_entity_types_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -50494,7 +52401,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -50592,6 +52499,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -50757,7 +52665,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -51049,7 +52957,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -51059,7 +52967,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_create(req, "parent")
-///              .environment_id("At")
+///              .environment_id("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -51352,7 +53260,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -51450,6 +53358,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -51614,7 +53523,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -51712,6 +53621,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -51876,13 +53786,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_get_history("parent")
-///              .page_token("aliquyam")
-///              .page_size(-37)
+///              .page_token("consetetur")
+///              .page_size(-19)
 ///              .doit().await;
 /// # }
 /// ```
@@ -51984,6 +53894,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -52162,13 +54073,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_list("parent")
-///              .page_token("vero")
-///              .page_size(-16)
+///              .page_token("invidunt")
+///              .page_size(-64)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52270,6 +54181,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -52449,7 +54361,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -52459,7 +54371,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_environments_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .allow_load_to_draft_and_discard_changes(false)
 ///              .doit().await;
 /// # }
@@ -52765,7 +54677,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -53057,7 +54969,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -53349,7 +55261,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -53359,8 +55271,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_create(req, "parent")
-///              .language_code("clita")
-///              .intent_view("dolor")
+///              .language_code("et")
+///              .intent_view("sanctus")
 ///              .doit().await;
 /// # }
 /// ```
@@ -53664,7 +55576,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -53762,6 +55674,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -53926,13 +55839,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_get("name")
-///              .language_code("diam")
-///              .intent_view("nonumy")
+///              .language_code("sed")
+///              .intent_view("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -54034,6 +55947,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -54212,15 +56126,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_list("parent")
-///              .page_token("sanctus")
-///              .page_size(-23)
-///              .language_code("tempor")
-///              .intent_view("sed")
+///              .page_token("dolor")
+///              .page_size(-79)
+///              .language_code("At")
+///              .intent_view("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -54330,6 +56244,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -54523,7 +56438,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -54533,9 +56448,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_intents_patch(req, "name")
-///              .update_mask(&Default::default())
-///              .language_code("takimata")
-///              .intent_view("dolor")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .language_code("ipsum")
+///              .intent_view("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -54851,7 +56766,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -55142,7 +57057,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -55240,6 +57155,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -55404,7 +57320,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -55502,6 +57418,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -55666,13 +57583,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_sessions_contexts_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-73)
+///              .page_token("sadipscing")
+///              .page_size(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55774,6 +57691,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -55953,7 +57871,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -55963,7 +57881,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_sessions_contexts_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -56257,7 +58175,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -56548,7 +58466,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -56646,6 +58564,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -56810,7 +58729,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -56908,6 +58827,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -57072,13 +58992,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_sessions_entity_types_list("parent")
-///              .page_token("diam")
-///              .page_size(-10)
+///              .page_token("no")
+///              .page_size(-98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -57180,6 +59100,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -57359,7 +59280,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -57369,7 +59290,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_sessions_entity_types_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -57662,7 +59583,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -57760,6 +59681,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -57925,7 +59847,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -58217,7 +60139,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -58508,7 +60430,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -58606,6 +60528,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -58770,7 +60693,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -58868,6 +60791,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -59032,13 +60956,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_versions_list("parent")
-///              .page_token("amet")
-///              .page_size(-56)
+///              .page_token("sea")
+///              .page_size(-100)
 ///              .doit().await;
 /// # }
 /// ```
@@ -59140,6 +61064,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -59319,7 +61244,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -59329,7 +61254,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_versions_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -59623,7 +61548,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -59914,7 +61839,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -60012,6 +61937,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -60176,12 +62102,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_get_validation_result("parent")
-///              .language_code("sea")
+///              .language_code("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -60279,6 +62205,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -60451,7 +62378,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -60743,7 +62670,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -61034,13 +62961,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_search("parent")
-///              .page_token("ea")
-///              .page_size(-77)
+///              .page_token("nonumy")
+///              .page_size(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -61142,6 +63069,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -61321,7 +63249,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -61613,7 +63541,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -61623,7 +63551,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agent_update_fulfillment(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -61916,14 +63844,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_answer_records_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-91)
-///              .filter("erat")
+///              .page_token("voluptua.")
+///              .page_size(-25)
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -62029,6 +63957,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -62215,7 +64144,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -62225,7 +64154,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_answer_records_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -62519,7 +64448,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -62810,7 +64739,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -62908,6 +64837,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -63072,7 +65002,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -63170,6 +65100,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -63335,7 +65266,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -63626,13 +65557,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversation_datasets_list("parent")
-///              .page_token("elitr")
-///              .page_size(-46)
+///              .page_token("erat")
+///              .page_size(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -63734,6 +65665,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -63913,7 +65845,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -64204,7 +66136,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -64302,6 +66234,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -64466,13 +66399,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversation_models_evaluations_list("parent")
-///              .page_token("takimata")
-///              .page_size(-31)
+///              .page_token("diam")
+///              .page_size(-92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -64574,6 +66507,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -64753,7 +66687,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -65044,7 +66978,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -65142,6 +67076,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -65307,7 +67242,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -65598,7 +67533,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -65696,6 +67631,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -65860,13 +67796,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversation_models_list("parent")
-///              .page_token("diam")
-///              .page_size(-93)
+///              .page_token("ea")
+///              .page_size(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -65968,6 +67904,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -66147,7 +68084,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -66439,7 +68376,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -66731,7 +68668,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -67022,7 +68959,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -67120,6 +69057,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -67284,7 +69222,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -67382,6 +69320,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -67546,13 +69485,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversation_profiles_list("parent")
-///              .page_token("sit")
-///              .page_size(-98)
+///              .page_token("aliquyam")
+///              .page_size(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -67654,6 +69593,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -67833,7 +69773,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -67843,7 +69783,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversation_profiles_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -68137,7 +70077,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -68428,14 +70368,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversations_messages_list("parent")
-///              .page_token("elitr")
-///              .page_size(-32)
-///              .filter("erat")
+///              .page_token("rebum.")
+///              .page_size(-35)
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -68541,6 +70481,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -68727,7 +70668,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -69019,7 +70960,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -69288,6 +71229,298 @@ where
 }
 
 
+/// Gets knowledge assist suggestions based on historical messages.
+///
+/// A builder for the *locations.conversations.participants.suggestions.suggestKnowledgeAssist* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// use dialogflow2::api::GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_conversations_participants_suggestions_suggest_knowledge_assist(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {}
+
+impl<'a, S> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2SuggestKnowledgeAssistResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.conversations.participants.suggestions.suggestKnowledgeAssist",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/suggestions:suggestKnowledgeAssist";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2SuggestKnowledgeAssistRequest) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the participant to fetch suggestions for. Format: `projects//locations//conversations//participants/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationConversationParticipantSuggestionSuggestKnowledgeAssistCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets smart replies for a participant based on specific historical messages.
 ///
 /// A builder for the *locations.conversations.participants.suggestions.suggestSmartReplies* method supported by a *project* resource.
@@ -69311,7 +71544,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -69603,7 +71836,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -69895,7 +72128,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -70186,7 +72419,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -70284,6 +72517,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -70448,13 +72682,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversations_participants_list("parent")
-///              .page_token("aliquyam")
-///              .page_size(-13)
+///              .page_token("amet")
+///              .page_size(-3)
 ///              .doit().await;
 /// # }
 /// ```
@@ -70556,6 +72790,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -70735,7 +72970,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -70745,7 +72980,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversations_participants_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -71039,7 +73274,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -71222,7 +73457,7 @@ where
         self._request = new_value;
         self
     }
-    /// The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
+    /// Optional. The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`.
     ///
     /// Sets the *conversation* path property to the given value.
     ///
@@ -71331,7 +73566,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -71623,7 +73858,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -71915,7 +74150,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -71925,7 +74160,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversations_create(req, "parent")
-///              .conversation_id("amet")
+///              .conversation_id("elitr")
 ///              .doit().await;
 /// # }
 /// ```
@@ -72218,7 +74453,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -72316,6 +74551,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -72480,14 +74716,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_conversations_list("parent")
-///              .page_token("sea")
-///              .page_size(-100)
-///              .filter("ipsum")
+///              .page_token("sadipscing")
+///              .page_size(-4)
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -72593,6 +74829,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -72673,7 +74910,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// A filter expression that filters conversations listed in the response. In general, the expression must specify the field name, a comparison operator, and the value to use for filtering: - The value must be a string, a number, or a boolean. - The comparison operator must be either `=`,`!=`, `>`, or `<`. - To filter on multiple expressions, separate the expressions with `AND` or `OR` (omitting both implies `AND`). - For clarity, expressions can be enclosed in parentheses. Only `lifecycle_state` can be filtered on in this way. For example, the following expression only returns `COMPLETED` conversations: `lifecycle_state = "COMPLETED"` For more information about filtering, see [API Filtering](https://aip.dev/160).
+    /// Optional. A filter expression that filters conversations listed in the response. Only `lifecycle_state` can be filtered on in this way. For example, the following expression only returns `COMPLETED` conversations: `lifecycle_state = "COMPLETED"` For more information about filtering, see [API Filtering](https://aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationConversationListCall<'a, S> {
@@ -72756,6 +74993,1427 @@ where
 }
 
 
+/// Creates a generator.
+///
+/// A builder for the *locations.generators.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// use dialogflow2::api::GoogleCloudDialogflowV2Generator;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2Generator::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_generators_create(req, "parent")
+///              .generator_id("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGeneratorCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowV2Generator,
+    _parent: String,
+    _generator_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGeneratorCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGeneratorCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2Generator)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.generators.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "generatorId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._generator_id.as_ref() {
+            params.push("generatorId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/generators";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2Generator) -> ProjectLocationGeneratorCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project/location to create generator for. Format: `projects//locations/`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGeneratorCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The ID to use for the generator, which will become the final component of the generator's resource name. The generator ID must be compliant with the regression fomula `a-zA-Z*` with the characters length in range of [3,64]. If the field is not provided, an Id will be auto-generated. If the field is provided, the caller is resposible for 1. the uniqueness of the ID, otherwise the request will be rejected. 2. the consistency for whether to use custom ID or not under a project to better ensure uniqueness.
+    ///
+    /// Sets the *generator id* query property to the given value.
+    pub fn generator_id(mut self, new_value: &str) -> ProjectLocationGeneratorCreateCall<'a, S> {
+        self._generator_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGeneratorCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGeneratorCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGeneratorCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGeneratorCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGeneratorCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes a generator.
+///
+/// A builder for the *locations.generators.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_generators_delete("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGeneratorDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGeneratorDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGeneratorDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.generators.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The generator resource name to delete. Format: `projects//locations//generators/`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGeneratorDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGeneratorDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGeneratorDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGeneratorDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGeneratorDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGeneratorDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Retrieves a generator.
+///
+/// A builder for the *locations.generators.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_generators_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGeneratorGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGeneratorGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGeneratorGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2Generator)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.generators.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The generator resource name to retrieve. Format: `projects//locations/`/generators/`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGeneratorGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGeneratorGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGeneratorGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGeneratorGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGeneratorGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGeneratorGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists generators.
+///
+/// A builder for the *locations.generators.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_generators_list("parent")
+///              .page_token("diam")
+///              .page_size(-100)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGeneratorListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGeneratorListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGeneratorListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2ListGeneratorsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.generators.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/generators";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The project/location to list generators for. Format: `projects//locations/`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGeneratorListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGeneratorListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of conversation models to return in a single page. Default to 10.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGeneratorListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGeneratorListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGeneratorListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGeneratorListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGeneratorListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGeneratorListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates a generator.
+///
+/// A builder for the *locations.generators.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// use dialogflow2::api::GoogleCloudDialogflowV2Generator;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2Generator::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_generators_patch(req, "name")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGeneratorPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowV2Generator,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGeneratorPatchCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGeneratorPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2Generator)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.generators.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2Generator) -> ProjectLocationGeneratorPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Output only. Identifier. The resource name of the generator. Format: `projects//locations//generators/`
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGeneratorPatchCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The list of fields to update.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationGeneratorPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGeneratorPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGeneratorPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGeneratorPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGeneratorPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGeneratorPatchCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates a new document. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: KnowledgeOperationMetadata - `response`: Document
 ///
 /// A builder for the *locations.knowledgeBases.documents.create* method supported by a *project* resource.
@@ -72779,7 +76437,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -73070,7 +76728,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -73168,6 +76826,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -73333,7 +76992,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -73624,7 +77283,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -73722,6 +77381,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -73887,7 +77547,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -74178,14 +77838,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_knowledge_bases_documents_list("parent")
-///              .page_token("dolor")
-///              .page_size(-46)
-///              .filter("et")
+///              .page_token("eirmod")
+///              .page_size(-31)
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -74291,6 +77951,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -74477,7 +78138,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -74487,7 +78148,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_knowledge_bases_documents_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -74781,7 +78442,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -75073,7 +78734,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -75364,7 +79025,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -75467,6 +79128,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -75638,7 +79300,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -75736,6 +79398,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -75900,14 +79563,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_knowledge_bases_list("parent")
 ///              .page_token("voluptua.")
-///              .page_size(-77)
-///              .filter("diam")
+///              .page_size(-46)
+///              .filter("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -76013,6 +79676,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -76199,7 +79863,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -76209,7 +79873,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_knowledge_bases_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -76502,7 +80166,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -76600,6 +80264,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -76764,7 +80429,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -76862,6 +80527,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -77026,14 +80692,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("duo")
-///              .page_size(-35)
-///              .filter("erat")
+///              .page_token("gubergren")
+///              .page_size(-88)
+///              .filter("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -77139,6 +80805,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -77302,6 +80969,298 @@ where
 }
 
 
+/// Generates and returns a suggestion for a conversation that does not have a resource created for it.
+///
+/// A builder for the *locations.statelessSuggestion.generate* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow2 as dialogflow2;
+/// use dialogflow2::api::GoogleCloudDialogflowV2GenerateStatelessSuggestionRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow2::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowV2GenerateStatelessSuggestionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_stateless_suggestion_generate(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationStatelessSuggestionGenerateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowV2GenerateStatelessSuggestionRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationStatelessSuggestionGenerateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationStatelessSuggestionGenerateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowV2GenerateStatelessSuggestionResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.statelessSuggestion.generate",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v2/{+parent}/statelessSuggestion:generate";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowV2GenerateStatelessSuggestionRequest) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The parent resource to charge for the Suggestion's generation. Format: `projects//locations/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationStatelessSuggestionGenerateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Generates and returns a summary for a conversation that does not have a resource created for it.
 ///
 /// A builder for the *locations.suggestions.generateStatelessSummary* method supported by a *project* resource.
@@ -77325,7 +81284,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -77617,7 +81576,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -77800,7 +81759,7 @@ where
         self._request = new_value;
         self
     }
-    /// The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
+    /// Required. The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -77908,7 +81867,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -78006,6 +81965,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -78170,7 +82130,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -78268,6 +82228,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -78432,7 +82393,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -78530,6 +82491,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -78694,14 +82656,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("voluptua.")
-///              .page_size(-46)
-///              .filter("dolor")
+///              .page_token("sea")
+///              .page_size(-98)
+///              .filter("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -78807,6 +82769,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -78993,7 +82956,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -79003,7 +82966,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_set_agent(req, "parent")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -79296,7 +83259,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -79394,6 +83357,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -79558,7 +83522,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -79656,6 +83620,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -79820,14 +83785,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
 ///              .page_token("gubergren")
-///              .page_size(-88)
-///              .filter("sea")
+///              .page_size(-74)
+///              .filter("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -79933,6 +83898,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -80119,7 +84085,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -80411,7 +84377,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -80594,7 +84560,7 @@ where
         self._request = new_value;
         self
     }
-    /// The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
+    /// Required. The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -80702,7 +84668,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -80800,6 +84766,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -80964,7 +84931,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -81062,6 +85029,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -81227,7 +85195,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -81237,7 +85205,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().set_agent(req, "parent")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```

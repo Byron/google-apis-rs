@@ -74,12 +74,20 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.hours" => Some(("dailyRecurrence.time.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.minutes" => Some(("dailyRecurrence.time.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.nanos" => Some(("dailyRecurrence.time.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.seconds" => Some(("dailyRecurrence.time.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention" => Some(("retention", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "weekly-recurrence.day" => Some(("weeklyRecurrence.day", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.hours" => Some(("weeklyRecurrence.time.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.minutes" => Some(("weeklyRecurrence.time.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.nanos" => Some(("weeklyRecurrence.time.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.seconds" => Some(("weeklyRecurrence.time.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "day", "name", "retention", "update-time", "weekly-recurrence"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "daily-recurrence", "day", "hours", "minutes", "name", "nanos", "retention", "seconds", "time", "update-time", "weekly-recurrence"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -319,12 +327,20 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.hours" => Some(("dailyRecurrence.time.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.minutes" => Some(("dailyRecurrence.time.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.nanos" => Some(("dailyRecurrence.time.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "daily-recurrence.time.seconds" => Some(("dailyRecurrence.time.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention" => Some(("retention", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "weekly-recurrence.day" => Some(("weeklyRecurrence.day", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.hours" => Some(("weeklyRecurrence.time.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.minutes" => Some(("weeklyRecurrence.time.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.nanos" => Some(("weeklyRecurrence.time.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "weekly-recurrence.time.seconds" => Some(("weeklyRecurrence.time.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "day", "name", "retention", "update-time", "weekly-recurrence"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "daily-recurrence", "day", "hours", "minutes", "name", "nanos", "retention", "seconds", "time", "update-time", "weekly-recurrence"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -355,6 +371,92 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_databases_bulk_delete_documents(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "collection-ids" => Some(("collectionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "namespace-ids" => Some(("namespaceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["collection-ids", "namespace-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1BulkDeleteDocumentsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().databases_bulk_delete_documents(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -873,21 +975,25 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "app-engine-integration-mode" => Some(("appEngineIntegrationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cmek-config.active-key-version" => Some(("cmekConfig.activeKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cmek-config.kms-key-name" => Some(("cmekConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "concurrency-mode" => Some(("concurrencyMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delete-protection-state" => Some(("deleteProtectionState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "earliest-version-time" => Some(("earliestVersionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "key-prefix" => Some(("keyPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "point-in-time-recovery-enablement" => Some(("pointInTimeRecoveryEnablement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "previous-id" => Some(("previousId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-retention-period" => Some(("versionRetentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-integration-mode", "concurrency-mode", "create-time", "delete-protection-state", "earliest-version-time", "etag", "key-prefix", "location-id", "name", "point-in-time-recovery-enablement", "type", "uid", "update-time", "version-retention-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "app-engine-integration-mode", "cmek-config", "concurrency-mode", "create-time", "delete-protection-state", "delete-time", "earliest-version-time", "etag", "key-prefix", "kms-key-name", "location-id", "name", "point-in-time-recovery-enablement", "previous-id", "type", "uid", "update-time", "version-retention-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1831,6 +1937,19 @@ where
                     "add-target.once" => Some(("addTarget.once", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.parent" => Some(("addTarget.query.parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.end-at.before" => Some(("addTarget.query.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.distance-measure" => Some(("addTarget.query.structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.limit" => Some(("addTarget.query.structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.boolean-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.bytes-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.double-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.integer-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.null-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.reference-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.referenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.string-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.query-vector.timestamp-value" => Some(("addTarget.query.structuredQuery.findNearest.queryVector.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.find-nearest.vector-field.field-path" => Some(("addTarget.query.structuredQuery.findNearest.vectorField.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.limit" => Some(("addTarget.query.structuredQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.offset" => Some(("addTarget.query.structuredQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.start-at.before" => Some(("addTarget.query.structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1855,7 +1974,7 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "remove-target" => Some(("removeTarget", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "documents", "double-value", "end-at", "expected-count", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "documents", "double-value", "end-at", "expected-count", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "query-vector", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1943,6 +2062,19 @@ where
                     "partition-count" => Some(("partitionCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.end-at.before" => Some(("structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.distance-measure" => Some(("structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.limit" => Some(("structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.boolean-value" => Some(("structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.bytes-value" => Some(("structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.double-value" => Some(("structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.integer-value" => Some(("structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.null-value" => Some(("structuredQuery.findNearest.queryVector.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.reference-value" => Some(("structuredQuery.findNearest.queryVector.referenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.string-value" => Some(("structuredQuery.findNearest.queryVector.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.timestamp-value" => Some(("structuredQuery.findNearest.queryVector.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.vector-field.field-path" => Some(("structuredQuery.findNearest.vectorField.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.limit" => Some(("structuredQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-query.offset" => Some(("structuredQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-query.start-at.before" => Some(("structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1962,7 +2094,7 @@ where
                     "structured-query.where.unary-filter.field.field-path" => Some(("structuredQuery.where.unaryFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.unary-filter.op" => Some(("structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["before", "boolean-value", "bytes-value", "composite-filter", "double-value", "end-at", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "null-value", "offset", "op", "page-size", "page-token", "partition-count", "read-time", "reference-value", "start-at", "string-value", "structured-query", "timestamp-value", "unary-filter", "value", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "double-value", "end-at", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "null-value", "offset", "op", "page-size", "page-token", "partition-count", "query-vector", "read-time", "reference-value", "start-at", "string-value", "structured-query", "timestamp-value", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2230,10 +2362,24 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "explain-options.analyze" => Some(("explainOptions.analyze", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "new-transaction.read-only.read-time" => Some(("newTransaction.readOnly.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "new-transaction.read-write.retry-transaction" => Some(("newTransaction.readWrite.retryTransaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.end-at.before" => Some(("structuredAggregationQuery.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.distance-measure" => Some(("structuredAggregationQuery.structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.limit" => Some(("structuredAggregationQuery.structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.boolean-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.bytes-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.double-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.integer-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.null-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.reference-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.referenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.string-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.query-vector.timestamp-value" => Some(("structuredAggregationQuery.structuredQuery.findNearest.queryVector.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-aggregation-query.structured-query.find-nearest.vector-field.field-path" => Some(("structuredAggregationQuery.structuredQuery.findNearest.vectorField.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.limit" => Some(("structuredAggregationQuery.structuredQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.offset" => Some(("structuredAggregationQuery.structuredQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-aggregation-query.structured-query.start-at.before" => Some(("structuredAggregationQuery.structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2254,7 +2400,7 @@ where
                     "structured-aggregation-query.structured-query.where.unary-filter.op" => Some(("structuredAggregationQuery.structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["before", "boolean-value", "bytes-value", "composite-filter", "double-value", "end-at", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "new-transaction", "null-value", "offset", "op", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-aggregation-query", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "double-value", "end-at", "explain-options", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "new-transaction", "null-value", "offset", "op", "query-vector", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-aggregation-query", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2337,10 +2483,24 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "explain-options.analyze" => Some(("explainOptions.analyze", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "new-transaction.read-only.read-time" => Some(("newTransaction.readOnly.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "new-transaction.read-write.retry-transaction" => Some(("newTransaction.readWrite.retryTransaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-time" => Some(("readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.end-at.before" => Some(("structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.distance-measure" => Some(("structuredQuery.findNearest.distanceMeasure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.limit" => Some(("structuredQuery.findNearest.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.boolean-value" => Some(("structuredQuery.findNearest.queryVector.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.bytes-value" => Some(("structuredQuery.findNearest.queryVector.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.double-value" => Some(("structuredQuery.findNearest.queryVector.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.geo-point-value.latitude" => Some(("structuredQuery.findNearest.queryVector.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.geo-point-value.longitude" => Some(("structuredQuery.findNearest.queryVector.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.integer-value" => Some(("structuredQuery.findNearest.queryVector.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.null-value" => Some(("structuredQuery.findNearest.queryVector.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.reference-value" => Some(("structuredQuery.findNearest.queryVector.referenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.string-value" => Some(("structuredQuery.findNearest.queryVector.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.query-vector.timestamp-value" => Some(("structuredQuery.findNearest.queryVector.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.find-nearest.vector-field.field-path" => Some(("structuredQuery.findNearest.vectorField.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.limit" => Some(("structuredQuery.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-query.offset" => Some(("structuredQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "structured-query.start-at.before" => Some(("structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2361,7 +2521,7 @@ where
                     "structured-query.where.unary-filter.op" => Some(("structuredQuery.where.unaryFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["before", "boolean-value", "bytes-value", "composite-filter", "double-value", "end-at", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "new-transaction", "null-value", "offset", "op", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "where"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze", "before", "boolean-value", "bytes-value", "composite-filter", "distance-measure", "double-value", "end-at", "explain-options", "field", "field-filter", "field-path", "find-nearest", "geo-point-value", "integer-value", "latitude", "limit", "longitude", "new-transaction", "null-value", "offset", "op", "query-vector", "read-only", "read-time", "read-write", "reference-value", "retry-transaction", "start-at", "string-value", "structured-query", "timestamp-value", "transaction", "unary-filter", "value", "vector-field", "where"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2741,6 +2901,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "show-deleted" => {
+                    call = call.show_deleted(        value.map(|v| arg_from_str(v, err, "show-deleted", "boolean")).unwrap_or(false));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2754,6 +2917,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["show-deleted"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3061,21 +3225,25 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "app-engine-integration-mode" => Some(("appEngineIntegrationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cmek-config.active-key-version" => Some(("cmekConfig.activeKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cmek-config.kms-key-name" => Some(("cmekConfig.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "concurrency-mode" => Some(("concurrencyMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delete-protection-state" => Some(("deleteProtectionState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "earliest-version-time" => Some(("earliestVersionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "key-prefix" => Some(("keyPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "point-in-time-recovery-enablement" => Some(("pointInTimeRecoveryEnablement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "previous-id" => Some(("previousId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-retention-period" => Some(("versionRetentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-integration-mode", "concurrency-mode", "create-time", "delete-protection-state", "earliest-version-time", "etag", "key-prefix", "location-id", "name", "point-in-time-recovery-enablement", "type", "uid", "update-time", "version-retention-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "app-engine-integration-mode", "cmek-config", "concurrency-mode", "create-time", "delete-protection-state", "delete-time", "earliest-version-time", "etag", "key-prefix", "kms-key-name", "location-id", "name", "point-in-time-recovery-enablement", "previous-id", "type", "uid", "update-time", "version-retention-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3164,10 +3332,9 @@ where
                 match &temp_cursor.to_string()[..] {
                     "backup" => Some(("backup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database-id" => Some(("databaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "database-snapshot.database" => Some(("databaseSnapshot.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "database-snapshot.snapshot-time" => Some(("databaseSnapshot.snapshotTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup", "database", "database-id", "database-snapshot", "snapshot-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup", "database-id", "kms-key-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3519,6 +3686,9 @@ where
                     ("databases-backup-schedules-patch", Some(opt)) => {
                         call_result = self._projects_databases_backup_schedules_patch(opt, dry_run, &mut err).await;
                     },
+                    ("databases-bulk-delete-documents", Some(opt)) => {
+                        call_result = self._projects_databases_bulk_delete_documents(opt, dry_run, &mut err).await;
+                    },
                     ("databases-collection-groups-fields-get", Some(opt)) => {
                         call_result = self._projects_databases_collection_groups_fields_get(opt, dry_run, &mut err).await;
                     },
@@ -3721,9 +3891,9 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'databases-backup-schedules-create', 'databases-backup-schedules-delete', 'databases-backup-schedules-get', 'databases-backup-schedules-list', 'databases-backup-schedules-patch', 'databases-collection-groups-fields-get', 'databases-collection-groups-fields-list', 'databases-collection-groups-fields-patch', 'databases-collection-groups-indexes-create', 'databases-collection-groups-indexes-delete', 'databases-collection-groups-indexes-get', 'databases-collection-groups-indexes-list', 'databases-create', 'databases-delete', 'databases-documents-batch-get', 'databases-documents-batch-write', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-list-documents', 'databases-documents-listen', 'databases-documents-partition-query', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-aggregation-query', 'databases-documents-run-query', 'databases-documents-write', 'databases-export-documents', 'databases-get', 'databases-import-documents', 'databases-list', 'databases-operations-cancel', 'databases-operations-delete', 'databases-operations-get', 'databases-operations-list', 'databases-patch', 'databases-restore', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-get' and 'locations-list'", vec![
+        ("projects", "methods: 'databases-backup-schedules-create', 'databases-backup-schedules-delete', 'databases-backup-schedules-get', 'databases-backup-schedules-list', 'databases-backup-schedules-patch', 'databases-bulk-delete-documents', 'databases-collection-groups-fields-get', 'databases-collection-groups-fields-list', 'databases-collection-groups-fields-patch', 'databases-collection-groups-indexes-create', 'databases-collection-groups-indexes-delete', 'databases-collection-groups-indexes-get', 'databases-collection-groups-indexes-list', 'databases-create', 'databases-delete', 'databases-documents-batch-get', 'databases-documents-batch-write', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-list-documents', 'databases-documents-listen', 'databases-documents-partition-query', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-aggregation-query', 'databases-documents-run-query', 'databases-documents-write', 'databases-export-documents', 'databases-get', 'databases-import-documents', 'databases-list', 'databases-operations-cancel', 'databases-operations-delete', 'databases-operations-get', 'databases-operations-list', 'databases-patch', 'databases-restore', 'locations-backups-delete', 'locations-backups-get', 'locations-backups-list', 'locations-get' and 'locations-list'", vec![
             ("databases-backup-schedules-create",
-                    Some(r##"Creates a backup schedule on a database. At most two backup schedules can be configured on a database, one daily backup schedule with retention up to 7 days and one weekly backup schedule with retention up to 14 weeks."##),
+                    Some(r##"Creates a backup schedule on a database. At most two backup schedules can be configured on a database, one daily backup schedule and one weekly backup schedule."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-backup-schedules-create",
                   vec![
                     (Some(r##"parent"##),
@@ -3756,7 +3926,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of backup schedule. Format `projects/{project}/databases/{database}/backupSchedules/{backup_schedule}`"##),
+                     Some(r##"Required. The name of the backup schedule. Format `projects/{project}/databases/{database}/backupSchedules/{backup_schedule}`"##),
                      Some(true),
                      Some(false)),
         
@@ -3844,6 +4014,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("databases-bulk-delete-documents",
+                    Some(r##"Bulk deletes a subset of documents from Google Cloud Firestore. Documents created or updated after the underlying system starts to process the request will not be deleted. The bulk delete occurs in the background and its progress can be monitored and managed via the Operation resource that is created. For more details on bulk delete behavior, refer to: https://cloud.google.com/firestore/docs/manage-data/bulk-delete"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-bulk-delete-documents",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Database to operate. Should be of the form: `projects/{project_id}/databases/{database_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("databases-collection-groups-fields-get",
                     Some(r##"Gets the metadata and configuration for a Field."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firestore1_cli/projects_databases-collection-groups-fields-get",
@@ -3894,7 +4092,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. A field name of the form `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_path}` A field path may be a simple field name, e.g. `address` or a path to fields within map_value , e.g. `address.city`, or a special field path. The only valid special field is `*`, which represents any field. Field paths may be quoted using ` (backtick). The only character that needs to be escaped within a quoted field path is the backtick character itself, escaped using a backslash. Special characters in field paths that must be quoted include: `*`, `.`, ``` (backtick), `[`, `]`, as well as any ascii symbolic characters. Examples: (Note: Comments here are written in markdown syntax, so there is an additional layer of backticks to represent a code block) `\`address.city\`` represents a field named `address.city`, not the map key `city` in the field `address`. `\`*\`` represents a field named `*`, not any field. A special `Field` contains the default indexing settings for all fields. This field's resource name is: `projects/{project_id}/databases/{database_id}/collectionGroups/__default__/fields/*` Indexes defined on this `Field` will be applied to all fields which do not have their own `Field` index configuration."##),
+                     Some(r##"Required. A field name of the form: `projects/{project_id}/databases/{database_id}/collectionGroups/{collection_id}/fields/{field_path}` A field path can be a simple field name, e.g. `address` or a path to fields within `map_value` , e.g. `address.city`, or a special field path. The only valid special field is `*`, which represents any field. Field paths can be quoted using `` ` `` (backtick). The only character that must be escaped within a quoted field path is the backtick character itself, escaped using a backslash. Special characters in field paths that must be quoted include: `*`, `.`, `` ` `` (backtick), `[`, `]`, as well as any ascii symbolic characters. Examples: `` `address.city` `` represents a field named `address.city`, not the map key `city` in the field `address`. `` `*` `` represents a field named `*`, not any field. A special `Field` contains the default indexing settings for all fields. This field's resource name is: `projects/{project_id}/databases/{database_id}/collectionGroups/__default__/fields/*` Indexes defined on this `Field` will be applied to all fields which do not have their own `Field` index configuration."##),
                      Some(true),
                      Some(false)),
         
@@ -4896,7 +5094,7 @@ async fn main() {
     
     let mut app = App::new("firestore1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240226")
+           .version("5.0.5+20240617")
            .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_cli")
            .arg(Arg::with_name("url")
@@ -4960,6 +5158,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dlp2-cli"
-version = "5.0.4+20240225"
+version = "5.0.5+20240616"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DLP (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dlp2-cli"
@@ -21,13 +21,13 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "^ 1.0"
-hyper-rustls = "0.24.0"
+hyper-rustls = "0.25.0"
 mime = "^ 0.3.0"
 serde = { version = "^ 1.0", features = ["derive"] }
+utoipa = { version = "^4.2", optional = true }
 serde_json = "^ 1.0"
-itertools = "^ 0.10"
+itertools = "0.13"
 google-clis-common = { path = "../../google-clis-common", version = "6.0" }
-strsim = "^0.5"
 clap = "^2.0"
 http = "^0.2"
 hyper = { version = "0.14", features = ["full"] }
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-dlp2]
 path = "../dlp2"
-version = "5.0.4+20240225"
+version = "5.0.5+20240616"
 

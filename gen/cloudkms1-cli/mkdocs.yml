@@ -1,4 +1,4 @@
-site_name: Cloud KMS v5.0.4+20240219
+site_name: Cloud KMS v5.0.5+20240621
 site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
 site_description: A complete library to interact with Cloud KMS (protocol v1)
 
@@ -9,6 +9,9 @@ site_dir: build_html
 
 nav:
 - Home: 'index.md'
+- 'Folders':
+    - 'Get Autokey Config': 'folders_get-autokey-config.md'
+    - 'Update Autokey Config': 'folders_update-autokey-config.md'
 - 'Projects':
     - 'Locations Ekm Config Get Iam Policy': 'projects_locations-ekm-config-get-iam-policy.md'
     - 'Locations Ekm Config Set Iam Policy': 'projects_locations-ekm-config-set-iam-policy.md'
@@ -24,6 +27,9 @@ nav:
     - 'Locations Generate Random Bytes': 'projects_locations-generate-random-bytes.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Get Ekm Config': 'projects_locations-get-ekm-config.md'
+    - 'Locations Key Handles Create': 'projects_locations-key-handles-create.md'
+    - 'Locations Key Handles Get': 'projects_locations-key-handles-get.md'
+    - 'Locations Key Handles List': 'projects_locations-key-handles-list.md'
     - 'Locations Key Rings Create': 'projects_locations-key-rings-create.md'
     - 'Locations Key Rings Crypto Keys Create': 'projects_locations-key-rings-crypto-keys-create.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Decrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt.md'
@@ -61,9 +67,11 @@ nav:
     - 'Locations Key Rings Set Iam Policy': 'projects_locations-key-rings-set-iam-policy.md'
     - 'Locations Key Rings Test Iam Permissions': 'projects_locations-key-rings-test-iam-permissions.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Update Ekm Config': 'projects_locations-update-ekm-config.md'
+    - 'Show Effective Autokey Config': 'projects_show-effective-autokey-config.md'
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

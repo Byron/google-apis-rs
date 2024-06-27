@@ -62,6 +62,9 @@ where
                 "sort" => {
                     call = call.sort(value.unwrap_or(""));
                 },
+                "snippet-length" => {
+                    call = call.snippet_length(        value.map(|v| arg_from_str(v, err, "snippet-length", "int32")).unwrap_or(-0));
+                },
                 "site-search-filter" => {
                     call = call.site_search_filter(value.unwrap_or(""));
                 },
@@ -162,7 +165,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["c2coff", "cr", "cx", "date-restrict", "exact-terms", "exclude-terms", "file-type", "filter", "gl", "googlehost", "high-range", "hl", "hq", "img-color-type", "img-dominant-color", "img-size", "img-type", "link-site", "low-range", "lr", "num", "or-terms", "q", "related-site", "rights", "safe", "search-type", "site-search", "site-search-filter", "sort", "start"].iter().map(|v|*v));
+                                                                           v.extend(["c2coff", "cr", "cx", "date-restrict", "exact-terms", "exclude-terms", "file-type", "filter", "gl", "googlehost", "high-range", "hl", "hq", "img-color-type", "img-dominant-color", "img-size", "img-type", "link-site", "low-range", "lr", "num", "or-terms", "q", "related-site", "rights", "safe", "search-type", "site-search", "site-search-filter", "snippet-length", "sort", "start"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -205,6 +208,9 @@ where
                 "sort" => {
                     call = call.sort(value.unwrap_or(""));
                 },
+                "snippet-length" => {
+                    call = call.snippet_length(        value.map(|v| arg_from_str(v, err, "snippet-length", "int32")).unwrap_or(-0));
+                },
                 "site-search-filter" => {
                     call = call.site_search_filter(value.unwrap_or(""));
                 },
@@ -305,7 +311,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["c2coff", "cr", "cx", "date-restrict", "exact-terms", "exclude-terms", "file-type", "filter", "gl", "googlehost", "high-range", "hl", "hq", "img-color-type", "img-dominant-color", "img-size", "img-type", "link-site", "low-range", "lr", "num", "or-terms", "q", "related-site", "rights", "safe", "search-type", "site-search", "site-search-filter", "sort", "start"].iter().map(|v|*v));
+                                                                           v.extend(["c2coff", "cr", "cx", "date-restrict", "exact-terms", "exclude-terms", "file-type", "filter", "gl", "googlehost", "high-range", "hl", "hq", "img-color-type", "img-dominant-color", "img-size", "img-type", "link-site", "low-range", "lr", "num", "or-terms", "q", "related-site", "rights", "safe", "search-type", "site-search", "site-search-filter", "snippet-length", "sort", "start"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -467,7 +473,7 @@ async fn main() {
     
     let mut app = App::new("customsearch1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240303")
+           .version("5.0.5+20240625")
            .about("Searches over a website or collection of websites")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_customsearch1_cli")
            .arg(Arg::with_name("folder")
@@ -526,6 +532,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

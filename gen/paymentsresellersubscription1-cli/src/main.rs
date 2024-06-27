@@ -380,6 +380,7 @@ where
                     "processing-state" => Some(("processingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "products" => Some(("products", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "promotions" => Some(("promotions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "purchase-time" => Some(("purchaseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "renewal-time" => Some(("renewalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-location.postal-code" => Some(("serviceLocation.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -389,7 +390,7 @@ where
                     "upgrade-downgrade-details.billing-cycle-spec" => Some(("upgradeDowngradeDetails.billingCycleSpec", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade-downgrade-details.previous-subscription-id" => Some(("upgradeDowngradeDetails.previousSubscriptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-cycle-spec", "cancellation-details", "create-time", "cycle-end-time", "end-user-entitled", "free-trial-end-time", "name", "partner-user-token", "postal-code", "previous-subscription-id", "processing-state", "products", "promotions", "reason", "redirect-uri", "region-code", "renewal-time", "service-location", "state", "update-time", "upgrade-downgrade-details"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-cycle-spec", "cancellation-details", "create-time", "cycle-end-time", "end-user-entitled", "free-trial-end-time", "name", "partner-user-token", "postal-code", "previous-subscription-id", "processing-state", "products", "promotions", "purchase-time", "reason", "redirect-uri", "region-code", "renewal-time", "service-location", "state", "update-time", "upgrade-downgrade-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -710,6 +711,7 @@ where
                     "processing-state" => Some(("processingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "products" => Some(("products", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "promotions" => Some(("promotions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "purchase-time" => Some(("purchaseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "renewal-time" => Some(("renewalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-location.postal-code" => Some(("serviceLocation.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -719,7 +721,7 @@ where
                     "upgrade-downgrade-details.billing-cycle-spec" => Some(("upgradeDowngradeDetails.billingCycleSpec", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "upgrade-downgrade-details.previous-subscription-id" => Some(("upgradeDowngradeDetails.previousSubscriptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-cycle-spec", "cancellation-details", "create-time", "cycle-end-time", "end-user-entitled", "free-trial-end-time", "name", "partner-user-token", "postal-code", "previous-subscription-id", "processing-state", "products", "promotions", "reason", "redirect-uri", "region-code", "renewal-time", "service-location", "state", "update-time", "upgrade-downgrade-details"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-cycle-spec", "cancellation-details", "create-time", "cycle-end-time", "end-user-entitled", "free-trial-end-time", "name", "partner-user-token", "postal-code", "previous-subscription-id", "processing-state", "products", "promotions", "purchase-time", "reason", "redirect-uri", "region-code", "renewal-time", "service-location", "state", "update-time", "upgrade-downgrade-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -985,7 +987,7 @@ async fn main() {
     let arg_data = [
         ("partners", "methods: 'products-list', 'promotions-find-eligible', 'promotions-list', 'subscriptions-cancel', 'subscriptions-create', 'subscriptions-entitle', 'subscriptions-extend', 'subscriptions-get', 'subscriptions-provision' and 'subscriptions-undo-cancel'", vec![
             ("products-list",
-                    Some(r##"To retrieve the products that can be resold by the partner. It should be autenticated with a service account."##),
+                    Some(r##"To retrieve the products that can be resold by the partner. It should be autenticated with a service account. - This API doesn't apply to YouTube products currently."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_products-list",
                   vec![
                     (Some(r##"parent"##),
@@ -1035,7 +1037,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("promotions-list",
-                    Some(r##"To retrieve the promotions, such as free trial, that can be used by the partner. It should be autenticated with a service account."##),
+                    Some(r##"Retrieves the promotions, such as free trial, that can be used by the partner. - This API doesn't apply to YouTube promotions currently. It should be autenticated with a service account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_promotions-list",
                   vec![
                     (Some(r##"parent"##),
@@ -1219,7 +1221,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-undo-cancel",
-                    Some(r##"Used by partners to revoke the pending cancellation of a subscription, which is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already cancelled, the request will fail. It should be called directly by the partner using service accounts."##),
+                    Some(r##"Revokes the pending cancellation of a subscription, which is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already cancelled, the request will fail. - **This API doesn't apply to YouTube subscriptions.** It should be called directly by the partner using service accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_subscriptions-undo-cancel",
                   vec![
                     (Some(r##"name"##),
@@ -1252,7 +1254,7 @@ async fn main() {
     
     let mut app = App::new("paymentsresellersubscription1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240303")
+           .version("5.0.5+20240626")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli")
            .arg(Arg::with_name("url")
@@ -1316,6 +1318,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

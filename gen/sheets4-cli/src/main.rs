@@ -243,6 +243,7 @@ where
                     "properties.default-format.text-rotation.vertical" => Some(("properties.defaultFormat.textRotation.vertical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "properties.default-format.vertical-alignment" => Some(("properties.defaultFormat.verticalAlignment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "properties.default-format.wrap-strategy" => Some(("properties.defaultFormat.wrapStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "properties.import-functions-external-url-access-allowed" => Some(("properties.importFunctionsExternalUrlAccessAllowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "properties.iterative-calculation-settings.convergence-threshold" => Some(("properties.iterativeCalculationSettings.convergenceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "properties.iterative-calculation-settings.max-iterations" => Some(("properties.iterativeCalculationSettings.maxIterations", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "properties.locale" => Some(("properties.locale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -252,7 +253,7 @@ where
                     "spreadsheet-id" => Some(("spreadsheetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spreadsheet-url" => Some(("spreadsheetUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alpha", "angle", "auto-recalc", "background-color", "background-color-style", "blue", "bold", "borders", "bottom", "color", "color-style", "convergence-threshold", "default-format", "font-family", "font-size", "foreground-color", "foreground-color-style", "green", "horizontal-alignment", "hyperlink-display-type", "italic", "iterative-calculation-settings", "left", "link", "locale", "max-iterations", "number-format", "padding", "pattern", "primary-font-family", "properties", "red", "rgb-color", "right", "spreadsheet-id", "spreadsheet-theme", "spreadsheet-url", "strikethrough", "style", "text-direction", "text-format", "text-rotation", "theme-color", "time-zone", "title", "top", "type", "underline", "uri", "vertical", "vertical-alignment", "width", "wrap-strategy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alpha", "angle", "auto-recalc", "background-color", "background-color-style", "blue", "bold", "borders", "bottom", "color", "color-style", "convergence-threshold", "default-format", "font-family", "font-size", "foreground-color", "foreground-color-style", "green", "horizontal-alignment", "hyperlink-display-type", "import-functions-external-url-access-allowed", "italic", "iterative-calculation-settings", "left", "link", "locale", "max-iterations", "number-format", "padding", "pattern", "primary-font-family", "properties", "red", "rgb-color", "right", "spreadsheet-id", "spreadsheet-theme", "spreadsheet-url", "strikethrough", "style", "text-direction", "text-format", "text-rotation", "theme-color", "time-zone", "title", "top", "type", "underline", "uri", "vertical", "vertical-alignment", "width", "wrap-strategy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2149,7 +2150,7 @@ async fn main() {
     
     let mut app = App::new("sheets4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240229")
+           .version("5.0.5+20240621")
            .about("Reads and writes Google Sheets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sheets4_cli")
            .arg(Arg::with_name("url")
@@ -2213,6 +2214,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

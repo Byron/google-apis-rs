@@ -227,6 +227,7 @@ impl<'a, S> CalendarHub<S> {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list acl](AclListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Acl {
@@ -263,6 +264,7 @@ impl client::ResponseResult for Acl {}
 /// * [insert acl](AclInsertCall) (request|response)
 /// * [patch acl](AclPatchCall) (request|response)
 /// * [update acl](AclUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AclRule {
@@ -305,6 +307,7 @@ impl client::ResponseResult for AclRule {}
 /// * [insert calendars](CalendarInsertCall) (request|response)
 /// * [patch calendars](CalendarPatchCall) (request|response)
 /// * [update calendars](CalendarUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Calendar {
@@ -349,6 +352,7 @@ impl client::ResponseResult for Calendar {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list calendar list](CalendarListListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarList {
@@ -385,6 +389,7 @@ impl client::ResponseResult for CalendarList {}
 /// * [insert calendar list](CalendarListInsertCall) (request|response)
 /// * [patch calendar list](CalendarListPatchCall) (request|response)
 /// * [update calendar list](CalendarListUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarListEntry {
@@ -468,6 +473,7 @@ impl client::ResponseResult for CalendarListEntry {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarNotification {
@@ -503,6 +509,7 @@ impl client::Part for CalendarNotification {}
 /// * [stop channels](ChannelStopCall) (request)
 /// * [watch events](EventWatchCall) (request|response)
 /// * [watch settings](SettingWatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
@@ -551,6 +558,7 @@ impl client::ResponseResult for Channel {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ColorDefinition {
@@ -573,6 +581,7 @@ impl client::Part for ColorDefinition {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get colors](ColorGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Colors {
@@ -597,6 +606,7 @@ impl client::ResponseResult for Colors {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConferenceData {
@@ -648,6 +658,7 @@ impl client::Part for ConferenceData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConferenceParameters {
@@ -664,6 +675,7 @@ impl client::Part for ConferenceParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConferenceParametersAddOnParameters {
@@ -679,6 +691,7 @@ impl client::Part for ConferenceParametersAddOnParameters {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConferenceProperties {
@@ -699,6 +712,7 @@ impl client::Part for ConferenceProperties {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConferenceRequestStatus {
@@ -719,6 +733,7 @@ impl client::Part for ConferenceRequestStatus {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConferenceSolution {
@@ -741,6 +756,7 @@ impl client::Part for ConferenceSolution {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ConferenceSolutionKey {
@@ -763,6 +779,7 @@ impl client::Part for ConferenceSolutionKey {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateConferenceRequest {
@@ -787,6 +804,7 @@ impl client::Part for CreateConferenceRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntryPoint {
@@ -860,6 +878,7 @@ impl client::Part for EntryPoint {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Error {
@@ -896,6 +915,7 @@ impl client::Part for Error {}
 /// * [quick add events](EventQuickAddCall) (response)
 /// * [update events](EventUpdateCall) (request|response)
 /// * [watch events](EventWatchCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
@@ -946,7 +966,8 @@ pub struct Event {
     /// - "default" - A regular event or not further specified. 
     /// - "outOfOffice" - An out-of-office event. 
     /// - "focusTime" - A focus-time event. 
-    /// - "workingLocation" - A working location event.  Currently, only "default " and "workingLocation" events can be created using the API. Extended support for other event types will be made available in later releases.
+    /// - "workingLocation" - A working location event. 
+    /// - "fromGmail" - An event from Gmail. This type of event cannot be created.
     #[serde(rename="eventType")]
     
     pub event_type: Option<String>,
@@ -1082,6 +1103,7 @@ impl client::ResponseResult for Event {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventAttachment {
@@ -1116,6 +1138,7 @@ impl client::Part for EventAttachment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventAttendee {
@@ -1167,6 +1190,7 @@ impl client::Part for EventAttendee {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventDateTime {
@@ -1190,6 +1214,7 @@ impl client::Part for EventDateTime {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventFocusTimeProperties {
@@ -1214,6 +1239,7 @@ impl client::Part for EventFocusTimeProperties {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventOutOfOfficeProperties {
@@ -1234,6 +1260,7 @@ impl client::Part for EventOutOfOfficeProperties {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventReminder {
@@ -1256,6 +1283,7 @@ impl client::Part for EventReminder {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventWorkingLocationProperties {
@@ -1293,6 +1321,7 @@ impl client::Part for EventWorkingLocationProperties {}
 /// 
 /// * [instances events](EventInstanceCall) (response)
 /// * [list events](EventListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Events {
@@ -1348,6 +1377,7 @@ impl client::ResponseResult for Events {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyCalendar {
@@ -1366,6 +1396,7 @@ impl client::Part for FreeBusyCalendar {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyGroup {
@@ -1388,6 +1419,7 @@ impl client::Part for FreeBusyGroup {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query freebusy](FreebusyQueryCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyRequest {
@@ -1423,6 +1455,7 @@ impl client::RequestValue for FreeBusyRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyRequestItem {
@@ -1442,6 +1475,7 @@ impl client::Part for FreeBusyRequestItem {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [query freebusy](FreebusyQueryCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyResponse {
@@ -1477,6 +1511,7 @@ impl client::ResponseResult for FreeBusyResponse {}
 /// * [get settings](SettingGetCall) (response)
 /// * [list settings](SettingListCall) (none)
 /// * [watch settings](SettingWatchCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Setting {
@@ -1506,6 +1541,7 @@ impl client::ResponseResult for Setting {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list settings](SettingListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Settings {
@@ -1535,6 +1571,7 @@ impl client::ResponseResult for Settings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimePeriod {
@@ -1553,6 +1590,7 @@ impl client::Part for TimePeriod {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AclRuleScope {
@@ -1577,6 +1615,7 @@ impl client::Part for AclRuleScope {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CalendarListEntryNotificationSettings {
@@ -1593,6 +1632,7 @@ impl client::Part for CalendarListEntryNotificationSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventCreator {
@@ -1620,6 +1660,7 @@ impl client::Part for EventCreator {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventExtendedProperties {
@@ -1639,6 +1680,7 @@ impl client::Part for EventExtendedProperties {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventGadget {
@@ -1680,6 +1722,7 @@ impl client::Part for EventGadget {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventOrganizer {
@@ -1707,6 +1750,7 @@ impl client::Part for EventOrganizer {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventReminders {
@@ -1727,6 +1771,7 @@ impl client::Part for EventReminders {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventSource {
@@ -1746,6 +1791,7 @@ impl client::Part for EventSource {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventWorkingLocationPropertiesCustomLocation {
@@ -1762,6 +1808,7 @@ impl client::Part for EventWorkingLocationPropertiesCustomLocation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventWorkingLocationPropertiesOfficeLocation {
@@ -2497,7 +2544,8 @@ impl<'a, S> EventMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Imports an event. This operation is used to add a private copy of an existing event to a calendar.
+    /// Imports an event. This operation is used to add a private copy of an existing event to a calendar. Only events with an eventType of default may be imported.
+    /// Deprecated behavior: If a non-default event is imported, its type will be changed to default and any event-type-specific properties it may have will be dropped.
     /// 
     /// # Arguments
     ///
@@ -2605,7 +2653,7 @@ impl<'a, S> EventMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime and workingLocation events cannot be moved.
+    /// Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime, workingLocation and fromGmail events cannot be moved.
     /// 
     /// # Arguments
     ///
@@ -9742,7 +9790,8 @@ where
 }
 
 
-/// Imports an event. This operation is used to add a private copy of an existing event to a calendar.
+/// Imports an event. This operation is used to add a private copy of an existing event to a calendar. Only events with an eventType of default may be imported.
+/// Deprecated behavior: If a non-default event is imported, its type will be changed to default and any event-type-specific properties it may have will be dropped.
 ///
 /// A builder for the *import* method supported by a *event* resource.
 /// It is not used directly, but through a [`EventMethods`] instance.
@@ -11293,7 +11342,7 @@ where
 }
 
 
-/// Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime and workingLocation events cannot be moved.
+/// Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime, workingLocation and fromGmail events cannot be moved.
 ///
 /// A builder for the *move* method supported by a *event* resource.
 /// It is not used directly, but through a [`EventMethods`] instance.

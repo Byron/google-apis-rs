@@ -1,4 +1,4 @@
-site_name: Shopping Content v5.0.4+20220303
+site_name: Shopping Content v5.0.5+20220303
 site_url: http://byron.github.io/google-apis-rs/google-content2-cli
 site_description: A complete library to interact with Shopping Content (protocol v2)
 
@@ -115,5 +115,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Dataproc* API at revision *20240222*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Dataproc* API at revision *20240617*. The CLI is at version *5.0.5*.
 
 ```bash
 dataproc1 [options]
@@ -38,6 +38,7 @@ dataproc1 [options]
                 locations-autoscaling-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-autoscaling-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-autoscaling-policies-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-batches-analyze <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-batches-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-batches-delete <name> [-p <v>]... [-o <out>]
                 locations-batches-get <name> [-p <v>]... [-o <out>]

@@ -1,4 +1,4 @@
-site_name: Cloud Video Intelligence v5.0.4+20240118
+site_name: Cloud Video Intelligence v5.0.5+20240614
 site_url: http://byron.github.io/google-apis-rs/google-videointelligence1-cli
 site_description: A complete library to interact with Cloud Video Intelligence (protocol v1)
 
@@ -23,5 +23,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

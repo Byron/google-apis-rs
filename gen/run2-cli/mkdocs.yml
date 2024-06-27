@@ -1,4 +1,4 @@
-site_name: Cloud Run v5.0.4+20240225
+site_name: Cloud Run v5.0.5+20240621
 site_url: http://byron.github.io/google-apis-rs/google-run2-cli
 site_description: A complete library to interact with Cloud Run (protocol v2)
 
@@ -10,10 +10,14 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Export Image': 'projects_locations-export-image.md'
+    - 'Locations Export Image Metadata': 'projects_locations-export-image-metadata.md'
+    - 'Locations Export Metadata': 'projects_locations-export-metadata.md'
     - 'Locations Jobs Create': 'projects_locations-jobs-create.md'
     - 'Locations Jobs Delete': 'projects_locations-jobs-delete.md'
     - 'Locations Jobs Executions Cancel': 'projects_locations-jobs-executions-cancel.md'
     - 'Locations Jobs Executions Delete': 'projects_locations-jobs-executions-delete.md'
+    - 'Locations Jobs Executions Export Status': 'projects_locations-jobs-executions-export-status.md'
     - 'Locations Jobs Executions Get': 'projects_locations-jobs-executions-get.md'
     - 'Locations Jobs Executions List': 'projects_locations-jobs-executions-list.md'
     - 'Locations Jobs Executions Tasks Get': 'projects_locations-jobs-executions-tasks-get.md'
@@ -36,6 +40,7 @@ nav:
     - 'Locations Services List': 'projects_locations-services-list.md'
     - 'Locations Services Patch': 'projects_locations-services-patch.md'
     - 'Locations Services Revisions Delete': 'projects_locations-services-revisions-delete.md'
+    - 'Locations Services Revisions Export Status': 'projects_locations-services-revisions-export-status.md'
     - 'Locations Services Revisions Get': 'projects_locations-services-revisions-get.md'
     - 'Locations Services Revisions List': 'projects_locations-services-revisions-list.md'
     - 'Locations Services Set Iam Policy': 'projects_locations-services-set-iam-policy.md'
@@ -43,5 +48,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

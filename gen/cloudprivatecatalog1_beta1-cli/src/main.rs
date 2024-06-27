@@ -975,7 +975,7 @@ async fn main() {
     
     let mut app = App::new("cloudprivatecatalog1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20200405")
+           .version("5.0.5+20200405")
            .about("Enable cloud users to discover enterprise catalogs and products in their organizations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudprivatecatalog1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -1039,6 +1039,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

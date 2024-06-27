@@ -81,7 +81,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -129,7 +129,7 @@ impl<'a, S> Firebaseappcheck<S> {
         Firebaseappcheck {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://firebaseappcheck.googleapis.com/".to_string(),
             _root_url: "https://firebaseappcheck.googleapis.com/".to_string(),
         }
@@ -146,7 +146,7 @@ impl<'a, S> Firebaseappcheck<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -183,6 +183,7 @@ impl<'a, S> Firebaseappcheck<S> {
 /// 
 /// * [apps app attest config get projects](ProjectAppAppAttestConfigGetCall) (response)
 /// * [apps app attest config patch projects](ProjectAppAppAttestConfigPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaAppAttestConfig {
@@ -218,6 +219,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaAppAttestConfig {}
 /// * [apps exchange recaptcha token projects](ProjectAppExchangeRecaptchaTokenCall) (response)
 /// * [apps exchange recaptcha v3 token projects](ProjectAppExchangeRecaptchaV3TokenCall) (response)
 /// * [apps exchange safety net token projects](ProjectAppExchangeSafetyNetTokenCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaAppCheckToken {
@@ -241,6 +243,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaAppCheckToken {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaAttestationTokenResponse {
@@ -265,6 +268,7 @@ impl client::Part for GoogleFirebaseAppcheckV1betaAttestationTokenResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps app attest config batch get projects](ProjectAppAppAttestConfigBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchGetAppAttestConfigsResponse {
@@ -284,6 +288,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchGetAppAttestCon
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps device check config batch get projects](ProjectAppDeviceCheckConfigBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchGetDeviceCheckConfigsResponse {
@@ -303,6 +308,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchGetDeviceCheckC
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps play integrity config batch get projects](ProjectAppPlayIntegrityConfigBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchGetPlayIntegrityConfigsResponse {
@@ -322,6 +328,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchGetPlayIntegrit
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps recaptcha config batch get projects](ProjectAppRecaptchaConfigBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchGetRecaptchaConfigsResponse {
@@ -341,6 +348,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchGetRecaptchaCon
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps recaptcha enterprise config batch get projects](ProjectAppRecaptchaEnterpriseConfigBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchGetRecaptchaEnterpriseConfigsResponse {
@@ -360,6 +368,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchGetRecaptchaEnt
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps recaptcha v3 config batch get projects](ProjectAppRecaptchaV3ConfigBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchGetRecaptchaV3ConfigsResponse {
@@ -379,6 +388,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchGetRecaptchaV3C
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps safety net config batch get projects](ProjectAppSafetyNetConfigBatchGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchGetSafetyNetConfigsResponse {
@@ -398,13 +408,14 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchGetSafetyNetCon
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [services resource policies batch update projects](ProjectServiceResourcePolicyBatchUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchUpdateResourcePoliciesRequest {
-    /// Required. The request messages specifying the ResourcePolicys to update. A maximum of 100 objects can be updated in a batch.
+    /// Required. The request messages specifying the ResourcePolicy objects to update. A maximum of 100 objects can be updated in a batch.
     
     pub requests: Option<Vec<GoogleFirebaseAppcheckV1betaUpdateResourcePolicyRequest>>,
-    /// Optional. A comma-separated list of names of fields in the ResourceConfigurations to update. Example: `enforcement_mode`. If this field is present, the `update_mask` field in the UpdateResourcePolicyRequest messages must all match this field, or the entire batch fails and no updates will be committed.
+    /// Optional. A comma-separated list of names of fields in the ResourcePolicy objects to update. Example: `enforcement_mode`. If this field is present, the `update_mask` field in the UpdateResourcePolicyRequest messages must all match this field, or the entire batch fails and no updates will be committed.
     #[serde(rename="updateMask")]
     
     pub update_mask: Option<client::FieldMask>,
@@ -421,6 +432,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaBatchUpdateResourcePol
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [services resource policies batch update projects](ProjectServiceResourcePolicyBatchUpdateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchUpdateResourcePoliciesResponse {
@@ -441,13 +453,14 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchUpdateResourceP
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [services batch update projects](ProjectServiceBatchUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest {
     /// Required. The request messages specifying the Services to update. A maximum of 100 objects can be updated in a batch.
     
     pub requests: Option<Vec<GoogleFirebaseAppcheckV1betaUpdateServiceRequest>>,
-    /// Optional. A comma-separated list of names of fields in the Services to update. Example: `display_name`. If this field is present, the `update_mask` field in the UpdateServiceRequest messages must all match this field, or the entire batch fails and no updates will be committed.
+    /// Optional. A comma-separated list of names of fields in the Services to update. Example: `display_name`. If the `update_mask` field is set in both this request and any of the UpdateServiceRequest messages, they must match or the entire batch fails and no updates will be committed.
     #[serde(rename="updateMask")]
     
     pub update_mask: Option<client::FieldMask>,
@@ -464,6 +477,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaBatchUpdateServicesReq
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [services batch update projects](ProjectServiceBatchUpdateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaBatchUpdateServicesResponse {
@@ -485,6 +499,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaBatchUpdateServicesR
 /// * [apps debug tokens create projects](ProjectAppDebugTokenCreateCall) (request|response)
 /// * [apps debug tokens get projects](ProjectAppDebugTokenGetCall) (response)
 /// * [apps debug tokens patch projects](ProjectAppDebugTokenPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaDebugToken {
@@ -498,6 +513,10 @@ pub struct GoogleFirebaseAppcheckV1betaDebugToken {
     /// Required. Input only. Immutable. The secret token itself. Must be provided during creation, and must be a UUID4, case insensitive. This field is immutable once set, and cannot be provided during an UpdateDebugToken request. You can, however, delete this debug token using DeleteDebugToken to revoke it. For security reasons, this field will never be populated in any response.
     
     pub token: Option<String>,
+    /// Output only. Timestamp when this debug token was most recently updated.
+    #[serde(rename="updateTime")]
+    
+    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
 }
 
 impl client::RequestValue for GoogleFirebaseAppcheckV1betaDebugToken {}
@@ -513,6 +532,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaDebugToken {}
 /// 
 /// * [apps device check config get projects](ProjectAppDeviceCheckConfigGetCall) (response)
 /// * [apps device check config patch projects](ProjectAppDeviceCheckConfigPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaDeviceCheckConfig {
@@ -551,6 +571,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaDeviceCheckConfig {}
 /// 
 /// * [exchange app attest assertion oauth clients](OauthClientExchangeAppAttestAssertionCall) (request)
 /// * [apps exchange app attest assertion projects](ProjectAppExchangeAppAttestAssertionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest {
@@ -584,13 +605,14 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeAppAttestAsser
 /// 
 /// * [exchange app attest attestation oauth clients](OauthClientExchangeAppAttestAttestationCall) (request)
 /// * [apps exchange app attest attestation projects](ProjectAppExchangeAppAttestAttestationCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest {
     /// Required. The App Attest statement returned by the client-side App Attest API. This is a base64url encoded CBOR object in the JSON response.
     #[serde(rename="attestationStatement")]
     
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
     pub attestation_statement: Option<Vec<u8>>,
     /// Required. A one-time challenge returned by an immediately prior call to GenerateAppAttestChallenge.
     
@@ -619,6 +641,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeAppAttestAttes
 /// 
 /// * [exchange app attest attestation oauth clients](OauthClientExchangeAppAttestAttestationCall) (response)
 /// * [apps exchange app attest attestation projects](ProjectAppExchangeAppAttestAttestationCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationResponse {
@@ -647,6 +670,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaExchangeAppAttestAtt
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps exchange custom token projects](ProjectAppExchangeCustomTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest {
@@ -672,6 +696,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeCustomTokenReq
 /// 
 /// * [exchange debug token oauth clients](OauthClientExchangeDebugTokenCall) (request)
 /// * [apps exchange debug token projects](ProjectAppExchangeDebugTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest {
@@ -696,6 +721,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequ
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps exchange device check token projects](ProjectAppExchangeDeviceCheckTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest {
@@ -720,6 +746,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTok
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps exchange play integrity token projects](ProjectAppExchangePlayIntegrityTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangePlayIntegrityTokenRequest {
@@ -744,6 +771,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangePlayIntegrityT
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps exchange recaptcha enterprise token projects](ProjectAppExchangeRecaptchaEnterpriseTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest {
@@ -768,6 +796,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnter
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps exchange recaptcha token projects](ProjectAppExchangeRecaptchaTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest {
@@ -788,6 +817,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeRecaptchaToken
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps exchange recaptcha v3 token projects](ProjectAppExchangeRecaptchaV3TokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeRecaptchaV3TokenRequest {
@@ -812,6 +842,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeRecaptchaV3Tok
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps exchange safety net token projects](ProjectAppExchangeSafetyNetTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest {
@@ -833,6 +864,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaExchangeSafetyNetToken
 /// 
 /// * [generate app attest challenge oauth clients](OauthClientGenerateAppAttestChallengeCall) (request)
 /// * [apps generate app attest challenge projects](ProjectAppGenerateAppAttestChallengeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest { _never_set: Option<bool> }
@@ -849,6 +881,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaGenerateAppAttestChall
 /// 
 /// * [generate app attest challenge oauth clients](OauthClientGenerateAppAttestChallengeCall) (response)
 /// * [apps generate app attest challenge projects](ProjectAppGenerateAppAttestChallengeCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeResponse {
@@ -873,6 +906,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaGenerateAppAttestCha
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps generate play integrity challenge projects](ProjectAppGeneratePlayIntegrityChallengeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaGeneratePlayIntegrityChallengeRequest { _never_set: Option<bool> }
@@ -888,6 +922,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaGeneratePlayIntegrityC
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps generate play integrity challenge projects](ProjectAppGeneratePlayIntegrityChallengeCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaGeneratePlayIntegrityChallengeResponse {
@@ -911,6 +946,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaGeneratePlayIntegrit
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [apps debug tokens list projects](ProjectAppDebugTokenListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaListDebugTokensResponse {
@@ -935,14 +971,15 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaListDebugTokensRespo
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [services resource policies list projects](ProjectServiceResourcePolicyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaListResourcePoliciesResponse {
-    /// If the result list is too large to fit in a single response, then a token is returned. If the string is empty or omitted, then this response is the last page of results. This token can be used in a subsequent call to ListResourcePolicies to find the next group of ResourcePolicys. Page tokens are short-lived and should not be persisted.
+    /// If the result list is too large to fit in a single response, then a token is returned. If the string is empty or omitted, then this response is the last page of results. This token can be used in a subsequent call to ListResourcePolicies to find the next group of ResourcePolicy objects. Page tokens are short-lived and should not be persisted.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
-    /// The ResourcePolicys retrieved.
+    /// The ResourcePolicy objects retrieved.
     #[serde(rename="resourcePolicies")]
     
     pub resource_policies: Option<Vec<GoogleFirebaseAppcheckV1betaResourcePolicy>>,
@@ -959,6 +996,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaListResourcePolicies
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [services list projects](ProjectServiceListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaListServicesResponse {
@@ -983,6 +1021,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaListServicesResponse
 /// 
 /// * [apps play integrity config get projects](ProjectAppPlayIntegrityConfigGetCall) (response)
 /// * [apps play integrity config patch projects](ProjectAppPlayIntegrityConfigPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaPlayIntegrityConfig {
@@ -1004,6 +1043,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaPlayIntegrityConfig 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaPublicJwk {
@@ -1039,6 +1079,7 @@ impl client::Part for GoogleFirebaseAppcheckV1betaPublicJwk {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get jwks](JwkGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaPublicJwkSet {
@@ -1059,6 +1100,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaPublicJwkSet {}
 /// 
 /// * [apps recaptcha config get projects](ProjectAppRecaptchaConfigGetCall) (response)
 /// * [apps recaptcha config patch projects](ProjectAppRecaptchaConfigPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaRecaptchaConfig {
@@ -1093,6 +1135,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaRecaptchaConfig {}
 /// 
 /// * [apps recaptcha enterprise config get projects](ProjectAppRecaptchaEnterpriseConfigGetCall) (response)
 /// * [apps recaptcha enterprise config patch projects](ProjectAppRecaptchaEnterpriseConfigPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig {
@@ -1123,6 +1166,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseC
 /// 
 /// * [apps recaptcha v3 config get projects](ProjectAppRecaptchaV3ConfigGetCall) (response)
 /// * [apps recaptcha v3 config patch projects](ProjectAppRecaptchaV3ConfigPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaRecaptchaV3Config {
@@ -1148,7 +1192,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaRecaptchaV3Config {}
 impl client::ResponseResult for GoogleFirebaseAppcheckV1betaRecaptchaV3Config {}
 
 
-/// App Check enforcement policy for a specific resource of a Firebase service supported by App Check. Note that this policy will override the Service level enforcement mode configuration.
+/// App Check enforcement policy for a specific resource of a Firebase service supported by App Check. Note that this policy will override the service-level configuration.
 /// 
 /// # Activities
 /// 
@@ -1158,24 +1202,25 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaRecaptchaV3Config {}
 /// * [services resource policies create projects](ProjectServiceResourcePolicyCreateCall) (request|response)
 /// * [services resource policies get projects](ProjectServiceResourcePolicyGetCall) (response)
 /// * [services resource policies patch projects](ProjectServiceResourcePolicyPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaResourcePolicy {
-    /// Required. The App Check enforcement mode for this resource. This will override the EnforcementMode setting on the service. For new resources that you are creating, you should consider setting an override and enable enforcement on the resource immediately, if there are no outdated clients that can use it.
+    /// Required. The App Check enforcement mode for this resource. This will override the EnforcementMode setting on the parent service.
     #[serde(rename="enforcementMode")]
     
     pub enforcement_mode: Option<String>,
-    /// This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding. This etag is strongly validated.
+    /// This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding. This etag is strongly validated as defined by RFC 7232.
     
     pub etag: Option<String>,
-    /// Required. The relative name of the resource configuration object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID used as the resource ID for the policy.
+    /// Required. Identifier. The relative name of the resource policy object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID.
     
     pub name: Option<String>,
-    /// Required. Service specific name of the resource object to which this policy applies, in the format: * `//oauth2.googleapis.com/projects/{project}/oauthClients/{oauth_client_id}` (Google Identity for iOS) NOTE that the resource must belong to the service specified in the `name` and be from the same project as this policy, but it may or may not exist at the time of creation of the policy.
+    /// Required. Service specific name of the resource object to which this policy applies, in the format: * `//oauth2.googleapis.com/projects/{project_number}/oauthClients/{oauth_client_id}` (Google Identity for iOS) Note that the resource must belong to the service specified in the `name` and be from the same project as this policy, but the resource is allowed to be missing at the time of creation of this policy; in that case, we make a best-effort attempt at respecting this policy, but it may not have any effect until the resource is fully created.
     #[serde(rename="targetResource")]
     
     pub target_resource: Option<String>,
-    /// Output only. Timestamp when this service configuration object was most recently updated.
+    /// Output only. Timestamp when this resource policy configuration object was most recently updated.
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -1194,6 +1239,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaResourcePolicy {}
 /// 
 /// * [apps safety net config get projects](ProjectAppSafetyNetConfigGetCall) (response)
 /// * [apps safety net config patch projects](ProjectAppSafetyNetConfigPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaSafetyNetConfig {
@@ -1220,6 +1266,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaSafetyNetConfig {}
 /// 
 /// * [services get projects](ProjectServiceGetCall) (response)
 /// * [services patch projects](ProjectServicePatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaService {
@@ -1247,10 +1294,11 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaService {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaUpdateResourcePolicyRequest {
-    /// Required. The ResourcePolicy to update. The ResourcePolicy's `name` field is used to identify the ResourcePolicy to be updated, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_name} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) Only the top-level resources are supported for each of the services. The resources must belong to the service specified and `resource_name` should be formatted as: * `oauthClients/{oauth_client_id}` (Google Identity for iOS)
+    /// Required. The ResourcePolicy to update. The ResourcePolicy's `name` field is used to identify the ResourcePolicy to be updated, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
     #[serde(rename="resourcePolicy")]
     
     pub resource_policy: Option<GoogleFirebaseAppcheckV1betaResourcePolicy>,
@@ -1267,10 +1315,11 @@ impl client::Part for GoogleFirebaseAppcheckV1betaUpdateResourcePolicyRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaUpdateServiceRequest {
-    /// Required. The Service to update. The Service's `name` field is used to identify the Service to be updated, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform) For Firebase Authentication to work with App Check, you must first upgrade to [Firebase Authentication with Identity Platform](https://firebase.google.com/docs/auth#identity-platform).
+    /// Required. The Service to update. The Service's `name` field is used to identify the Service to be updated, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform) * `oauth2.googleapis.com` (Google Identity for iOS) For Firebase Authentication to work with App Check, you must first upgrade to [Firebase Authentication with Identity Platform](https://firebase.google.com/docs/auth#identity-platform).
     
     pub service: Option<GoogleFirebaseAppcheckV1betaService>,
     /// Required. A comma-separated list of names of fields in the Service to update. Example: `enforcement_mode`.
@@ -1290,6 +1339,7 @@ impl client::Part for GoogleFirebaseAppcheckV1betaUpdateServiceRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify app check token projects](ProjectVerifyAppCheckTokenCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaVerifyAppCheckTokenRequest {
@@ -1310,6 +1360,7 @@ impl client::RequestValue for GoogleFirebaseAppcheckV1betaVerifyAppCheckTokenReq
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [verify app check token projects](ProjectVerifyAppCheckTokenCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseAppcheckV1betaVerifyAppCheckTokenResponse {
@@ -1331,6 +1382,7 @@ impl client::ResponseResult for GoogleFirebaseAppcheckV1betaVerifyAppCheckTokenR
 /// 
 /// * [apps debug tokens delete projects](ProjectAppDebugTokenDeleteCall) (response)
 /// * [services resource policies delete projects](ProjectServiceResourcePolicyDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
@@ -1364,7 +1416,7 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`
 /// // to build up your call.
@@ -1422,7 +1474,7 @@ impl<'a, S> JwkMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `exchange_app_attest_assertion(...)`, `exchange_app_attest_attestation(...)`, `exchange_debug_token(...)` and `generate_app_attest_challenge(...)`
 /// // to build up your call.
@@ -1446,7 +1498,7 @@ impl<'a, S> OauthClientMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn exchange_app_attest_assertion(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest, app: &str) -> OauthClientExchangeAppAttestAssertionCall<'a, S> {
         OauthClientExchangeAppAttestAssertionCall {
             hub: self.hub,
@@ -1465,7 +1517,7 @@ impl<'a, S> OauthClientMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn exchange_app_attest_attestation(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest, app: &str) -> OauthClientExchangeAppAttestAttestationCall<'a, S> {
         OauthClientExchangeAppAttestAttestationCall {
             hub: self.hub,
@@ -1484,7 +1536,7 @@ impl<'a, S> OauthClientMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn exchange_debug_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest, app: &str) -> OauthClientExchangeDebugTokenCall<'a, S> {
         OauthClientExchangeDebugTokenCall {
             hub: self.hub,
@@ -1503,7 +1555,7 @@ impl<'a, S> OauthClientMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn generate_app_attest_challenge(&self, request: GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest, app: &str) -> OauthClientGenerateAppAttestChallengeCall<'a, S> {
         OauthClientGenerateAppAttestChallengeCall {
             hub: self.hub,
@@ -1539,7 +1591,7 @@ impl<'a, S> OauthClientMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `apps_app_attest_config_batch_get(...)`, `apps_app_attest_config_get(...)`, `apps_app_attest_config_patch(...)`, `apps_debug_tokens_create(...)`, `apps_debug_tokens_delete(...)`, `apps_debug_tokens_get(...)`, `apps_debug_tokens_list(...)`, `apps_debug_tokens_patch(...)`, `apps_device_check_config_batch_get(...)`, `apps_device_check_config_get(...)`, `apps_device_check_config_patch(...)`, `apps_exchange_app_attest_assertion(...)`, `apps_exchange_app_attest_attestation(...)`, `apps_exchange_custom_token(...)`, `apps_exchange_debug_token(...)`, `apps_exchange_device_check_token(...)`, `apps_exchange_play_integrity_token(...)`, `apps_exchange_recaptcha_enterprise_token(...)`, `apps_exchange_recaptcha_token(...)`, `apps_exchange_recaptcha_v3_token(...)`, `apps_exchange_safety_net_token(...)`, `apps_generate_app_attest_challenge(...)`, `apps_generate_play_integrity_challenge(...)`, `apps_play_integrity_config_batch_get(...)`, `apps_play_integrity_config_get(...)`, `apps_play_integrity_config_patch(...)`, `apps_recaptcha_config_batch_get(...)`, `apps_recaptcha_config_get(...)`, `apps_recaptcha_config_patch(...)`, `apps_recaptcha_enterprise_config_batch_get(...)`, `apps_recaptcha_enterprise_config_get(...)`, `apps_recaptcha_enterprise_config_patch(...)`, `apps_recaptcha_v3_config_batch_get(...)`, `apps_recaptcha_v3_config_get(...)`, `apps_recaptcha_v3_config_patch(...)`, `apps_safety_net_config_batch_get(...)`, `apps_safety_net_config_get(...)`, `apps_safety_net_config_patch(...)`, `services_batch_update(...)`, `services_get(...)`, `services_list(...)`, `services_patch(...)`, `services_resource_policies_batch_update(...)`, `services_resource_policies_create(...)`, `services_resource_policies_delete(...)`, `services_resource_policies_get(...)`, `services_resource_policies_list(...)`, `services_resource_policies_patch(...)` and `verify_app_check_token(...)`
 /// // to build up your call.
@@ -2040,7 +2092,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn apps_exchange_app_attest_assertion(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest, app: &str) -> ProjectAppExchangeAppAttestAssertionCall<'a, S> {
         ProjectAppExchangeAppAttestAssertionCall {
             hub: self.hub,
@@ -2059,7 +2111,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn apps_exchange_app_attest_attestation(&self, request: GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest, app: &str) -> ProjectAppExchangeAppAttestAttestationCall<'a, S> {
         ProjectAppExchangeAppAttestAttestationCall {
             hub: self.hub,
@@ -2097,7 +2149,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn apps_exchange_debug_token(&self, request: GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest, app: &str) -> ProjectAppExchangeDebugTokenCall<'a, S> {
         ProjectAppExchangeDebugTokenCall {
             hub: self.hub,
@@ -2230,7 +2282,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// * `app` - Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     pub fn apps_generate_app_attest_challenge(&self, request: GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest, app: &str) -> ProjectAppGenerateAppAttestChallengeCall<'a, S> {
         ProjectAppGenerateAppAttestChallengeCall {
             hub: self.hub,
@@ -2268,7 +2320,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent project name and the service, in the format ``` projects/{project_number}/services/{service_id} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails.
+    /// * `parent` - Required. The parent service name, in the format ``` projects/{project_number}/services/{service_id} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails.
     pub fn services_resource_policies_batch_update(&self, request: GoogleFirebaseAppcheckV1betaBatchUpdateResourcePoliciesRequest, parent: &str) -> ProjectServiceResourcePolicyBatchUpdateCall<'a, S> {
         ProjectServiceResourcePolicyBatchUpdateCall {
             hub: self.hub,
@@ -2287,7 +2339,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The relative resource name of the parent service in which the specified ResourcePolicy will be created, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
+    /// * `parent` - Required. The relative resource name of the parent Service in which the specified ResourcePolicy will be created, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
     pub fn services_resource_policies_create(&self, request: GoogleFirebaseAppcheckV1betaResourcePolicy, parent: &str) -> ProjectServiceResourcePolicyCreateCall<'a, S> {
         ProjectServiceResourcePolicyCreateCall {
             hub: self.hub,
@@ -2305,7 +2357,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The relative resource name of the ResourcePolicy to delete, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_name} ```
+    /// * `name` - Required. The relative resource name of the ResourcePolicy to delete, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ```
     pub fn services_resource_policies_delete(&self, name: &str) -> ProjectServiceResourcePolicyDeleteCall<'a, S> {
         ProjectServiceResourcePolicyDeleteCall {
             hub: self.hub,
@@ -2323,7 +2375,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The relative resource name of the ResourcePolicy to retrieve, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID used as the resource ID for the policy.
+    /// * `name` - Required. The relative resource name of the ResourcePolicy to retrieve, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
     pub fn services_resource_policies_get(&self, name: &str) -> ProjectServiceResourcePolicyGetCall<'a, S> {
         ProjectServiceResourcePolicyGetCall {
             hub: self.hub,
@@ -2340,7 +2392,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The relative resource name of the parent project and service for which to list each associated ResourcePolicy, in the format: ``` projects/{project_number}/services/{service_name} ```
+    /// * `parent` - Required. The relative resource name of the parent Service for which to list each associated ResourcePolicy, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
     pub fn services_resource_policies_list(&self, parent: &str) -> ProjectServiceResourcePolicyListCall<'a, S> {
         ProjectServiceResourcePolicyListCall {
             hub: self.hub,
@@ -2361,7 +2413,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The relative name of the resource configuration object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID used as the resource ID for the policy.
+    /// * `name` - Required. Identifier. The relative name of the resource policy object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID.
     pub fn services_resource_policies_patch(&self, request: GoogleFirebaseAppcheckV1betaResourcePolicy, name: &str) -> ProjectServiceResourcePolicyPatchCall<'a, S> {
         ProjectServiceResourcePolicyPatchCall {
             hub: self.hub,
@@ -2399,7 +2451,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform)
+    /// * `name` - Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform) * `oauth2.googleapis.com` (Google Identity for iOS)
     pub fn services_get(&self, name: &str) -> ProjectServiceGetCall<'a, S> {
         ProjectServiceGetCall {
             hub: self.hub,
@@ -2499,7 +2551,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2597,6 +2649,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2762,7 +2815,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2945,7 +2998,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -3054,7 +3107,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3237,7 +3290,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -3346,7 +3399,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3529,7 +3582,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -3638,7 +3691,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3821,7 +3874,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -3929,7 +3982,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4034,6 +4087,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4206,7 +4260,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4304,6 +4358,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4469,7 +4524,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4479,7 +4534,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_app_attest_config_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -4667,7 +4722,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. A comma-separated list of names of fields in the AppAttestConfig Gets to update. Example: `token_ttl`.
+    /// Required. A comma-separated list of names of fields in the AppAttestConfig to update. Example: `token_ttl`.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectAppAppAttestConfigPatchCall<'a, S> {
@@ -4773,7 +4828,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5064,7 +5119,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5162,6 +5217,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5326,7 +5382,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5424,6 +5480,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5588,7 +5645,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5696,6 +5753,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5875,7 +5933,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5885,7 +5943,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_debug_tokens_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -6178,7 +6236,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6283,6 +6341,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6455,7 +6514,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6553,6 +6612,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6718,7 +6778,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6728,7 +6788,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_device_check_config_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -6916,7 +6976,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. A comma-separated list of names of fields in the DeviceCheckConfig Gets to update. Example: `key_id,private_key`.
+    /// Required. A comma-separated list of names of fields in the DeviceCheckConfig to update. Example: `key_id,private_key`.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectAppDeviceCheckConfigPatchCall<'a, S> {
@@ -7021,7 +7081,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7126,6 +7186,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7298,7 +7359,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7396,6 +7457,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7561,7 +7623,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7571,7 +7633,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_play_integrity_config_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -7759,7 +7821,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. A comma-separated list of names of fields in the PlayIntegrityConfig Gets to update. Example: `token_ttl`.
+    /// Required. A comma-separated list of names of fields in the PlayIntegrityConfig to update. Example: `token_ttl`.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectAppPlayIntegrityConfigPatchCall<'a, S> {
@@ -7864,7 +7926,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7969,6 +8031,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8141,7 +8204,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8239,6 +8302,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8404,7 +8468,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8414,7 +8478,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_recaptcha_config_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -8707,7 +8771,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8812,6 +8876,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8984,7 +9049,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9082,6 +9147,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9247,7 +9313,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9257,7 +9323,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_recaptcha_enterprise_config_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -9550,7 +9616,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9655,6 +9721,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9827,7 +9894,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -9925,6 +9992,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10090,7 +10158,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10100,7 +10168,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_recaptcha_v3_config_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -10393,7 +10461,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10498,6 +10566,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10670,7 +10739,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10768,6 +10837,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10933,7 +11003,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10943,7 +11013,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().apps_safety_net_config_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -11131,7 +11201,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. A comma-separated list of names of fields in the SafetyNetConfig Gets to update. Example: `token_ttl`.
+    /// Required. A comma-separated list of names of fields in the SafetyNetConfig to update. Example: `token_ttl`.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectAppSafetyNetConfigPatchCall<'a, S> {
@@ -11237,7 +11307,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11420,7 +11490,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -11529,7 +11599,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11712,7 +11782,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -11821,7 +11891,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12113,7 +12183,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12296,7 +12366,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -12405,7 +12475,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12697,7 +12767,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12989,7 +13059,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13281,7 +13351,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13573,7 +13643,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13865,7 +13935,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14157,7 +14227,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14340,7 +14410,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard.
+    /// Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information.
     ///
     /// Sets the *app* path property to the given value.
     ///
@@ -14449,7 +14519,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14741,7 +14811,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14924,7 +14994,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent project name and the service, in the format ``` projects/{project_number}/services/{service_id} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails.
+    /// Required. The parent service name, in the format ``` projects/{project_number}/services/{service_id} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15033,7 +15103,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15216,7 +15286,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative resource name of the parent service in which the specified ResourcePolicy will be created, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
+    /// Required. The relative resource name of the parent Service in which the specified ResourcePolicy will be created, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15324,7 +15394,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15427,6 +15497,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15483,7 +15554,7 @@ where
     }
 
 
-    /// Required. The relative resource name of the ResourcePolicy to delete, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_name} ```
+    /// Required. The relative resource name of the ResourcePolicy to delete, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ```
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -15493,7 +15564,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// The checksum to be validated against the current ResourcePolicy, to ensure the client has an up-to-date value before proceeding. The user can obtain this from the ResourcePolicy object that they last received. This etag is strongly validated.
+    /// The checksum to be validated against the current ResourcePolicy, to ensure the client has an up-to-date value before proceeding. This checksum is computed by the server based on the values of fields in the ResourcePolicy object, and can be obtained from the ResourcePolicy object received from the last CreateResourcePolicy, GetResourcePolicy, ListResourcePolicies, UpdateResourcePolicy, or BatchUpdateResourcePolicies call. This etag is strongly validated as defined by RFC 7232.
     ///
     /// Sets the *etag* query property to the given value.
     pub fn etag(mut self, new_value: &str) -> ProjectServiceResourcePolicyDeleteCall<'a, S> {
@@ -15598,7 +15669,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15696,6 +15767,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15752,7 +15824,7 @@ where
     }
 
 
-    /// Required. The relative resource name of the ResourcePolicy to retrieve, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID used as the resource ID for the policy.
+    /// Required. The relative resource name of the ResourcePolicy to retrieve, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -15860,7 +15932,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15973,6 +16045,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16029,7 +16102,7 @@ where
     }
 
 
-    /// Required. The relative resource name of the parent project and service for which to list each associated ResourcePolicy, in the format: ``` projects/{project_number}/services/{service_name} ```
+    /// Required. The relative resource name of the parent Service for which to list each associated ResourcePolicy, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -16039,14 +16112,14 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Token returned from a previous call to ListResourcePolicies indicating where in the set of ResourcePolicys to resume listing. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to ListResourcePolicies must match the call that provided the page token; if they do not match, the result is undefined.
+    /// Token returned from a previous call to ListResourcePolicies indicating where in the set of ResourcePolicy objects to resume listing. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to ListResourcePolicies must match the call that provided the page token; if they do not match, the result is undefined.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectServiceResourcePolicyListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of ResourcePolicys to return in the response. Only explicitly configured policies are returned. The server may return fewer than this at its own discretion. If no value is specified (or too large a value is specified), the server will impose its own limit.
+    /// The maximum number of ResourcePolicy objects to return in the response. The server may return fewer than this at its own discretion. If no value is specified (or too large a value is specified), the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectServiceResourcePolicyListCall<'a, S> {
@@ -16159,7 +16232,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16169,7 +16242,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().services_resource_policies_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -16347,7 +16420,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The relative name of the resource configuration object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID used as the resource ID for the policy.
+    /// Required. Identifier. The relative name of the resource policy object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -16463,7 +16536,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16754,7 +16827,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -16852,6 +16925,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16908,7 +16982,7 @@ where
     }
 
 
-    /// Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform)
+    /// Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform) * `oauth2.googleapis.com` (Google Identity for iOS)
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17016,7 +17090,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17124,6 +17198,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17197,7 +17272,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of Services to return in the response. Only explicitly configured services are returned. The server may return fewer than this at its own discretion. If no value is specified or set to zero (or too large a value is specified), the server will impose its own limit.
+    /// The maximum number of Services to return in the response. Only explicitly configured services are returned. The server may return fewer than this at its own discretion. If no value is specified (or too large a value is specified), the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectServiceListCall<'a, S> {
@@ -17303,7 +17378,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17313,7 +17388,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().services_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -17607,7 +17682,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Firebaseappcheck::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !

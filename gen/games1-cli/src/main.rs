@@ -50,6 +50,127 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _accesstokens_generate_play_grouping_api_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accesstokens().generate_play_grouping_api_token();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "persona" => {
+                    call = call.persona(value.unwrap_or(""));
+                },
+                "package-name" => {
+                    call = call.package_name(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["package-name", "persona"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accesstokens_generate_recall_play_grouping_api_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accesstokens().generate_recall_play_grouping_api_token();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "recall-session-id" => {
+                    call = call.recall_session_id(value.unwrap_or(""));
+                },
+                "persona" => {
+                    call = call.persona(value.unwrap_or(""));
+                },
+                "package-name" => {
+                    call = call.package_name(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["package-name", "persona", "recall-session-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _achievement_definitions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.achievement_definitions().list();
@@ -1366,6 +1487,114 @@ where
         }
     }
 
+    async fn _recall_games_player_tokens(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.recall().games_player_tokens(opt.value_of("session-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "application-ids" => {
+                    call = call.add_application_ids(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["application-ids"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _recall_last_token_from_all_developer_games(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.recall().last_token_from_all_developer_games(opt.value_of("session-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _recall_link_persona(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2251,6 +2480,20 @@ where
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("accesstokens", Some(opt)) => {
+                match opt.subcommand() {
+                    ("generate-play-grouping-api-token", Some(opt)) => {
+                        call_result = self._accesstokens_generate_play_grouping_api_token(opt, dry_run, &mut err).await;
+                    },
+                    ("generate-recall-play-grouping-api-token", Some(opt)) => {
+                        call_result = self._accesstokens_generate_recall_play_grouping_api_token(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("accesstokens".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("achievement-definitions", Some(opt)) => {
                 match opt.subcommand() {
                     ("list", Some(opt)) => {
@@ -2375,6 +2618,12 @@ where
             },
             ("recall", Some(opt)) => {
                 match opt.subcommand() {
+                    ("games-player-tokens", Some(opt)) => {
+                        call_result = self._recall_games_player_tokens(opt, dry_run, &mut err).await;
+                    },
+                    ("last-token-from-all-developer-games", Some(opt)) => {
+                        call_result = self._recall_last_token_from_all_developer_games(opt, dry_run, &mut err).await;
+                    },
                     ("link-persona", Some(opt)) => {
                         call_result = self._recall_link_persona(opt, dry_run, &mut err).await;
                     },
@@ -2525,6 +2774,41 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("accesstokens", "methods: 'generate-play-grouping-api-token' and 'generate-recall-play-grouping-api-token'", vec![
+            ("generate-play-grouping-api-token",
+                    Some(r##"Generates a Play Grouping API token for the PGS user identified by the attached credential."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/accesstokens_generate-play-grouping-api-token",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("generate-recall-play-grouping-api-token",
+                    Some(r##"Generates a Play Grouping API token for the PGS user identified by the Recall session ID provided in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/accesstokens_generate-recall-play-grouping-api-token",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("achievement-definitions", "methods: 'list'", vec![
             ("list",
                     Some(r##"Lists all the achievement definitions for your application."##),
@@ -2988,7 +3272,51 @@ async fn main() {
                   ]),
             ]),
         
-        ("recall", "methods: 'link-persona', 'reset-persona', 'retrieve-tokens' and 'unlink-persona'", vec![
+        ("recall", "methods: 'games-player-tokens', 'last-token-from-all-developer-games', 'link-persona', 'reset-persona', 'retrieve-tokens' and 'unlink-persona'", vec![
+            ("games-player-tokens",
+                    Some(r##"Retrieve the Recall tokens from all requested games that is associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have an active PGS Player profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/recall_games-player-tokens",
+                  vec![
+                    (Some(r##"session-id"##),
+                     None,
+                     Some(r##"Required. Opaque server-generated string that encodes all the necessary information to identify the PGS player / Google user and application."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("last-token-from-all-developer-games",
+                    Some(r##"Retrieve the last Recall token from all developer games that is associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have active PGS Player profile."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_games1_cli/recall_last-token-from-all-developer-games",
+                  vec![
+                    (Some(r##"session-id"##),
+                     None,
+                     Some(r##"Required. Opaque server-generated string that encodes all the necessary information to identify the PGS player / Google user and application."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("link-persona",
                     Some(r##"Associate the PGS Player principal encoded in the provided recall session id with an in-game account"##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/recall_link-persona",
@@ -3034,7 +3362,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("retrieve-tokens",
-                    Some(r##"Retrieve all Recall tokens associated with the PGS Player principal encoded in the provided recall session id. The API is only available for users that have active PGS Player profile."##),
+                    Some(r##"Retrieve all Recall tokens associated with the PGS Player encoded in the provided recall session id. The API is only available for users that have active PGS Player profile."##),
                     "Details at http://byron.github.io/google-apis-rs/google_games1_cli/recall_retrieve-tokens",
                   vec![
                     (Some(r##"session-id"##),
@@ -3329,7 +3657,7 @@ async fn main() {
     
     let mut app = App::new("games1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240228")
+           .version("5.0.5+20240618")
            .about("The Google Play games service allows developers to enhance games with social leaderboards, achievements, game state, sign-in with Google, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_games1_cli")
            .arg(Arg::with_name("url")
@@ -3393,6 +3721,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

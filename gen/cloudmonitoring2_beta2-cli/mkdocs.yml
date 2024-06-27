@@ -1,4 +1,4 @@
-site_name: Cloud Monitoring v5.0.4+20170501
+site_name: Cloud Monitoring v5.0.5+20170501
 site_url: http://byron.github.io/google-apis-rs/google-cloudmonitoring2_beta2-cli
 site_description: A complete library to interact with Cloud Monitoring (protocol v2beta2)
 
@@ -21,5 +21,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

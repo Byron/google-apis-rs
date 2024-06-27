@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Artifact Registry* API at revision *20240213*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Artifact Registry* API at revision *20240608*. The CLI is at version *5.0.5*.
 
 ```bash
 artifactregistry1-beta1 [options]

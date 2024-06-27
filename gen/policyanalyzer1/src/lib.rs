@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Policy Analyzer* crate version *5.0.4+20240303*, where *20240303* is the exact revision of the *policyanalyzer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *Policy Analyzer* crate version *5.0.5+20240623*, where *20240623* is the exact revision of the *policyanalyzer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *Policy Analyzer* *v1* API can be found at the
 //! [official documentation site](https://www.google.com).
@@ -11,6 +11,10 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](PolicyAnalyzer) ... 
 //! 
+//! * folders
+//!  * [*locations activity types activities query*](api::FolderLocationActivityTypeActivityQueryCall)
+//! * organizations
+//!  * [*locations activity types activities query*](api::OrganizationLocationActivityTypeActivityQueryCall)
 //! * projects
 //!  * [*locations activity types activities query*](api::ProjectLocationActivityTypeActivityQueryCall)
 //! 
@@ -47,6 +51,8 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.folders().locations_activity_types_activities_query(...).doit().await
+//! let r = hub.organizations().locations_activity_types_activities_query(...).doit().await
 //! let r = hub.projects().locations_activity_types_activities_query(...).doit().await
 //! ```
 //! 
@@ -91,11 +97,11 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = PolicyAnalyzer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = PolicyAnalyzer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_activity_types_activities_query("parent")
+//! let result = hub.folders().locations_activity_types_activities_query("parent")
 //!              .page_token("At")
 //!              .page_size(-8)
 //!              .filter("sed")
@@ -171,6 +177,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

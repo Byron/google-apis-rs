@@ -1,4 +1,4 @@
-site_name: Indexing v5.0.4+20240227
+site_name: Indexing v5.0.5+20240604
 site_url: http://byron.github.io/google-apis-rs/google-indexing3-cli
 site_description: A complete library to interact with Indexing (protocol v3)
 
@@ -15,5 +15,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

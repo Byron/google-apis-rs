@@ -516,9 +516,10 @@ where
                     "release-version" => Some(("releaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-patch-time" => Some(("securityPatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "serial-number" => Some(("serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "unified-device-id" => Some(("unifiedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wifi-mac-addresses" => Some(("wifiMacAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-specific-attributes", "asset-tag", "baseband-version", "bootloader-version", "brand", "build-number", "compromised-state", "create-time", "cts-profile-match", "device-id", "device-type", "enabled-developer-options", "enabled-unknown-sources", "enabled-usb-debugging", "encryption-state", "has-potentially-harmful-apps", "hostname", "imei", "kernel-version", "last-sync-time", "management-state", "manufacturer", "meid", "model", "name", "network-operator", "os-version", "other-accounts", "owner-profile-account", "owner-type", "ownership-privilege", "release-version", "security-patch-time", "serial-number", "supports-work-profile", "verified-boot", "verify-apps-enabled", "wifi-mac-addresses"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-specific-attributes", "asset-tag", "baseband-version", "bootloader-version", "brand", "build-number", "compromised-state", "create-time", "cts-profile-match", "device-id", "device-type", "enabled-developer-options", "enabled-unknown-sources", "enabled-usb-debugging", "encryption-state", "has-potentially-harmful-apps", "hostname", "imei", "kernel-version", "last-sync-time", "management-state", "manufacturer", "meid", "model", "name", "network-operator", "os-version", "other-accounts", "owner-profile-account", "owner-type", "ownership-privilege", "release-version", "security-patch-time", "serial-number", "supports-work-profile", "unified-device-id", "verified-boot", "verify-apps-enabled", "wifi-mac-addresses"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5232,7 +5233,7 @@ async fn main() {
         
         ("inbound-saml-sso-profiles", "methods: 'create', 'delete', 'get', 'idp-credentials-add', 'idp-credentials-delete', 'idp-credentials-get', 'idp-credentials-list', 'list' and 'patch'", vec![
             ("create",
-                    Some(r##"Creates an InboundSamlSsoProfile for a customer."##),
+                    Some(r##"Creates an InboundSamlSsoProfile for a customer. When the target customer has enabled [Multi-party approval for sensitive actions](https://support.google.com/a/answer/13790448), the `Operation` in the response will have `"done": false`, it will not have a response, and the metadata will have `"state": "awaiting-multi-party-approval"`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli/inbound-saml-sso-profiles_create",
                   vec![
                     (Some(r##"kv"##),
@@ -5298,7 +5299,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("idp-credentials-add",
-                    Some(r##"Adds an IdpCredential. Up to 2 credentials are allowed."##),
+                    Some(r##"Adds an IdpCredential. Up to 2 credentials are allowed. When the target customer has enabled [Multi-party approval for sensitive actions](https://support.google.com/a/answer/13790448), the `Operation` in the response will have `"done": false`, it will not have a response, and the metadata will have `"state": "awaiting-multi-party-approval"`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli/inbound-saml-sso-profiles_idp-credentials-add",
                   vec![
                     (Some(r##"parent"##),
@@ -5408,7 +5409,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an InboundSamlSsoProfile."##),
+                    Some(r##"Updates an InboundSamlSsoProfile. When the target customer has enabled [Multi-party approval for sensitive actions](https://support.google.com/a/answer/13790448), the `Operation` in the response will have `"done": false`, it will not have a response, and the metadata will have `"state": "awaiting-multi-party-approval"`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli/inbound-saml-sso-profiles_patch",
                   vec![
                     (Some(r##"name"##),
@@ -5554,7 +5555,7 @@ async fn main() {
     
     let mut app = App::new("cloudidentity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240227")
+           .version("5.0.5+20240625")
            .about("API for provisioning and managing identity resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli")
            .arg(Arg::with_name("url")
@@ -5618,6 +5619,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

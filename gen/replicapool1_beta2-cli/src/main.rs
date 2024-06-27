@@ -1482,7 +1482,7 @@ async fn main() {
     
     let mut app = App::new("replicapool1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20160512")
+           .version("5.0.5+20160512")
            .about("[Deprecated. Please use Instance Group Manager in Compute API] Provides groups of homogenous Compute Engine instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -1546,6 +1546,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

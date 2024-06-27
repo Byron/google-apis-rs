@@ -1,4 +1,4 @@
-site_name: Dataproc Metastore v5.0.4+20240228
+site_name: Dataproc Metastore v5.0.5+20240613
 site_url: http://byron.github.io/google-apis-rs/google-metastore1_beta-cli
 site_description: A complete library to interact with Dataproc Metastore (protocol v1beta)
 
@@ -33,6 +33,8 @@ nav:
     - 'Locations Services Backups List': 'projects_locations-services-backups-list.md'
     - 'Locations Services Backups Set Iam Policy': 'projects_locations-services-backups-set-iam-policy.md'
     - 'Locations Services Backups Test Iam Permissions': 'projects_locations-services-backups-test-iam-permissions.md'
+    - 'Locations Services Cancel Migration': 'projects_locations-services-cancel-migration.md'
+    - 'Locations Services Complete Migration': 'projects_locations-services-complete-migration.md'
     - 'Locations Services Create': 'projects_locations-services-create.md'
     - 'Locations Services Databases Get Iam Policy': 'projects_locations-services-databases-get-iam-policy.md'
     - 'Locations Services Databases Set Iam Policy': 'projects_locations-services-databases-set-iam-policy.md'
@@ -50,15 +52,18 @@ nav:
     - 'Locations Services Metadata Imports List': 'projects_locations-services-metadata-imports-list.md'
     - 'Locations Services Metadata Imports Patch': 'projects_locations-services-metadata-imports-patch.md'
     - 'Locations Services Migration Executions Delete': 'projects_locations-services-migration-executions-delete.md'
+    - 'Locations Services Migration Executions Get': 'projects_locations-services-migration-executions-get.md'
+    - 'Locations Services Migration Executions List': 'projects_locations-services-migration-executions-list.md'
     - 'Locations Services Move Table To Database': 'projects_locations-services-move-table-to-database.md'
     - 'Locations Services Patch': 'projects_locations-services-patch.md'
     - 'Locations Services Query Metadata': 'projects_locations-services-query-metadata.md'
     - 'Locations Services Remove Iam Policy': 'projects_locations-services-remove-iam-policy.md'
     - 'Locations Services Restore': 'projects_locations-services-restore.md'
     - 'Locations Services Set Iam Policy': 'projects_locations-services-set-iam-policy.md'
+    - 'Locations Services Start Migration': 'projects_locations-services-start-migration.md'
     - 'Locations Services Test Iam Permissions': 'projects_locations-services-test-iam-permissions.md'
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

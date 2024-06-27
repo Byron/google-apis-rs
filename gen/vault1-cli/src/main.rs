@@ -2304,6 +2304,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -2353,6 +2356,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -2464,6 +2470,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -3575,7 +3584,7 @@ async fn main() {
     
     let mut app = App::new("vault1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240220")
+           .version("5.0.5+20240617")
            .about("Retention and eDiscovery for Google Workspace. To work with Vault resources, the account must have the [required Vault privileges](https://support.google.com/vault/answer/2799699) and access to the matter. To access a matter, the account must have created the matter, have the matter shared with them, or have the **View All Matters** privilege. For example, to download an export, an account needs the **Manage Exports** privilege and the matter shared with them. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vault1_cli")
            .arg(Arg::with_name("url")
@@ -3639,6 +3648,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

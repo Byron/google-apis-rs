@@ -50,6 +50,71 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _claims_image_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.claims().image_search();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "offset" => {
+                    call = call.offset(        value.map(|v| arg_from_str(v, err, "offset", "int32")).unwrap_or(-0));
+                },
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                "image-uri" => {
+                    call = call.image_uri(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["image-uri", "language-code", "offset", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _claims_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.claims().search();
@@ -480,6 +545,9 @@ where
         match self.opt.subcommand() {
             ("claims", Some(opt)) => {
                 match opt.subcommand() {
+                    ("image-search", Some(opt)) => {
+                        call_result = self._claims_image_search(opt, dry_run, &mut err).await;
+                    },
                     ("search", Some(opt)) => {
                         call_result = self._claims_search(opt, dry_run, &mut err).await;
                     },
@@ -585,7 +653,23 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("claims", "methods: 'search'", vec![
+        ("claims", "methods: 'image-search' and 'search'", vec![
+            ("image-search",
+                    Some(r##"Search through fact-checked claims using an image as the query."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli/claims_image-search",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("search",
                     Some(r##"Search through fact-checked claims."##),
                     "Details at http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli/claims_search",
@@ -721,7 +805,7 @@ async fn main() {
     
     let mut app = App::new("factchecktools1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240303")
+           .version("5.0.5+20240626")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli")
            .arg(Arg::with_name("url")
@@ -785,6 +869,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

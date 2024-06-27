@@ -1,4 +1,4 @@
-site_name: Android Publisher v5.0.4+20200331
+site_name: Android Publisher v5.0.5+20200331
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: A complete library to interact with Android Publisher (protocol v2)
 
@@ -75,5 +75,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

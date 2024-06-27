@@ -80,13 +80,15 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threat-exceptions" => Some(("threatExceptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "traffic-logs" => Some(("trafficLogs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-forwarding-rule", "endpoint-ip", "labels", "name", "network", "severity", "state", "threat-exceptions", "traffic-logs", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-forwarding-rule", "endpoint-ip", "labels", "name", "network", "satisfies-pzi", "satisfies-pzs", "severity", "state", "threat-exceptions", "traffic-logs", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -412,13 +414,15 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threat-exceptions" => Some(("threatExceptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "traffic-logs" => Some(("trafficLogs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-forwarding-rule", "endpoint-ip", "labels", "name", "network", "severity", "state", "threat-exceptions", "traffic-logs", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-forwarding-rule", "endpoint-ip", "labels", "name", "network", "satisfies-pzi", "satisfies-pzs", "severity", "state", "threat-exceptions", "traffic-logs", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1494,7 +1498,7 @@ async fn main() {
     
     let mut app = App::new("ids1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20231203")
+           .version("5.0.5+20240613")
            .about("Cloud IDS (Cloud Intrusion Detection System) detects malware, spyware, command-and-control attacks, and other network-based threats. Its security efficacy is industry leading, built with Palo Alto Networks technologies. When you use this product, your organization name and consumption levels will be shared with Palo Alto Networks.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_ids1_cli")
            .arg(Arg::with_name("url")
@@ -1558,6 +1562,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

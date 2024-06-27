@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *replicapool* API at revision *20160512*. The CLI is at version *5.0.4*.
+This documentation was generated from the *replicapool* API at revision *20160512*. The CLI is at version *5.0.5*.
 
 ```bash
 replicapool1-beta2 [options]

@@ -25,19 +25,22 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *baremetalsolution* API at revision *20240228*. The CLI is at version *5.0.4*.
+This documentation was generated from the *baremetalsolution* API at revision *20240617*. The CLI is at version *5.0.5*.
 
 ```bash
 baremetalsolution2 [options]
         projects
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-instances-detach-lun <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-disable-hyperthreading <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-disable-interactive-serial-console <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-enable-hyperthreading <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-enable-interactive-serial-console <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-get <name> [-p <v>]... [-o <out>]
                 locations-instances-list <parent> [-p <v>]... [-o <out>]
                 locations-instances-load-auth-info <name> [-p <v>]... [-o <out>]
                 locations-instances-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-instances-reimage <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-rename <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-reset <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-start <name> (-r <kv>)... [-p <v>]... [-o <out>]

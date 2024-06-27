@@ -1,4 +1,4 @@
-site_name: Apigee v5.0.4+20240222
+site_name: Apigee v5.0.5+20240620
 site_url: http://byron.github.io/google-apis-rs/google-apigee1-cli
 site_description: A complete library to interact with Apigee (protocol v1)
 
@@ -289,6 +289,7 @@ nav:
     - 'Reports Get': 'organizations_reports-get.md'
     - 'Reports List': 'organizations_reports-list.md'
     - 'Reports Update': 'organizations_reports-update.md'
+    - 'Security Assessment Results Batch Compute': 'organizations_security-assessment-results-batch-compute.md'
     - 'Security Profiles Create': 'organizations_security-profiles-create.md'
     - 'Security Profiles Delete': 'organizations_security-profiles-delete.md'
     - 'Security Profiles Environments Compute Environment Scores': 'organizations_security-profiles-environments-compute-environment-scores.md'
@@ -328,5 +329,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

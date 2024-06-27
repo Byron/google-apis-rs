@@ -1,4 +1,4 @@
-site_name: Data Fusion v5.0.4+20240111
+site_name: Data Fusion v5.0.5+20240618
 site_url: http://byron.github.io/google-apis-rs/google-datafusion1-cli
 site_description: A complete library to interact with Data Fusion (protocol v1)
 
@@ -32,5 +32,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

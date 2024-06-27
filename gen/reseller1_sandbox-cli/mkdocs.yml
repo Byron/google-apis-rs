@@ -1,4 +1,4 @@
-site_name: reseller v5.0.4+20160329
+site_name: reseller v5.0.5+20160329
 site_url: http://byron.github.io/google-apis-rs/google-reseller1_sandbox-cli
 site_description: A complete library to interact with reseller (protocol v1sandbox)
 
@@ -28,5 +28,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

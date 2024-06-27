@@ -1,4 +1,4 @@
-site_name: Artifact Registry v5.0.4+20240213
+site_name: Artifact Registry v5.0.5+20240608
 site_url: http://byron.github.io/google-apis-rs/google-artifactregistry1-cli
 site_description: A complete library to interact with Artifact Registry (protocol v1)
 
@@ -21,8 +21,11 @@ nav:
     - 'Locations Repositories Delete': 'projects_locations-repositories-delete.md'
     - 'Locations Repositories Docker Images Get': 'projects_locations-repositories-docker-images-get.md'
     - 'Locations Repositories Docker Images List': 'projects_locations-repositories-docker-images-list.md'
+    - 'Locations Repositories Files Delete': 'projects_locations-repositories-files-delete.md'
+    - 'Locations Repositories Files Download': 'projects_locations-repositories-files-download.md'
     - 'Locations Repositories Files Get': 'projects_locations-repositories-files-get.md'
     - 'Locations Repositories Files List': 'projects_locations-repositories-files-list.md'
+    - 'Locations Repositories Generic Artifacts Upload': 'projects_locations-repositories-generic-artifacts-upload.md'
     - 'Locations Repositories Get': 'projects_locations-repositories-get.md'
     - 'Locations Repositories Get Iam Policy': 'projects_locations-repositories-get-iam-policy.md'
     - 'Locations Repositories Go Modules Upload': 'projects_locations-repositories-go-modules-upload.md'
@@ -37,6 +40,7 @@ nav:
     - 'Locations Repositories Packages Delete': 'projects_locations-repositories-packages-delete.md'
     - 'Locations Repositories Packages Get': 'projects_locations-repositories-packages-get.md'
     - 'Locations Repositories Packages List': 'projects_locations-repositories-packages-list.md'
+    - 'Locations Repositories Packages Patch': 'projects_locations-repositories-packages-patch.md'
     - 'Locations Repositories Packages Tags Create': 'projects_locations-repositories-packages-tags-create.md'
     - 'Locations Repositories Packages Tags Delete': 'projects_locations-repositories-packages-tags-delete.md'
     - 'Locations Repositories Packages Tags Get': 'projects_locations-repositories-packages-tags-get.md'
@@ -58,5 +62,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

@@ -564,11 +564,12 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-token", "create-time", "crypto-key-name", "name", "provider", "pubsub-topic", "state", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-token", "create-time", "crypto-key-name", "name", "provider", "pubsub-topic", "satisfies-pzs", "state", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -890,11 +891,12 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-token", "create-time", "crypto-key-name", "name", "provider", "pubsub-topic", "state", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-token", "create-time", "crypto-key-name", "name", "provider", "pubsub-topic", "satisfies-pzs", "state", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1707,13 +1709,14 @@ where
                     "event-data-content-type" => Some(("eventDataContentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transport.pubsub.subscription" => Some(("transport.pubsub.subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transport.pubsub.topic" => Some(("transport.pubsub.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "event-data-content-type", "gke", "http-endpoint", "labels", "location", "name", "namespace", "network-attachment", "network-config", "path", "pubsub", "region", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "uri", "workflow"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "event-data-content-type", "gke", "http-endpoint", "labels", "location", "name", "namespace", "network-attachment", "network-config", "path", "pubsub", "region", "satisfies-pzs", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "uri", "workflow"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2056,13 +2059,14 @@ where
                     "event-data-content-type" => Some(("eventDataContentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transport.pubsub.subscription" => Some(("transport.pubsub.subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transport.pubsub.topic" => Some(("transport.pubsub.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "event-data-content-type", "gke", "http-endpoint", "labels", "location", "name", "namespace", "network-attachment", "network-config", "path", "pubsub", "region", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "uri", "workflow"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel", "cloud-function", "cloud-run", "cluster", "create-time", "destination", "etag", "event-data-content-type", "gke", "http-endpoint", "labels", "location", "name", "namespace", "network-attachment", "network-config", "path", "pubsub", "region", "satisfies-pzs", "service", "service-account", "subscription", "topic", "transport", "uid", "update-time", "uri", "workflow"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3391,7 +3395,7 @@ async fn main() {
     
     let mut app = App::new("eventarc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240618")
            .about("Build event-driven applications on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_eventarc1_cli")
            .arg(Arg::with_name("url")
@@ -3455,6 +3459,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

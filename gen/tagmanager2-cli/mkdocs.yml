@@ -1,4 +1,4 @@
-site_name: Tag Manager v5.0.4+20240228
+site_name: Tag Manager v5.0.5+20240619
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager2-cli
 site_description: A complete library to interact with Tag Manager (protocol v2)
 
@@ -117,5 +117,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

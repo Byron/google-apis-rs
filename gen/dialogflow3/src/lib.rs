@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dialogflow* crate version *5.0.4+20240227*, where *20240227* is the exact revision of the *dialogflow:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *Dialogflow* crate version *5.0.5+20240614*, where *20240614* is the exact revision of the *dialogflow:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *Dialogflow* *v3* API can be found at the
 //! [official documentation site](https://cloud.google.com/dialogflow/).
@@ -112,7 +112,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -122,7 +122,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().locations_agents_environments_patch(req, "name")
-//!              .update_mask(&Default::default())
+//!              .update_mask(FieldMask::new::<&str>(&[]))
 //!              .doit().await;
 //! 
 //! match result {
@@ -195,6 +195,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

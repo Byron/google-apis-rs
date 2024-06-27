@@ -2394,7 +2394,7 @@ async fn main() {
     
     let mut app = App::new("recommendationengine1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240229")
+           .version("5.0.5+20240618")
            .about("Note that we now highly recommend new customers to use Retail API, which incorporates the GA version of the Recommendations AI funtionalities. To enable Retail API, please visit https://console.cloud.google.com/apis/library/retail.googleapis.com. The Recommendations AI service enables customers to build end-to-end personalized recommendation systems without requiring a high level of expertise in machine learning, recommendation system, or Google Cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_recommendationengine1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -2458,6 +2458,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

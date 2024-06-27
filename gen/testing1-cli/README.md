@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *testing* API can be found at the
-[official documentation site](https://developers.google.com/cloud-test-lab/).
+[official documentation site](https://firebase.google.com/docs/test-lab/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *testing* API at revision *20240227*. The CLI is at version *5.0.4*.
+This documentation was generated from the *testing* API at revision *20240621*. The CLI is at version *5.0.5*.
 
 ```bash
 testing1 [options]

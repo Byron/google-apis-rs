@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SAS Portal Testing* API at revision *20240226*. The CLI is at version *5.0.4*.
+This documentation was generated from the *SAS Portal Testing* API at revision *20240626*. The CLI is at version *5.0.5*.
 
 ```bash
 prod-tt-sasportal1-alpha1 [options]

@@ -139,13 +139,14 @@ where
                     "contact-info.eu-representative-phone" => Some(("contactInfo.euRepresentativePhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled-notification-types" => Some(("enabledNotificationTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "enterprise-display-name" => Some(("enterpriseDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "google-authentication-settings.google-authentication-required" => Some(("googleAuthenticationSettings.googleAuthenticationRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logo.sha256-hash" => Some(("logo.sha256Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logo.url" => Some(("logo.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-color" => Some(("primaryColor", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-auto-approval-enabled", "contact-email", "contact-info", "data-protection-officer-email", "data-protection-officer-name", "data-protection-officer-phone", "enabled-notification-types", "enterprise-display-name", "eu-representative-email", "eu-representative-name", "eu-representative-phone", "logo", "name", "primary-color", "pubsub-topic", "sha256-hash", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-auto-approval-enabled", "contact-email", "contact-info", "data-protection-officer-email", "data-protection-officer-name", "data-protection-officer-phone", "enabled-notification-types", "enterprise-display-name", "eu-representative-email", "eu-representative-name", "eu-representative-phone", "google-authentication-required", "google-authentication-settings", "logo", "name", "primary-color", "pubsub-topic", "sha256-hash", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1476,13 +1477,14 @@ where
                     "contact-info.eu-representative-phone" => Some(("contactInfo.euRepresentativePhone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled-notification-types" => Some(("enabledNotificationTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "enterprise-display-name" => Some(("enterpriseDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "google-authentication-settings.google-authentication-required" => Some(("googleAuthenticationSettings.googleAuthenticationRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logo.sha256-hash" => Some(("logo.sha256Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "logo.url" => Some(("logo.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-color" => Some(("primaryColor", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "pubsub-topic" => Some(("pubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-auto-approval-enabled", "contact-email", "contact-info", "data-protection-officer-email", "data-protection-officer-name", "data-protection-officer-phone", "enabled-notification-types", "enterprise-display-name", "eu-representative-email", "eu-representative-name", "eu-representative-phone", "logo", "name", "primary-color", "pubsub-topic", "sha256-hash", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-auto-approval-enabled", "contact-email", "contact-info", "data-protection-officer-email", "data-protection-officer-name", "data-protection-officer-phone", "enabled-notification-types", "enterprise-display-name", "eu-representative-email", "eu-representative-name", "eu-representative-phone", "google-authentication-required", "google-authentication-settings", "logo", "name", "primary-color", "pubsub-topic", "sha256-hash", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1769,6 +1771,7 @@ where
                     "device-connectivity-management.tethering-settings" => Some(("deviceConnectivityManagement.tetheringSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-connectivity-management.usb-data-access" => Some(("deviceConnectivityManagement.usbDataAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-connectivity-management.wifi-direct-settings" => Some(("deviceConnectivityManagement.wifiDirectSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-connectivity-management.wifi-ssid-policy.wifi-ssid-policy-type" => Some(("deviceConnectivityManagement.wifiSsidPolicy.wifiSsidPolicyType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-owner-lock-screen-info.default-message" => Some(("deviceOwnerLockScreenInfo.defaultMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-owner-lock-screen-info.localized-messages" => Some(("deviceOwnerLockScreenInfo.localizedMessages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "device-radio-state.airplane-mode-state" => Some(("deviceRadioState.airplaneModeState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1776,6 +1779,10 @@ where
                     "device-radio-state.minimum-wifi-security-level" => Some(("deviceRadioState.minimumWifiSecurityLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-radio-state.ultra-wideband-state" => Some(("deviceRadioState.ultraWidebandState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-radio-state.wifi-state" => Some(("deviceRadioState.wifiState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-settings.screen-brightness-settings.screen-brightness" => Some(("displaySettings.screenBrightnessSettings.screenBrightness", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "display-settings.screen-brightness-settings.screen-brightness-mode" => Some(("displaySettings.screenBrightnessSettings.screenBrightnessMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-settings.screen-timeout-settings.screen-timeout" => Some(("displaySettings.screenTimeoutSettings.screenTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-settings.screen-timeout-settings.screen-timeout-mode" => Some(("displaySettings.screenTimeoutSettings.screenTimeoutMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "encryption-policy" => Some(("encryptionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ensure-verify-apps-enabled" => Some(("ensureVerifyAppsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "factory-reset-disabled" => Some(("factoryResetDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1872,7 +1879,7 @@ where
                     "wifi-config-disabled" => Some(("wifiConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wifi-configs-lockdown-enabled" => Some(("wifiConfigsLockdownEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "advanced-security-overrides", "airplane-mode-state", "always-on-vpn-package", "android-device-policy-tracks", "app-auto-update-policy", "application-reporting-settings", "application-reports-enabled", "auto-date-and-time-zone", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "camera-access", "camera-disabled", "cell-broadcasts-config-disabled", "cellular-two-g-state", "common-criteria-mode", "common-criteria-mode-enabled", "configure-wifi", "create-windows-disabled", "credential-provider-policy-default", "credentials-config-disabled", "cross-profile-copy-paste", "cross-profile-data-sharing", "cross-profile-policies", "data-roaming-disabled", "debugging-features-allowed", "default-message", "default-permission-policy", "developer-settings", "device-connectivity-management", "device-owner-lock-screen-info", "device-radio-state", "device-settings", "device-settings-enabled", "display-info-enabled", "enabled-log-types", "encryption-policy", "end-minutes", "ensure-verify-apps-enabled", "excluded-hosts", "exemptions-to-show-work-contacts-in-personal-profile", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "google-play-protect-verify-apps", "hardware-status-enabled", "host", "include-removed-apps", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "kiosk-custom-launcher-enabled", "kiosk-customization", "localized-messages", "location-mode", "lockdown-enabled", "long-support-message", "max-days-with-work-off", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "microphone-access", "minimum-api-level", "minimum-wifi-security-level", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "mte-policy", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "password-scope", "permitted-accessibility-services", "permitted-input-methods", "personal-apps-that-can-read-work-notifications", "personal-play-store-mode", "personal-usage-policies", "play-store-mode", "port", "power-button-actions", "power-management-events-enabled", "preferential-network-service", "printing-policy", "private-key-selection-enabled", "recommended-global-proxy", "remove-user-disabled", "require-password-unlock", "safe-boot-disabled", "screen-capture-disabled", "set-user-icon-disabled", "set-wallpaper-disabled", "share-location-disabled", "short-support-message", "show-work-contacts-in-personal-profile", "skip-first-use-hints-enabled", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-error-warnings", "system-navigation", "system-properties-enabled", "system-update", "tethering-config-disabled", "tethering-settings", "type", "ultra-wideband-state", "unified-lock-settings", "uninstall-apps-disabled", "unmute-microphone-disabled", "untrusted-apps-policy", "upload-on-cellular-allowed", "usage-log", "usb-data-access", "usb-file-transfer-disabled", "usb-mass-storage-enabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled", "wifi-direct-settings", "wifi-state", "work-profile-widgets-default"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "advanced-security-overrides", "airplane-mode-state", "always-on-vpn-package", "android-device-policy-tracks", "app-auto-update-policy", "application-reporting-settings", "application-reports-enabled", "auto-date-and-time-zone", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "camera-access", "camera-disabled", "cell-broadcasts-config-disabled", "cellular-two-g-state", "common-criteria-mode", "common-criteria-mode-enabled", "configure-wifi", "create-windows-disabled", "credential-provider-policy-default", "credentials-config-disabled", "cross-profile-copy-paste", "cross-profile-data-sharing", "cross-profile-policies", "data-roaming-disabled", "debugging-features-allowed", "default-message", "default-permission-policy", "developer-settings", "device-connectivity-management", "device-owner-lock-screen-info", "device-radio-state", "device-settings", "device-settings-enabled", "display-info-enabled", "display-settings", "enabled-log-types", "encryption-policy", "end-minutes", "ensure-verify-apps-enabled", "excluded-hosts", "exemptions-to-show-work-contacts-in-personal-profile", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "google-play-protect-verify-apps", "hardware-status-enabled", "host", "include-removed-apps", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "kiosk-custom-launcher-enabled", "kiosk-customization", "localized-messages", "location-mode", "lockdown-enabled", "long-support-message", "max-days-with-work-off", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "microphone-access", "minimum-api-level", "minimum-wifi-security-level", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "mte-policy", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "password-scope", "permitted-accessibility-services", "permitted-input-methods", "personal-apps-that-can-read-work-notifications", "personal-play-store-mode", "personal-usage-policies", "play-store-mode", "port", "power-button-actions", "power-management-events-enabled", "preferential-network-service", "printing-policy", "private-key-selection-enabled", "recommended-global-proxy", "remove-user-disabled", "require-password-unlock", "safe-boot-disabled", "screen-brightness", "screen-brightness-mode", "screen-brightness-settings", "screen-capture-disabled", "screen-timeout", "screen-timeout-mode", "screen-timeout-settings", "set-user-icon-disabled", "set-wallpaper-disabled", "share-location-disabled", "short-support-message", "show-work-contacts-in-personal-profile", "skip-first-use-hints-enabled", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-error-warnings", "system-navigation", "system-properties-enabled", "system-update", "tethering-config-disabled", "tethering-settings", "type", "ultra-wideband-state", "unified-lock-settings", "uninstall-apps-disabled", "unmute-microphone-disabled", "untrusted-apps-policy", "upload-on-cellular-allowed", "usage-log", "usb-data-access", "usb-file-transfer-disabled", "usb-mass-storage-enabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled", "wifi-direct-settings", "wifi-ssid-policy", "wifi-ssid-policy-type", "wifi-state", "work-profile-widgets-default"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2434,6 +2441,9 @@ where
                 "callback-url" => {
                     call = call.callback_url(value.unwrap_or(""));
                 },
+                "admin-email" => {
+                    call = call.admin_email(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2447,7 +2457,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["callback-url", "project-id"].iter().map(|v|*v));
+                                                                           v.extend(["admin-email", "callback-url", "project-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2988,7 +2998,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("enrollment-tokens-get",
-                    Some(r##"Gets an active, unexpired enrollment token. Only a partial view of EnrollmentToken is returned: all the fields but name and expiration_timestamp are empty. This method is meant to help manage active enrollment tokens lifecycle. For security reasons, it's recommended to delete active enrollment tokens as soon as they're not intended to be used anymore."##),
+                    Some(r##"Gets an active, unexpired enrollment token. A partial view of the enrollment token is returned. Only the following fields are populated: name, expirationTimestamp, allowPersonalUsage, value, qrCode. This method is meant to help manage active enrollment tokens lifecycle. For security reasons, it's recommended to delete active enrollment tokens as soon as they're not intended to be used anymore."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_enrollment-tokens-get",
                   vec![
                     (Some(r##"name"##),
@@ -3010,7 +3020,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("enrollment-tokens-list",
-                    Some(r##"Lists active, unexpired enrollment tokens for a given enterprise. The list items contain only a partial view of EnrollmentToken: all the fields but name and expiration_timestamp are empty. This method is meant to help manage active enrollment tokens lifecycle. For security reasons, it's recommended to delete active enrollment tokens as soon as they're not intended to be used anymore."##),
+                    Some(r##"Lists active, unexpired enrollment tokens for a given enterprise. The list items contain only a partial view of EnrollmentToken object. Only the following fields are populated: name, expirationTimestamp, allowPersonalUsage, value, qrCode. This method is meant to help manage active enrollment tokens lifecycle. For security reasons, it's recommended to delete active enrollment tokens as soon as they're not intended to be used anymore."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_enrollment-tokens-list",
                   vec![
                     (Some(r##"parent"##),
@@ -3070,12 +3080,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("migration-tokens-create",
-                    Some(r##"Creates a migration token, to migrate an existing device from being managed by the EMM's Device Policy Controller (DPC) to being managed by the Android Management API."##),
+                    Some(r##"Creates a migration token, to migrate an existing device from being managed by the EMM's Device Policy Controller (DPC) to being managed by the Android Management API. See the guide (https://developers.google.com/android/management/dpc-migration) for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_migration-tokens-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The enterprise in which this migration token will be created. Format: enterprises/{enterprise}"##),
+                     Some(r##"Required. The enterprise in which this migration token is created. This must be the same enterprise which already manages the device in the Play EMM API. Format: enterprises/{enterprise}"##),
                      Some(true),
                      Some(false)),
         
@@ -3463,7 +3473,7 @@ async fn main() {
     
     let mut app = App::new("androidmanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240221")
+           .version("5.0.5+20240626")
            .about("The Android Management API provides remote enterprise management of Android devices and apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli")
            .arg(Arg::with_name("url")
@@ -3527,6 +3537,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

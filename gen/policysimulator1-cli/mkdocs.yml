@@ -1,4 +1,4 @@
-site_name: Policy Simulator v5.0.4+20240303
+site_name: Policy Simulator v5.0.5+20240623
 site_url: http://byron.github.io/google-apis-rs/google-policysimulator1-cli
 site_description: A complete library to interact with Policy Simulator (protocol v1)
 
@@ -20,11 +20,7 @@ nav:
     - 'Get': 'operations_get.md'
     - 'List': 'operations_list.md'
 - 'Organizations':
-    - 'Locations Org Policy Violations Previews Create': 'organizations_locations-org-policy-violations-previews-create.md'
-    - 'Locations Org Policy Violations Previews Get': 'organizations_locations-org-policy-violations-previews-get.md'
-    - 'Locations Org Policy Violations Previews List': 'organizations_locations-org-policy-violations-previews-list.md'
     - 'Locations Org Policy Violations Previews Operations Get': 'organizations_locations-org-policy-violations-previews-operations-get.md'
-    - 'Locations Org Policy Violations Previews Org Policy Violations List': 'organizations_locations-org-policy-violations-previews-org-policy-violations-list.md'
     - 'Locations Replays Create': 'organizations_locations-replays-create.md'
     - 'Locations Replays Get': 'organizations_locations-replays-get.md'
     - 'Locations Replays Operations Get': 'organizations_locations-replays-operations-get.md'
@@ -40,5 +36,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

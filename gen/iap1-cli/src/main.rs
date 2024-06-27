@@ -386,6 +386,7 @@ where
                     "access-settings.cors-settings.allow-http-options" => Some(("accessSettings.corsSettings.allowHttpOptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "access-settings.gcip-settings.login-page-uri" => Some(("accessSettings.gcipSettings.loginPageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.gcip-settings.tenant-ids" => Some(("accessSettings.gcipSettings.tenantIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "access-settings.identity-sources" => Some(("accessSettings.identitySources", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "access-settings.oauth-settings.login-hint" => Some(("accessSettings.oauthSettings.loginHint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.oauth-settings.programmatic-clients" => Some(("accessSettings.oauthSettings.programmaticClients", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "access-settings.policy-delegation-settings.iam-permission" => Some(("accessSettings.policyDelegationSettings.iamPermission", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -395,11 +396,19 @@ where
                     "access-settings.policy-delegation-settings.policy-name.type" => Some(("accessSettings.policyDelegationSettings.policyName.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.policy-delegation-settings.resource.labels" => Some(("accessSettings.policyDelegationSettings.resource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "access-settings.policy-delegation-settings.resource.name" => Some(("accessSettings.policyDelegationSettings.resource.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access-settings.policy-delegation-settings.resource.next-state-of-tags.tags-full-state.tags" => Some(("accessSettings.policyDelegationSettings.resource.nextStateOfTags.tagsFullState.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "access-settings.policy-delegation-settings.resource.next-state-of-tags.tags-full-state-for-child-resource.tags" => Some(("accessSettings.policyDelegationSettings.resource.nextStateOfTags.tagsFullStateForChildResource.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "access-settings.policy-delegation-settings.resource.next-state-of-tags.tags-partial-state.tag-keys-to-remove" => Some(("accessSettings.policyDelegationSettings.resource.nextStateOfTags.tagsPartialState.tagKeysToRemove", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "access-settings.policy-delegation-settings.resource.next-state-of-tags.tags-partial-state.tags-to-upsert" => Some(("accessSettings.policyDelegationSettings.resource.nextStateOfTags.tagsPartialState.tagsToUpsert", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "access-settings.policy-delegation-settings.resource.service" => Some(("accessSettings.policyDelegationSettings.resource.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.policy-delegation-settings.resource.type" => Some(("accessSettings.policyDelegationSettings.resource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.reauth-settings.max-age" => Some(("accessSettings.reauthSettings.maxAge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.reauth-settings.method" => Some(("accessSettings.reauthSettings.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-settings.reauth-settings.policy-type" => Some(("accessSettings.reauthSettings.policyType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access-settings.workforce-identity-settings.oauth2.client-id" => Some(("accessSettings.workforceIdentitySettings.oauth2.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access-settings.workforce-identity-settings.oauth2.client-secret" => Some(("accessSettings.workforceIdentitySettings.oauth2.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access-settings.workforce-identity-settings.oauth2.client-secret-sha256" => Some(("accessSettings.workforceIdentitySettings.oauth2.clientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access-settings.workforce-identity-settings.workforce-pools" => Some(("accessSettings.workforceIdentitySettings.workforcePools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "application-settings.access-denied-page-settings.access-denied-page-uri" => Some(("applicationSettings.accessDeniedPageSettings.accessDeniedPageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "application-settings.access-denied-page-settings.generate-troubleshooting-uri" => Some(("applicationSettings.accessDeniedPageSettings.generateTroubleshootingUri", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "application-settings.access-denied-page-settings.remediation-token-generation-enabled" => Some(("applicationSettings.accessDeniedPageSettings.remediationTokenGenerationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -410,7 +419,7 @@ where
                     "application-settings.csm-settings.rctoken-aud" => Some(("applicationSettings.csmSettings.rctokenAud", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "allowed-domains-settings", "application-settings", "attribute-propagation-settings", "cookie-domain", "cors-settings", "csm-settings", "domains", "enable", "expression", "gcip-settings", "generate-troubleshooting-uri", "iam-permission", "iam-service-name", "id", "labels", "login-hint", "login-page-uri", "max-age", "method", "name", "oauth-settings", "output-credentials", "policy-delegation-settings", "policy-name", "policy-type", "programmatic-clients", "rctoken-aud", "reauth-settings", "region", "remediation-token-generation-enabled", "resource", "service", "tenant-ids", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-denied-page-settings", "access-denied-page-uri", "access-settings", "allow-http-options", "allowed-domains-settings", "application-settings", "attribute-propagation-settings", "client-id", "client-secret", "client-secret-sha256", "cookie-domain", "cors-settings", "csm-settings", "domains", "enable", "expression", "gcip-settings", "generate-troubleshooting-uri", "iam-permission", "iam-service-name", "id", "identity-sources", "labels", "login-hint", "login-page-uri", "max-age", "method", "name", "next-state-of-tags", "oauth2", "oauth-settings", "output-credentials", "policy-delegation-settings", "policy-name", "policy-type", "programmatic-clients", "rctoken-aud", "reauth-settings", "region", "remediation-token-generation-enabled", "resource", "service", "tag-keys-to-remove", "tags", "tags-full-state", "tags-full-state-for-child-resource", "tags-partial-state", "tags-to-upsert", "tenant-ids", "type", "workforce-identity-settings", "workforce-pools"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1688,7 +1697,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("validate-attribute-expression",
-                    Some(r##"Validates a given CEL expression conforms to IAP restrictions."##),
+                    Some(r##"Validates that a given CEL expression conforms to IAP restrictions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iap1_cli/methods_validate-attribute-expression",
                   vec![
                     (Some(r##"name"##),
@@ -2006,7 +2015,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Immutable. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-)."##),
+                     Some(r##"Identifier. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-)."##),
                      Some(true),
                      Some(false)),
         
@@ -2034,7 +2043,7 @@ async fn main() {
     
     let mut app = App::new("iap1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240224")
+           .version("5.0.5+20240623")
            .about("Controls access to cloud applications running on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iap1_cli")
            .arg(Arg::with_name("url")
@@ -2098,6 +2107,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

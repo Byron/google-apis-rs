@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Functions* API at revision *20240229*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Functions* API at revision *20240620*. The CLI is at version *5.0.5*.
 
 ```bash
 cloudfunctions1 [options]

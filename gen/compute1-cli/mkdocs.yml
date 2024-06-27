@@ -1,4 +1,4 @@
-site_name: compute v5.0.4+20240218
+site_name: compute v5.0.5+20240604
 site_url: http://byron.github.io/google-apis-rs/google-compute1-cli
 site_description: A complete library to interact with compute (protocol v1)
 
@@ -199,6 +199,12 @@ nav:
     - 'Set Iam Policy': 'images_set-iam-policy.md'
     - 'Set Labels': 'images_set-labels.md'
     - 'Test Iam Permissions': 'images_test-iam-permissions.md'
+- 'Instance Group Manager Resize Requests':
+    - 'Cancel': 'instance-group-manager-resize-requests_cancel.md'
+    - 'Delete': 'instance-group-manager-resize-requests_delete.md'
+    - 'Get': 'instance-group-manager-resize-requests_get.md'
+    - 'Insert': 'instance-group-manager-resize-requests_insert.md'
+    - 'List': 'instance-group-manager-resize-requests_list.md'
 - 'Instance Group Managers':
     - 'Abandon Instances': 'instance-group-managers_abandon-instances.md'
     - 'Aggregated List': 'instance-group-managers_aggregated-list.md'
@@ -230,6 +236,9 @@ nav:
     - 'List Instances': 'instance-groups_list-instances.md'
     - 'Remove Instances': 'instance-groups_remove-instances.md'
     - 'Set Named Ports': 'instance-groups_set-named-ports.md'
+- 'Instance Settings':
+    - 'Get': 'instance-settings_get.md'
+    - 'Patch': 'instance-settings_patch.md'
 - 'Instance Templates':
     - 'Aggregated List': 'instance-templates_aggregated-list.md'
     - 'Delete': 'instance-templates_delete.md'
@@ -410,6 +419,7 @@ nav:
     - 'List': 'node-groups_list.md'
     - 'List Nodes': 'node-groups_list-nodes.md'
     - 'Patch': 'node-groups_patch.md'
+    - 'Perform Maintenance': 'node-groups_perform-maintenance.md'
     - 'Set Iam Policy': 'node-groups_set-iam-policy.md'
     - 'Set Node Template': 'node-groups_set-node-template.md'
     - 'Simulate Maintenance Event': 'node-groups_simulate-maintenance-event.md'
@@ -745,6 +755,21 @@ nav:
     - 'List': 'ssl-policies_list.md'
     - 'List Available Features': 'ssl-policies_list-available-features.md'
     - 'Patch': 'ssl-policies_patch.md'
+- 'Storage Pool Types':
+    - 'Aggregated List': 'storage-pool-types_aggregated-list.md'
+    - 'Get': 'storage-pool-types_get.md'
+    - 'List': 'storage-pool-types_list.md'
+- 'Storage Pools':
+    - 'Aggregated List': 'storage-pools_aggregated-list.md'
+    - 'Delete': 'storage-pools_delete.md'
+    - 'Get': 'storage-pools_get.md'
+    - 'Get Iam Policy': 'storage-pools_get-iam-policy.md'
+    - 'Insert': 'storage-pools_insert.md'
+    - 'List': 'storage-pools_list.md'
+    - 'List Disks': 'storage-pools_list-disks.md'
+    - 'Set Iam Policy': 'storage-pools_set-iam-policy.md'
+    - 'Test Iam Permissions': 'storage-pools_test-iam-permissions.md'
+    - 'Update': 'storage-pools_update.md'
 - 'Subnetworks':
     - 'Aggregated List': 'subnetworks_aggregated-list.md'
     - 'Delete': 'subnetworks_delete.md'
@@ -866,5 +891,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

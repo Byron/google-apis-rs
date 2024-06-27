@@ -25,11 +25,20 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container Analysis* API at revision *20240223*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Container Analysis* API at revision *20240625*. The CLI is at version *5.0.5*.
 
 ```bash
 containeranalysis1-beta1 [options]
         projects
+                locations-notes-get <name> [-p <v>]... [-o <out>]
+                locations-notes-list <parent> [-p <v>]... [-o <out>]
+                locations-notes-occurrences-list <name> [-p <v>]... [-o <out>]
+                locations-occurrences-get <name> [-p <v>]... [-o <out>]
+                locations-occurrences-get-notes <name> [-p <v>]... [-o <out>]
+                locations-occurrences-get-vulnerability-summary <parent> [-p <v>]... [-o <out>]
+                locations-occurrences-list <parent> [-p <v>]... [-o <out>]
+                locations-resources-export-sbom <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-resources-generate-packages-summary <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 notes-batch-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 notes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 notes-delete <name> [-p <v>]... [-o <out>]

@@ -3685,7 +3685,7 @@ async fn main() {
     
     let mut app = App::new("content2-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20181009")
+           .version("5.0.5+20181009")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli")
            .arg(Arg::with_name("url")
@@ -3749,6 +3749,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

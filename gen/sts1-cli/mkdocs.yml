@@ -1,4 +1,4 @@
-site_name: Cloud Security Token v5.0.4+20240222
+site_name: Cloud Security Token v5.0.5+20240612
 site_url: http://byron.github.io/google-apis-rs/google-sts1-cli
 site_description: A complete library to interact with Cloud Security Token (protocol v1)
 
@@ -10,11 +10,9 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Methods':
-    - 'Introspect': 'methods_introspect.md'
-    - 'Oauthtoken': 'methods_oauthtoken.md'
     - 'Token': 'methods_token.md'
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

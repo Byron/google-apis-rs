@@ -1504,6 +1504,9 @@ where
                 "entity" => {
                     call = call.entity(value.unwrap_or(""));
                 },
+                "enable-attribute-suggestions" => {
+                    call = call.enable_attribute_suggestions(        value.map(|v| arg_from_str(v, err, "enable-attribute-suggestions", "boolean")).unwrap_or(false));
+                },
                 "device-type" => {
                     call = call.device_type(value.unwrap_or(""));
                 },
@@ -1523,7 +1526,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["dataset", "device-type", "entity", "language-codes", "max-suggestions", "query", "visitor-id"].iter().map(|v|*v));
+                                                                           v.extend(["dataset", "device-type", "enable-attribute-suggestions", "entity", "language-codes", "max-suggestions", "query", "visitor-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3508,6 +3511,7 @@ where
                     "facet-control-ids" => Some(("facetControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "filter-control-ids" => Some(("filterControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "ignore-control-ids" => Some(("ignoreControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "ignore-recs-denylist" => Some(("ignoreRecsDenylist", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "model-id" => Some(("modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oneway-synonyms-control-ids" => Some(("onewaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3518,7 +3522,7 @@ where
                     "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "twoway-synonyms-control-ids" => Some(("twowaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-control-ids", "display-name", "diversity-level", "diversity-type", "do-not-associate-control-ids", "dynamic-facet-spec", "enable-category-filter-level", "facet-control-ids", "filter-control-ids", "ignore-control-ids", "mode", "model-id", "name", "oneway-synonyms-control-ids", "personalization-spec", "price-reranking-level", "redirect-control-ids", "replacement-control-ids", "solution-types", "twoway-synonyms-control-ids"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-control-ids", "display-name", "diversity-level", "diversity-type", "do-not-associate-control-ids", "dynamic-facet-spec", "enable-category-filter-level", "facet-control-ids", "filter-control-ids", "ignore-control-ids", "ignore-recs-denylist", "mode", "model-id", "name", "oneway-synonyms-control-ids", "personalization-spec", "price-reranking-level", "redirect-control-ids", "replacement-control-ids", "solution-types", "twoway-synonyms-control-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3778,6 +3782,7 @@ where
                     "facet-control-ids" => Some(("facetControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "filter-control-ids" => Some(("filterControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "ignore-control-ids" => Some(("ignoreControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "ignore-recs-denylist" => Some(("ignoreRecsDenylist", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "model-id" => Some(("modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oneway-synonyms-control-ids" => Some(("onewaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3788,7 +3793,7 @@ where
                     "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "twoway-synonyms-control-ids" => Some(("twowaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-control-ids", "display-name", "diversity-level", "diversity-type", "do-not-associate-control-ids", "dynamic-facet-spec", "enable-category-filter-level", "facet-control-ids", "filter-control-ids", "ignore-control-ids", "mode", "model-id", "name", "oneway-synonyms-control-ids", "personalization-spec", "price-reranking-level", "redirect-control-ids", "replacement-control-ids", "solution-types", "twoway-synonyms-control-ids"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-control-ids", "display-name", "diversity-level", "diversity-type", "do-not-associate-control-ids", "dynamic-facet-spec", "enable-category-filter-level", "facet-control-ids", "filter-control-ids", "ignore-control-ids", "ignore-recs-denylist", "mode", "model-id", "name", "oneway-synonyms-control-ids", "personalization-spec", "price-reranking-level", "redirect-control-ids", "replacement-control-ids", "solution-types", "twoway-synonyms-control-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7002,7 +7007,7 @@ async fn main() {
     
     let mut app = App::new("retail2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240222")
+           .version("5.0.5+20240614")
            .about("Vertex AI Search for Retail API is made up of Retail Search, Browse and Recommendations. These discovery AI solutions help you implement personalized search, browse and recommendations, based on machine learning models, across your websites and mobile applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_retail2_cli")
            .arg(Arg::with_name("url")
@@ -7066,6 +7071,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

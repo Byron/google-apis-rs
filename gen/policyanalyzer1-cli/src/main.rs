@@ -50,6 +50,130 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _folders_locations_activity_types_activities_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().locations_activity_types_activities_query(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_activity_types_activities_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_activity_types_activities_query(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_activity_types_activities_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_activity_types_activities_query(opt.value_of("parent").unwrap_or(""));
@@ -117,6 +241,28 @@ where
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("folders", Some(opt)) => {
+                match opt.subcommand() {
+                    ("locations-activity-types-activities-query", Some(opt)) => {
+                        call_result = self._folders_locations_activity_types_activities_query(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("folders".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("organizations", Some(opt)) => {
+                match opt.subcommand() {
+                    ("locations-activity-types-activities-query", Some(opt)) => {
+                        call_result = self._organizations_locations_activity_types_activities_query(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("organizations".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-activity-types-activities-query", Some(opt)) => {
@@ -201,6 +347,56 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("folders", "methods: 'locations-activity-types-activities-query'", vec![
+            ("locations-activity-types-activities-query",
+                    Some(r##"Queries policy activities on Google Cloud resources."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_policyanalyzer1_cli/folders_locations-activity-types-activities-query",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The container resource on which to execute the request. Acceptable formats: `projects/[PROJECT_ID|PROJECT_NUMBER]/locations/[LOCATION]/activityTypes/[ACTIVITY_TYPE]` LOCATION here refers to Google Cloud Locations: https://cloud.google.com/about/locations/"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("organizations", "methods: 'locations-activity-types-activities-query'", vec![
+            ("locations-activity-types-activities-query",
+                    Some(r##"Queries policy activities on Google Cloud resources."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_policyanalyzer1_cli/organizations_locations-activity-types-activities-query",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The container resource on which to execute the request. Acceptable formats: `projects/[PROJECT_ID|PROJECT_NUMBER]/locations/[LOCATION]/activityTypes/[ACTIVITY_TYPE]` LOCATION here refers to Google Cloud Locations: https://cloud.google.com/about/locations/"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("projects", "methods: 'locations-activity-types-activities-query'", vec![
             ("locations-activity-types-activities-query",
                     Some(r##"Queries policy activities on Google Cloud resources."##),
@@ -230,7 +426,7 @@ async fn main() {
     
     let mut app = App::new("policyanalyzer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240303")
+           .version("5.0.5+20240623")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_policyanalyzer1_cli")
            .arg(Arg::with_name("url")
@@ -294,6 +490,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

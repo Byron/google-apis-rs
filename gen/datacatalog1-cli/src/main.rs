@@ -2826,11 +2826,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "dataplex-transfer-status" => Some(("dataplexTransferStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-publicly-readable" => Some(("isPubliclyReadable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "is-publicly-readable", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataplex-transfer-status", "display-name", "is-publicly-readable", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3524,11 +3525,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "dataplex-transfer-status" => Some(("dataplexTransferStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-publicly-readable" => Some(("isPubliclyReadable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "is-publicly-readable", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataplex-transfer-status", "display-name", "is-publicly-readable", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5816,7 +5818,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. The resource name of an entry in URL format. Note: The entry itself and its child resources might not be stored in the location specified in its name."##),
+                     Some(r##"Output only. Identifier. The resource name of an entry in URL format. Note: The entry itself and its child resources might not be stored in the location specified in its name."##),
                      Some(true),
                      Some(false)),
         
@@ -5944,7 +5946,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the tag in URL format where tag ID is a system-generated identifier. Note: The tag itself might not be stored in the location specified in its name."##),
+                     Some(r##"Identifier. The resource name of the tag in URL format where tag ID is a system-generated identifier. Note: The tag itself might not be stored in the location specified in its name."##),
                      Some(true),
                      Some(false)),
         
@@ -6128,7 +6130,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the entry group in URL format. Note: The entry group itself and its child resources might not be stored in the location specified in its name."##),
+                     Some(r##"Identifier. The resource name of the entry group in URL format. Note: The entry group itself and its child resources might not be stored in the location specified in its name."##),
                      Some(true),
                      Some(false)),
         
@@ -6256,7 +6258,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the tag in URL format where tag ID is a system-generated identifier. Note: The tag itself might not be stored in the location specified in its name."##),
+                     Some(r##"Identifier. The resource name of the tag in URL format where tag ID is a system-generated identifier. Note: The tag itself might not be stored in the location specified in its name."##),
                      Some(true),
                      Some(false)),
         
@@ -6634,7 +6636,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the tag template in URL format. Note: The tag template itself and its child resources might not be stored in the location specified in its name."##),
+                     Some(r##"Identifier. The resource name of the tag template in URL format. Note: The tag template itself and its child resources might not be stored in the location specified in its name."##),
                      Some(true),
                      Some(false)),
         
@@ -7208,7 +7210,7 @@ async fn main() {
     
     let mut app = App::new("datacatalog1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240222")
+           .version("5.0.5+20240624")
            .about("A fully managed and highly scalable data discovery and metadata management service. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datacatalog1_cli")
            .arg(Arg::with_name("url")
@@ -7272,6 +7274,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

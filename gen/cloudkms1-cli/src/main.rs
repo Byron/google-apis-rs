@@ -50,6 +50,148 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _folders_get_autokey_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().get_autokey_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_update_autokey_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "key-project" => Some(("keyProject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["key-project", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AutokeyConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().update_autokey_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_ekm_config_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_ekm_config_get_iam_policy(opt.value_of("resource").unwrap_or(""));
@@ -1051,6 +1193,205 @@ where
         }
     }
 
+    async fn _projects_locations_key_handles_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kms-key" => Some(("kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-type-selector" => Some(("resourceTypeSelector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kms-key", "name", "resource-type-selector"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::KeyHandle = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_key_handles_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "key-handle-id" => {
+                    call = call.key_handle_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["key-handle-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_key_handles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_key_handles_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_key_handles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_key_handles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_key_rings_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1168,6 +1509,7 @@ where
                     "crypto-key-backend" => Some(("cryptoKeyBackend", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destroy-scheduled-duration" => Some(("destroyScheduledDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-only" => Some(("importOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "key-access-justifications-policy.allowed-access-reasons" => Some(("keyAccessJustificationsPolicy.allowedAccessReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1197,7 +1539,7 @@ where
                     "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "crypto-key-backend", "destroy-event-time", "destroy-scheduled-duration", "destroy-time", "ekm-connection-key-path", "external-destruction-failure-reason", "external-key-uri", "external-protection-level-options", "format", "generate-time", "generation-failure-reason", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-only", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "reimport-eligible", "rotation-period", "state", "version-template"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allowed-access-reasons", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "crypto-key-backend", "destroy-event-time", "destroy-scheduled-duration", "destroy-time", "ekm-connection-key-path", "external-destruction-failure-reason", "external-key-uri", "external-protection-level-options", "format", "generate-time", "generation-failure-reason", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-only", "import-time", "key-access-justifications-policy", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "reimport-eligible", "rotation-period", "state", "version-template"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2817,6 +3159,7 @@ where
                     "crypto-key-backend" => Some(("cryptoKeyBackend", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destroy-scheduled-duration" => Some(("destroyScheduledDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-only" => Some(("importOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "key-access-justifications-policy.allowed-access-reasons" => Some(("keyAccessJustificationsPolicy.allowedAccessReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-rotation-time" => Some(("nextRotationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2846,7 +3189,7 @@ where
                     "version-template.algorithm" => Some(("versionTemplate.algorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-template.protection-level" => Some(("versionTemplate.protectionLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "crypto-key-backend", "destroy-event-time", "destroy-scheduled-duration", "destroy-time", "ekm-connection-key-path", "external-destruction-failure-reason", "external-key-uri", "external-protection-level-options", "format", "generate-time", "generation-failure-reason", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-only", "import-time", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "reimport-eligible", "rotation-period", "state", "version-template"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allowed-access-reasons", "attestation", "cavium-certs", "cert-chains", "content", "create-time", "crypto-key-backend", "destroy-event-time", "destroy-scheduled-duration", "destroy-time", "ekm-connection-key-path", "external-destruction-failure-reason", "external-key-uri", "external-protection-level-options", "format", "generate-time", "generation-failure-reason", "google-card-certs", "google-partition-certs", "import-failure-reason", "import-job", "import-only", "import-time", "key-access-justifications-policy", "labels", "name", "next-rotation-time", "primary", "protection-level", "purpose", "reimport-eligible", "rotation-period", "state", "version-template"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4021,6 +4364,58 @@ where
         }
     }
 
+    async fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_update_ekm_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -4111,11 +4506,77 @@ where
         }
     }
 
+    async fn _projects_show_effective_autokey_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().show_effective_autokey_config(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("folders", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get-autokey-config", Some(opt)) => {
+                        call_result = self._folders_get_autokey_config(opt, dry_run, &mut err).await;
+                    },
+                    ("update-autokey-config", Some(opt)) => {
+                        call_result = self._folders_update_autokey_config(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("folders".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-ekm-config-get-iam-policy", Some(opt)) => {
@@ -4159,6 +4620,15 @@ where
                     },
                     ("locations-get-ekm-config", Some(opt)) => {
                         call_result = self._projects_locations_get_ekm_config(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-key-handles-create", Some(opt)) => {
+                        call_result = self._projects_locations_key_handles_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-key-handles-get", Some(opt)) => {
+                        call_result = self._projects_locations_key_handles_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-key-handles-list", Some(opt)) => {
+                        call_result = self._projects_locations_key_handles_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-key-rings-create", Some(opt)) => {
                         call_result = self._projects_locations_key_rings_create(opt, dry_run, &mut err).await;
@@ -4271,8 +4741,14 @@ where
                     ("locations-list", Some(opt)) => {
                         call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-operations-get", Some(opt)) => {
+                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err).await;
+                    },
                     ("locations-update-ekm-config", Some(opt)) => {
                         call_result = self._projects_locations_update_ekm_config(opt, dry_run, &mut err).await;
+                    },
+                    ("show-effective-autokey-config", Some(opt)) => {
+                        call_result = self._projects_show_effective_autokey_config(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -4353,7 +4829,60 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-ekm-config-get-iam-policy', 'locations-ekm-config-set-iam-policy', 'locations-ekm-config-test-iam-permissions', 'locations-ekm-connections-create', 'locations-ekm-connections-get', 'locations-ekm-connections-get-iam-policy', 'locations-ekm-connections-list', 'locations-ekm-connections-patch', 'locations-ekm-connections-set-iam-policy', 'locations-ekm-connections-test-iam-permissions', 'locations-ekm-connections-verify-connectivity', 'locations-generate-random-bytes', 'locations-get', 'locations-get-ekm-config', 'locations-key-rings-create', 'locations-key-rings-crypto-keys-create', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-create', 'locations-key-rings-crypto-keys-crypto-key-versions-destroy', 'locations-key-rings-crypto-keys-crypto-key-versions-get', 'locations-key-rings-crypto-keys-crypto-key-versions-get-public-key', 'locations-key-rings-crypto-keys-crypto-key-versions-import', 'locations-key-rings-crypto-keys-crypto-key-versions-list', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-verify', 'locations-key-rings-crypto-keys-crypto-key-versions-patch', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-encrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-restore', 'locations-key-rings-crypto-keys-decrypt', 'locations-key-rings-crypto-keys-encrypt', 'locations-key-rings-crypto-keys-get', 'locations-key-rings-crypto-keys-get-iam-policy', 'locations-key-rings-crypto-keys-list', 'locations-key-rings-crypto-keys-patch', 'locations-key-rings-crypto-keys-set-iam-policy', 'locations-key-rings-crypto-keys-test-iam-permissions', 'locations-key-rings-crypto-keys-update-primary-version', 'locations-key-rings-get', 'locations-key-rings-get-iam-policy', 'locations-key-rings-import-jobs-create', 'locations-key-rings-import-jobs-get', 'locations-key-rings-import-jobs-get-iam-policy', 'locations-key-rings-import-jobs-list', 'locations-key-rings-import-jobs-set-iam-policy', 'locations-key-rings-import-jobs-test-iam-permissions', 'locations-key-rings-list', 'locations-key-rings-set-iam-policy', 'locations-key-rings-test-iam-permissions', 'locations-list' and 'locations-update-ekm-config'", vec![
+        ("folders", "methods: 'get-autokey-config' and 'update-autokey-config'", vec![
+            ("get-autokey-config",
+                    Some(r##"Returns the AutokeyConfig for a folder."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/folders_get-autokey-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update-autokey-config",
+                    Some(r##"Updates the AutokeyConfig for a folder. The caller must have both `cloudkms.autokeyConfigs.update` permission on the parent folder and `cloudkms.cryptoKeys.setIamPolicy` permission on the provided key project. A KeyHandle creation in the folder's descendant projects will use this configuration to determine where to create the resulting CryptoKey."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/folders_update-autokey-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Identifier. Name of the AutokeyConfig resource, e.g. `folders/{FOLDER_NUMBER}/autokeyConfig`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("projects", "methods: 'locations-ekm-config-get-iam-policy', 'locations-ekm-config-set-iam-policy', 'locations-ekm-config-test-iam-permissions', 'locations-ekm-connections-create', 'locations-ekm-connections-get', 'locations-ekm-connections-get-iam-policy', 'locations-ekm-connections-list', 'locations-ekm-connections-patch', 'locations-ekm-connections-set-iam-policy', 'locations-ekm-connections-test-iam-permissions', 'locations-ekm-connections-verify-connectivity', 'locations-generate-random-bytes', 'locations-get', 'locations-get-ekm-config', 'locations-key-handles-create', 'locations-key-handles-get', 'locations-key-handles-list', 'locations-key-rings-create', 'locations-key-rings-crypto-keys-create', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-create', 'locations-key-rings-crypto-keys-crypto-key-versions-destroy', 'locations-key-rings-crypto-keys-crypto-key-versions-get', 'locations-key-rings-crypto-keys-crypto-key-versions-get-public-key', 'locations-key-rings-crypto-keys-crypto-key-versions-import', 'locations-key-rings-crypto-keys-crypto-key-versions-list', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-sign', 'locations-key-rings-crypto-keys-crypto-key-versions-mac-verify', 'locations-key-rings-crypto-keys-crypto-key-versions-patch', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-decrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-raw-encrypt', 'locations-key-rings-crypto-keys-crypto-key-versions-restore', 'locations-key-rings-crypto-keys-decrypt', 'locations-key-rings-crypto-keys-encrypt', 'locations-key-rings-crypto-keys-get', 'locations-key-rings-crypto-keys-get-iam-policy', 'locations-key-rings-crypto-keys-list', 'locations-key-rings-crypto-keys-patch', 'locations-key-rings-crypto-keys-set-iam-policy', 'locations-key-rings-crypto-keys-test-iam-permissions', 'locations-key-rings-crypto-keys-update-primary-version', 'locations-key-rings-get', 'locations-key-rings-get-iam-policy', 'locations-key-rings-import-jobs-create', 'locations-key-rings-import-jobs-get', 'locations-key-rings-import-jobs-get-iam-policy', 'locations-key-rings-import-jobs-list', 'locations-key-rings-import-jobs-set-iam-policy', 'locations-key-rings-import-jobs-test-iam-permissions', 'locations-key-rings-list', 'locations-key-rings-set-iam-policy', 'locations-key-rings-test-iam-permissions', 'locations-list', 'locations-operations-get', 'locations-update-ekm-config' and 'show-effective-autokey-config'", vec![
             ("locations-ekm-config-get-iam-policy",
                     Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-ekm-config-get-iam-policy",
@@ -4689,6 +5218,78 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The name of the EkmConfig to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-key-handles-create",
+                    Some(r##"Creates a new KeyHandle, triggering the provisioning of a new CryptoKey for CMEK use with the given resource type in the configured key project and the same location. GetOperation should be used to resolve the resulting long-running operation and get the resulting KeyHandle and CryptoKey."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-handles-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the resource project and location to create the KeyHandle in, e.g. `projects/{PROJECT_ID}/locations/{LOCATION}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-key-handles-get",
+                    Some(r##"Returns the KeyHandle."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-handles-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the KeyHandle resource, e.g. `projects/{PROJECT_ID}/locations/{LOCATION}/keyHandles/{KEY_HANDLE_ID}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-key-handles-list",
+                    Some(r##"Lists KeyHandles."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-key-handles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the resource project and location from which to list KeyHandles, e.g. `projects/{PROJECT_ID}/locations/{LOCATION}`."##),
                      Some(true),
                      Some(false)),
         
@@ -5662,6 +6263,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-operations-get",
+                    Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-operations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-update-ekm-config",
                     Some(r##"Updates the EkmConfig singleton resource for a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_locations-update-ekm-config",
@@ -5690,13 +6313,35 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("show-effective-autokey-config",
+                    Some(r##"Returns the effective Cloud KMS Autokey configuration for a given project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudkms1_cli/projects_show-effective-autokey-config",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the resource project to the show effective Cloud KMS Autokey configuration for. This may be helpful for interrogating the effect of nested folder configurations on a given resource project."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("cloudkms1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240219")
+           .version("5.0.5+20240621")
            .about("Manages keys and performs cryptographic operations in a central cloud service, for direct use by other cloud resources and applications. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudkms1_cli")
            .arg(Arg::with_name("url")
@@ -5760,6 +6405,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

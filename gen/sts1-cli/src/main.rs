@@ -50,177 +50,6 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
-    async fn _methods_introspect(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token-type-hint" => Some(("tokenTypeHint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["token", "token-type-hint"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleIdentityStsV1IntrospectTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.methods().introspect(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _methods_oauthtoken(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "client-id" => Some(("clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "code" => Some(("code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "code-verifier" => Some(("codeVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "grant-type" => Some(("grantType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "refresh-token" => Some(("refreshToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-id", "code", "code-verifier", "grant-type", "redirect-uri", "refresh-token", "scope"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::GoogleIdentityStsV1ExchangeOauthTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.methods().oauthtoken(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _methods_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -316,12 +145,6 @@ where
         match self.opt.subcommand() {
             ("methods", Some(opt)) => {
                 match opt.subcommand() {
-                    ("introspect", Some(opt)) => {
-                        call_result = self._methods_introspect(opt, dry_run, &mut err).await;
-                    },
-                    ("oauthtoken", Some(opt)) => {
-                        call_result = self._methods_oauthtoken(opt, dry_run, &mut err).await;
-                    },
                     ("token", Some(opt)) => {
                         call_result = self._methods_token(opt, dry_run, &mut err).await;
                     },
@@ -404,51 +227,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("methods", "methods: 'introspect', 'oauthtoken' and 'token'", vec![
-            ("introspect",
-                    Some(r##"Gets information about a Google OAuth 2.0 access token issued by the Google Cloud [Security Token Service API](https://cloud.google.com/iam/docs/reference/sts/rest)."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_sts1_cli/methods_introspect",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("oauthtoken",
-                    Some(r##"Exchanges a credential that represents the resource owner's authorization for a Google-generated [OAuth 2.0 access token] (https://www.rfc-editor.org/rfc/rfc6749#section-5) or [refreshes an accesstoken] (https://www.rfc-editor.org/rfc/rfc6749#section-6) following [the OAuth 2.0 authorization framework] (https://tools.ietf.org/html/rfc8693) The credential can be one of the following: - An authorization code issued by the workforce identity federation authorization endpoint - A [refresh token](https://www.rfc-editor.org/rfc/rfc6749#section-10.4) issued by this endpoint This endpoint is only meant to be called by the Google Cloud CLI. Also note that this API only accepts the authorization code issued for workforce pools."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_sts1_cli/methods_oauthtoken",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
+        ("methods", "methods: 'token'", vec![
             ("token",
                     Some(r##"Exchanges a credential for a Google OAuth 2.0 access token. The token asserts an external identity within an identity pool, or it applies a Credential Access Boundary to a Google access token. Note that workforce pools do not support Credential Access Boundaries. When you call this method, do not send the `Authorization` HTTP header in the request. This method does not require the `Authorization` header, and using the header can cause the request to fail."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sts1_cli/methods_token",
@@ -477,7 +256,7 @@ async fn main() {
     
     let mut app = App::new("sts1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240222")
+           .version("5.0.5+20240612")
            .about("The Security Token Service exchanges Google or third-party credentials for a short-lived access token to Google Cloud resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sts1_cli")
            .arg(Arg::with_name("folder")
@@ -536,6 +315,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

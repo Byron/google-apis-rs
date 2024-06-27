@@ -1,4 +1,4 @@
-site_name: networkconnectivity v5.0.4+20240221
+site_name: networkconnectivity v5.0.5+20240618
 site_url: http://byron.github.io/google-apis-rs/google-networkconnectivity1-cli
 site_description: A complete library to interact with networkconnectivity (protocol v1)
 
@@ -19,6 +19,7 @@ nav:
     - 'Locations Global Hubs Groups Get': 'projects_locations-global-hubs-groups-get.md'
     - 'Locations Global Hubs Groups Get Iam Policy': 'projects_locations-global-hubs-groups-get-iam-policy.md'
     - 'Locations Global Hubs Groups List': 'projects_locations-global-hubs-groups-list.md'
+    - 'Locations Global Hubs Groups Patch': 'projects_locations-global-hubs-groups-patch.md'
     - 'Locations Global Hubs Groups Set Iam Policy': 'projects_locations-global-hubs-groups-set-iam-policy.md'
     - 'Locations Global Hubs Groups Test Iam Permissions': 'projects_locations-global-hubs-groups-test-iam-permissions.md'
     - 'Locations Global Hubs List': 'projects_locations-global-hubs-list.md'
@@ -48,6 +49,10 @@ nav:
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Regional Endpoints Create': 'projects_locations-regional-endpoints-create.md'
+    - 'Locations Regional Endpoints Delete': 'projects_locations-regional-endpoints-delete.md'
+    - 'Locations Regional Endpoints Get': 'projects_locations-regional-endpoints-get.md'
+    - 'Locations Regional Endpoints List': 'projects_locations-regional-endpoints-list.md'
     - 'Locations Service Classes Delete': 'projects_locations-service-classes-delete.md'
     - 'Locations Service Classes Get': 'projects_locations-service-classes-get.md'
     - 'Locations Service Classes Get Iam Policy': 'projects_locations-service-classes-get-iam-policy.md'
@@ -86,5 +91,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

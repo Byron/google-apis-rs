@@ -660,6 +660,8 @@ where
                     "lifetime" => Some(("lifetime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pem-ca-certificates" => Some(("pemCaCertificates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subordinate-config.certificate-authority" => Some(("subordinateConfig.certificateAuthority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subordinate-config.pem-issuer-chain.pem-certificates" => Some(("subordinateConfig.pemIssuerChain.pemCertificates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -667,7 +669,7 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-id", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subject-key-id", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-id", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "satisfies-pzi", "satisfies-pzs", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subject-key-id", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1216,6 +1218,8 @@ where
                     "lifetime" => Some(("lifetime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pem-ca-certificates" => Some(("pemCaCertificates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subordinate-config.certificate-authority" => Some(("subordinateConfig.certificateAuthority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subordinate-config.pem-issuer-chain.pem-certificates" => Some(("subordinateConfig.pemIssuerChain.pemCertificates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1223,7 +1227,7 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-id", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subject-key-id", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-id", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "satisfies-pzi", "satisfies-pzs", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subject-key-id", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4564,7 +4568,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-ca-pools-fetch-ca-certs",
-                    Some(r##"FetchCaCerts returns the current trust anchor for the CaPool. This will include CA certificate chains for all Certificate Authorities in the ENABLED, DISABLED, or STAGED states."##),
+                    Some(r##"FetchCaCerts returns the current trust anchor for the CaPool. This will include CA certificate chains for all certificate authorities in the ENABLED, DISABLED, or STAGED states."##),
                     "Details at http://byron.github.io/google-apis-rs/google_privateca1_cli/projects_locations-ca-pools-fetch-ca-certs",
                   vec![
                     (Some(r##"ca-pool"##),
@@ -5085,7 +5089,7 @@ async fn main() {
     
     let mut app = App::new("privateca1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240221")
+           .version("5.0.5+20240605")
            .about("The Certificate Authority Service API is a highly-available, scalable service that enables you to simplify and automate the management of private certificate authorities (CAs) while staying in control of your private keys. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_privateca1_cli")
            .arg(Arg::with_name("url")
@@ -5149,6 +5153,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

@@ -659,7 +659,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("mediation-report-generate",
-                    Some(r##"Generates an AdMob mediation report based on the provided report specification. Returns result of a server-side streaming RPC. The result is returned in a sequence of responses."##),
+                    Some(r##"Generates an AdMob Mediation report based on the provided report specification. Returns result of a server-side streaming RPC. The result is returned in a sequence of responses."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admob1_cli/accounts_mediation-report-generate",
                   vec![
                     (Some(r##"parent"##),
@@ -720,7 +720,7 @@ async fn main() {
     
     let mut app = App::new("admob1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240626")
            .about("The AdMob API allows publishers to programmatically get information about their AdMob account. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admob1_cli")
            .arg(Arg::with_name("url")
@@ -784,6 +784,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

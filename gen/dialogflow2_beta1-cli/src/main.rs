@@ -1763,6 +1763,7 @@ where
                     "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audioConfig.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.total-duration" => Some(("queryInput.audioConfig.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio-config.default-no-speech-timeout" => Some(("queryInput.audioConfig.defaultNoSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.disable-no-speech-recognized-event" => Some(("queryInput.audioConfig.disableNoSpeechRecognizedEvent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-automatic-punctuation" => Some(("queryInput.audioConfig.enableAutomaticPunctuation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-word-info" => Some(("queryInput.audioConfig.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1787,7 +1788,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "default-no-speech-timeout", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4404,6 +4405,7 @@ where
                     "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audioConfig.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.total-duration" => Some(("queryInput.audioConfig.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio-config.default-no-speech-timeout" => Some(("queryInput.audioConfig.defaultNoSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.disable-no-speech-recognized-event" => Some(("queryInput.audioConfig.disableNoSpeechRecognizedEvent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-automatic-punctuation" => Some(("queryInput.audioConfig.enableAutomaticPunctuation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-word-info" => Some(("queryInput.audioConfig.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4428,7 +4430,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "default-no-speech-timeout", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5534,6 +5536,8 @@ where
                     "answer-feedback.agent-assistant-detail-feedback.answer-relevance" => Some(("answerFeedback.agentAssistantDetailFeedback.answerRelevance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-correctness" => Some(("answerFeedback.agentAssistantDetailFeedback.documentCorrectness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-efficiency" => Some(("answerFeedback.agentAssistantDetailFeedback.documentEfficiency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.knowledge-assist-feedback.answer-copied" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeAssistFeedback.answerCopied", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.knowledge-assist-feedback.clicked-uris" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeAssistFeedback.clickedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "answer-feedback.agent-assistant-detail-feedback.knowledge-search-feedback.answer-copied" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeSearchFeedback.answerCopied", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.knowledge-search-feedback.clicked-uris" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeSearchFeedback.clickedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.start-timestamp" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.startTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5547,7 +5551,7 @@ where
                     "answer-feedback.displayed" => Some(("answerFeedback.displayed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "agent-assistant-detail-feedback", "agent-assistant-record", "all-required-params-present", "answer", "answer-copied", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "cancels-slot-filling", "click-time", "clicked", "clicked-uris", "confidence", "correctness-level", "default-response-platforms", "description", "dialogflow-assist-answer", "display-name", "display-time", "displayed", "document-correctness", "document-efficiency", "end-interaction", "events", "faq-answer", "fulfillment-text", "input-context-names", "intent", "intent-detection-confidence", "intent-suggestion", "intent-v2", "is-fallback", "knowledge-search-feedback", "language-code", "live-agent-handoff", "magnitude", "metadata", "ml-disabled", "ml-enabled", "name", "parent-followup-intent-name", "priority", "query-result", "query-text", "query-text-sentiment", "question", "reset-contexts", "root-followup-intent-name", "score", "sentiment-analysis-result", "snippets", "source", "speech-recognition-confidence", "start-timestamp", "submit-timestamp", "summarization-feedback", "summary-text", "text-sections", "title", "uri", "webhook-source", "webhook-state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "agent-assistant-detail-feedback", "agent-assistant-record", "all-required-params-present", "answer", "answer-copied", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "cancels-slot-filling", "click-time", "clicked", "clicked-uris", "confidence", "correctness-level", "default-response-platforms", "description", "dialogflow-assist-answer", "display-name", "display-time", "displayed", "document-correctness", "document-efficiency", "end-interaction", "events", "faq-answer", "fulfillment-text", "input-context-names", "intent", "intent-detection-confidence", "intent-suggestion", "intent-v2", "is-fallback", "knowledge-assist-feedback", "knowledge-search-feedback", "language-code", "live-agent-handoff", "magnitude", "metadata", "ml-disabled", "ml-enabled", "name", "parent-followup-intent-name", "priority", "query-result", "query-text", "query-text-sentiment", "question", "reset-contexts", "root-followup-intent-name", "score", "sentiment-analysis-result", "snippets", "source", "speech-recognition-confidence", "start-timestamp", "submit-timestamp", "summarization-feedback", "summary-text", "text-sections", "title", "uri", "webhook-source", "webhook-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5724,7 +5728,11 @@ where
                     "automated-agent-config.session-ttl" => Some(("automatedAgentConfig.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.generators" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.end-user-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.generators" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.human-agent-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-entity-extraction" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableEntityExtraction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-sentiment-analysis" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableSentimentAnalysis", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -5755,7 +5763,7 @@ where
                     "tts-config.volume-gain-db" => Some(("ttsConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "disable-high-latency-features-sync-delivery", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "generators", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6005,7 +6013,11 @@ where
                     "automated-agent-config.session-ttl" => Some(("automatedAgentConfig.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.generators" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.end-user-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.generators" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.human-agent-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-entity-extraction" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableEntityExtraction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-sentiment-analysis" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableSentimentAnalysis", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6036,7 +6048,7 @@ where
                     "tts-config.volume-gain-db" => Some(("ttsConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "disable-high-latency-features-sync-delivery", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "generators", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6130,6 +6142,8 @@ where
                     "suggestion-feature-config.disable-agent-query-logging" => Some(("suggestionFeatureConfig.disableAgentQueryLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.enable-conversation-augmented-query" => Some(("suggestionFeatureConfig.enableConversationAugmentedQuery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.enable-event-based-suggestion" => Some(("suggestionFeatureConfig.enableEventBasedSuggestion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "suggestion-feature-config.enable-query-suggestion-only" => Some(("suggestionFeatureConfig.enableQuerySuggestionOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "suggestion-feature-config.enable-query-suggestion-when-no-answer" => Some(("suggestionFeatureConfig.enableQuerySuggestionWhenNoAnswer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.query-config.confidence-threshold" => Some(("suggestionFeatureConfig.queryConfig.confidenceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.query-config.context-filter-settings.drop-handoff-messages" => Some(("suggestionFeatureConfig.queryConfig.contextFilterSettings.dropHandoffMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.query-config.context-filter-settings.drop-ivr-messages" => Some(("suggestionFeatureConfig.queryConfig.contextFilterSettings.dropIvrMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6144,7 +6158,7 @@ where
                     "suggestion-feature-config.suggestion-trigger-settings.no-small-talk" => Some(("suggestionFeatureConfig.suggestionTriggerSettings.noSmallTalk", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.suggestion-trigger-settings.only-end-user" => Some(("suggestionFeatureConfig.suggestionTriggerSettings.onlyEndUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent", "baseline-model-version", "confidence-threshold", "context-filter-settings", "conversation-model-config", "conversation-process-config", "dialogflow-query-source", "disable-agent-query-logging", "document-query-source", "documents", "drop-handoff-messages", "drop-ivr-messages", "drop-virtual-agent-messages", "enable-conversation-augmented-query", "enable-event-based-suggestion", "human-agent-side-config", "knowledge-base-query-source", "knowledge-bases", "max-results", "model", "no-small-talk", "only-end-user", "participant-role", "query-config", "recent-sentences-count", "section-types", "sections", "suggestion-feature", "suggestion-feature-config", "suggestion-trigger-settings", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent", "baseline-model-version", "confidence-threshold", "context-filter-settings", "conversation-model-config", "conversation-process-config", "dialogflow-query-source", "disable-agent-query-logging", "document-query-source", "documents", "drop-handoff-messages", "drop-ivr-messages", "drop-virtual-agent-messages", "enable-conversation-augmented-query", "enable-event-based-suggestion", "enable-query-suggestion-only", "enable-query-suggestion-when-no-answer", "human-agent-side-config", "knowledge-base-query-source", "knowledge-bases", "max-results", "model", "no-small-talk", "only-end-user", "participant-role", "query-config", "recent-sentences-count", "section-types", "sections", "suggestion-feature", "suggestion-feature-config", "suggestion-trigger-settings", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6671,6 +6685,7 @@ where
                     "audio-input.config.audio-encoding" => Some(("audioInput.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-input.config.barge-in-config.no-barge-in-duration" => Some(("audioInput.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-input.config.barge-in-config.total-duration" => Some(("audioInput.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-input.config.default-no-speech-timeout" => Some(("audioInput.config.defaultNoSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-input.config.disable-no-speech-recognized-event" => Some(("audioInput.config.disableNoSpeechRecognizedEvent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audio-input.config.enable-automatic-punctuation" => Some(("audioInput.config.enableAutomaticPunctuation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audio-input.config.enable-word-info" => Some(("audioInput.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6712,7 +6727,7 @@ where
                     "text-input.language-code" => Some(("textInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "text-input.text" => Some(("textInput.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "answer-record", "assist-query-params", "audio", "audio-encoding", "audio-input", "barge-in-config", "config", "cx-current-page", "disable-no-speech-recognized-event", "documents-metadata-filters", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event-input", "geo-location", "intent", "intent-input", "knowledge-base-names", "language-code", "latitude", "longitude", "message-send-time", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "phrase-hints", "pitch", "platform", "query-params", "reply-audio-config", "request-id", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "suggestion-input", "synthesize-speech-config", "text", "text-input", "text-override", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "answer-record", "assist-query-params", "audio", "audio-encoding", "audio-input", "barge-in-config", "config", "cx-current-page", "default-no-speech-timeout", "disable-no-speech-recognized-event", "documents-metadata-filters", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event-input", "geo-location", "intent", "intent-input", "knowledge-base-names", "language-code", "latitude", "longitude", "message-send-time", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "phrase-hints", "pitch", "platform", "query-params", "reply-audio-config", "request-id", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "suggestion-input", "synthesize-speech-config", "text", "text-input", "text-override", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7385,6 +7400,93 @@ where
         }
     }
 
+    async fn _projects_conversations_participants_suggestions_suggest_knowledge_assist(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "context-size" => Some(("contextSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-message" => Some(("latestMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "previous-suggested-query" => Some(("previousSuggestedQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-size", "latest-message", "previous-suggested-query"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1SuggestKnowledgeAssistRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().conversations_participants_suggestions_suggest_knowledge_assist(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_conversations_participants_suggestions_suggest_smart_replies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -7670,6 +7772,164 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_generators_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inference-parameter.max-output-tokens" => Some(("inferenceParameter.maxOutputTokens", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inference-parameter.temperature" => Some(("inferenceParameter.temperature", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "inference-parameter.top-k" => Some(("inferenceParameter.topK", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inference-parameter.top-p" => Some(("inferenceParameter.topP", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summarization-context.output-language-code" => Some(("summarizationContext.outputLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summarization-context.version" => Some(("summarizationContext.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger-event" => Some(("triggerEvent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "inference-parameter", "max-output-tokens", "name", "output-language-code", "summarization-context", "temperature", "top-k", "top-p", "trigger-event", "update-time", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1Generator = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().generators_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "generator-id" => {
+                    call = call.generator_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["generator-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_generators_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().generators_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -10359,6 +10619,7 @@ where
                     "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audioConfig.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.total-duration" => Some(("queryInput.audioConfig.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio-config.default-no-speech-timeout" => Some(("queryInput.audioConfig.defaultNoSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.disable-no-speech-recognized-event" => Some(("queryInput.audioConfig.disableNoSpeechRecognizedEvent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-automatic-punctuation" => Some(("queryInput.audioConfig.enableAutomaticPunctuation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-word-info" => Some(("queryInput.audioConfig.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -10383,7 +10644,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "default-no-speech-timeout", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12198,6 +12459,7 @@ where
                     "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audioConfig.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.barge-in-config.total-duration" => Some(("queryInput.audioConfig.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio-config.default-no-speech-timeout" => Some(("queryInput.audioConfig.defaultNoSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.disable-no-speech-recognized-event" => Some(("queryInput.audioConfig.disableNoSpeechRecognizedEvent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-automatic-punctuation" => Some(("queryInput.audioConfig.enableAutomaticPunctuation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio-config.enable-word-info" => Some(("queryInput.audioConfig.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -12222,7 +12484,7 @@ where
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "barge-in-config", "default-no-speech-timeout", "disable-no-speech-recognized-event", "dtmf", "dtmf-events", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event", "geo-location", "input-audio", "knowledge-base-names", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "output-audio-config-mask", "phrase-hints", "pitch", "platform", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13328,6 +13590,8 @@ where
                     "answer-feedback.agent-assistant-detail-feedback.answer-relevance" => Some(("answerFeedback.agentAssistantDetailFeedback.answerRelevance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-correctness" => Some(("answerFeedback.agentAssistantDetailFeedback.documentCorrectness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.document-efficiency" => Some(("answerFeedback.agentAssistantDetailFeedback.documentEfficiency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.knowledge-assist-feedback.answer-copied" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeAssistFeedback.answerCopied", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "answer-feedback.agent-assistant-detail-feedback.knowledge-assist-feedback.clicked-uris" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeAssistFeedback.clickedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "answer-feedback.agent-assistant-detail-feedback.knowledge-search-feedback.answer-copied" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeSearchFeedback.answerCopied", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "answer-feedback.agent-assistant-detail-feedback.knowledge-search-feedback.clicked-uris" => Some(("answerFeedback.agentAssistantDetailFeedback.knowledgeSearchFeedback.clickedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "answer-feedback.agent-assistant-detail-feedback.summarization-feedback.start-timestamp" => Some(("answerFeedback.agentAssistantDetailFeedback.summarizationFeedback.startTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13341,7 +13605,7 @@ where
                     "answer-feedback.displayed" => Some(("answerFeedback.displayed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "agent-assistant-detail-feedback", "agent-assistant-record", "all-required-params-present", "answer", "answer-copied", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "cancels-slot-filling", "click-time", "clicked", "clicked-uris", "confidence", "correctness-level", "default-response-platforms", "description", "dialogflow-assist-answer", "display-name", "display-time", "displayed", "document-correctness", "document-efficiency", "end-interaction", "events", "faq-answer", "fulfillment-text", "input-context-names", "intent", "intent-detection-confidence", "intent-suggestion", "intent-v2", "is-fallback", "knowledge-search-feedback", "language-code", "live-agent-handoff", "magnitude", "metadata", "ml-disabled", "ml-enabled", "name", "parent-followup-intent-name", "priority", "query-result", "query-text", "query-text-sentiment", "question", "reset-contexts", "root-followup-intent-name", "score", "sentiment-analysis-result", "snippets", "source", "speech-recognition-confidence", "start-timestamp", "submit-timestamp", "summarization-feedback", "summary-text", "text-sections", "title", "uri", "webhook-source", "webhook-state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "agent-assistant-detail-feedback", "agent-assistant-record", "all-required-params-present", "answer", "answer-copied", "answer-feedback", "answer-record", "answer-relevance", "article-suggestion-answer", "cancels-slot-filling", "click-time", "clicked", "clicked-uris", "confidence", "correctness-level", "default-response-platforms", "description", "dialogflow-assist-answer", "display-name", "display-time", "displayed", "document-correctness", "document-efficiency", "end-interaction", "events", "faq-answer", "fulfillment-text", "input-context-names", "intent", "intent-detection-confidence", "intent-suggestion", "intent-v2", "is-fallback", "knowledge-assist-feedback", "knowledge-search-feedback", "language-code", "live-agent-handoff", "magnitude", "metadata", "ml-disabled", "ml-enabled", "name", "parent-followup-intent-name", "priority", "query-result", "query-text", "query-text-sentiment", "question", "reset-contexts", "root-followup-intent-name", "score", "sentiment-analysis-result", "snippets", "source", "speech-recognition-confidence", "start-timestamp", "submit-timestamp", "summarization-feedback", "summary-text", "text-sections", "title", "uri", "webhook-source", "webhook-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13518,7 +13782,11 @@ where
                     "automated-agent-config.session-ttl" => Some(("automatedAgentConfig.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.generators" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.end-user-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.generators" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.human-agent-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-entity-extraction" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableEntityExtraction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-sentiment-analysis" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableSentimentAnalysis", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -13549,7 +13817,7 @@ where
                     "tts-config.volume-gain-db" => Some(("ttsConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "disable-high-latency-features-sync-delivery", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "generators", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13799,7 +14067,11 @@ where
                     "automated-agent-config.session-ttl" => Some(("automatedAgentConfig.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.end-user-suggestion-config.generators" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.end-user-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.endUserSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "human-agent-assistant-config.human-agent-suggestion-config.generators" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "human-agent-assistant-config.human-agent-suggestion-config.group-suggestion-responses" => Some(("humanAgentAssistantConfig.humanAgentSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-entity-extraction" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableEntityExtraction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "human-agent-assistant-config.message-analysis-config.enable-sentiment-analysis" => Some(("humanAgentAssistantConfig.messageAnalysisConfig.enableSentimentAnalysis", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -13830,7 +14102,7 @@ where
                     "tts-config.volume-gain-db" => Some(("ttsConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "create-time", "deployment-id", "disable-high-latency-features-sync-delivery", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "generators", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "live-person-config", "logging-config", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13924,6 +14196,8 @@ where
                     "suggestion-feature-config.disable-agent-query-logging" => Some(("suggestionFeatureConfig.disableAgentQueryLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.enable-conversation-augmented-query" => Some(("suggestionFeatureConfig.enableConversationAugmentedQuery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.enable-event-based-suggestion" => Some(("suggestionFeatureConfig.enableEventBasedSuggestion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "suggestion-feature-config.enable-query-suggestion-only" => Some(("suggestionFeatureConfig.enableQuerySuggestionOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "suggestion-feature-config.enable-query-suggestion-when-no-answer" => Some(("suggestionFeatureConfig.enableQuerySuggestionWhenNoAnswer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.query-config.confidence-threshold" => Some(("suggestionFeatureConfig.queryConfig.confidenceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.query-config.context-filter-settings.drop-handoff-messages" => Some(("suggestionFeatureConfig.queryConfig.contextFilterSettings.dropHandoffMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.query-config.context-filter-settings.drop-ivr-messages" => Some(("suggestionFeatureConfig.queryConfig.contextFilterSettings.dropIvrMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -13938,7 +14212,7 @@ where
                     "suggestion-feature-config.suggestion-trigger-settings.no-small-talk" => Some(("suggestionFeatureConfig.suggestionTriggerSettings.noSmallTalk", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "suggestion-feature-config.suggestion-trigger-settings.only-end-user" => Some(("suggestionFeatureConfig.suggestionTriggerSettings.onlyEndUser", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent", "baseline-model-version", "confidence-threshold", "context-filter-settings", "conversation-model-config", "conversation-process-config", "dialogflow-query-source", "disable-agent-query-logging", "document-query-source", "documents", "drop-handoff-messages", "drop-ivr-messages", "drop-virtual-agent-messages", "enable-conversation-augmented-query", "enable-event-based-suggestion", "human-agent-side-config", "knowledge-base-query-source", "knowledge-bases", "max-results", "model", "no-small-talk", "only-end-user", "participant-role", "query-config", "recent-sentences-count", "section-types", "sections", "suggestion-feature", "suggestion-feature-config", "suggestion-trigger-settings", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent", "baseline-model-version", "confidence-threshold", "context-filter-settings", "conversation-model-config", "conversation-process-config", "dialogflow-query-source", "disable-agent-query-logging", "document-query-source", "documents", "drop-handoff-messages", "drop-ivr-messages", "drop-virtual-agent-messages", "enable-conversation-augmented-query", "enable-event-based-suggestion", "enable-query-suggestion-only", "enable-query-suggestion-when-no-answer", "human-agent-side-config", "knowledge-base-query-source", "knowledge-bases", "max-results", "model", "no-small-talk", "only-end-user", "participant-role", "query-config", "recent-sentences-count", "section-types", "sections", "suggestion-feature", "suggestion-feature-config", "suggestion-trigger-settings", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14465,6 +14739,7 @@ where
                     "audio-input.config.audio-encoding" => Some(("audioInput.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-input.config.barge-in-config.no-barge-in-duration" => Some(("audioInput.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-input.config.barge-in-config.total-duration" => Some(("audioInput.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-input.config.default-no-speech-timeout" => Some(("audioInput.config.defaultNoSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-input.config.disable-no-speech-recognized-event" => Some(("audioInput.config.disableNoSpeechRecognizedEvent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audio-input.config.enable-automatic-punctuation" => Some(("audioInput.config.enableAutomaticPunctuation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audio-input.config.enable-word-info" => Some(("audioInput.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -14506,7 +14781,7 @@ where
                     "text-input.language-code" => Some(("textInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "text-input.text" => Some(("textInput.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "answer-record", "assist-query-params", "audio", "audio-encoding", "audio-input", "barge-in-config", "config", "cx-current-page", "disable-no-speech-recognized-event", "documents-metadata-filters", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event-input", "geo-location", "intent", "intent-input", "knowledge-base-names", "language-code", "latitude", "longitude", "message-send-time", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "phrase-hints", "pitch", "platform", "query-params", "reply-audio-config", "request-id", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "suggestion-input", "synthesize-speech-config", "text", "text-input", "text-override", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "answer-record", "assist-query-params", "audio", "audio-encoding", "audio-input", "barge-in-config", "config", "cx-current-page", "default-no-speech-timeout", "disable-no-speech-recognized-event", "documents-metadata-filters", "effects-profile-id", "enable-automatic-punctuation", "enable-word-info", "event-input", "geo-location", "intent", "intent-input", "knowledge-base-names", "language-code", "latitude", "longitude", "message-send-time", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "phrase-hints", "pitch", "platform", "query-params", "reply-audio-config", "request-id", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "single-utterance", "speaking-rate", "ssml-gender", "suggestion-input", "synthesize-speech-config", "text", "text-input", "text-override", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -15031,6 +15306,93 @@ where
         }
     }
 
+    async fn _projects_locations_conversations_participants_suggestions_suggest_knowledge_assist(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "context-size" => Some(("contextSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "latest-message" => Some(("latestMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "previous-suggested-query" => Some(("previousSuggestedQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-size", "latest-message", "previous-suggested-query"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1SuggestKnowledgeAssistRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_conversations_participants_suggestions_suggest_knowledge_assist(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_conversations_participants_suggestions_suggest_smart_replies(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -15316,6 +15678,367 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_generators_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inference-parameter.max-output-tokens" => Some(("inferenceParameter.maxOutputTokens", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inference-parameter.temperature" => Some(("inferenceParameter.temperature", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "inference-parameter.top-k" => Some(("inferenceParameter.topK", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inference-parameter.top-p" => Some(("inferenceParameter.topP", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summarization-context.output-language-code" => Some(("summarizationContext.outputLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summarization-context.version" => Some(("summarizationContext.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger-event" => Some(("triggerEvent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "inference-parameter", "max-output-tokens", "name", "output-language-code", "summarization-context", "temperature", "top-k", "top-p", "trigger-event", "update-time", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1Generator = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_generators_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "generator-id" => {
+                    call = call.generator_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["generator-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_generators_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_generators_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_generators_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_generators_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_generators_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_generators_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_generators_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inference-parameter.max-output-tokens" => Some(("inferenceParameter.maxOutputTokens", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inference-parameter.temperature" => Some(("inferenceParameter.temperature", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "inference-parameter.top-k" => Some(("inferenceParameter.topK", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "inference-parameter.top-p" => Some(("inferenceParameter.topP", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summarization-context.output-language-code" => Some(("summarizationContext.outputLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "summarization-context.version" => Some(("summarizationContext.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger-event" => Some(("triggerEvent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "inference-parameter", "max-output-tokens", "name", "output-language-code", "summarization-context", "temperature", "top-k", "top-p", "trigger-event", "update-time", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1Generator = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_generators_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -16672,6 +17395,103 @@ where
         }
     }
 
+    async fn _projects_locations_stateless_suggestion_generate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "generator.create-time" => Some(("generator.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generator.description" => Some(("generator.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generator.inference-parameter.max-output-tokens" => Some(("generator.inferenceParameter.maxOutputTokens", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "generator.inference-parameter.temperature" => Some(("generator.inferenceParameter.temperature", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "generator.inference-parameter.top-k" => Some(("generator.inferenceParameter.topK", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "generator.inference-parameter.top-p" => Some(("generator.inferenceParameter.topP", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "generator.name" => Some(("generator.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generator.summarization-context.output-language-code" => Some(("generator.summarizationContext.outputLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generator.summarization-context.version" => Some(("generator.summarizationContext.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generator.trigger-event" => Some(("generator.triggerEvent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generator.update-time" => Some(("generator.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generator-name" => Some(("generatorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger-events" => Some(("triggerEvents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "generator", "generator-name", "inference-parameter", "max-output-tokens", "name", "output-language-code", "summarization-context", "temperature", "top-k", "top-p", "trigger-event", "trigger-events", "update-time", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowV2beta1GenerateStatelessSuggestionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_stateless_suggestion_generate(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_suggestions_generate_stateless_summary(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -16699,7 +17519,11 @@ where
                     "conversation-profile.automated-agent-config.session-ttl" => Some(("conversationProfile.automatedAgentConfig.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation-profile.create-time" => Some(("conversationProfile.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation-profile.display-name" => Some(("conversationProfile.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.end-user-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("conversationProfile.humanAgentAssistantConfig.endUserSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.end-user-suggestion-config.generators" => Some(("conversationProfile.humanAgentAssistantConfig.endUserSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "conversation-profile.human-agent-assistant-config.end-user-suggestion-config.group-suggestion-responses" => Some(("conversationProfile.humanAgentAssistantConfig.endUserSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.human-agent-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("conversationProfile.humanAgentAssistantConfig.humanAgentSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.human-agent-suggestion-config.generators" => Some(("conversationProfile.humanAgentAssistantConfig.humanAgentSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "conversation-profile.human-agent-assistant-config.human-agent-suggestion-config.group-suggestion-responses" => Some(("conversationProfile.humanAgentAssistantConfig.humanAgentSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "conversation-profile.human-agent-assistant-config.message-analysis-config.enable-entity-extraction" => Some(("conversationProfile.humanAgentAssistantConfig.messageAnalysisConfig.enableEntityExtraction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "conversation-profile.human-agent-assistant-config.message-analysis-config.enable-sentiment-analysis" => Some(("conversationProfile.humanAgentAssistantConfig.messageAnalysisConfig.enableSentimentAnalysis", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -16732,7 +17556,7 @@ where
                     "latest-message" => Some(("latestMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-context-size" => Some(("maxContextSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "conversation-profile", "create-time", "deployment-id", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "latest-message", "live-person-config", "logging-config", "max-context-size", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "conversation-profile", "create-time", "deployment-id", "disable-high-latency-features-sync-delivery", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "generators", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "latest-message", "live-person-config", "logging-config", "max-context-size", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -17176,7 +18000,11 @@ where
                     "conversation-profile.automated-agent-config.session-ttl" => Some(("conversationProfile.automatedAgentConfig.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation-profile.create-time" => Some(("conversationProfile.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "conversation-profile.display-name" => Some(("conversationProfile.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.end-user-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("conversationProfile.humanAgentAssistantConfig.endUserSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.end-user-suggestion-config.generators" => Some(("conversationProfile.humanAgentAssistantConfig.endUserSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "conversation-profile.human-agent-assistant-config.end-user-suggestion-config.group-suggestion-responses" => Some(("conversationProfile.humanAgentAssistantConfig.endUserSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.human-agent-suggestion-config.disable-high-latency-features-sync-delivery" => Some(("conversationProfile.humanAgentAssistantConfig.humanAgentSuggestionConfig.disableHighLatencyFeaturesSyncDelivery", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conversation-profile.human-agent-assistant-config.human-agent-suggestion-config.generators" => Some(("conversationProfile.humanAgentAssistantConfig.humanAgentSuggestionConfig.generators", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "conversation-profile.human-agent-assistant-config.human-agent-suggestion-config.group-suggestion-responses" => Some(("conversationProfile.humanAgentAssistantConfig.humanAgentSuggestionConfig.groupSuggestionResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "conversation-profile.human-agent-assistant-config.message-analysis-config.enable-entity-extraction" => Some(("conversationProfile.humanAgentAssistantConfig.messageAnalysisConfig.enableEntityExtraction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "conversation-profile.human-agent-assistant-config.message-analysis-config.enable-sentiment-analysis" => Some(("conversationProfile.humanAgentAssistantConfig.messageAnalysisConfig.enableSentimentAnalysis", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -17209,7 +18037,7 @@ where
                     "latest-message" => Some(("latestMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-context-size" => Some(("maxContextSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "conversation-profile", "create-time", "deployment-id", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "latest-message", "live-person-config", "logging-config", "max-context-size", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-number", "agent", "automated-agent-config", "button-id", "conversation-profile", "create-time", "deployment-id", "disable-high-latency-features-sync-delivery", "display-name", "effects-profile-id", "enable-entity-extraction", "enable-sentiment-analysis", "enable-stackdriver-logging", "end-user-suggestion-config", "endpoint-domain", "generators", "group-suggestion-responses", "human-agent-assistant-config", "human-agent-handoff-config", "human-agent-suggestion-config", "language-code", "latest-message", "live-person-config", "logging-config", "max-context-size", "message-analysis-config", "message-format", "model", "name", "new-message-event-notification-config", "notification-config", "organization-id", "pitch", "salesforce-live-agent-config", "security-settings", "session-ttl", "speaking-rate", "speech-model-variant", "ssml-gender", "stt-config", "time-zone", "topic", "tts-config", "update-time", "use-timeout-based-endpointing", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -17658,6 +18486,9 @@ where
                     ("conversations-participants-suggestions-suggest-faq-answers", Some(opt)) => {
                         call_result = self._projects_conversations_participants_suggestions_suggest_faq_answers(opt, dry_run, &mut err).await;
                     },
+                    ("conversations-participants-suggestions-suggest-knowledge-assist", Some(opt)) => {
+                        call_result = self._projects_conversations_participants_suggestions_suggest_knowledge_assist(opt, dry_run, &mut err).await;
+                    },
                     ("conversations-participants-suggestions-suggest-smart-replies", Some(opt)) => {
                         call_result = self._projects_conversations_participants_suggestions_suggest_smart_replies(opt, dry_run, &mut err).await;
                     },
@@ -17669,6 +18500,12 @@ where
                     },
                     ("delete-agent", Some(opt)) => {
                         call_result = self._projects_delete_agent(opt, dry_run, &mut err).await;
+                    },
+                    ("generators-create", Some(opt)) => {
+                        call_result = self._projects_generators_create(opt, dry_run, &mut err).await;
+                    },
+                    ("generators-list", Some(opt)) => {
+                        call_result = self._projects_generators_list(opt, dry_run, &mut err).await;
                     },
                     ("get-agent", Some(opt)) => {
                         call_result = self._projects_get_agent(opt, dry_run, &mut err).await;
@@ -17961,6 +18798,9 @@ where
                     ("locations-conversations-participants-suggestions-suggest-faq-answers", Some(opt)) => {
                         call_result = self._projects_locations_conversations_participants_suggestions_suggest_faq_answers(opt, dry_run, &mut err).await;
                     },
+                    ("locations-conversations-participants-suggestions-suggest-knowledge-assist", Some(opt)) => {
+                        call_result = self._projects_locations_conversations_participants_suggestions_suggest_knowledge_assist(opt, dry_run, &mut err).await;
+                    },
                     ("locations-conversations-participants-suggestions-suggest-smart-replies", Some(opt)) => {
                         call_result = self._projects_locations_conversations_participants_suggestions_suggest_smart_replies(opt, dry_run, &mut err).await;
                     },
@@ -17972,6 +18812,21 @@ where
                     },
                     ("locations-delete-agent", Some(opt)) => {
                         call_result = self._projects_locations_delete_agent(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-generators-create", Some(opt)) => {
+                        call_result = self._projects_locations_generators_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-generators-delete", Some(opt)) => {
+                        call_result = self._projects_locations_generators_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-generators-get", Some(opt)) => {
+                        call_result = self._projects_locations_generators_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-generators-list", Some(opt)) => {
+                        call_result = self._projects_locations_generators_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-generators-patch", Some(opt)) => {
+                        call_result = self._projects_locations_generators_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-get", Some(opt)) => {
                         call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
@@ -18029,6 +18884,9 @@ where
                     },
                     ("locations-set-agent", Some(opt)) => {
                         call_result = self._projects_locations_set_agent(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-stateless-suggestion-generate", Some(opt)) => {
+                        call_result = self._projects_locations_stateless_suggestion_generate(opt, dry_run, &mut err).await;
                     },
                     ("locations-suggestions-generate-stateless-summary", Some(opt)) => {
                         call_result = self._projects_locations_suggestions_generate_stateless_summary(opt, dry_run, &mut err).await;
@@ -18133,7 +18991,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-create', 'agent-environments-delete', 'agent-environments-get', 'agent-environments-get-history', 'agent-environments-intents-list', 'agent-environments-list', 'agent-environments-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-documents-patch', 'agent-knowledge-bases-documents-reload', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-knowledge-bases-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'agent-versions-create', 'agent-versions-delete', 'agent-versions-get', 'agent-versions-list', 'agent-versions-patch', 'answer-records-get', 'answer-records-list', 'answer-records-patch', 'conversation-profiles-clear-suggestion-feature-config', 'conversation-profiles-create', 'conversation-profiles-delete', 'conversation-profiles-get', 'conversation-profiles-list', 'conversation-profiles-patch', 'conversation-profiles-set-suggestion-feature-config', 'conversations-complete', 'conversations-create', 'conversations-get', 'conversations-list', 'conversations-messages-batch-create', 'conversations-messages-list', 'conversations-participants-analyze-content', 'conversations-participants-create', 'conversations-participants-get', 'conversations-participants-list', 'conversations-participants-patch', 'conversations-participants-suggestions-compile', 'conversations-participants-suggestions-list', 'conversations-participants-suggestions-suggest-articles', 'conversations-participants-suggestions-suggest-faq-answers', 'conversations-participants-suggestions-suggest-smart-replies', 'conversations-suggestions-search-knowledge', 'conversations-suggestions-suggest-conversation-summary', 'delete-agent', 'get-agent', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-get', 'knowledge-bases-documents-import', 'knowledge-bases-documents-list', 'knowledge-bases-documents-patch', 'knowledge-bases-documents-reload', 'knowledge-bases-get', 'knowledge-bases-list', 'knowledge-bases-patch', 'locations-agent-entity-types-batch-delete', 'locations-agent-entity-types-batch-update', 'locations-agent-entity-types-create', 'locations-agent-entity-types-delete', 'locations-agent-entity-types-entities-batch-create', 'locations-agent-entity-types-entities-batch-delete', 'locations-agent-entity-types-entities-batch-update', 'locations-agent-entity-types-get', 'locations-agent-entity-types-list', 'locations-agent-entity-types-patch', 'locations-agent-environments-create', 'locations-agent-environments-delete', 'locations-agent-environments-get', 'locations-agent-environments-get-history', 'locations-agent-environments-intents-list', 'locations-agent-environments-list', 'locations-agent-environments-patch', 'locations-agent-environments-users-sessions-contexts-create', 'locations-agent-environments-users-sessions-contexts-delete', 'locations-agent-environments-users-sessions-contexts-get', 'locations-agent-environments-users-sessions-contexts-list', 'locations-agent-environments-users-sessions-contexts-patch', 'locations-agent-environments-users-sessions-delete-contexts', 'locations-agent-environments-users-sessions-detect-intent', 'locations-agent-environments-users-sessions-entity-types-create', 'locations-agent-environments-users-sessions-entity-types-delete', 'locations-agent-environments-users-sessions-entity-types-get', 'locations-agent-environments-users-sessions-entity-types-list', 'locations-agent-environments-users-sessions-entity-types-patch', 'locations-agent-export', 'locations-agent-get-fulfillment', 'locations-agent-get-validation-result', 'locations-agent-import', 'locations-agent-intents-batch-delete', 'locations-agent-intents-batch-update', 'locations-agent-intents-create', 'locations-agent-intents-delete', 'locations-agent-intents-get', 'locations-agent-intents-list', 'locations-agent-intents-patch', 'locations-agent-restore', 'locations-agent-search', 'locations-agent-sessions-contexts-create', 'locations-agent-sessions-contexts-delete', 'locations-agent-sessions-contexts-get', 'locations-agent-sessions-contexts-list', 'locations-agent-sessions-contexts-patch', 'locations-agent-sessions-delete-contexts', 'locations-agent-sessions-detect-intent', 'locations-agent-sessions-entity-types-create', 'locations-agent-sessions-entity-types-delete', 'locations-agent-sessions-entity-types-get', 'locations-agent-sessions-entity-types-list', 'locations-agent-sessions-entity-types-patch', 'locations-agent-train', 'locations-agent-update-fulfillment', 'locations-agent-versions-create', 'locations-agent-versions-delete', 'locations-agent-versions-get', 'locations-agent-versions-list', 'locations-agent-versions-patch', 'locations-answer-records-get', 'locations-answer-records-list', 'locations-answer-records-patch', 'locations-conversation-profiles-clear-suggestion-feature-config', 'locations-conversation-profiles-create', 'locations-conversation-profiles-delete', 'locations-conversation-profiles-get', 'locations-conversation-profiles-list', 'locations-conversation-profiles-patch', 'locations-conversation-profiles-set-suggestion-feature-config', 'locations-conversations-complete', 'locations-conversations-create', 'locations-conversations-get', 'locations-conversations-list', 'locations-conversations-messages-batch-create', 'locations-conversations-messages-list', 'locations-conversations-participants-analyze-content', 'locations-conversations-participants-create', 'locations-conversations-participants-get', 'locations-conversations-participants-list', 'locations-conversations-participants-patch', 'locations-conversations-participants-suggestions-suggest-articles', 'locations-conversations-participants-suggestions-suggest-faq-answers', 'locations-conversations-participants-suggestions-suggest-smart-replies', 'locations-conversations-suggestions-search-knowledge', 'locations-conversations-suggestions-suggest-conversation-summary', 'locations-delete-agent', 'locations-get', 'locations-get-agent', 'locations-knowledge-bases-create', 'locations-knowledge-bases-delete', 'locations-knowledge-bases-documents-create', 'locations-knowledge-bases-documents-delete', 'locations-knowledge-bases-documents-get', 'locations-knowledge-bases-documents-import', 'locations-knowledge-bases-documents-list', 'locations-knowledge-bases-documents-patch', 'locations-knowledge-bases-documents-reload', 'locations-knowledge-bases-get', 'locations-knowledge-bases-list', 'locations-knowledge-bases-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-set-agent', 'locations-suggestions-generate-stateless-summary', 'locations-suggestions-search-knowledge', 'operations-cancel', 'operations-get', 'operations-list', 'set-agent', 'suggestions-generate-stateless-summary' and 'suggestions-search-knowledge'", vec![
+        ("projects", "methods: 'agent-entity-types-batch-delete', 'agent-entity-types-batch-update', 'agent-entity-types-create', 'agent-entity-types-delete', 'agent-entity-types-entities-batch-create', 'agent-entity-types-entities-batch-delete', 'agent-entity-types-entities-batch-update', 'agent-entity-types-get', 'agent-entity-types-list', 'agent-entity-types-patch', 'agent-environments-create', 'agent-environments-delete', 'agent-environments-get', 'agent-environments-get-history', 'agent-environments-intents-list', 'agent-environments-list', 'agent-environments-patch', 'agent-environments-users-sessions-contexts-create', 'agent-environments-users-sessions-contexts-delete', 'agent-environments-users-sessions-contexts-get', 'agent-environments-users-sessions-contexts-list', 'agent-environments-users-sessions-contexts-patch', 'agent-environments-users-sessions-delete-contexts', 'agent-environments-users-sessions-detect-intent', 'agent-environments-users-sessions-entity-types-create', 'agent-environments-users-sessions-entity-types-delete', 'agent-environments-users-sessions-entity-types-get', 'agent-environments-users-sessions-entity-types-list', 'agent-environments-users-sessions-entity-types-patch', 'agent-export', 'agent-get-fulfillment', 'agent-get-validation-result', 'agent-import', 'agent-intents-batch-delete', 'agent-intents-batch-update', 'agent-intents-create', 'agent-intents-delete', 'agent-intents-get', 'agent-intents-list', 'agent-intents-patch', 'agent-knowledge-bases-create', 'agent-knowledge-bases-delete', 'agent-knowledge-bases-documents-create', 'agent-knowledge-bases-documents-delete', 'agent-knowledge-bases-documents-get', 'agent-knowledge-bases-documents-list', 'agent-knowledge-bases-documents-patch', 'agent-knowledge-bases-documents-reload', 'agent-knowledge-bases-get', 'agent-knowledge-bases-list', 'agent-knowledge-bases-patch', 'agent-restore', 'agent-search', 'agent-sessions-contexts-create', 'agent-sessions-contexts-delete', 'agent-sessions-contexts-get', 'agent-sessions-contexts-list', 'agent-sessions-contexts-patch', 'agent-sessions-delete-contexts', 'agent-sessions-detect-intent', 'agent-sessions-entity-types-create', 'agent-sessions-entity-types-delete', 'agent-sessions-entity-types-get', 'agent-sessions-entity-types-list', 'agent-sessions-entity-types-patch', 'agent-train', 'agent-update-fulfillment', 'agent-versions-create', 'agent-versions-delete', 'agent-versions-get', 'agent-versions-list', 'agent-versions-patch', 'answer-records-get', 'answer-records-list', 'answer-records-patch', 'conversation-profiles-clear-suggestion-feature-config', 'conversation-profiles-create', 'conversation-profiles-delete', 'conversation-profiles-get', 'conversation-profiles-list', 'conversation-profiles-patch', 'conversation-profiles-set-suggestion-feature-config', 'conversations-complete', 'conversations-create', 'conversations-get', 'conversations-list', 'conversations-messages-batch-create', 'conversations-messages-list', 'conversations-participants-analyze-content', 'conversations-participants-create', 'conversations-participants-get', 'conversations-participants-list', 'conversations-participants-patch', 'conversations-participants-suggestions-compile', 'conversations-participants-suggestions-list', 'conversations-participants-suggestions-suggest-articles', 'conversations-participants-suggestions-suggest-faq-answers', 'conversations-participants-suggestions-suggest-knowledge-assist', 'conversations-participants-suggestions-suggest-smart-replies', 'conversations-suggestions-search-knowledge', 'conversations-suggestions-suggest-conversation-summary', 'delete-agent', 'generators-create', 'generators-list', 'get-agent', 'knowledge-bases-create', 'knowledge-bases-delete', 'knowledge-bases-documents-create', 'knowledge-bases-documents-delete', 'knowledge-bases-documents-get', 'knowledge-bases-documents-import', 'knowledge-bases-documents-list', 'knowledge-bases-documents-patch', 'knowledge-bases-documents-reload', 'knowledge-bases-get', 'knowledge-bases-list', 'knowledge-bases-patch', 'locations-agent-entity-types-batch-delete', 'locations-agent-entity-types-batch-update', 'locations-agent-entity-types-create', 'locations-agent-entity-types-delete', 'locations-agent-entity-types-entities-batch-create', 'locations-agent-entity-types-entities-batch-delete', 'locations-agent-entity-types-entities-batch-update', 'locations-agent-entity-types-get', 'locations-agent-entity-types-list', 'locations-agent-entity-types-patch', 'locations-agent-environments-create', 'locations-agent-environments-delete', 'locations-agent-environments-get', 'locations-agent-environments-get-history', 'locations-agent-environments-intents-list', 'locations-agent-environments-list', 'locations-agent-environments-patch', 'locations-agent-environments-users-sessions-contexts-create', 'locations-agent-environments-users-sessions-contexts-delete', 'locations-agent-environments-users-sessions-contexts-get', 'locations-agent-environments-users-sessions-contexts-list', 'locations-agent-environments-users-sessions-contexts-patch', 'locations-agent-environments-users-sessions-delete-contexts', 'locations-agent-environments-users-sessions-detect-intent', 'locations-agent-environments-users-sessions-entity-types-create', 'locations-agent-environments-users-sessions-entity-types-delete', 'locations-agent-environments-users-sessions-entity-types-get', 'locations-agent-environments-users-sessions-entity-types-list', 'locations-agent-environments-users-sessions-entity-types-patch', 'locations-agent-export', 'locations-agent-get-fulfillment', 'locations-agent-get-validation-result', 'locations-agent-import', 'locations-agent-intents-batch-delete', 'locations-agent-intents-batch-update', 'locations-agent-intents-create', 'locations-agent-intents-delete', 'locations-agent-intents-get', 'locations-agent-intents-list', 'locations-agent-intents-patch', 'locations-agent-restore', 'locations-agent-search', 'locations-agent-sessions-contexts-create', 'locations-agent-sessions-contexts-delete', 'locations-agent-sessions-contexts-get', 'locations-agent-sessions-contexts-list', 'locations-agent-sessions-contexts-patch', 'locations-agent-sessions-delete-contexts', 'locations-agent-sessions-detect-intent', 'locations-agent-sessions-entity-types-create', 'locations-agent-sessions-entity-types-delete', 'locations-agent-sessions-entity-types-get', 'locations-agent-sessions-entity-types-list', 'locations-agent-sessions-entity-types-patch', 'locations-agent-train', 'locations-agent-update-fulfillment', 'locations-agent-versions-create', 'locations-agent-versions-delete', 'locations-agent-versions-get', 'locations-agent-versions-list', 'locations-agent-versions-patch', 'locations-answer-records-get', 'locations-answer-records-list', 'locations-answer-records-patch', 'locations-conversation-profiles-clear-suggestion-feature-config', 'locations-conversation-profiles-create', 'locations-conversation-profiles-delete', 'locations-conversation-profiles-get', 'locations-conversation-profiles-list', 'locations-conversation-profiles-patch', 'locations-conversation-profiles-set-suggestion-feature-config', 'locations-conversations-complete', 'locations-conversations-create', 'locations-conversations-get', 'locations-conversations-list', 'locations-conversations-messages-batch-create', 'locations-conversations-messages-list', 'locations-conversations-participants-analyze-content', 'locations-conversations-participants-create', 'locations-conversations-participants-get', 'locations-conversations-participants-list', 'locations-conversations-participants-patch', 'locations-conversations-participants-suggestions-suggest-articles', 'locations-conversations-participants-suggestions-suggest-faq-answers', 'locations-conversations-participants-suggestions-suggest-knowledge-assist', 'locations-conversations-participants-suggestions-suggest-smart-replies', 'locations-conversations-suggestions-search-knowledge', 'locations-conversations-suggestions-suggest-conversation-summary', 'locations-delete-agent', 'locations-generators-create', 'locations-generators-delete', 'locations-generators-get', 'locations-generators-list', 'locations-generators-patch', 'locations-get', 'locations-get-agent', 'locations-knowledge-bases-create', 'locations-knowledge-bases-delete', 'locations-knowledge-bases-documents-create', 'locations-knowledge-bases-documents-delete', 'locations-knowledge-bases-documents-get', 'locations-knowledge-bases-documents-import', 'locations-knowledge-bases-documents-list', 'locations-knowledge-bases-documents-patch', 'locations-knowledge-bases-documents-reload', 'locations-knowledge-bases-get', 'locations-knowledge-bases-list', 'locations-knowledge-bases-patch', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-set-agent', 'locations-stateless-suggestion-generate', 'locations-suggestions-generate-stateless-summary', 'locations-suggestions-search-knowledge', 'operations-cancel', 'operations-get', 'operations-list', 'set-agent', 'suggestions-generate-stateless-summary' and 'suggestions-search-knowledge'", vec![
             ("agent-entity-types-batch-delete",
                     Some(r##"Deletes entity types in the specified agent. This method is a [long-running operation](https://cloud.google.com/dialogflow/es/docs/how/long-running-operations). The returned `Operation` type has the following method-specific fields: - `metadata`: An empty [Struct message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct) - `response`: An [Empty message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#empty) Note: You should always train an agent prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/es/docs/training)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_agent-entity-types-batch-delete",
@@ -20562,6 +21420,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("conversations-participants-suggestions-suggest-knowledge-assist",
+                    Some(r##"Gets knowledge assist suggestions based on historical messages."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-suggestions-suggest-knowledge-assist",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the participant to fetch suggestions for. Format: `projects//locations//conversations//participants/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("conversations-participants-suggestions-suggest-smart-replies",
                     Some(r##"Gets smart replies for a participant based on specific historical messages."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_conversations-participants-suggestions-suggest-smart-replies",
@@ -20596,7 +21482,7 @@ async fn main() {
                   vec![
                     (Some(r##"conversation"##),
                      None,
-                     Some(r##"The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`."##),
+                     Some(r##"Optional. The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`."##),
                      Some(true),
                      Some(false)),
         
@@ -20653,6 +21539,56 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. The project that the agent to delete is associated with. Format: `projects/` or `projects//locations/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("generators-create",
+                    Some(r##"Creates a generator."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_generators-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project/location to create generator for. Format: `projects//locations/`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("generators-list",
+                    Some(r##"Lists generators."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_generators-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project/location to list generators for. Format: `projects//locations/`"##),
                      Some(true),
                      Some(false)),
         
@@ -23096,6 +24032,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-conversations-participants-suggestions-suggest-knowledge-assist",
+                    Some(r##"Gets knowledge assist suggestions based on historical messages."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-conversations-participants-suggestions-suggest-knowledge-assist",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the participant to fetch suggestions for. Format: `projects//locations//conversations//participants/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-conversations-participants-suggestions-suggest-smart-replies",
                     Some(r##"Gets smart replies for a participant based on specific historical messages."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-conversations-participants-suggestions-suggest-smart-replies",
@@ -23130,7 +24094,7 @@ async fn main() {
                   vec![
                     (Some(r##"conversation"##),
                      None,
-                     Some(r##"The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`."##),
+                     Some(r##"Optional. The conversation (between human agent and end user) where the search request is triggered. Format: `projects//locations//conversations/`."##),
                      Some(true),
                      Some(false)),
         
@@ -23189,6 +24153,128 @@ async fn main() {
                      Some(r##"Required. The project that the agent to delete is associated with. Format: `projects/` or `projects//locations/`."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-generators-create",
+                    Some(r##"Creates a generator."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-generators-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project/location to create generator for. Format: `projects//locations/`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-generators-delete",
+                    Some(r##"Deletes a generator."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-generators-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The generator resource name to delete. Format: `projects//locations//generators/`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-generators-get",
+                    Some(r##"Retrieves a generator."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-generators-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The generator resource name to retrieve. Format: `projects//locations/`/generators/`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-generators-list",
+                    Some(r##"Lists generators."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-generators-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The project/location to list generators for. Format: `projects//locations/`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-generators-patch",
+                    Some(r##"Updates a generator."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-generators-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. Identifier. The resource name of the generator. Format: `projects//locations//generators/`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -23662,6 +24748,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-stateless-suggestion-generate",
+                    Some(r##"Generates and returns a suggestion for a conversation that does not have a resource created for it."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-stateless-suggestion-generate",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource to charge for the Suggestion's generation. Format: `projects//locations/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-suggestions-generate-stateless-summary",
                     Some(r##"Generates and returns a summary for a conversation that does not have a resource created for it."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli/projects_locations-suggestions-generate-stateless-summary",
@@ -23696,7 +24810,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`."##),
+                     Some(r##"Required. The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`."##),
                      Some(true),
                      Some(false)),
         
@@ -23846,7 +24960,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`."##),
+                     Some(r##"Required. The parent resource contains the conversation profile Format: 'projects/' or `projects//locations/`."##),
                      Some(true),
                      Some(false)),
         
@@ -23874,7 +24988,7 @@ async fn main() {
     
     let mut app = App::new("dialogflow2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240227")
+           .version("5.0.5+20240614")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli")
            .arg(Arg::with_name("url")
@@ -23938,6 +25052,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

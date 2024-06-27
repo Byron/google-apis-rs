@@ -421,6 +421,7 @@ where
                     "auth-config.ssh-public-key.username" => Some(("authConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.password.secret-version" => Some(("authConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.username" => Some(("authConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "billing-config.billing-category" => Some(("billingConfig.billingCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-revision" => Some(("connectionRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version" => Some(("connectorVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.connection-ratelimit-window-seconds" => Some(("connectorVersionInfraConfig.connectionRatelimitWindowSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -494,12 +495,18 @@ where
                     "eventing-runtime-data.events-listener-psc-sa" => Some(("eventingRuntimeData.eventsListenerPscSa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.status.description" => Some(("eventingRuntimeData.status.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.status.state" => Some(("eventingRuntimeData.status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.create-time" => Some(("eventingRuntimeData.webhookData.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.id" => Some(("eventingRuntimeData.webhookData.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.name" => Some(("eventingRuntimeData.webhookData.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.next-refresh-time" => Some(("eventingRuntimeData.webhookData.nextRefreshTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.update-time" => Some(("eventingRuntimeData.webhookData.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-location" => Some(("imageLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-trusted-tester" => Some(("isTrustedTester", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "lock-config.locked" => Some(("lockConfig.locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "lock-config.reason" => Some(("lockConfig.reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-config.enabled" => Some(("logConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "log-config.level" => Some(("logConfig.level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-config.max-node-count" => Some(("nodeConfig.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-config.min-node-count" => Some(("nodeConfig.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -521,7 +528,7 @@ where
                     "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "description", "enable-pkce", "enabled", "enrichment-enabled", "envoy-image-location", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "hpa-config", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "listener-auth-config", "lock-config", "locked", "log-config", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "node-config", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "billing-category", "billing-config", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "description", "enable-pkce", "enabled", "enrichment-enabled", "envoy-image-location", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "hpa-config", "id", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "level", "listener-auth-config", "lock-config", "locked", "log-config", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "next-refresh-time", "node-config", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username", "webhook-data"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1453,6 +1460,7 @@ where
                     "auth-config.ssh-public-key.username" => Some(("authConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.password.secret-version" => Some(("authConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-config.user-password.username" => Some(("authConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "billing-config.billing-category" => Some(("billingConfig.billingCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-revision" => Some(("connectionRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version" => Some(("connectorVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connector-version-infra-config.connection-ratelimit-window-seconds" => Some(("connectorVersionInfraConfig.connectionRatelimitWindowSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1526,12 +1534,18 @@ where
                     "eventing-runtime-data.events-listener-psc-sa" => Some(("eventingRuntimeData.eventsListenerPscSa", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.status.description" => Some(("eventingRuntimeData.status.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "eventing-runtime-data.status.state" => Some(("eventingRuntimeData.status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.create-time" => Some(("eventingRuntimeData.webhookData.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.id" => Some(("eventingRuntimeData.webhookData.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.name" => Some(("eventingRuntimeData.webhookData.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.next-refresh-time" => Some(("eventingRuntimeData.webhookData.nextRefreshTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "eventing-runtime-data.webhook-data.update-time" => Some(("eventingRuntimeData.webhookData.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-location" => Some(("imageLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-trusted-tester" => Some(("isTrustedTester", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "lock-config.locked" => Some(("lockConfig.locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "lock-config.reason" => Some(("lockConfig.reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-config.enabled" => Some(("logConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "log-config.level" => Some(("logConfig.level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-config.max-node-count" => Some(("nodeConfig.maxNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-config.min-node-count" => Some(("nodeConfig.minNodeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1553,7 +1567,7 @@ where
                     "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "description", "enable-pkce", "enabled", "enrichment-enabled", "envoy-image-location", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "hpa-config", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "listener-auth-config", "lock-config", "locked", "log-config", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "node-config", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "billing-category", "billing-config", "cert-type", "client-cert-type", "client-certificate", "client-id", "client-key", "client-private-key", "client-private-key-pass", "client-secret", "connection-ratelimit-window-seconds", "connection-revision", "connector-version", "connector-version-infra-config", "connector-version-launch-stage", "cpu", "cpu-utilization-threshold", "create-time", "dead-letter-config", "deployment-model", "description", "enable-pkce", "enabled", "enrichment-enabled", "envoy-image-location", "eventing-config", "eventing-enablement-type", "eventing-runtime-data", "events-listener-endpoint", "events-listener-ingress-endpoint", "events-listener-psc-sa", "hpa-config", "id", "image-location", "internalclient-ratelimit-threshold", "is-trusted-tester", "issuer", "jwt-claims", "key", "labels", "level", "listener-auth-config", "lock-config", "locked", "log-config", "max-node-count", "memory", "memory-utilization-threshold", "min-node-count", "name", "next-refresh-time", "node-config", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "private-connectivity-enabled", "private-server-certificate", "project-id", "proxy-destination-config", "ratelimit-threshold", "reason", "redirect-uri", "registration-destination-config", "resource-limits", "resource-requests", "scopes", "secret-version", "server-cert-type", "service-account", "service-directory", "shared-deployment", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "ssl-config", "state", "status", "subject", "subscription-type", "suspended", "topic", "trust-model", "type", "update-time", "use-ssl", "user-password", "username", "webhook-data"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1825,6 +1839,68 @@ where
         }
     }
 
+    async fn _projects_locations_connections_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_connections_search(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "query" => {
+                    call = call.query(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "query"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_connections_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1997,6 +2073,229 @@ where
         }
     }
 
+    async fn _projects_locations_custom_connectors_custom_connector_versions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_custom_connectors_custom_connector_versions_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_connectors_custom_connector_versions_deprecate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DeprecateCustomConnectorVersionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_custom_connectors_custom_connector_versions_deprecate(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_connectors_validate_custom_connector_spec(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spec-location" => Some(("specLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spec-type" => Some(("specType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["service-account", "spec-location", "spec-type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ValidateCustomConnectorSpecRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_custom_connectors_validate_custom_connector_spec(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_endpoint_attachments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2022,13 +2321,14 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "endpoint-global-access" => Some(("endpointGlobalAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "endpoint-ip" => Some(("endpointIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-attachment" => Some(("serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-ip", "labels", "name", "service-attachment", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-global-access", "endpoint-ip", "labels", "name", "service-attachment", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2286,13 +2586,14 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "endpoint-global-access" => Some(("endpointGlobalAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "endpoint-ip" => Some(("endpointIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-attachment" => Some(("serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-ip", "labels", "name", "service-attachment", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "endpoint-global-access", "endpoint-ip", "labels", "name", "service-attachment", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2536,6 +2837,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "active-connector-versions" => Some(("activeConnectorVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "all-connector-versions" => Some(("allConnectorVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-connector-type" => Some(("customConnectorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2545,7 +2847,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-connector-versions", "create-time", "custom-connector-type", "description", "display-name", "labels", "logo", "name", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-connector-versions", "all-connector-versions", "create-time", "custom-connector-type", "description", "display-name", "labels", "logo", "name", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2660,10 +2962,11 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec-location" => Some(("specLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spec-server-urls" => Some(("specServerUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "cert-type", "client-id", "client-key", "client-secret", "create-time", "enable-backend-destination-config", "enable-pkce", "issuer", "jwt-claims", "labels", "name", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "redirect-uri", "scopes", "secret-version", "service-account", "spec-location", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "state", "subject", "update-time", "user-password", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "cert-type", "client-id", "client-key", "client-secret", "create-time", "enable-backend-destination-config", "enable-pkce", "issuer", "jwt-claims", "labels", "name", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "redirect-uri", "scopes", "secret-version", "service-account", "spec-location", "spec-server-urls", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "state", "subject", "update-time", "user-password", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2694,58 +2997,6 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["custom-connector-version-id"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_locations_global_custom_connectors_custom_connector_versions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_global_custom_connectors_custom_connector_versions_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2857,124 +3108,6 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_locations_global_custom_connectors_custom_connector_versions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "auth-config.auth-key" => Some(("authConfig.authKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.auth-type" => Some(("authConfig.authType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.auth-code" => Some(("authConfig.oauth2AuthCodeFlow.authCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.auth-uri" => Some(("authConfig.oauth2AuthCodeFlow.authUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.client-id" => Some(("authConfig.oauth2AuthCodeFlow.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.client-secret.secret-version" => Some(("authConfig.oauth2AuthCodeFlow.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.enable-pkce" => Some(("authConfig.oauth2AuthCodeFlow.enablePkce", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.pkce-verifier" => Some(("authConfig.oauth2AuthCodeFlow.pkceVerifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.redirect-uri" => Some(("authConfig.oauth2AuthCodeFlow.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-auth-code-flow.scopes" => Some(("authConfig.oauth2AuthCodeFlow.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "auth-config.oauth2-client-credentials.client-id" => Some(("authConfig.oauth2ClientCredentials.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-client-credentials.client-secret.secret-version" => Some(("authConfig.oauth2ClientCredentials.clientSecret.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-jwt-bearer.client-key.secret-version" => Some(("authConfig.oauth2JwtBearer.clientKey.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-jwt-bearer.jwt-claims.audience" => Some(("authConfig.oauth2JwtBearer.jwtClaims.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-jwt-bearer.jwt-claims.issuer" => Some(("authConfig.oauth2JwtBearer.jwtClaims.issuer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.oauth2-jwt-bearer.jwt-claims.subject" => Some(("authConfig.oauth2JwtBearer.jwtClaims.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.ssh-public-key.cert-type" => Some(("authConfig.sshPublicKey.certType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.ssh-public-key.ssh-client-cert.secret-version" => Some(("authConfig.sshPublicKey.sshClientCert.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.ssh-public-key.ssh-client-cert-pass.secret-version" => Some(("authConfig.sshPublicKey.sshClientCertPass.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.ssh-public-key.username" => Some(("authConfig.sshPublicKey.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.user-password.password.secret-version" => Some(("authConfig.userPassword.password.secretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-config.user-password.username" => Some(("authConfig.userPassword.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "enable-backend-destination-config" => Some(("enableBackendDestinationConfig", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spec-location" => Some(("specLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audience", "auth-code", "auth-config", "auth-key", "auth-type", "auth-uri", "cert-type", "client-id", "client-key", "client-secret", "create-time", "enable-backend-destination-config", "enable-pkce", "issuer", "jwt-claims", "labels", "name", "oauth2-auth-code-flow", "oauth2-client-credentials", "oauth2-jwt-bearer", "password", "pkce-verifier", "redirect-uri", "scopes", "secret-version", "service-account", "spec-location", "ssh-client-cert", "ssh-client-cert-pass", "ssh-public-key", "state", "subject", "update-time", "user-password", "username"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::CustomConnectorVersion = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_global_custom_connectors_custom_connector_versions_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3202,6 +3335,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "active-connector-versions" => Some(("activeConnectorVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "all-connector-versions" => Some(("allConnectorVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-connector-type" => Some(("customConnectorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3211,7 +3345,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-connector-versions", "create-time", "custom-connector-type", "description", "display-name", "labels", "logo", "name", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-connector-versions", "all-connector-versions", "create-time", "custom-connector-type", "description", "display-name", "labels", "logo", "name", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4941,11 +5075,23 @@ where
                     ("locations-connections-runtime-entity-schemas-list", Some(opt)) => {
                         call_result = self._projects_locations_connections_runtime_entity_schemas_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-connections-search", Some(opt)) => {
+                        call_result = self._projects_locations_connections_search(opt, dry_run, &mut err).await;
+                    },
                     ("locations-connections-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_connections_set_iam_policy(opt, dry_run, &mut err).await;
                     },
                     ("locations-connections-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_locations_connections_test_iam_permissions(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-connectors-custom-connector-versions-delete", Some(opt)) => {
+                        call_result = self._projects_locations_custom_connectors_custom_connector_versions_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-connectors-custom-connector-versions-deprecate", Some(opt)) => {
+                        call_result = self._projects_locations_custom_connectors_custom_connector_versions_deprecate(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-connectors-validate-custom-connector-spec", Some(opt)) => {
+                        call_result = self._projects_locations_custom_connectors_validate_custom_connector_spec(opt, dry_run, &mut err).await;
                     },
                     ("locations-endpoint-attachments-create", Some(opt)) => {
                         call_result = self._projects_locations_endpoint_attachments_create(opt, dry_run, &mut err).await;
@@ -4977,17 +5123,11 @@ where
                     ("locations-global-custom-connectors-custom-connector-versions-create", Some(opt)) => {
                         call_result = self._projects_locations_global_custom_connectors_custom_connector_versions_create(opt, dry_run, &mut err).await;
                     },
-                    ("locations-global-custom-connectors-custom-connector-versions-delete", Some(opt)) => {
-                        call_result = self._projects_locations_global_custom_connectors_custom_connector_versions_delete(opt, dry_run, &mut err).await;
-                    },
                     ("locations-global-custom-connectors-custom-connector-versions-get", Some(opt)) => {
                         call_result = self._projects_locations_global_custom_connectors_custom_connector_versions_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-global-custom-connectors-custom-connector-versions-list", Some(opt)) => {
                         call_result = self._projects_locations_global_custom_connectors_custom_connector_versions_list(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-global-custom-connectors-custom-connector-versions-patch", Some(opt)) => {
-                        call_result = self._projects_locations_global_custom_connectors_custom_connector_versions_patch(opt, dry_run, &mut err).await;
                     },
                     ("locations-global-custom-connectors-delete", Some(opt)) => {
                         call_result = self._projects_locations_global_custom_connectors_delete(opt, dry_run, &mut err).await;
@@ -5152,7 +5292,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-connections-connection-schema-metadata-get-action', 'locations-connections-connection-schema-metadata-get-entity-type', 'locations-connections-connection-schema-metadata-list-actions', 'locations-connections-connection-schema-metadata-list-entity-types', 'locations-connections-connection-schema-metadata-refresh', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-event-subscriptions-create', 'locations-connections-event-subscriptions-delete', 'locations-connections-event-subscriptions-get', 'locations-connections-event-subscriptions-list', 'locations-connections-event-subscriptions-patch', 'locations-connections-event-subscriptions-retry', 'locations-connections-get', 'locations-connections-get-connection-schema-metadata', 'locations-connections-get-iam-policy', 'locations-connections-list', 'locations-connections-listen-event', 'locations-connections-patch', 'locations-connections-repair-eventing', 'locations-connections-runtime-action-schemas-list', 'locations-connections-runtime-entity-schemas-list', 'locations-connections-set-iam-policy', 'locations-connections-test-iam-permissions', 'locations-endpoint-attachments-create', 'locations-endpoint-attachments-delete', 'locations-endpoint-attachments-get', 'locations-endpoint-attachments-list', 'locations-endpoint-attachments-patch', 'locations-get', 'locations-get-regional-settings', 'locations-get-runtime-config', 'locations-global-custom-connectors-create', 'locations-global-custom-connectors-custom-connector-versions-create', 'locations-global-custom-connectors-custom-connector-versions-delete', 'locations-global-custom-connectors-custom-connector-versions-get', 'locations-global-custom-connectors-custom-connector-versions-list', 'locations-global-custom-connectors-custom-connector-versions-patch', 'locations-global-custom-connectors-delete', 'locations-global-custom-connectors-get', 'locations-global-custom-connectors-list', 'locations-global-custom-connectors-patch', 'locations-global-get-settings', 'locations-global-managed-zones-create', 'locations-global-managed-zones-delete', 'locations-global-managed-zones-get', 'locations-global-managed-zones-list', 'locations-global-managed-zones-patch', 'locations-global-update-settings', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-providers-connectors-get', 'locations-providers-connectors-list', 'locations-providers-connectors-versions-eventtypes-get', 'locations-providers-connectors-versions-eventtypes-list', 'locations-providers-connectors-versions-get', 'locations-providers-connectors-versions-list', 'locations-providers-get', 'locations-providers-get-iam-policy', 'locations-providers-list', 'locations-providers-set-iam-policy', 'locations-providers-test-iam-permissions' and 'locations-update-regional-settings'", vec![
+        ("projects", "methods: 'locations-connections-connection-schema-metadata-get-action', 'locations-connections-connection-schema-metadata-get-entity-type', 'locations-connections-connection-schema-metadata-list-actions', 'locations-connections-connection-schema-metadata-list-entity-types', 'locations-connections-connection-schema-metadata-refresh', 'locations-connections-create', 'locations-connections-delete', 'locations-connections-event-subscriptions-create', 'locations-connections-event-subscriptions-delete', 'locations-connections-event-subscriptions-get', 'locations-connections-event-subscriptions-list', 'locations-connections-event-subscriptions-patch', 'locations-connections-event-subscriptions-retry', 'locations-connections-get', 'locations-connections-get-connection-schema-metadata', 'locations-connections-get-iam-policy', 'locations-connections-list', 'locations-connections-listen-event', 'locations-connections-patch', 'locations-connections-repair-eventing', 'locations-connections-runtime-action-schemas-list', 'locations-connections-runtime-entity-schemas-list', 'locations-connections-search', 'locations-connections-set-iam-policy', 'locations-connections-test-iam-permissions', 'locations-custom-connectors-custom-connector-versions-delete', 'locations-custom-connectors-custom-connector-versions-deprecate', 'locations-custom-connectors-validate-custom-connector-spec', 'locations-endpoint-attachments-create', 'locations-endpoint-attachments-delete', 'locations-endpoint-attachments-get', 'locations-endpoint-attachments-list', 'locations-endpoint-attachments-patch', 'locations-get', 'locations-get-regional-settings', 'locations-get-runtime-config', 'locations-global-custom-connectors-create', 'locations-global-custom-connectors-custom-connector-versions-create', 'locations-global-custom-connectors-custom-connector-versions-get', 'locations-global-custom-connectors-custom-connector-versions-list', 'locations-global-custom-connectors-delete', 'locations-global-custom-connectors-get', 'locations-global-custom-connectors-list', 'locations-global-custom-connectors-patch', 'locations-global-get-settings', 'locations-global-managed-zones-create', 'locations-global-managed-zones-delete', 'locations-global-managed-zones-get', 'locations-global-managed-zones-list', 'locations-global-managed-zones-patch', 'locations-global-update-settings', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-providers-connectors-get', 'locations-providers-connectors-list', 'locations-providers-connectors-versions-eventtypes-get', 'locations-providers-connectors-versions-eventtypes-list', 'locations-providers-connectors-versions-get', 'locations-providers-connectors-versions-list', 'locations-providers-get', 'locations-providers-get-iam-policy', 'locations-providers-list', 'locations-providers-set-iam-policy', 'locations-providers-test-iam-permissions' and 'locations-update-regional-settings'", vec![
             ("locations-connections-connection-schema-metadata-get-action",
                     Some(r##"Get action."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-connection-schema-metadata-get-action",
@@ -5685,6 +5825,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-connections-search",
+                    Some(r##"Returns Top matching Connections for a given query."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-search",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Parent resource of the Connection, of the form: `projects/*/locations/*/connections`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-connections-set-iam-policy",
                     Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-connections-set-iam-policy",
@@ -5720,6 +5882,84 @@ async fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-connectors-custom-connector-versions-delete",
+                    Some(r##"Deletes a single CustomConnectorVersion."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-custom-connectors-custom-connector-versions-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the form: `projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-connectors-custom-connector-versions-deprecate",
+                    Some(r##"Deprecates a single CustomConnectorVersion."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-custom-connectors-custom-connector-versions-deprecate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the form: `projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-connectors-validate-custom-connector-spec",
+                    Some(r##"Validates a Custom Connector Spec."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-custom-connectors-validate-custom-connector-spec",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Location at which the custom connector is being created."##),
                      Some(true),
                      Some(false)),
         
@@ -5985,28 +6225,6 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-global-custom-connectors-custom-connector-versions-delete",
-                    Some(r##"Deletes a single CustomConnectorVersion."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-global-custom-connectors-custom-connector-versions-delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Required. Resource name of the form: `projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}`"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("locations-global-custom-connectors-custom-connector-versions-get",
                     Some(r##"Gets details of a single CustomConnectorVersion."##),
                     "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-global-custom-connectors-custom-connector-versions-get",
@@ -6038,34 +6256,6 @@ async fn main() {
                      Some(r##"Required. Parent resource of the connectors, of the form: `projects/*/locations/{location}/customConnectors/*/customConnectorVersions/*`"##),
                      Some(true),
                      Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-global-custom-connectors-custom-connector-versions-patch",
-                    Some(r##"Updates the parameters of a CustomConnectorVersion."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_connectors1_cli/projects_locations-global-custom-connectors-custom-connector-versions-patch",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Output only. Identifier. Resource name of the Version. Format: projects/{project}/locations/{location}/customConnectors/{custom_connector}/customConnectorVersions/{custom_connector_version}"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6749,7 +6939,7 @@ async fn main() {
     
     let mut app = App::new("connectors1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240221")
+           .version("5.0.5+20240619")
            .about("Enables users to create and manage connections to Google Cloud services and third-party business applications using the Connectors interface.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_connectors1_cli")
            .arg(Arg::with_name("url")
@@ -6813,6 +7003,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

@@ -275,6 +275,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-managed-encryption.kms-key-name" => Some(("customerManagedEncryption.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -284,8 +285,9 @@ where
                     "rotation.rotation-period" => Some(("rotation.rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-aliases" => Some(("versionAliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "version-destroy-ttl" => Some(("versionDestroyTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases", "version-destroy-ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -600,6 +602,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-managed-encryption.kms-key-name" => Some(("customerManagedEncryption.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -609,8 +612,9 @@ where
                     "rotation.rotation-period" => Some(("rotation.rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-aliases" => Some(("versionAliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "version-destroy-ttl" => Some(("versionDestroyTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases", "version-destroy-ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1378,6 +1382,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-managed-encryption.kms-key-name" => Some(("customerManagedEncryption.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1387,8 +1392,9 @@ where
                     "rotation.rotation-period" => Some(("rotation.rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-aliases" => Some(("versionAliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "version-destroy-ttl" => Some(("versionDestroyTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases", "version-destroy-ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1703,6 +1709,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-managed-encryption.kms-key-name" => Some(("customerManagedEncryption.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1712,8 +1719,9 @@ where
                     "rotation.rotation-period" => Some(("rotation.rotationPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-aliases" => Some(("versionAliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "version-destroy-ttl" => Some(("versionDestroyTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "automatic", "create-time", "customer-managed-encryption", "etag", "expire-time", "kms-key-name", "labels", "name", "next-rotation-time", "replication", "rotation", "rotation-period", "ttl", "version-aliases", "version-destroy-ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3359,7 +3367,7 @@ async fn main() {
     
     let mut app = App::new("secretmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240621")
            .about("Stores sensitive data such as API keys, passwords, and certificates. Provides convenience while improving security. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_secretmanager1_cli")
            .arg(Arg::with_name("url")
@@ -3423,6 +3431,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

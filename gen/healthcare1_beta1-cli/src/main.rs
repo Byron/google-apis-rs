@@ -3892,10 +3892,11 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "encryption-spec.kms-key-name" => Some(("encryptionSpec.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["encryption-spec", "kms-key-name", "name", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7446,6 +7447,94 @@ where
         }
     }
 
+    async fn _projects_locations_datasets_fhir_stores_export_history(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "-since" => Some(("_since", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "-type" => Some(("_type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-destination.uri-prefix" => Some(("gcsDestination.uriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-resource-versions" => Some(("maxResourceVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["-since", "-type", "gcs-destination", "max-resource-versions", "uri-prefix"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ExportResourcesHistoryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_export_history(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_datasets_fhir_stores_fhir__concept_map_search_translate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_datasets_fhir_stores_fhir__concept_map_search_translate(opt.value_of("parent").unwrap_or(""));
@@ -9231,6 +9320,93 @@ where
         }
         let mut request: api::ImportResourcesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_datasets_fhir_stores_import(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_datasets_fhir_stores_import_history(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "content-structure" => Some(("contentStructure", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-source.uri" => Some(("gcsSource.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-error-count" => Some(("maxErrorCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content-structure", "gcs-source", "max-error-count", "uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ImportResourcesHistoryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_datasets_fhir_stores_import_history(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -11442,10 +11618,11 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "encryption-spec.kms-key-name" => Some(("encryptionSpec.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["encryption-spec", "kms-key-name", "name", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12201,6 +12378,9 @@ where
                     ("locations-datasets-fhir-stores-export", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_export(opt, dry_run, &mut err).await;
                     },
+                    ("locations-datasets-fhir-stores-export-history", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_export_history(opt, dry_run, &mut err).await;
+                    },
                     ("locations-datasets-fhir-stores-fhir--concept-map-search-translate", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_fhir__concept_map_search_translate(opt, dry_run, &mut err).await;
                     },
@@ -12281,6 +12461,9 @@ where
                     },
                     ("locations-datasets-fhir-stores-import", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_import(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-datasets-fhir-stores-import-history", Some(opt)) => {
+                        call_result = self._projects_locations_datasets_fhir_stores_import_history(opt, dry_run, &mut err).await;
                     },
                     ("locations-datasets-fhir-stores-list", Some(opt)) => {
                         call_result = self._projects_locations_datasets_fhir_stores_list(opt, dry_run, &mut err).await;
@@ -12466,7 +12649,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-datasets-annotation-stores-annotations-create', 'locations-datasets-annotation-stores-annotations-delete', 'locations-datasets-annotation-stores-annotations-get', 'locations-datasets-annotation-stores-annotations-list', 'locations-datasets-annotation-stores-annotations-patch', 'locations-datasets-annotation-stores-create', 'locations-datasets-annotation-stores-delete', 'locations-datasets-annotation-stores-evaluate', 'locations-datasets-annotation-stores-export', 'locations-datasets-annotation-stores-get', 'locations-datasets-annotation-stores-get-iam-policy', 'locations-datasets-annotation-stores-import', 'locations-datasets-annotation-stores-list', 'locations-datasets-annotation-stores-patch', 'locations-datasets-annotation-stores-set-iam-policy', 'locations-datasets-annotation-stores-test-iam-permissions', 'locations-datasets-consent-stores-attribute-definitions-create', 'locations-datasets-consent-stores-attribute-definitions-delete', 'locations-datasets-consent-stores-attribute-definitions-get', 'locations-datasets-consent-stores-attribute-definitions-list', 'locations-datasets-consent-stores-attribute-definitions-patch', 'locations-datasets-consent-stores-check-data-access', 'locations-datasets-consent-stores-consent-artifacts-create', 'locations-datasets-consent-stores-consent-artifacts-delete', 'locations-datasets-consent-stores-consent-artifacts-get', 'locations-datasets-consent-stores-consent-artifacts-list', 'locations-datasets-consent-stores-consents-activate', 'locations-datasets-consent-stores-consents-create', 'locations-datasets-consent-stores-consents-delete', 'locations-datasets-consent-stores-consents-delete-revision', 'locations-datasets-consent-stores-consents-get', 'locations-datasets-consent-stores-consents-list', 'locations-datasets-consent-stores-consents-list-revisions', 'locations-datasets-consent-stores-consents-patch', 'locations-datasets-consent-stores-consents-reject', 'locations-datasets-consent-stores-consents-revoke', 'locations-datasets-consent-stores-create', 'locations-datasets-consent-stores-delete', 'locations-datasets-consent-stores-evaluate-user-consents', 'locations-datasets-consent-stores-get', 'locations-datasets-consent-stores-get-iam-policy', 'locations-datasets-consent-stores-list', 'locations-datasets-consent-stores-patch', 'locations-datasets-consent-stores-query-accessible-data', 'locations-datasets-consent-stores-set-iam-policy', 'locations-datasets-consent-stores-test-iam-permissions', 'locations-datasets-consent-stores-user-data-mappings-archive', 'locations-datasets-consent-stores-user-data-mappings-create', 'locations-datasets-consent-stores-user-data-mappings-delete', 'locations-datasets-consent-stores-user-data-mappings-get', 'locations-datasets-consent-stores-user-data-mappings-list', 'locations-datasets-consent-stores-user-data-mappings-patch', 'locations-datasets-create', 'locations-datasets-data-mapper-workspaces-get-iam-policy', 'locations-datasets-data-mapper-workspaces-set-iam-policy', 'locations-datasets-data-mapper-workspaces-test-iam-permissions', 'locations-datasets-deidentify', 'locations-datasets-delete', 'locations-datasets-dicom-stores-create', 'locations-datasets-dicom-stores-deidentify', 'locations-datasets-dicom-stores-delete', 'locations-datasets-dicom-stores-dicom-web-studies-get-study-metrics', 'locations-datasets-dicom-stores-dicom-web-studies-series-get-series-metrics', 'locations-datasets-dicom-stores-dicom-web-studies-series-instances-get-storage-info', 'locations-datasets-dicom-stores-dicom-web-studies-set-blob-storage-settings', 'locations-datasets-dicom-stores-export', 'locations-datasets-dicom-stores-get', 'locations-datasets-dicom-stores-get-dicom-store-metrics', 'locations-datasets-dicom-stores-get-iam-policy', 'locations-datasets-dicom-stores-import', 'locations-datasets-dicom-stores-list', 'locations-datasets-dicom-stores-patch', 'locations-datasets-dicom-stores-search-for-instances', 'locations-datasets-dicom-stores-search-for-series', 'locations-datasets-dicom-stores-search-for-studies', 'locations-datasets-dicom-stores-set-blob-storage-settings', 'locations-datasets-dicom-stores-set-iam-policy', 'locations-datasets-dicom-stores-store-instances', 'locations-datasets-dicom-stores-studies-delete', 'locations-datasets-dicom-stores-studies-retrieve-metadata', 'locations-datasets-dicom-stores-studies-retrieve-study', 'locations-datasets-dicom-stores-studies-search-for-instances', 'locations-datasets-dicom-stores-studies-search-for-series', 'locations-datasets-dicom-stores-studies-series-delete', 'locations-datasets-dicom-stores-studies-series-instances-bulkdata-retrieve-bulkdata', 'locations-datasets-dicom-stores-studies-series-instances-delete', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-instance', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-retrieve-series', 'locations-datasets-dicom-stores-studies-series-search-for-instances', 'locations-datasets-dicom-stores-studies-store-instances', 'locations-datasets-dicom-stores-test-iam-permissions', 'locations-datasets-fhir-stores-apply-admin-consents', 'locations-datasets-fhir-stores-apply-consents', 'locations-datasets-fhir-stores-configure-search', 'locations-datasets-fhir-stores-create', 'locations-datasets-fhir-stores-deidentify', 'locations-datasets-fhir-stores-delete', 'locations-datasets-fhir-stores-explain-data-access', 'locations-datasets-fhir-stores-export', 'locations-datasets-fhir-stores-fhir--concept-map-search-translate', 'locations-datasets-fhir-stores-fhir--concept-map-translate', 'locations-datasets-fhir-stores-fhir--consent-enforcement-status', 'locations-datasets-fhir-stores-fhir--observation-lastn', 'locations-datasets-fhir-stores-fhir--patient-consent-enforcement-status', 'locations-datasets-fhir-stores-fhir--patient-everything', 'locations-datasets-fhir-stores-fhir--resource-incoming-references', 'locations-datasets-fhir-stores-fhir--resource-purge', 'locations-datasets-fhir-stores-fhir--resource-validate', 'locations-datasets-fhir-stores-fhir-capabilities', 'locations-datasets-fhir-stores-fhir-conditional-delete', 'locations-datasets-fhir-stores-fhir-conditional-patch', 'locations-datasets-fhir-stores-fhir-conditional-update', 'locations-datasets-fhir-stores-fhir-create', 'locations-datasets-fhir-stores-fhir-delete', 'locations-datasets-fhir-stores-fhir-execute-bundle', 'locations-datasets-fhir-stores-fhir-history', 'locations-datasets-fhir-stores-fhir-patch', 'locations-datasets-fhir-stores-fhir-read', 'locations-datasets-fhir-stores-fhir-search', 'locations-datasets-fhir-stores-fhir-search-type', 'locations-datasets-fhir-stores-fhir-update', 'locations-datasets-fhir-stores-fhir-vread', 'locations-datasets-fhir-stores-get', 'locations-datasets-fhir-stores-get-fhir-store-metrics', 'locations-datasets-fhir-stores-get-iam-policy', 'locations-datasets-fhir-stores-import', 'locations-datasets-fhir-stores-list', 'locations-datasets-fhir-stores-patch', 'locations-datasets-fhir-stores-rollback', 'locations-datasets-fhir-stores-set-iam-policy', 'locations-datasets-fhir-stores-test-iam-permissions', 'locations-datasets-get', 'locations-datasets-get-iam-policy', 'locations-datasets-hl7-v2-stores-create', 'locations-datasets-hl7-v2-stores-delete', 'locations-datasets-hl7-v2-stores-export', 'locations-datasets-hl7-v2-stores-get', 'locations-datasets-hl7-v2-stores-get-hl7v2-store-metrics', 'locations-datasets-hl7-v2-stores-get-iam-policy', 'locations-datasets-hl7-v2-stores-import', 'locations-datasets-hl7-v2-stores-list', 'locations-datasets-hl7-v2-stores-messages-batch-get', 'locations-datasets-hl7-v2-stores-messages-create', 'locations-datasets-hl7-v2-stores-messages-delete', 'locations-datasets-hl7-v2-stores-messages-get', 'locations-datasets-hl7-v2-stores-messages-ingest', 'locations-datasets-hl7-v2-stores-messages-list', 'locations-datasets-hl7-v2-stores-messages-patch', 'locations-datasets-hl7-v2-stores-patch', 'locations-datasets-hl7-v2-stores-set-iam-policy', 'locations-datasets-hl7-v2-stores-test-iam-permissions', 'locations-datasets-list', 'locations-datasets-operations-cancel', 'locations-datasets-operations-get', 'locations-datasets-operations-list', 'locations-datasets-patch', 'locations-datasets-set-iam-policy', 'locations-datasets-test-iam-permissions', 'locations-get', 'locations-list' and 'locations-services-nlp-analyze-entities'", vec![
+        ("projects", "methods: 'locations-datasets-annotation-stores-annotations-create', 'locations-datasets-annotation-stores-annotations-delete', 'locations-datasets-annotation-stores-annotations-get', 'locations-datasets-annotation-stores-annotations-list', 'locations-datasets-annotation-stores-annotations-patch', 'locations-datasets-annotation-stores-create', 'locations-datasets-annotation-stores-delete', 'locations-datasets-annotation-stores-evaluate', 'locations-datasets-annotation-stores-export', 'locations-datasets-annotation-stores-get', 'locations-datasets-annotation-stores-get-iam-policy', 'locations-datasets-annotation-stores-import', 'locations-datasets-annotation-stores-list', 'locations-datasets-annotation-stores-patch', 'locations-datasets-annotation-stores-set-iam-policy', 'locations-datasets-annotation-stores-test-iam-permissions', 'locations-datasets-consent-stores-attribute-definitions-create', 'locations-datasets-consent-stores-attribute-definitions-delete', 'locations-datasets-consent-stores-attribute-definitions-get', 'locations-datasets-consent-stores-attribute-definitions-list', 'locations-datasets-consent-stores-attribute-definitions-patch', 'locations-datasets-consent-stores-check-data-access', 'locations-datasets-consent-stores-consent-artifacts-create', 'locations-datasets-consent-stores-consent-artifacts-delete', 'locations-datasets-consent-stores-consent-artifacts-get', 'locations-datasets-consent-stores-consent-artifacts-list', 'locations-datasets-consent-stores-consents-activate', 'locations-datasets-consent-stores-consents-create', 'locations-datasets-consent-stores-consents-delete', 'locations-datasets-consent-stores-consents-delete-revision', 'locations-datasets-consent-stores-consents-get', 'locations-datasets-consent-stores-consents-list', 'locations-datasets-consent-stores-consents-list-revisions', 'locations-datasets-consent-stores-consents-patch', 'locations-datasets-consent-stores-consents-reject', 'locations-datasets-consent-stores-consents-revoke', 'locations-datasets-consent-stores-create', 'locations-datasets-consent-stores-delete', 'locations-datasets-consent-stores-evaluate-user-consents', 'locations-datasets-consent-stores-get', 'locations-datasets-consent-stores-get-iam-policy', 'locations-datasets-consent-stores-list', 'locations-datasets-consent-stores-patch', 'locations-datasets-consent-stores-query-accessible-data', 'locations-datasets-consent-stores-set-iam-policy', 'locations-datasets-consent-stores-test-iam-permissions', 'locations-datasets-consent-stores-user-data-mappings-archive', 'locations-datasets-consent-stores-user-data-mappings-create', 'locations-datasets-consent-stores-user-data-mappings-delete', 'locations-datasets-consent-stores-user-data-mappings-get', 'locations-datasets-consent-stores-user-data-mappings-list', 'locations-datasets-consent-stores-user-data-mappings-patch', 'locations-datasets-create', 'locations-datasets-data-mapper-workspaces-get-iam-policy', 'locations-datasets-data-mapper-workspaces-set-iam-policy', 'locations-datasets-data-mapper-workspaces-test-iam-permissions', 'locations-datasets-deidentify', 'locations-datasets-delete', 'locations-datasets-dicom-stores-create', 'locations-datasets-dicom-stores-deidentify', 'locations-datasets-dicom-stores-delete', 'locations-datasets-dicom-stores-dicom-web-studies-get-study-metrics', 'locations-datasets-dicom-stores-dicom-web-studies-series-get-series-metrics', 'locations-datasets-dicom-stores-dicom-web-studies-series-instances-get-storage-info', 'locations-datasets-dicom-stores-dicom-web-studies-set-blob-storage-settings', 'locations-datasets-dicom-stores-export', 'locations-datasets-dicom-stores-get', 'locations-datasets-dicom-stores-get-dicom-store-metrics', 'locations-datasets-dicom-stores-get-iam-policy', 'locations-datasets-dicom-stores-import', 'locations-datasets-dicom-stores-list', 'locations-datasets-dicom-stores-patch', 'locations-datasets-dicom-stores-search-for-instances', 'locations-datasets-dicom-stores-search-for-series', 'locations-datasets-dicom-stores-search-for-studies', 'locations-datasets-dicom-stores-set-blob-storage-settings', 'locations-datasets-dicom-stores-set-iam-policy', 'locations-datasets-dicom-stores-store-instances', 'locations-datasets-dicom-stores-studies-delete', 'locations-datasets-dicom-stores-studies-retrieve-metadata', 'locations-datasets-dicom-stores-studies-retrieve-study', 'locations-datasets-dicom-stores-studies-search-for-instances', 'locations-datasets-dicom-stores-studies-search-for-series', 'locations-datasets-dicom-stores-studies-series-delete', 'locations-datasets-dicom-stores-studies-series-instances-bulkdata-retrieve-bulkdata', 'locations-datasets-dicom-stores-studies-series-instances-delete', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-frames', 'locations-datasets-dicom-stores-studies-series-instances-frames-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-instance', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-instances-retrieve-rendered', 'locations-datasets-dicom-stores-studies-series-retrieve-metadata', 'locations-datasets-dicom-stores-studies-series-retrieve-series', 'locations-datasets-dicom-stores-studies-series-search-for-instances', 'locations-datasets-dicom-stores-studies-store-instances', 'locations-datasets-dicom-stores-test-iam-permissions', 'locations-datasets-fhir-stores-apply-admin-consents', 'locations-datasets-fhir-stores-apply-consents', 'locations-datasets-fhir-stores-configure-search', 'locations-datasets-fhir-stores-create', 'locations-datasets-fhir-stores-deidentify', 'locations-datasets-fhir-stores-delete', 'locations-datasets-fhir-stores-explain-data-access', 'locations-datasets-fhir-stores-export', 'locations-datasets-fhir-stores-export-history', 'locations-datasets-fhir-stores-fhir--concept-map-search-translate', 'locations-datasets-fhir-stores-fhir--concept-map-translate', 'locations-datasets-fhir-stores-fhir--consent-enforcement-status', 'locations-datasets-fhir-stores-fhir--observation-lastn', 'locations-datasets-fhir-stores-fhir--patient-consent-enforcement-status', 'locations-datasets-fhir-stores-fhir--patient-everything', 'locations-datasets-fhir-stores-fhir--resource-incoming-references', 'locations-datasets-fhir-stores-fhir--resource-purge', 'locations-datasets-fhir-stores-fhir--resource-validate', 'locations-datasets-fhir-stores-fhir-capabilities', 'locations-datasets-fhir-stores-fhir-conditional-delete', 'locations-datasets-fhir-stores-fhir-conditional-patch', 'locations-datasets-fhir-stores-fhir-conditional-update', 'locations-datasets-fhir-stores-fhir-create', 'locations-datasets-fhir-stores-fhir-delete', 'locations-datasets-fhir-stores-fhir-execute-bundle', 'locations-datasets-fhir-stores-fhir-history', 'locations-datasets-fhir-stores-fhir-patch', 'locations-datasets-fhir-stores-fhir-read', 'locations-datasets-fhir-stores-fhir-search', 'locations-datasets-fhir-stores-fhir-search-type', 'locations-datasets-fhir-stores-fhir-update', 'locations-datasets-fhir-stores-fhir-vread', 'locations-datasets-fhir-stores-get', 'locations-datasets-fhir-stores-get-fhir-store-metrics', 'locations-datasets-fhir-stores-get-iam-policy', 'locations-datasets-fhir-stores-import', 'locations-datasets-fhir-stores-import-history', 'locations-datasets-fhir-stores-list', 'locations-datasets-fhir-stores-patch', 'locations-datasets-fhir-stores-rollback', 'locations-datasets-fhir-stores-set-iam-policy', 'locations-datasets-fhir-stores-test-iam-permissions', 'locations-datasets-get', 'locations-datasets-get-iam-policy', 'locations-datasets-hl7-v2-stores-create', 'locations-datasets-hl7-v2-stores-delete', 'locations-datasets-hl7-v2-stores-export', 'locations-datasets-hl7-v2-stores-get', 'locations-datasets-hl7-v2-stores-get-hl7v2-store-metrics', 'locations-datasets-hl7-v2-stores-get-iam-policy', 'locations-datasets-hl7-v2-stores-import', 'locations-datasets-hl7-v2-stores-list', 'locations-datasets-hl7-v2-stores-messages-batch-get', 'locations-datasets-hl7-v2-stores-messages-create', 'locations-datasets-hl7-v2-stores-messages-delete', 'locations-datasets-hl7-v2-stores-messages-get', 'locations-datasets-hl7-v2-stores-messages-ingest', 'locations-datasets-hl7-v2-stores-messages-list', 'locations-datasets-hl7-v2-stores-messages-patch', 'locations-datasets-hl7-v2-stores-patch', 'locations-datasets-hl7-v2-stores-set-iam-policy', 'locations-datasets-hl7-v2-stores-test-iam-permissions', 'locations-datasets-list', 'locations-datasets-operations-cancel', 'locations-datasets-operations-get', 'locations-datasets-operations-list', 'locations-datasets-patch', 'locations-datasets-set-iam-policy', 'locations-datasets-test-iam-permissions', 'locations-get', 'locations-list' and 'locations-services-nlp-analyze-entities'", vec![
             ("locations-datasets-annotation-stores-annotations-create",
                     Some(r##"Creates a new Annotation record. It is valid to create Annotation objects for the same source more than once since a unique ID is assigned to each record by this service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-annotation-stores-annotations-create",
@@ -14057,7 +14240,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"Required. The path of the resource for which the storage info is requested (for exaxmple for a DICOM Instance: `projects/{projectid}/datasets/{datasetid}/dicomStores/{dicomStoreId}/dicomWeb/studies/{study_uid}/series/{series_uid}/instances/{instance_uid}`)"##),
+                     Some(r##"Required. The path of the resource for which the storage info is requested (for exaxmple for a DICOM Instance: `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreId}/dicomWeb/studies/{study_uid}/series/{series_uid}/instances/{instance_uid}`)"##),
                      Some(true),
                      Some(false)),
         
@@ -14079,7 +14262,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"Required. The path of the resource to update the blob storage settings in the format of `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}`, `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/`, or `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}`. If `filter_config` is specified, set the value of `resource` to the resource name of a DICOM store in the format `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}`."##),
+                     Some(r##"Required. The path of the resource to update the blob storage settings in the format of `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}`, `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/`, or `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}`. If `filter_config` is specified, set the value of `resource` to the resource name of a DICOM store in the format `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}`."##),
                      Some(true),
                      Some(false)),
         
@@ -14363,7 +14546,7 @@ async fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"Required. The path of the resource to update the blob storage settings in the format of `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}`, `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/`, or `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}`. If `filter_config` is specified, set the value of `resource` to the resource name of a DICOM store in the format `projects/{projectID}/datasets/{datasetID}/dicomStores/{dicomStoreID}`."##),
+                     Some(r##"Required. The path of the resource to update the blob storage settings in the format of `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}`, `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/`, or `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}/dicomWeb/studies/{studyUID}/series/{seriesUID}/instances/{instanceUID}`. If `filter_config` is specified, set the value of `resource` to the resource name of a DICOM store in the format `projects/{projectID}/locations/{locationID}/datasets/{datasetID}/dicomStores/{dicomStoreID}`."##),
                      Some(true),
                      Some(false)),
         
@@ -15169,6 +15352,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-datasets-fhir-stores-export-history",
+                    Some(r##"Export resources including historical versions from the FHIR store to the specified destination. The exported resource, along with previous versions, will be exported in one or more FHIR history bundles. This method returns an Operation that can be used to track the status of the export by calling GetOperation. Immediate fatal errors appear in the error field, errors are also logged to Cloud Logging (see [Viewing error logs in Cloud Logging](https://cloud.google.com/healthcare/docs/how-tos/logging)). Otherwise, when the operation finishes, a detailed response of type ExportResourcesResponse is returned in the response field. The metadata field type for this operation is OperationMetadata."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-export-history",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the FHIR store to export resource from, in the format `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-datasets-fhir-stores-fhir--concept-map-search-translate",
                     Some(r##"Translates a code from one value set to another by searching for appropriate concept maps. Implements the FHIR standard $translate operation ([DSTU2](https://www.hl7.org/fhir/DSTU2/operation-conceptmap-translate.html), [STU3](https://www.hl7.org/fhir/STU3/operation-conceptmap-translate.html), [R4](https://www.hl7.org/fhir/R4/operation-conceptmap-translate.html)). On success, the response body contains a JSON-encoded representation of a FHIR Parameters resource, which includes the translation result. Errors generated by the FHIR store contain a JSON-encoded `OperationOutcome` resource describing the reason for the error. If the request cannot be mapped to a valid API method on a FHIR store, a generic GCP error might be returned instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-fhir--concept-map-search-translate",
@@ -15859,6 +16070,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-datasets-fhir-stores-import-history",
+                    Some(r##"Import resource historical versions from Cloud Storage source to destination fhir store. The exported resource, along with previous versions, will be exported in one or more FHIR history bundles. This method returns an Operation that can be used to track the status of the export by calling GetOperation. Immediate fatal errors appear in the error field, errors are also logged to Cloud Logging (see [Viewing error logs in Cloud Logging](https://cloud.google.com/healthcare/docs/how-tos/logging)). Otherwise, when the operation finishes, a detailed response of type ImportResourcesResponse is returned in the response field. The metadata field type for this operation is OperationMetadata."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-import-history",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the FHIR store to import FHIR resources to, in the format of `projects/{project_id}/locations/{location_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-datasets-fhir-stores-list",
                     Some(r##"Lists the FHIR stores in the given dataset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli/projects_locations-datasets-fhir-stores-list",
@@ -15887,7 +16126,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Identifier. Resource name of the FHIR store, of the form `projects/{project_id}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
+                     Some(r##"Output only. Identifier. Resource name of the FHIR store, of the form `projects/{project_id}/locations/{location}/datasets/{dataset_id}/fhirStores/{fhir_store_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -16743,7 +16982,7 @@ async fn main() {
     
     let mut app = App::new("healthcare1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240228")
+           .version("5.0.5+20240605")
            .about("Manage, store, and access healthcare data in Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_healthcare1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -16807,6 +17046,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

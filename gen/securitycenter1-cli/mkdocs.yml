@@ -1,4 +1,4 @@
-site_name: Security Command Center v5.0.4+20240302
+site_name: Security Command Center v5.0.5+20240622
 site_url: http://byron.github.io/google-apis-rs/google-securitycenter1-cli
 site_description: A complete library to interact with Security Command Center (protocol v1)
 
@@ -28,8 +28,10 @@ nav:
     - 'Event Threat Detection Settings Effective Custom Modules List': 'folders_event-threat-detection-settings-effective-custom-modules-list.md'
     - 'Event Threat Detection Settings Validate Custom Module': 'folders_event-threat-detection-settings-validate-custom-module.md'
     - 'Findings Bulk Mute': 'folders_findings-bulk-mute.md'
+    - 'Locations Mute Configs Create': 'folders_locations-mute-configs-create.md'
     - 'Locations Mute Configs Delete': 'folders_locations-mute-configs-delete.md'
     - 'Locations Mute Configs Get': 'folders_locations-mute-configs-get.md'
+    - 'Locations Mute Configs List': 'folders_locations-mute-configs-list.md'
     - 'Locations Mute Configs Patch': 'folders_locations-mute-configs-patch.md'
     - 'Mute Configs Create': 'folders_mute-configs-create.md'
     - 'Mute Configs Delete': 'folders_mute-configs-delete.md'
@@ -79,8 +81,10 @@ nav:
     - 'Event Threat Detection Settings Validate Custom Module': 'organizations_event-threat-detection-settings-validate-custom-module.md'
     - 'Findings Bulk Mute': 'organizations_findings-bulk-mute.md'
     - 'Get Organization Settings': 'organizations_get-organization-settings.md'
+    - 'Locations Mute Configs Create': 'organizations_locations-mute-configs-create.md'
     - 'Locations Mute Configs Delete': 'organizations_locations-mute-configs-delete.md'
     - 'Locations Mute Configs Get': 'organizations_locations-mute-configs-get.md'
+    - 'Locations Mute Configs List': 'organizations_locations-mute-configs-list.md'
     - 'Locations Mute Configs Patch': 'organizations_locations-mute-configs-patch.md'
     - 'Mute Configs Create': 'organizations_mute-configs-create.md'
     - 'Mute Configs Delete': 'organizations_mute-configs-delete.md'
@@ -152,8 +156,10 @@ nav:
     - 'Event Threat Detection Settings Effective Custom Modules List': 'projects_event-threat-detection-settings-effective-custom-modules-list.md'
     - 'Event Threat Detection Settings Validate Custom Module': 'projects_event-threat-detection-settings-validate-custom-module.md'
     - 'Findings Bulk Mute': 'projects_findings-bulk-mute.md'
+    - 'Locations Mute Configs Create': 'projects_locations-mute-configs-create.md'
     - 'Locations Mute Configs Delete': 'projects_locations-mute-configs-delete.md'
     - 'Locations Mute Configs Get': 'projects_locations-mute-configs-get.md'
+    - 'Locations Mute Configs List': 'projects_locations-mute-configs-list.md'
     - 'Locations Mute Configs Patch': 'projects_locations-mute-configs-patch.md'
     - 'Mute Configs Create': 'projects_mute-configs-create.md'
     - 'Mute Configs Delete': 'projects_mute-configs-delete.md'
@@ -185,5 +191,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

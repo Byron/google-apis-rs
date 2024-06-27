@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Chrome Management* API at revision *20240303*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Chrome Management* API at revision *20240624*. The CLI is at version *5.0.5*.
 
 ```bash
 chromemanagement1 [options]
@@ -33,8 +33,11 @@ chromemanagement1 [options]
                 apps-android-get <name> [-p <v>]... [-o <out>]
                 apps-chrome-get <name> [-p <v>]... [-o <out>]
                 apps-count-chrome-app-requests <customer> [-p <v>]... [-o <out>]
+                apps-fetch-devices-requesting-extension <customer> [-p <v>]... [-o <out>]
+                apps-fetch-users-requesting-extension <customer> [-p <v>]... [-o <out>]
                 apps-web-get <name> [-p <v>]... [-o <out>]
                 reports-count-chrome-browsers-needing-attention <customer> [-p <v>]... [-o <out>]
+                reports-count-chrome-crash-events <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-devices-reaching-auto-expiration-date <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-devices-that-need-attention <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-hardware-fleet-devices <customer> [-p <v>]... [-o <out>]

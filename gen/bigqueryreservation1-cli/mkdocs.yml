@@ -1,4 +1,4 @@
-site_name: BigQuery Reservation v5.0.4+20240227
+site_name: BigQuery Reservation v5.0.5+20240611
 site_url: http://byron.github.io/google-apis-rs/google-bigqueryreservation1-cli
 site_description: A complete library to interact with BigQuery Reservation (protocol v1)
 
@@ -25,6 +25,7 @@ nav:
     - 'Locations Reservations Assignments Patch': 'projects_locations-reservations-assignments-patch.md'
     - 'Locations Reservations Create': 'projects_locations-reservations-create.md'
     - 'Locations Reservations Delete': 'projects_locations-reservations-delete.md'
+    - 'Locations Reservations Failover Reservation': 'projects_locations-reservations-failover-reservation.md'
     - 'Locations Reservations Get': 'projects_locations-reservations-get.md'
     - 'Locations Reservations List': 'projects_locations-reservations-list.md'
     - 'Locations Reservations Patch': 'projects_locations-reservations-patch.md'
@@ -34,5 +35,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

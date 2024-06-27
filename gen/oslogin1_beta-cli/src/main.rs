@@ -908,7 +908,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent project and zone for the signing request. This is needed to properly ensure per-organization ISS processing and potentially to provide for the possibility of zone-specific certificates used in the signing process."##),
+                     Some(r##"The parent project and region for the signing request."##),
                      Some(true),
                      Some(false)),
         
@@ -936,7 +936,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The parent project and zone for the signing request. This is needed to properly ensure per-organization ISS processing and potentially to provide for the possibility of zone-specific certificates used in the signing process."##),
+                     Some(r##"The parent project and region for the signing request."##),
                      Some(true),
                      Some(false)),
         
@@ -1064,7 +1064,7 @@ async fn main() {
     
     let mut app = App::new("oslogin1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240225")
+           .version("5.0.5+20240616")
            .about("You can use OS Login to manage access to your VM instances using IAM roles.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oslogin1_beta_cli")
            .arg(Arg::with_name("url")
@@ -1128,6 +1128,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

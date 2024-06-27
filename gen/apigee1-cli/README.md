@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Apigee* API at revision *20240222*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Apigee* API at revision *20240620*. The CLI is at version *5.0.5*.
 
 ```bash
 apigee1 [options]
@@ -309,6 +309,7 @@ apigee1 [options]
                 reports-get <name> [-p <v>]... [-o <out>]
                 reports-list <parent> [-p <v>]... [-o <out>]
                 reports-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                security-assessment-results-batch-compute <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 security-profiles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 security-profiles-delete <name> [-p <v>]... [-o <out>]
                 security-profiles-environments-compute-environment-scores <profile-environment> (-r <kv>)... [-p <v>]... [-o <out>]

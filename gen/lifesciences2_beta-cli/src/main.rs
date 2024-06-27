@@ -724,7 +724,7 @@ async fn main() {
     
     let mut app = App::new("lifesciences2-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240220")
+           .version("5.0.5+20240614")
            .about("Cloud Life Sciences is a suite of services and tools for managing, processing, and transforming life sciences data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_lifesciences2_beta_cli")
            .arg(Arg::with_name("url")
@@ -788,6 +788,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

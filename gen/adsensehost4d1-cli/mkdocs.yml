@@ -1,4 +1,4 @@
-site_name: AdSense Host v5.0.4+20200930
+site_name: AdSense Host v5.0.5+20200930
 site_url: http://byron.github.io/google-apis-rs/google-adsensehost4d1-cli
 site_description: A complete library to interact with AdSense Host (protocol v4.1)
 
@@ -44,5 +44,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

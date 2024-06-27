@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Support* API at revision *20240304*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Support* API at revision *20240624*. The CLI is at version *5.0.5*.
 
 ```bash
 cloudsupport2-beta [options]
@@ -42,6 +42,7 @@ cloudsupport2-beta [options]
                 list <parent> [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 search [-p <v>]... [-o <out>]
+                show-feed <parent> [-p <v>]... [-o <out>]
         media
                 download <name> [-p <v>]... [-o <out>]
                 upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]

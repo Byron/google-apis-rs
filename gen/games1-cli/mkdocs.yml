@@ -1,4 +1,4 @@
-site_name: Games v5.0.4+20240228
+site_name: Games v5.0.5+20240618
 site_url: http://byron.github.io/google-apis-rs/google-games1-cli
 site_description: A complete library to interact with Games (protocol v1)
 
@@ -9,6 +9,9 @@ site_dir: build_html
 
 nav:
 - Home: 'index.md'
+- 'Accesstokens':
+    - 'Generate Play Grouping Api Token': 'accesstokens_generate-play-grouping-api-token.md'
+    - 'Generate Recall Play Grouping Api Token': 'accesstokens_generate-recall-play-grouping-api-token.md'
 - 'Achievement Definitions':
     - 'List': 'achievement-definitions_list.md'
 - 'Achievements':
@@ -39,6 +42,8 @@ nav:
     - 'Get Scoped Player Ids': 'players_get-scoped-player-ids.md'
     - 'List': 'players_list.md'
 - 'Recall':
+    - 'Games Player Tokens': 'recall_games-player-tokens.md'
+    - 'Last Token From All Developer Games': 'recall_last-token-from-all-developer-games.md'
     - 'Link Persona': 'recall_link-persona.md'
     - 'Reset Persona': 'recall_reset-persona.md'
     - 'Retrieve Tokens': 'recall_retrieve-tokens.md'
@@ -59,5 +64,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

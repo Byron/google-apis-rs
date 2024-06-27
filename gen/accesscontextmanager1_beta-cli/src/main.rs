@@ -1687,7 +1687,7 @@ async fn main() {
     
     let mut app = App::new("accesscontextmanager1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20230123")
+           .version("5.0.5+20230123")
            .about("An API for setting attribute based access control to requests to GCP services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_beta_cli")
            .arg(Arg::with_name("url")
@@ -1751,6 +1751,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

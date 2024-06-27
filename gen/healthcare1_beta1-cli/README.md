@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Healthcare* API at revision *20240228*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Healthcare* API at revision *20240605*. The CLI is at version *5.0.5*.
 
 ```bash
 healthcare1-beta1 [options]
@@ -134,6 +134,7 @@ healthcare1-beta1 [options]
                 locations-datasets-fhir-stores-delete <name> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-explain-data-access <name> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-export <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-fhir-stores-export-history <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir--concept-map-search-translate <parent> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir--concept-map-translate <name> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-fhir--consent-enforcement-status <name> [-p <v>]... [-o <out>]
@@ -161,6 +162,7 @@ healthcare1-beta1 [options]
                 locations-datasets-fhir-stores-get-fhir-store-metrics <name> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-import <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-datasets-fhir-stores-import-history <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-list <parent> [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-datasets-fhir-stores-rollback <name> (-r <kv>)... [-p <v>]... [-o <out>]

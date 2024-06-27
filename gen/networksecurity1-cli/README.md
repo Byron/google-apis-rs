@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *NetworkSecurity* API at revision *20240221*. The CLI is at version *5.0.4*.
+This documentation was generated from the *NetworkSecurity* API at revision *20240606*. The CLI is at version *5.0.5*.
 
 ```bash
 networksecurity1 [options]
@@ -39,10 +39,25 @@ networksecurity1 [options]
                 locations-address-groups-list-references <address-group> [-p <v>]... [-o <out>]
                 locations-address-groups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-address-groups-remove-items <address-group> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-firewall-endpoints-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-firewall-endpoints-delete <name> [-p <v>]... [-o <out>]
+                locations-firewall-endpoints-get <name> [-p <v>]... [-o <out>]
+                locations-firewall-endpoints-list <parent> [-p <v>]... [-o <out>]
+                locations-firewall-endpoints-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-security-profile-groups-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-security-profile-groups-delete <name> [-p <v>]... [-o <out>]
+                locations-security-profile-groups-get <name> [-p <v>]... [-o <out>]
+                locations-security-profile-groups-list <parent> [-p <v>]... [-o <out>]
+                locations-security-profile-groups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-security-profiles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-security-profiles-delete <name> [-p <v>]... [-o <out>]
+                locations-security-profiles-get <name> [-p <v>]... [-o <out>]
+                locations-security-profiles-list <parent> [-p <v>]... [-o <out>]
+                locations-security-profiles-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 locations-address-groups-add-items <address-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-address-groups-clone-items <address-group> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -72,6 +87,11 @@ networksecurity1 [options]
                 locations-client-tls-policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-client-tls-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-client-tls-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-firewall-endpoint-associations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-firewall-endpoint-associations-delete <name> [-p <v>]... [-o <out>]
+                locations-firewall-endpoint-associations-get <name> [-p <v>]... [-o <out>]
+                locations-firewall-endpoint-associations-list <parent> [-p <v>]... [-o <out>]
+                locations-firewall-endpoint-associations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-gateway-security-policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-gateway-security-policies-delete <name> [-p <v>]... [-o <out>]
                 locations-gateway-security-policies-get <name> [-p <v>]... [-o <out>]

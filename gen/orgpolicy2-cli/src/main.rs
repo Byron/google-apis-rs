@@ -2650,7 +2650,7 @@ async fn main() {
     
     let mut app = App::new("orgpolicy2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240226")
+           .version("5.0.5+20240621")
            .about("The Organization Policy API allows users to configure governance rules on their Google Cloud resources across the resource hierarchy.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli")
            .arg(Arg::with_name("url")
@@ -2714,6 +2714,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

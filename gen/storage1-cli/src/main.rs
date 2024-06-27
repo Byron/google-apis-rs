@@ -1147,6 +1147,62 @@ where
         }
     }
 
+    async fn _buckets_get_storage_layout(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.buckets().get_storage_layout(opt.value_of("bucket").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "prefix" => {
+                    call = call.prefix(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["prefix"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _buckets_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2916,6 +2972,9 @@ where
                 "if-metageneration-match" => {
                     call = call.if_metageneration_match(        value.map(|v| arg_from_str(v, err, "if-metageneration-match", "int64")).unwrap_or(-0));
                 },
+                "allow-non-empty" => {
+                    call = call.allow_non_empty(        value.map(|v| arg_from_str(v, err, "allow-non-empty", "boolean")).unwrap_or(false));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2929,7 +2988,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["if-metageneration-match", "if-metageneration-not-match"].iter().map(|v|*v));
+                                                                           v.extend(["allow-non-empty", "if-metageneration-match", "if-metageneration-not-match"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5111,76 +5170,7 @@ where
 
     async fn _objects_restore(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "bucket" => Some(("bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cache-control" => Some(("cacheControl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "component-count" => Some(("componentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "content-disposition" => Some(("contentDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-encoding" => Some(("contentEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-language" => Some(("contentLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "crc32c" => Some(("crc32c", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "custom-time" => Some(("customTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "customer-encryption.encryption-algorithm" => Some(("customerEncryption.encryptionAlgorithm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "customer-encryption.key-sha256" => Some(("customerEncryption.keySha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event-based-hold" => Some(("eventBasedHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "generation" => Some(("generation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "hard-delete-time" => Some(("hardDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "md5-hash" => Some(("md5Hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "media-link" => Some(("mediaLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "metageneration" => Some(("metageneration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity" => Some(("owner.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "owner.entity-id" => Some(("owner.entityId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "retention.mode" => Some(("retention.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "retention.retain-until-time" => Some(("retention.retainUntilTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "retention-expiration-time" => Some(("retentionExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "size" => Some(("size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "soft-delete-time" => Some(("softDeleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-class" => Some(("storageClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "temporary-hold" => Some(("temporaryHold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "time-created" => Some(("timeCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-deleted" => Some(("timeDeleted", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "time-storage-class-updated" => Some(("timeStorageClassUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cache-control", "component-count", "content-disposition", "content-encoding", "content-language", "content-type", "crc32c", "custom-time", "customer-encryption", "encryption-algorithm", "entity", "entity-id", "etag", "event-based-hold", "generation", "hard-delete-time", "id", "key-sha256", "kind", "kms-key-name", "md5-hash", "media-link", "metadata", "metageneration", "mode", "name", "owner", "retain-until-time", "retention", "retention-expiration-time", "self-link", "size", "soft-delete-time", "storage-class", "temporary-hold", "time-created", "time-deleted", "time-storage-class-updated", "updated"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::Object = json::value::from_value(object).unwrap();
-        let mut call = self.hub.objects().restore(request, opt.value_of("bucket").unwrap_or(""), opt.value_of("object").unwrap_or(""), opt.value_of("generation").unwrap_or(""));
+        let mut call = self.hub.objects().restore(opt.value_of("bucket").unwrap_or(""), opt.value_of("object").unwrap_or(""), opt.value_of("generation").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6300,6 +6290,9 @@ where
                     ("get-iam-policy", Some(opt)) => {
                         call_result = self._buckets_get_iam_policy(opt, dry_run, &mut err).await;
                     },
+                    ("get-storage-layout", Some(opt)) => {
+                        call_result = self._buckets_get_storage_layout(opt, dry_run, &mut err).await;
+                    },
                     ("insert", Some(opt)) => {
                         call_result = self._buckets_insert(opt, dry_run, &mut err).await;
                     },
@@ -6992,7 +6985,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("buckets", "methods: 'delete', 'get', 'get-iam-policy', 'insert', 'list', 'lock-retention-policy', 'operations-cancel', 'operations-get', 'operations-list', 'patch', 'set-iam-policy', 'test-iam-permissions' and 'update'", vec![
+        ("buckets", "methods: 'delete', 'get', 'get-iam-policy', 'get-storage-layout', 'insert', 'list', 'lock-retention-policy', 'operations-cancel', 'operations-get', 'operations-list', 'patch', 'set-iam-policy', 'test-iam-permissions' and 'update'", vec![
             ("delete",
                     Some(r##"Permanently deletes an empty bucket."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_delete",
@@ -7034,6 +7027,28 @@ async fn main() {
             ("get-iam-policy",
                     Some(r##"Returns an IAM policy for the specified bucket."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_get-iam-policy",
+                  vec![
+                    (Some(r##"bucket"##),
+                     None,
+                     Some(r##"Name of a bucket."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-storage-layout",
+                    Some(r##"Returns the storage layout configuration for the specified bucket. Note that this operation requires storage.objects.list permission."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/buckets_get-storage-layout",
                   vec![
                     (Some(r##"bucket"##),
                      None,
@@ -8452,12 +8467,6 @@ async fn main() {
                      Some(true),
                      Some(false)),
         
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -8811,7 +8820,7 @@ async fn main() {
     
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240229")
+           .version("5.0.5+20240621")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")
@@ -8886,6 +8895,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

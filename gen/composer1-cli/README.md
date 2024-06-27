@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Composer* API at revision *20240227*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Composer* API at revision *20240618*. The CLI is at version *5.0.5*.
 
 ```bash
 composer1 [options]
         projects
+                locations-environments-check-upgrade <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-database-failover <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-delete <name> [-p <v>]... [-o <out>]

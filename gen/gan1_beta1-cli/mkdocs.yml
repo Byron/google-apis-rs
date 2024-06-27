@@ -1,4 +1,4 @@
-site_name: gan v5.0.4+20130205
+site_name: gan v5.0.5+20130205
 site_url: http://byron.github.io/google-apis-rs/google-gan1_beta1-cli
 site_description: A complete library to interact with gan (protocol v1beta1)
 
@@ -28,5 +28,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

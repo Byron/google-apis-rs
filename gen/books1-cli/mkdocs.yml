@@ -1,4 +1,4 @@
-site_name: books v5.0.4+20240222
+site_name: books v5.0.5+20240621
 site_url: http://byron.github.io/google-apis-rs/google-books1-cli
 site_description: A complete library to interact with books (protocol v1)
 
@@ -76,5 +76,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

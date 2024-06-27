@@ -141,6 +141,11 @@ where
                     "event-publish-config.topic" => Some(("eventPublishConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "maintenance-policy.maintenance-exclusion-window.end-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-exclusion-window.start-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-window.recurring-time-window.recurrence" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-window.recurring-time-window.window.end-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-window.recurring-time-window.window.start-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.connection-type" => Some(("networkConfig.connectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -164,7 +169,7 @@ where
                     "workforce-identity-service-endpoint" => Some(("workforceIdentityServiceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "satisfies-pzs", "service-account", "service-endpoint", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "workforce-identity-service-endpoint", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "end-time", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "maintenance-exclusion-window", "maintenance-policy", "maintenance-window", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "recurrence", "recurring-time-window", "satisfies-pzs", "service-account", "service-endpoint", "start-time", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "window", "workforce-identity-service-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -696,6 +701,11 @@ where
                     "event-publish-config.topic" => Some(("eventPublishConfig.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "maintenance-policy.maintenance-exclusion-window.end-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-exclusion-window.start-time" => Some(("maintenancePolicy.maintenanceExclusionWindow.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-window.recurring-time-window.recurrence" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.recurrence", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-window.recurring-time-window.window.end-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maintenance-policy.maintenance-window.recurring-time-window.window.start-time" => Some(("maintenancePolicy.maintenanceWindow.recurringTimeWindow.window.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.connection-type" => Some(("networkConfig.connectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -719,7 +729,7 @@ where
                     "workforce-identity-service-endpoint" => Some(("workforceIdentityServiceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "satisfies-pzs", "service-account", "service-endpoint", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "workforce-identity-service-endpoint", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "end-time", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "maintenance-exclusion-window", "maintenance-policy", "maintenance-window", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "recurrence", "recurring-time-window", "satisfies-pzs", "service-account", "service-endpoint", "start-time", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "window", "workforce-identity-service-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1051,9 +1061,6 @@ where
                 "page-size" => {
                     call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
-                "include-unrevealed-locations" => {
-                    call = call.include_unrevealed_locations(        value.map(|v| arg_from_str(v, err, "include-unrevealed-locations", "boolean")).unwrap_or(false));
-                },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
@@ -1070,7 +1077,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "include-unrevealed-locations", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2026,7 +2033,7 @@ async fn main() {
     
     let mut app = App::new("datafusion1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240111")
+           .version("5.0.5+20240618")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for quickly building and managing data pipelines. It provides a graphical interface to increase time efficiency and reduce complexity, and allows business users, developers, and data scientists to easily and reliably build scalable data integration solutions to cleanse, prepare, blend, transfer and transform data without having to wrestle with infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datafusion1_cli")
            .arg(Arg::with_name("url")
@@ -2090,6 +2097,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

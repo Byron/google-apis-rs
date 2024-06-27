@@ -6767,7 +6767,7 @@ async fn main() {
     
     let mut app = App::new("notebooks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20231227")
+           .version("5.0.5+20240613")
            .about("Notebooks API is used to manage notebook resources in Google Cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_notebooks1_cli")
            .arg(Arg::with_name("url")
@@ -6831,6 +6831,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

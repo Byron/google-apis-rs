@@ -25,10 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud KMS* API at revision *20240219*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud KMS* API at revision *20240621*. The CLI is at version *5.0.5*.
 
 ```bash
 cloudkms1 [options]
+        folders
+                get-autokey-config <name> [-p <v>]... [-o <out>]
+                update-autokey-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 locations-ekm-config-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-ekm-config-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -44,6 +47,9 @@ cloudkms1 [options]
                 locations-generate-random-bytes <location> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-get-ekm-config <name> [-p <v>]... [-o <out>]
+                locations-key-handles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-key-handles-get <name> [-p <v>]... [-o <out>]
+                locations-key-handles-list <parent> [-p <v>]... [-o <out>]
                 locations-key-rings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -81,7 +87,9 @@ cloudkms1 [options]
                 locations-key-rings-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-update-ekm-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                show-effective-autokey-config <parent> [-p <v>]... [-o <out>]
   cloudkms1 --help
 
 Configuration:

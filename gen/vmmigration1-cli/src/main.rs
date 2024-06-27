@@ -1461,6 +1461,8 @@ where
                     "aws.error.message" => Some(("aws.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aws.inventory-security-group-names" => Some(("aws.inventorySecurityGroupNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "aws.migration-resources-user-tags" => Some(("aws.migrationResourcesUserTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "aws.network-insights.source-network-config" => Some(("aws.networkInsights.sourceNetworkConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.network-insights.source-network-terraform" => Some(("aws.networkInsights.sourceNetworkTerraform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aws.public-ip" => Some(("aws.publicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aws.state" => Some(("aws.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "azure.azure-location" => Some(("azure.azureLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1485,7 +1487,7 @@ where
                     "vmware.username" => Some(("vmware.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vmware.vcenter-ip" => Some(("vmware.vcenterIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-creds", "access-key-id", "aws", "aws-region", "azure", "azure-location", "client-id", "client-secret", "client-secret-creds", "code", "create-time", "description", "encryption", "error", "inventory-security-group-names", "kms-key", "labels", "message", "migration-resources-user-tags", "name", "password", "public-ip", "resolved-vcenter-host", "resource-group-id", "secret-access-key", "session-token", "state", "subscription-id", "tenant-id", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-creds", "access-key-id", "aws", "aws-region", "azure", "azure-location", "client-id", "client-secret", "client-secret-creds", "code", "create-time", "description", "encryption", "error", "inventory-security-group-names", "kms-key", "labels", "message", "migration-resources-user-tags", "name", "network-insights", "password", "public-ip", "resolved-vcenter-host", "resource-group-id", "secret-access-key", "session-token", "source-network-config", "source-network-terraform", "state", "subscription-id", "tenant-id", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3825,6 +3827,8 @@ where
                     "aws.error.message" => Some(("aws.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aws.inventory-security-group-names" => Some(("aws.inventorySecurityGroupNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "aws.migration-resources-user-tags" => Some(("aws.migrationResourcesUserTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "aws.network-insights.source-network-config" => Some(("aws.networkInsights.sourceNetworkConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "aws.network-insights.source-network-terraform" => Some(("aws.networkInsights.sourceNetworkTerraform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aws.public-ip" => Some(("aws.publicIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aws.state" => Some(("aws.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "azure.azure-location" => Some(("azure.azureLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3849,7 +3853,7 @@ where
                     "vmware.username" => Some(("vmware.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vmware.vcenter-ip" => Some(("vmware.vcenterIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-creds", "access-key-id", "aws", "aws-region", "azure", "azure-location", "client-id", "client-secret", "client-secret-creds", "code", "create-time", "description", "encryption", "error", "inventory-security-group-names", "kms-key", "labels", "message", "migration-resources-user-tags", "name", "password", "public-ip", "resolved-vcenter-host", "resource-group-id", "secret-access-key", "session-token", "state", "subscription-id", "tenant-id", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-creds", "access-key-id", "aws", "aws-region", "azure", "azure-location", "client-id", "client-secret", "client-secret-creds", "code", "create-time", "description", "encryption", "error", "inventory-security-group-names", "kms-key", "labels", "message", "migration-resources-user-tags", "name", "network-insights", "password", "public-ip", "resolved-vcenter-host", "resource-group-id", "secret-access-key", "session-token", "source-network-config", "source-network-terraform", "state", "subscription-id", "tenant-id", "thumbprint", "update-time", "username", "vcenter-ip", "vmware"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6274,7 +6278,7 @@ async fn main() {
     
     let mut app = App::new("vmmigration1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240222")
+           .version("5.0.5+20240613")
            .about("Use the Migrate to Virtual Machines API to programmatically migrate workloads. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vmmigration1_cli")
            .arg(Arg::with_name("url")
@@ -6338,6 +6342,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

@@ -847,6 +847,8 @@ where
                     "metadata.resource-version" => Some(("metadata.resourceVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.self-link" => Some(("metadata.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.uid" => Some(("metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spec.run-execution-token" => Some(("spec.runExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spec.start-execution-token" => Some(("spec.startExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.metadata.annotations" => Some(("spec.template.metadata.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "spec.template.metadata.cluster-name" => Some(("spec.template.metadata.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.metadata.creation-timestamp" => Some(("spec.template.metadata.creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -872,7 +874,7 @@ where
                     "status.latest-created-execution.name" => Some(("status.latestCreatedExecution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "completion-timestamp", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "self-link", "service-account-name", "spec", "status", "task-count", "template", "timeout-seconds", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "completion-timestamp", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "run-execution-token", "self-link", "service-account-name", "spec", "start-execution-token", "status", "task-count", "template", "timeout-seconds", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1159,6 +1161,8 @@ where
                     "metadata.resource-version" => Some(("metadata.resourceVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.self-link" => Some(("metadata.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.uid" => Some(("metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spec.run-execution-token" => Some(("spec.runExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spec.start-execution-token" => Some(("spec.startExecutionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.metadata.annotations" => Some(("spec.template.metadata.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "spec.template.metadata.cluster-name" => Some(("spec.template.metadata.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.metadata.creation-timestamp" => Some(("spec.template.metadata.creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1184,7 +1188,7 @@ where
                     "status.latest-created-execution.name" => Some(("status.latestCreatedExecution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "completion-timestamp", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "self-link", "service-account-name", "spec", "status", "task-count", "template", "timeout-seconds", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "api-version", "cluster-name", "completion-timestamp", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "execution-count", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-execution", "max-retries", "metadata", "name", "namespace", "observed-generation", "parallelism", "resource-version", "run-execution-token", "self-link", "service-account-name", "spec", "start-execution-token", "status", "task-count", "template", "timeout-seconds", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1702,6 +1706,8 @@ where
                     "spec.template.metadata.uid" => Some(("spec.template.metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.container-concurrency" => Some(("spec.template.spec.containerConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "spec.template.spec.enable-service-links" => Some(("spec.template.spec.enableServiceLinks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.template.spec.node-selector" => Some(("spec.template.spec.nodeSelector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "spec.template.spec.runtime-class-name" => Some(("spec.template.spec.runtimeClassName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.service-account-name" => Some(("spec.template.spec.serviceAccountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.timeout-seconds" => Some(("spec.template.spec.timeoutSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.address.url" => Some(("status.address.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1710,7 +1716,7 @@ where
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.url" => Some(("status.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "node-selector", "observed-generation", "resource-version", "runtime-class-name", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2020,6 +2026,8 @@ where
                     "spec.template.metadata.uid" => Some(("spec.template.metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.container-concurrency" => Some(("spec.template.spec.containerConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "spec.template.spec.enable-service-links" => Some(("spec.template.spec.enableServiceLinks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.template.spec.node-selector" => Some(("spec.template.spec.nodeSelector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "spec.template.spec.runtime-class-name" => Some(("spec.template.spec.runtimeClassName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.service-account-name" => Some(("spec.template.spec.serviceAccountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.timeout-seconds" => Some(("spec.template.spec.timeoutSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.address.url" => Some(("status.address.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2028,7 +2036,7 @@ where
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.url" => Some(("status.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "node-selector", "observed-generation", "resource-version", "runtime-class-name", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3676,6 +3684,8 @@ where
                     "spec.template.metadata.uid" => Some(("spec.template.metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.container-concurrency" => Some(("spec.template.spec.containerConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "spec.template.spec.enable-service-links" => Some(("spec.template.spec.enableServiceLinks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.template.spec.node-selector" => Some(("spec.template.spec.nodeSelector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "spec.template.spec.runtime-class-name" => Some(("spec.template.spec.runtimeClassName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.service-account-name" => Some(("spec.template.spec.serviceAccountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.timeout-seconds" => Some(("spec.template.spec.timeoutSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.address.url" => Some(("status.address.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3684,7 +3694,7 @@ where
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.url" => Some(("status.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "node-selector", "observed-generation", "resource-version", "runtime-class-name", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4050,6 +4060,8 @@ where
                     "spec.template.metadata.uid" => Some(("spec.template.metadata.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.container-concurrency" => Some(("spec.template.spec.containerConcurrency", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "spec.template.spec.enable-service-links" => Some(("spec.template.spec.enableServiceLinks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "spec.template.spec.node-selector" => Some(("spec.template.spec.nodeSelector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "spec.template.spec.runtime-class-name" => Some(("spec.template.spec.runtimeClassName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.service-account-name" => Some(("spec.template.spec.serviceAccountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.template.spec.timeout-seconds" => Some(("spec.template.spec.timeoutSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.address.url" => Some(("status.address.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4058,7 +4070,7 @@ where
                     "status.observed-generation" => Some(("status.observedGeneration", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status.url" => Some(("status.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "observed-generation", "resource-version", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "annotations", "api-version", "cluster-name", "container-concurrency", "creation-timestamp", "deletion-grace-period-seconds", "deletion-timestamp", "enable-service-links", "finalizers", "generate-name", "generation", "kind", "labels", "latest-created-revision-name", "latest-ready-revision-name", "metadata", "name", "namespace", "node-selector", "observed-generation", "resource-version", "runtime-class-name", "self-link", "service-account-name", "spec", "status", "template", "timeout-seconds", "uid", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4608,7 +4620,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("configurations-list",
-                    Some(r##"List configurations."##),
+                    Some(r##"List configurations. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_configurations-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4796,7 +4808,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("executions-list",
-                    Some(r##"List executions."##),
+                    Some(r##"List executions. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_executions-list",
                   vec![
                     (Some(r##"parent"##),
@@ -4890,7 +4902,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("jobs-list",
-                    Some(r##"List jobs."##),
+                    Some(r##"List jobs. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_jobs-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5012,7 +5024,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("revisions-list",
-                    Some(r##"List revisions."##),
+                    Some(r##"List revisions. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_revisions-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5056,7 +5068,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("routes-list",
-                    Some(r##"List routes."##),
+                    Some(r##"List routes. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_routes-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5150,7 +5162,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("services-list",
-                    Some(r##"Lists services for the given project and region."##),
+                    Some(r##"Lists services for the given project and region. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/namespaces_services-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5313,7 +5325,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-configurations-list",
-                    Some(r##"List configurations."##),
+                    Some(r##"List configurations. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-configurations-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5667,7 +5679,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-revisions-list",
-                    Some(r##"List revisions."##),
+                    Some(r##"List revisions. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-revisions-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5711,7 +5723,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-routes-list",
-                    Some(r##"List routes."##),
+                    Some(r##"List routes. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-routes-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5827,7 +5839,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-list",
-                    Some(r##"Lists services for the given project and region."##),
+                    Some(r##"Lists services for the given project and region. Results are sorted by creation time, descending."##),
                     "Details at http://byron.github.io/google-apis-rs/google_run1_cli/projects_locations-services-list",
                   vec![
                     (Some(r##"parent"##),
@@ -5938,7 +5950,7 @@ async fn main() {
     
     let mut app = App::new("run1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240225")
+           .version("5.0.5+20240621")
            .about("Deploy and manage user provided container images that scale automatically based on incoming requests. The Cloud Run Admin API v1 follows the Knative Serving API specification, while v2 is aligned with Google Cloud AIP-based API standards, as described in https://google.aip.dev/.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_run1_cli")
            .arg(Arg::with_name("url")
@@ -6002,6 +6014,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

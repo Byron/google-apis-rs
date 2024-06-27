@@ -231,11 +231,13 @@ where
                     "parameters.id" => Some(("parameters.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parameters.params" => Some(("parameters.params", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "reserved-ip-range-id" => Some(("reservedIpRangeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "description", "discovery-endpoint", "display-name", "end-time", "id", "labels", "maintenance-policy", "maintenance-schedule", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "reserved-ip-range-id", "schedule-deadline-time", "start-time", "state", "update-time", "zones"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "description", "discovery-endpoint", "display-name", "end-time", "id", "labels", "maintenance-policy", "maintenance-schedule", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "reserved-ip-range-id", "satisfies-pzi", "satisfies-pzs", "schedule-deadline-time", "start-time", "state", "update-time", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -511,11 +513,13 @@ where
                     "parameters.id" => Some(("parameters.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parameters.params" => Some(("parameters.params", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "reserved-ip-range-id" => Some(("reservedIpRangeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "description", "discovery-endpoint", "display-name", "end-time", "id", "labels", "maintenance-policy", "maintenance-schedule", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "reserved-ip-range-id", "schedule-deadline-time", "start-time", "state", "update-time", "zones"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["authorized-network", "cpu-count", "create-time", "description", "discovery-endpoint", "display-name", "end-time", "id", "labels", "maintenance-policy", "maintenance-schedule", "memcache-full-version", "memcache-version", "memory-size-mb", "name", "node-config", "node-count", "parameters", "params", "reserved-ip-range-id", "satisfies-pzi", "satisfies-pzs", "schedule-deadline-time", "start-time", "state", "update-time", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1659,7 +1663,7 @@ async fn main() {
     
     let mut app = App::new("memcache1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240222")
+           .version("5.0.5+20240614")
            .about("Google Cloud Memorystore for Memcached API is used for creating and managing Memcached instances in GCP.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_memcache1_cli")
            .arg(Arg::with_name("url")
@@ -1723,6 +1727,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

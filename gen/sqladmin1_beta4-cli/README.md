@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20240219*. The CLI is at version *5.0.4*.
+This documentation was generated from the *SQL Admin* API at revision *20240618*. The CLI is at version *5.0.5*.
 
 ```bash
 sqladmin1-beta4 [options]
@@ -47,6 +47,7 @@ sqladmin1-beta4 [options]
         flags
                 list [-p <v>]... [-o <out>]
         instances
+                acquire-ssrs-lease <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 add-server-ca <project> <instance> [-p <v>]... [-o <out>]
                 clone <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> [-p <v>]... [-o <out>]
@@ -62,6 +63,7 @@ sqladmin1-beta4 [options]
                 patch <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 promote-replica <project> <instance> [-p <v>]... [-o <out>]
                 reencrypt <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                release-ssrs-lease <project> <instance> [-p <v>]... [-o <out>]
                 reset-ssl-config <project> <instance> [-p <v>]... [-o <out>]
                 restart <project> <instance> [-p <v>]... [-o <out>]
                 restore-backup <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]

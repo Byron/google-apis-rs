@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *My Business Business Calls* API at revision *20230124*. The CLI is at version *5.0.4*.
+This documentation was generated from the *My Business Business Calls* API at revision *20230124*. The CLI is at version *5.0.5*.
 
 ```bash
 mybusinessbusinesscalls1 [options]

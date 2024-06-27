@@ -2269,7 +2269,6 @@ where
                     "failure-reason" => Some(("failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "metadata.automation.advance-automation-runs" => Some(("metadata.automation.advanceAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "metadata.automation.current-repair-automation-run" => Some(("metadata.automation.currentRepairAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.automation.promote-automation-run" => Some(("metadata.automation.promoteAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.automation.repair-automation-runs" => Some(("metadata.automation.repairAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "metadata.cloud-run.job" => Some(("metadata.cloudRun.job", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2284,7 +2283,7 @@ where
                     "target-id" => Some(("targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advance-automation-runs", "annotations", "approval-state", "approve-time", "automation", "cloud-run", "controller-rollout", "create-time", "current-repair-automation-run", "custom", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "job", "labels", "metadata", "name", "promote-automation-run", "repair-automation-runs", "revision", "rollback-of-rollout", "rolled-back-by-rollouts", "service", "service-urls", "state", "target-id", "uid", "values"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advance-automation-runs", "annotations", "approval-state", "approve-time", "automation", "cloud-run", "controller-rollout", "create-time", "custom", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "job", "labels", "metadata", "name", "promote-automation-run", "repair-automation-runs", "revision", "rollback-of-rollout", "rolled-back-by-rollouts", "service", "service-urls", "state", "target-id", "uid", "values"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2886,7 +2885,6 @@ where
                     "rollback-config.rollout.failure-reason" => Some(("rollbackConfig.rollout.failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rollback-config.rollout.labels" => Some(("rollbackConfig.rollout.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "rollback-config.rollout.metadata.automation.advance-automation-runs" => Some(("rollbackConfig.rollout.metadata.automation.advanceAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rollback-config.rollout.metadata.automation.current-repair-automation-run" => Some(("rollbackConfig.rollout.metadata.automation.currentRepairAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rollback-config.rollout.metadata.automation.promote-automation-run" => Some(("rollbackConfig.rollout.metadata.automation.promoteAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rollback-config.rollout.metadata.automation.repair-automation-runs" => Some(("rollbackConfig.rollout.metadata.automation.repairAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rollback-config.rollout.metadata.cloud-run.job" => Some(("rollbackConfig.rollout.metadata.cloudRun.job", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2906,7 +2904,7 @@ where
                     "target-id" => Some(("targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advance-automation-runs", "annotations", "approval-state", "approve-time", "automation", "cloud-run", "controller-rollout", "create-time", "current-repair-automation-run", "custom", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "job", "labels", "metadata", "name", "promote-automation-run", "release-id", "repair-automation-runs", "revision", "rollback-config", "rollback-of-rollout", "rolled-back-by-rollouts", "rollout", "rollout-id", "rollout-to-roll-back", "service", "service-urls", "starting-phase-id", "state", "target-id", "uid", "validate-only", "values"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advance-automation-runs", "annotations", "approval-state", "approve-time", "automation", "cloud-run", "controller-rollout", "create-time", "custom", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "job", "labels", "metadata", "name", "promote-automation-run", "release-id", "repair-automation-runs", "revision", "rollback-config", "rollback-of-rollout", "rolled-back-by-rollouts", "rollout", "rollout-id", "rollout-to-roll-back", "service", "service-urls", "starting-phase-id", "state", "target-id", "uid", "validate-only", "values"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3586,6 +3584,7 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.cluster" => Some(("gke.cluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.internal-ip" => Some(("gke.internalIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gke.proxy-url" => Some(("gke.proxyUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "multi-target.target-ids" => Some(("multiTarget.targetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3595,7 +3594,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "custom-target", "custom-target-type", "deploy-parameters", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "multi-target", "name", "require-approval", "run", "target-id", "target-ids", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "custom-target", "custom-target-type", "deploy-parameters", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "multi-target", "name", "proxy-url", "require-approval", "run", "target-id", "target-ids", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3935,6 +3934,7 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.cluster" => Some(("gke.cluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.internal-ip" => Some(("gke.internalIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gke.proxy-url" => Some(("gke.proxyUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "multi-target.target-ids" => Some(("multiTarget.targetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3944,7 +3944,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "custom-target", "custom-target-type", "deploy-parameters", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "multi-target", "name", "require-approval", "run", "target-id", "target-ids", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "custom-target", "custom-target-type", "deploy-parameters", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "multi-target", "name", "proxy-url", "require-approval", "run", "target-id", "target-ids", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4560,7 +4560,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `CustomTargetType`. Format is `projects/{project}/locations/{location}/customTargetTypes/a-z{0,62}`."##),
+                     Some(r##"Optional. Name of the `CustomTargetType`. Format is `projects/{project}/locations/{location}/customTargetTypes/{customTargetType}`. The `customTargetType` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
                      Some(true),
                      Some(false)),
         
@@ -4926,7 +4926,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `DeliveryPipeline`. Format is `projects/{project}/locations/{location}/deliveryPipelines/a-z{0,62}`."##),
+                     Some(r##"Optional. Name of the `DeliveryPipeline`. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}`. The `deliveryPipeline` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
                      Some(true),
                      Some(false)),
         
@@ -5698,7 +5698,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `Target`. Format is `projects/{project}/locations/{location}/targets/a-z{0,62}`."##),
+                     Some(r##"Optional. Name of the `Target`. Format is `projects/{project}/locations/{location}/targets/{target}`. The `target` component must match `[a-z]([a-z0-9-]{0,61}[a-z0-9])?`"##),
                      Some(true),
                      Some(false)),
         
@@ -5782,7 +5782,7 @@ async fn main() {
     
     let mut app = App::new("clouddeploy1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240221")
+           .version("5.0.5+20240619")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli")
            .arg(Arg::with_name("url")
@@ -5846,6 +5846,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

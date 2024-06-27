@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Fact Check Tools* API at revision *20240303*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Fact Check Tools* API at revision *20240626*. The CLI is at version *5.0.5*.
 
 ```bash
 factchecktools1-alpha1 [options]
         claims
+                image-search [-p <v>]... [-o <out>]
                 search [-p <v>]... [-o <out>]
         pages
                 create (-r <kv>)... [-p <v>]... [-o <out>]

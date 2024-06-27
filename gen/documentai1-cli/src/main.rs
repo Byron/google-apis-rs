@@ -577,6 +577,8 @@ where
                     "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.layout-config.chunking-config.chunk-size" => Some(("processOptions.layoutConfig.chunkingConfig.chunkSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.layout-config.chunking-config.include-ancestor-headings" => Some(("processOptions.layoutConfig.chunkingConfig.includeAncestorHeadings", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -595,7 +597,7 @@ where
                     "process-options.schema-override.metadata.skip-naming-validation" => Some(("processOptions.schemaOverride.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "compute-style-info", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-output-config", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "field-mask", "from-end", "from-start", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "hints", "individual-page-selector", "input-documents", "labels", "language-hints", "metadata", "ocr-config", "pages", "pages-overlap", "pages-per-shard", "prefixed-naming-on-properties", "premium-features", "process-options", "schema-override", "sharding-config", "skip-human-review", "skip-naming-validation"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "chunk-size", "chunking-config", "compute-style-info", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-output-config", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "field-mask", "from-end", "from-start", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "hints", "include-ancestor-headings", "individual-page-selector", "input-documents", "labels", "language-hints", "layout-config", "metadata", "ocr-config", "pages", "pages-overlap", "pages-per-shard", "prefixed-naming-on-properties", "premium-features", "process-options", "schema-override", "sharding-config", "skip-human-review", "skip-naming-validation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -684,10 +686,12 @@ where
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "process-endpoint" => Some(("processEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "default-processor-version", "display-name", "kms-key-name", "name", "process-endpoint", "state", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "default-processor-version", "display-name", "kms-key-name", "name", "process-endpoint", "satisfies-pzi", "satisfies-pzs", "state", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1218,6 +1222,8 @@ where
                     "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.layout-config.chunking-config.chunk-size" => Some(("processOptions.layoutConfig.chunkingConfig.chunkSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.layout-config.chunking-config.include-ancestor-headings" => Some(("processOptions.layoutConfig.chunkingConfig.includeAncestorHeadings", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1239,7 +1245,7 @@ where
                     "raw-document.mime-type" => Some(("rawDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "code", "compute-style-info", "content", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "error", "field-mask", "from-end", "from-start", "gcs-document", "gcs-uri", "hints", "individual-page-selector", "inline-document", "labels", "language-hints", "message", "metadata", "mime-type", "ocr-config", "pages", "prefixed-naming-on-properties", "premium-features", "process-options", "raw-document", "schema-override", "shard-count", "shard-index", "shard-info", "skip-human-review", "skip-naming-validation", "text", "text-offset", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "chunk-size", "chunking-config", "code", "compute-style-info", "content", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "error", "field-mask", "from-end", "from-start", "gcs-document", "gcs-uri", "hints", "include-ancestor-headings", "individual-page-selector", "inline-document", "labels", "language-hints", "layout-config", "message", "metadata", "mime-type", "ocr-config", "pages", "prefixed-naming-on-properties", "premium-features", "process-options", "raw-document", "schema-override", "shard-count", "shard-index", "shard-info", "skip-human-review", "skip-naming-validation", "text", "text-offset", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1331,6 +1337,8 @@ where
                     "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.layout-config.chunking-config.chunk-size" => Some(("processOptions.layoutConfig.chunkingConfig.chunkSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.layout-config.chunking-config.include-ancestor-headings" => Some(("processOptions.layoutConfig.chunkingConfig.includeAncestorHeadings", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1349,7 +1357,7 @@ where
                     "process-options.schema-override.metadata.skip-naming-validation" => Some(("processOptions.schemaOverride.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "compute-style-info", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-output-config", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "field-mask", "from-end", "from-start", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "hints", "individual-page-selector", "input-documents", "labels", "language-hints", "metadata", "ocr-config", "pages", "pages-overlap", "pages-per-shard", "prefixed-naming-on-properties", "premium-features", "process-options", "schema-override", "sharding-config", "skip-human-review", "skip-naming-validation"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "chunk-size", "chunking-config", "compute-style-info", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-output-config", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "field-mask", "from-end", "from-start", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "hints", "include-ancestor-headings", "individual-page-selector", "input-documents", "labels", "language-hints", "layout-config", "metadata", "ocr-config", "pages", "pages-overlap", "pages-per-shard", "prefixed-naming-on-properties", "premium-features", "process-options", "schema-override", "sharding-config", "skip-human-review", "skip-naming-validation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1891,6 +1899,8 @@ where
                     "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.layout-config.chunking-config.chunk-size" => Some(("processOptions.layoutConfig.chunkingConfig.chunkSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.layout-config.chunking-config.include-ancestor-headings" => Some(("processOptions.layoutConfig.chunkingConfig.includeAncestorHeadings", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1912,7 +1922,7 @@ where
                     "raw-document.mime-type" => Some(("rawDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "code", "compute-style-info", "content", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "error", "field-mask", "from-end", "from-start", "gcs-document", "gcs-uri", "hints", "individual-page-selector", "inline-document", "labels", "language-hints", "message", "metadata", "mime-type", "ocr-config", "pages", "prefixed-naming-on-properties", "premium-features", "process-options", "raw-document", "schema-override", "shard-count", "shard-index", "shard-info", "skip-human-review", "skip-naming-validation", "text", "text-offset", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "chunk-size", "chunking-config", "code", "compute-style-info", "content", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "error", "field-mask", "from-end", "from-start", "gcs-document", "gcs-uri", "hints", "include-ancestor-headings", "individual-page-selector", "inline-document", "labels", "language-hints", "layout-config", "message", "metadata", "mime-type", "ocr-config", "pages", "prefixed-naming-on-properties", "premium-features", "process-options", "raw-document", "schema-override", "shard-count", "shard-index", "shard-info", "skip-human-review", "skip-naming-validation", "text", "text-offset", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2003,6 +2013,8 @@ where
                     "document-schema.metadata.document-splitter" => Some(("documentSchema.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "document-schema.metadata.prefixed-naming-on-properties" => Some(("documentSchema.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "document-schema.metadata.skip-naming-validation" => Some(("documentSchema.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "foundation-model-tuning-options.learning-rate-multiplier" => Some(("foundationModelTuningOptions.learningRateMultiplier", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "foundation-model-tuning-options.train-steps" => Some(("foundationModelTuningOptions.trainSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "input-data.test-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputData.testDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "input-data.training-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputData.trainingDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "processor-version.create-time" => Some(("processorVersion.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2044,9 +2056,11 @@ where
                     "processor-version.latest-evaluation.operation" => Some(("processorVersion.latestEvaluation.operation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "processor-version.model-type" => Some(("processorVersion.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "processor-version.name" => Some(("processorVersion.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.satisfies-pzi" => Some(("processorVersion.satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "processor-version.satisfies-pzs" => Some(("processorVersion.satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "processor-version.state" => Some(("processorVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregate-metrics", "aggregate-metrics-exact", "base-processor-version", "create-time", "custom-document-extraction-options", "deprecation-info", "deprecation-time", "description", "display-name", "document-allow-multiple-labels", "document-schema", "document-splitter", "evaluation", "f1-score", "false-negatives-count", "false-positives-count", "gcs-prefix", "gcs-uri-prefix", "google-managed", "ground-truth-document-count", "ground-truth-occurrences-count", "input-data", "kms-key-name", "kms-key-version-name", "latest-evaluation", "metadata", "model-type", "name", "operation", "precision", "predicted-document-count", "predicted-occurrences-count", "prefixed-naming-on-properties", "processor-version", "recall", "replacement-processor-version", "skip-naming-validation", "state", "test-documents", "total-documents-count", "training-documents", "training-method", "true-positives-count"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregate-metrics", "aggregate-metrics-exact", "base-processor-version", "create-time", "custom-document-extraction-options", "deprecation-info", "deprecation-time", "description", "display-name", "document-allow-multiple-labels", "document-schema", "document-splitter", "evaluation", "f1-score", "false-negatives-count", "false-positives-count", "foundation-model-tuning-options", "gcs-prefix", "gcs-uri-prefix", "google-managed", "ground-truth-document-count", "ground-truth-occurrences-count", "input-data", "kms-key-name", "kms-key-version-name", "latest-evaluation", "learning-rate-multiplier", "metadata", "model-type", "name", "operation", "precision", "predicted-document-count", "predicted-occurrences-count", "prefixed-naming-on-properties", "processor-version", "recall", "replacement-processor-version", "satisfies-pzi", "satisfies-pzs", "skip-naming-validation", "state", "test-documents", "total-documents-count", "train-steps", "training-documents", "training-method", "true-positives-count"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2745,7 +2759,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-processors-create",
-                    Some(r##"Creates a processor from the ProcessorType provided. The processor will be at `ENABLED` state by default after its creation."##),
+                    Some(r##"Creates a processor from the ProcessorType provided. The processor will be at `ENABLED` state by default after its creation. Note that this method requires the `documentai.processors.create` permission on the project, which is highly privileged. A user or service account with this permission can create new processors that can interact with any gcs bucket in your project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-create",
                   vec![
                     (Some(r##"parent"##),
@@ -3284,7 +3298,7 @@ async fn main() {
     
     let mut app = App::new("documentai1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240619")
            .about("Service to parse structured information from unstructured or semi-structured documents using state-of-the-art Google AI such as natural language, computer vision, translation, and AutoML.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_documentai1_cli")
            .arg(Arg::with_name("url")
@@ -3348,6 +3362,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

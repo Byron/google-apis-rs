@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Filestore* crate version *5.0.4+20240126*, where *20240126* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *Cloud Filestore* crate version *5.0.5+20240619*, where *20240619* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *Cloud Filestore* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/filestore/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudFilestore) ... 
 //! 
 //! * projects
-//!  * [*locations backups create*](api::ProjectLocationBackupCreateCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations backups patch*](api::ProjectLocationBackupPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances restore*](api::ProjectLocationInstanceRestoreCall), [*locations instances revert*](api::ProjectLocationInstanceRevertCall), [*locations instances shares create*](api::ProjectLocationInstanceShareCreateCall), [*locations instances shares delete*](api::ProjectLocationInstanceShareDeleteCall), [*locations instances shares get*](api::ProjectLocationInstanceShareGetCall), [*locations instances shares list*](api::ProjectLocationInstanceShareListCall), [*locations instances shares patch*](api::ProjectLocationInstanceSharePatchCall), [*locations instances snapshots create*](api::ProjectLocationInstanceSnapshotCreateCall), [*locations instances snapshots delete*](api::ProjectLocationInstanceSnapshotDeleteCall), [*locations instances snapshots get*](api::ProjectLocationInstanceSnapshotGetCall), [*locations instances snapshots list*](api::ProjectLocationInstanceSnapshotListCall), [*locations instances snapshots patch*](api::ProjectLocationInstanceSnapshotPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations backups create*](api::ProjectLocationBackupCreateCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations backups patch*](api::ProjectLocationBackupPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances promote replica*](api::ProjectLocationInstancePromoteReplicaCall), [*locations instances restore*](api::ProjectLocationInstanceRestoreCall), [*locations instances revert*](api::ProjectLocationInstanceRevertCall), [*locations instances shares create*](api::ProjectLocationInstanceShareCreateCall), [*locations instances shares delete*](api::ProjectLocationInstanceShareDeleteCall), [*locations instances shares get*](api::ProjectLocationInstanceShareGetCall), [*locations instances shares list*](api::ProjectLocationInstanceShareListCall), [*locations instances shares patch*](api::ProjectLocationInstanceSharePatchCall), [*locations instances snapshots create*](api::ProjectLocationInstanceSnapshotCreateCall), [*locations instances snapshots delete*](api::ProjectLocationInstanceSnapshotDeleteCall), [*locations instances snapshots get*](api::ProjectLocationInstanceSnapshotGetCall), [*locations instances snapshots list*](api::ProjectLocationInstanceSnapshotListCall), [*locations instances snapshots patch*](api::ProjectLocationInstanceSnapshotPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -59,6 +59,7 @@
 //! let r = hub.projects().locations_instances_create(...).doit().await
 //! let r = hub.projects().locations_instances_delete(...).doit().await
 //! let r = hub.projects().locations_instances_patch(...).doit().await
+//! let r = hub.projects().locations_instances_promote_replica(...).doit().await
 //! let r = hub.projects().locations_instances_restore(...).doit().await
 //! let r = hub.projects().locations_instances_revert(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
@@ -106,7 +107,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = CloudFilestore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = CloudFilestore::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -189,6 +190,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

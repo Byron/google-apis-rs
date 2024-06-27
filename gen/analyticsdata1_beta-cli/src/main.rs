@@ -1439,7 +1439,7 @@ async fn main() {
     
     let mut app = App::new("analyticsdata1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240304")
+           .version("5.0.5+20240625")
            .about("Accesses report data in Google Analytics. Warning: Creating multiple Customer Applications, Accounts, or Projects to simulate or act as a single Customer Application, Account, or Project (respectively) or to circumvent Service-specific usage limits or quotas is a direct violation of Google Cloud Platform Terms of Service as well as Google APIs Terms of Service. These actions can result in immediate termination of your GCP project(s) without any warning. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analyticsdata1_beta_cli")
            .arg(Arg::with_name("url")
@@ -1503,6 +1503,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

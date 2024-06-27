@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firestore* API at revision *20240226*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Firestore* API at revision *20240617*. The CLI is at version *5.0.5*.
 
 ```bash
 firestore1 [options]
@@ -35,6 +35,7 @@ firestore1 [options]
                 databases-backup-schedules-get <name> [-p <v>]... [-o <out>]
                 databases-backup-schedules-list <parent> [-p <v>]... [-o <out>]
                 databases-backup-schedules-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-bulk-delete-documents <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-get <name> [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-list <parent> [-p <v>]... [-o <out>]
                 databases-collection-groups-fields-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

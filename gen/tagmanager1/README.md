@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-tagmanager1` library allows access to all features of the *Google Tag Manager* service.
 
-This documentation was generated from *Tag Manager* crate version *5.0.4+20240228*, where *20240228* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+This documentation was generated from *Tag Manager* crate version *5.0.5+20240619*, where *20240619* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 
 Everything else about the *Tag Manager* *v1* API can be found at the
 [official documentation site](https://developers.google.com/tag-manager).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/TagManager) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/TagManager) ... 
 
-* [accounts](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::Account)
- * [*containers create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerCreateCall), [*containers delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerDeleteCall), [*containers environments create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerEnvironmentCreateCall), [*containers environments delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerEnvironmentDeleteCall), [*containers environments get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerEnvironmentGetCall), [*containers environments list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerEnvironmentListCall), [*containers environments update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerEnvironmentUpdateCall), [*containers folders create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerFolderCreateCall), [*containers folders delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerFolderDeleteCall), [*containers folders entities list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerFolderEntityListCall), [*containers folders get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerFolderGetCall), [*containers folders list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerFolderListCall), [*containers folders update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerFolderUpdateCall), [*containers get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerGetCall), [*containers list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerListCall), [*containers move_folders update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerMoveFolderUpdateCall), [*containers reauthorize_environments update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerReauthorizeEnvironmentUpdateCall), [*containers tags create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTagCreateCall), [*containers tags delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTagDeleteCall), [*containers tags get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTagGetCall), [*containers tags list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTagListCall), [*containers tags update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTagUpdateCall), [*containers triggers create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTriggerCreateCall), [*containers triggers delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTriggerDeleteCall), [*containers triggers get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTriggerGetCall), [*containers triggers list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTriggerListCall), [*containers triggers update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerTriggerUpdateCall), [*containers update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerUpdateCall), [*containers variables create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVariableCreateCall), [*containers variables delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVariableDeleteCall), [*containers variables get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVariableGetCall), [*containers variables list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVariableListCall), [*containers variables update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVariableUpdateCall), [*containers versions create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionCreateCall), [*containers versions delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionDeleteCall), [*containers versions get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionGetCall), [*containers versions list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionListCall), [*containers versions publish*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionPublishCall), [*containers versions restore*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionRestoreCall), [*containers versions undelete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionUndeleteCall), [*containers versions update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountContainerVersionUpdateCall), [*get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountGetCall), [*list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountListCall), [*permissions create*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountPermissionCreateCall), [*permissions delete*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountPermissionDeleteCall), [*permissions get*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountPermissionGetCall), [*permissions list*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountPermissionListCall), [*permissions update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountPermissionUpdateCall) and [*update*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/api::AccountUpdateCall)
+* [accounts](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::Account)
+ * [*containers create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerCreateCall), [*containers delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerDeleteCall), [*containers environments create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerEnvironmentCreateCall), [*containers environments delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerEnvironmentDeleteCall), [*containers environments get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerEnvironmentGetCall), [*containers environments list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerEnvironmentListCall), [*containers environments update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerEnvironmentUpdateCall), [*containers folders create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerFolderCreateCall), [*containers folders delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerFolderDeleteCall), [*containers folders entities list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerFolderEntityListCall), [*containers folders get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerFolderGetCall), [*containers folders list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerFolderListCall), [*containers folders update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerFolderUpdateCall), [*containers get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerGetCall), [*containers list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerListCall), [*containers move_folders update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerMoveFolderUpdateCall), [*containers reauthorize_environments update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerReauthorizeEnvironmentUpdateCall), [*containers tags create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTagCreateCall), [*containers tags delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTagDeleteCall), [*containers tags get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTagGetCall), [*containers tags list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTagListCall), [*containers tags update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTagUpdateCall), [*containers triggers create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTriggerCreateCall), [*containers triggers delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTriggerDeleteCall), [*containers triggers get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTriggerGetCall), [*containers triggers list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTriggerListCall), [*containers triggers update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerTriggerUpdateCall), [*containers update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerUpdateCall), [*containers variables create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVariableCreateCall), [*containers variables delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVariableDeleteCall), [*containers variables get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVariableGetCall), [*containers variables list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVariableListCall), [*containers variables update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVariableUpdateCall), [*containers versions create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionCreateCall), [*containers versions delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionDeleteCall), [*containers versions get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionGetCall), [*containers versions list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionListCall), [*containers versions publish*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionPublishCall), [*containers versions restore*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionRestoreCall), [*containers versions undelete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionUndeleteCall), [*containers versions update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountContainerVersionUpdateCall), [*get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountGetCall), [*list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountListCall), [*permissions create*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountPermissionCreateCall), [*permissions delete*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountPermissionDeleteCall), [*permissions get*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountPermissionGetCall), [*permissions list*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountPermissionListCall), [*permissions update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountPermissionUpdateCall) and [*update*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/api::AccountUpdateCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/TagManager)**
+* **[Hub](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/TagManager)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Part)**
+    * **[Parts](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -139,7 +139,7 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+let mut hub = TagManager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
@@ -175,17 +175,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -195,35 +195,42 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::RequestValue) and 
-[decodable](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::RequestValue) and 
+[decodable](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-tagmanager1/5.0.4+20240228/google_tagmanager1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-tagmanager1/5.0.5+20240619/google_tagmanager1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
 [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
+
+## Cargo Features
+
+* `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+generated `openapi` spec would be invalid.
+
 
 # License
 The **tagmanager1** library was generated by Sebastian Thiel, and is placed 

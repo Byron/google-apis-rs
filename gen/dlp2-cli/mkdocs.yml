@@ -1,4 +1,4 @@
-site_name: DLP v5.0.4+20240225
+site_name: DLP v5.0.5+20240616
 site_url: http://byron.github.io/google-apis-rs/google-dlp2-cli
 site_description: A complete library to interact with DLP (protocol v2)
 
@@ -26,6 +26,11 @@ nav:
     - 'Inspect Templates Patch': 'organizations_inspect-templates-patch.md'
     - 'Locations Column Data Profiles Get': 'organizations_locations-column-data-profiles-get.md'
     - 'Locations Column Data Profiles List': 'organizations_locations-column-data-profiles-list.md'
+    - 'Locations Connections Create': 'organizations_locations-connections-create.md'
+    - 'Locations Connections Delete': 'organizations_locations-connections-delete.md'
+    - 'Locations Connections Get': 'organizations_locations-connections-get.md'
+    - 'Locations Connections Patch': 'organizations_locations-connections-patch.md'
+    - 'Locations Connections Search': 'organizations_locations-connections-search.md'
     - 'Locations Deidentify Templates Create': 'organizations_locations-deidentify-templates-create.md'
     - 'Locations Deidentify Templates Delete': 'organizations_locations-deidentify-templates-delete.md'
     - 'Locations Deidentify Templates Get': 'organizations_locations-deidentify-templates-get.md'
@@ -54,6 +59,7 @@ nav:
     - 'Locations Stored Info Types Get': 'organizations_locations-stored-info-types-get.md'
     - 'Locations Stored Info Types List': 'organizations_locations-stored-info-types-list.md'
     - 'Locations Stored Info Types Patch': 'organizations_locations-stored-info-types-patch.md'
+    - 'Locations Table Data Profiles Delete': 'organizations_locations-table-data-profiles-delete.md'
     - 'Locations Table Data Profiles Get': 'organizations_locations-table-data-profiles-get.md'
     - 'Locations Table Data Profiles List': 'organizations_locations-table-data-profiles-list.md'
     - 'Stored Info Types Create': 'organizations_stored-info-types-create.md'
@@ -89,6 +95,12 @@ nav:
     - 'Job Triggers Patch': 'projects_job-triggers-patch.md'
     - 'Locations Column Data Profiles Get': 'projects_locations-column-data-profiles-get.md'
     - 'Locations Column Data Profiles List': 'projects_locations-column-data-profiles-list.md'
+    - 'Locations Connections Create': 'projects_locations-connections-create.md'
+    - 'Locations Connections Delete': 'projects_locations-connections-delete.md'
+    - 'Locations Connections Get': 'projects_locations-connections-get.md'
+    - 'Locations Connections List': 'projects_locations-connections-list.md'
+    - 'Locations Connections Patch': 'projects_locations-connections-patch.md'
+    - 'Locations Connections Search': 'projects_locations-connections-search.md'
     - 'Locations Content Deidentify': 'projects_locations-content-deidentify.md'
     - 'Locations Content Inspect': 'projects_locations-content-inspect.md'
     - 'Locations Content Reidentify': 'projects_locations-content-reidentify.md'
@@ -129,6 +141,7 @@ nav:
     - 'Locations Stored Info Types Get': 'projects_locations-stored-info-types-get.md'
     - 'Locations Stored Info Types List': 'projects_locations-stored-info-types-list.md'
     - 'Locations Stored Info Types Patch': 'projects_locations-stored-info-types-patch.md'
+    - 'Locations Table Data Profiles Delete': 'projects_locations-table-data-profiles-delete.md'
     - 'Locations Table Data Profiles Get': 'projects_locations-table-data-profiles-get.md'
     - 'Locations Table Data Profiles List': 'projects_locations-table-data-profiles-list.md'
     - 'Stored Info Types Create': 'projects_stored-info-types-create.md'
@@ -139,5 +152,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

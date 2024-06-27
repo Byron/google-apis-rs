@@ -1,4 +1,4 @@
-site_name: Iam v5.0.4+20240220
+site_name: Iam v5.0.5+20240621
 site_url: http://byron.github.io/google-apis-rs/google-iam1-cli
 site_description: A complete library to interact with Iam (protocol v1)
 
@@ -49,6 +49,17 @@ nav:
 - 'Permissions':
     - 'Query Testable Permissions': 'permissions_query-testable-permissions.md'
 - 'Projects':
+    - 'Locations Oauth Clients Create': 'projects_locations-oauth-clients-create.md'
+    - 'Locations Oauth Clients Credentials Create': 'projects_locations-oauth-clients-credentials-create.md'
+    - 'Locations Oauth Clients Credentials Delete': 'projects_locations-oauth-clients-credentials-delete.md'
+    - 'Locations Oauth Clients Credentials Get': 'projects_locations-oauth-clients-credentials-get.md'
+    - 'Locations Oauth Clients Credentials List': 'projects_locations-oauth-clients-credentials-list.md'
+    - 'Locations Oauth Clients Credentials Patch': 'projects_locations-oauth-clients-credentials-patch.md'
+    - 'Locations Oauth Clients Delete': 'projects_locations-oauth-clients-delete.md'
+    - 'Locations Oauth Clients Get': 'projects_locations-oauth-clients-get.md'
+    - 'Locations Oauth Clients List': 'projects_locations-oauth-clients-list.md'
+    - 'Locations Oauth Clients Patch': 'projects_locations-oauth-clients-patch.md'
+    - 'Locations Oauth Clients Undelete': 'projects_locations-oauth-clients-undelete.md'
     - 'Locations Workload Identity Pools Create': 'projects_locations-workload-identity-pools-create.md'
     - 'Locations Workload Identity Pools Delete': 'projects_locations-workload-identity-pools-delete.md'
     - 'Locations Workload Identity Pools Get': 'projects_locations-workload-identity-pools-get.md'
@@ -90,6 +101,7 @@ nav:
     - 'Service Accounts Keys Enable': 'projects_service-accounts-keys-enable.md'
     - 'Service Accounts Keys Get': 'projects_service-accounts-keys-get.md'
     - 'Service Accounts Keys List': 'projects_service-accounts-keys-list.md'
+    - 'Service Accounts Keys Patch': 'projects_service-accounts-keys-patch.md'
     - 'Service Accounts Keys Upload': 'projects_service-accounts-keys-upload.md'
     - 'Service Accounts List': 'projects_service-accounts-list.md'
     - 'Service Accounts Patch': 'projects_service-accounts-patch.md'
@@ -106,5 +118,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

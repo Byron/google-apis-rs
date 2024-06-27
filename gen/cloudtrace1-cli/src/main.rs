@@ -440,7 +440,7 @@ async fn main() {
     
     let mut app = App::new("cloudtrace1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240621")
            .about("Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenTelemetry. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace1_cli")
            .arg(Arg::with_name("url")
@@ -504,6 +504,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

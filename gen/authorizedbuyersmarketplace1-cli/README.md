@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Authorized Buyers Marketplace* API at revision *20240305*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Authorized Buyers Marketplace* API at revision *20240625*. The CLI is at version *5.0.5*.
 
 ```bash
 authorizedbuyersmarketplace1 [options]
         bidders
+                auction-packages-list <parent> [-p <v>]... [-o <out>]
                 finalized-deals-list <parent> [-p <v>]... [-o <out>]
         buyers
                 auction-packages-get <name> [-p <v>]... [-o <out>]

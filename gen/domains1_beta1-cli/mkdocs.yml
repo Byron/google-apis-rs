@@ -1,4 +1,4 @@
-site_name: Cloud Domains v5.0.4+20240221
+site_name: Cloud Domains v5.0.5+20240610
 site_url: http://byron.github.io/google-apis-rs/google-domains1_beta1-cli
 site_description: A complete library to interact with Cloud Domains (protocol v1beta1)
 
@@ -22,11 +22,15 @@ nav:
     - 'Locations Registrations Get': 'projects_locations-registrations-get.md'
     - 'Locations Registrations Get Iam Policy': 'projects_locations-registrations-get-iam-policy.md'
     - 'Locations Registrations Import': 'projects_locations-registrations-import.md'
+    - 'Locations Registrations Initiate Push Transfer': 'projects_locations-registrations-initiate-push-transfer.md'
     - 'Locations Registrations List': 'projects_locations-registrations-list.md'
     - 'Locations Registrations Patch': 'projects_locations-registrations-patch.md'
     - 'Locations Registrations Register': 'projects_locations-registrations-register.md'
+    - 'Locations Registrations Renew Domain': 'projects_locations-registrations-renew-domain.md'
     - 'Locations Registrations Reset Authorization Code': 'projects_locations-registrations-reset-authorization-code.md'
     - 'Locations Registrations Retrieve Authorization Code': 'projects_locations-registrations-retrieve-authorization-code.md'
+    - 'Locations Registrations Retrieve Google Domains Dns Records': 'projects_locations-registrations-retrieve-google-domains-dns-records.md'
+    - 'Locations Registrations Retrieve Google Domains Forwarding Config': 'projects_locations-registrations-retrieve-google-domains-forwarding-config.md'
     - 'Locations Registrations Retrieve Importable Domains': 'projects_locations-registrations-retrieve-importable-domains.md'
     - 'Locations Registrations Retrieve Register Parameters': 'projects_locations-registrations-retrieve-register-parameters.md'
     - 'Locations Registrations Retrieve Transfer Parameters': 'projects_locations-registrations-retrieve-transfer-parameters.md'
@@ -37,5 +41,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

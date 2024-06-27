@@ -93,7 +93,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -156,7 +156,7 @@ impl<'a, S> Storage<S> {
         Storage {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://storage.googleapis.com/storage/v1/".to_string(),
             _root_url: "https://storage.googleapis.com/".to_string(),
         }
@@ -197,7 +197,7 @@ impl<'a, S> Storage<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -239,6 +239,7 @@ impl<'a, S> Storage<S> {
 /// * [pause anywhere caches](AnywhereCachPauseCall) (response)
 /// * [resume anywhere caches](AnywhereCachResumeCall) (response)
 /// * [update anywhere caches](AnywhereCachUpdateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnywhereCache {
@@ -300,6 +301,7 @@ impl client::ResponseResult for AnywhereCache {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list anywhere caches](AnywhereCachListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AnywhereCaches {
@@ -328,6 +330,7 @@ impl client::ResponseResult for AnywhereCaches {}
 /// * [delete buckets](BucketDeleteCall) (none)
 /// * [get buckets](BucketGetCall) (response)
 /// * [get iam policy buckets](BucketGetIamPolicyCall) (none)
+/// * [get storage layout buckets](BucketGetStorageLayoutCall) (none)
 /// * [insert buckets](BucketInsertCall) (request|response)
 /// * [list buckets](BucketListCall) (none)
 /// * [lock retention policy buckets](BucketLockRetentionPolicyCall) (response)
@@ -338,6 +341,7 @@ impl client::ResponseResult for AnywhereCaches {}
 /// * [operations cancel buckets](BucketOperationCancelCall) (none)
 /// * [operations get buckets](BucketOperationGetCall) (none)
 /// * [operations list buckets](BucketOperationListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bucket {
@@ -476,6 +480,7 @@ impl client::ResponseResult for Bucket {}
 /// * [list bucket access controls](BucketAccessControlListCall) (none)
 /// * [patch bucket access controls](BucketAccessControlPatchCall) (request|response)
 /// * [update bucket access controls](BucketAccessControlUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAccessControl {
@@ -541,6 +546,7 @@ impl client::ResponseResult for BucketAccessControl {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list bucket access controls](BucketAccessControlListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAccessControls {
@@ -555,6 +561,44 @@ pub struct BucketAccessControls {
 impl client::ResponseResult for BucketAccessControls {}
 
 
+/// The storage layout configuration of a bucket.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get storage layout buckets](BucketGetStorageLayoutCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketStorageLayout {
+    /// The name of the bucket.
+    
+    pub bucket: Option<String>,
+    /// The bucket's custom placement configuration for Custom Dual Regions.
+    #[serde(rename="customPlacementConfig")]
+    
+    pub custom_placement_config: Option<BucketStorageLayoutCustomPlacementConfig>,
+    /// The bucket's hierarchical namespace configuration.
+    #[serde(rename="hierarchicalNamespace")]
+    
+    pub hierarchical_namespace: Option<BucketStorageLayoutHierarchicalNamespace>,
+    /// The kind of item this is. For storage layout, this is always storage#storageLayout.
+    
+    pub kind: Option<String>,
+    /// The location of the bucket.
+    
+    pub location: Option<String>,
+    /// The type of the bucket location.
+    #[serde(rename="locationType")]
+    
+    pub location_type: Option<String>,
+}
+
+impl client::ResponseResult for BucketStorageLayout {}
+
+
 /// A list of buckets.
 /// 
 /// # Activities
@@ -563,6 +607,7 @@ impl client::ResponseResult for BucketAccessControls {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list buckets](BucketListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Buckets {
@@ -589,6 +634,7 @@ impl client::ResponseResult for Buckets {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [bulk restore objects](ObjectBulkRestoreCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BulkRestoreObjectsRequest {
@@ -626,6 +672,7 @@ impl client::RequestValue for BulkRestoreObjectsRequest {}
 /// 
 /// * [stop channels](ChannelStopCall) (request)
 /// * [watch all objects](ObjectWatchAllCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Channel {
@@ -678,6 +725,7 @@ impl client::ResponseResult for Channel {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [compose objects](ObjectComposeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ComposeRequest {
@@ -700,6 +748,7 @@ impl client::RequestValue for ComposeRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
@@ -732,6 +781,7 @@ impl client::Part for Expr {}
 /// * [insert folders](FolderInsertCall) (request|response)
 /// * [list folders](FolderListCall) (none)
 /// * [rename folders](FolderRenameCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Folder {
@@ -782,6 +832,7 @@ impl client::ResponseResult for Folder {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list folders](FolderListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Folders {
@@ -808,9 +859,13 @@ impl client::ResponseResult for Folders {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [operations list buckets](BucketOperationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningListOperationsResponse {
+    /// The kind of item this is. For lists of operations, this is always storage#operations.
+    
+    pub kind: Option<String>,
     /// The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
     
@@ -835,6 +890,7 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// * [rename folders](FolderRenameCall) (response)
 /// * [bulk restore objects](ObjectBulkRestoreCall) (response)
 /// * [operations get buckets](BucketOperationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningOperation {
@@ -844,6 +900,9 @@ pub struct GoogleLongrunningOperation {
     /// The error result of the operation in case of failure or cancellation.
     
     pub error: Option<GoogleRpcStatus>,
+    /// The kind of item this is. For operations, this is always storage#operation.
+    
+    pub kind: Option<String>,
     /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
     
     pub metadata: Option<HashMap<String, json::Value>>,
@@ -853,6 +912,10 @@ pub struct GoogleLongrunningOperation {
     /// The normal response of the operation in case of success. If the original method returns no data on success, such as "Delete", the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type "XxxResponse", where "Xxx" is the original method name. For example, if the original method name is "TakeSnapshot()", the inferred response type is "TakeSnapshotResponse".
     
     pub response: Option<HashMap<String, json::Value>>,
+    /// The link to this long running operation.
+    #[serde(rename="selfLink")]
+    
+    pub self_link: Option<String>,
 }
 
 impl client::ResponseResult for GoogleLongrunningOperation {}
@@ -862,6 +925,7 @@ impl client::ResponseResult for GoogleLongrunningOperation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpcStatus {
@@ -887,6 +951,7 @@ impl client::Part for GoogleRpcStatus {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [hmac keys create projects](ProjectHmacKeyCreateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HmacKey {
@@ -913,6 +978,7 @@ impl client::ResponseResult for HmacKey {}
 /// 
 /// * [hmac keys get projects](ProjectHmacKeyGetCall) (response)
 /// * [hmac keys update projects](ProjectHmacKeyUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HmacKeyMetadata {
@@ -965,6 +1031,7 @@ impl client::ResponseResult for HmacKeyMetadata {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [hmac keys list projects](ProjectHmacKeyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HmacKeysMetadata {
@@ -997,6 +1064,7 @@ impl client::ResponseResult for HmacKeysMetadata {}
 /// * [list managed folders](ManagedFolderListCall) (none)
 /// * [set iam policy managed folders](ManagedFolderSetIamPolicyCall) (none)
 /// * [test iam permissions managed folders](ManagedFolderTestIamPermissionCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedFolder {
@@ -1043,6 +1111,7 @@ impl client::ResponseResult for ManagedFolder {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list managed folders](ManagedFolderListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManagedFolders {
@@ -1072,6 +1141,7 @@ impl client::ResponseResult for ManagedFolders {}
 /// * [get notifications](NotificationGetCall) (response)
 /// * [insert notifications](NotificationInsertCall) (request|response)
 /// * [list notifications](NotificationListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Notification {
@@ -1118,6 +1188,7 @@ impl client::ResponseResult for Notification {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list notifications](NotificationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Notifications {
@@ -1148,12 +1219,13 @@ impl client::ResponseResult for Notifications {}
 /// * [insert objects](ObjectInsertCall) (request|response)
 /// * [list objects](ObjectListCall) (none)
 /// * [patch objects](ObjectPatchCall) (request|response)
-/// * [restore objects](ObjectRestoreCall) (request|response)
+/// * [restore objects](ObjectRestoreCall) (response)
 /// * [rewrite objects](ObjectRewriteCall) (request)
 /// * [set iam policy objects](ObjectSetIamPolicyCall) (none)
 /// * [test iam permissions objects](ObjectTestIamPermissionCall) (none)
 /// * [update objects](ObjectUpdateCall) (request|response)
 /// * [watch all objects](ObjectWatchAllCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Object {
@@ -1310,6 +1382,7 @@ impl client::ResponseResult for Object {}
 /// * [list object access controls](ObjectAccessControlListCall) (none)
 /// * [patch object access controls](ObjectAccessControlPatchCall) (request|response)
 /// * [update object access controls](ObjectAccessControlUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControl {
@@ -1383,6 +1456,7 @@ impl client::ResponseResult for ObjectAccessControl {}
 /// 
 /// * [list default object access controls](DefaultObjectAccessControlListCall) (response)
 /// * [list object access controls](ObjectAccessControlListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControls {
@@ -1405,6 +1479,7 @@ impl client::ResponseResult for ObjectAccessControls {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list objects](ObjectListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Objects {
@@ -1439,6 +1514,7 @@ impl client::ResponseResult for Objects {}
 /// * [set iam policy managed folders](ManagedFolderSetIamPolicyCall) (request|response)
 /// * [get iam policy objects](ObjectGetIamPolicyCall) (response)
 /// * [set iam policy objects](ObjectSetIamPolicyCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
@@ -1473,6 +1549,7 @@ impl client::ResponseResult for Policy {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [rewrite objects](ObjectRewriteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RewriteResponse {
@@ -1512,6 +1589,7 @@ impl client::ResponseResult for RewriteResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service account get projects](ProjectServiceAccountGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
@@ -1536,6 +1614,7 @@ impl client::ResponseResult for ServiceAccount {}
 /// * [test iam permissions buckets](BucketTestIamPermissionCall) (response)
 /// * [test iam permissions managed folders](ManagedFolderTestIamPermissionCall) (response)
 /// * [test iam permissions objects](ObjectTestIamPermissionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
@@ -1574,6 +1653,7 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAutoclass {
@@ -1602,6 +1682,7 @@ impl client::Part for BucketAutoclass {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketBilling {
@@ -1619,6 +1700,7 @@ impl client::Part for BucketBilling {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketCors {
@@ -1646,6 +1728,7 @@ impl client::Part for BucketCors {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketCustomPlacementConfig {
@@ -1663,6 +1746,7 @@ impl client::Part for BucketCustomPlacementConfig {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketEncryption {
@@ -1680,6 +1764,7 @@ impl client::Part for BucketEncryption {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketHierarchicalNamespace {
@@ -1696,6 +1781,7 @@ impl client::Part for BucketHierarchicalNamespace {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketIamConfiguration {
@@ -1721,6 +1807,7 @@ impl client::Part for BucketIamConfiguration {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketIamConfigurationBucketPolicyOnly {
@@ -1741,6 +1828,7 @@ impl client::Part for BucketIamConfigurationBucketPolicyOnly {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketIamConfigurationUniformBucketLevelAccess {
@@ -1761,6 +1849,7 @@ impl client::Part for BucketIamConfigurationUniformBucketLevelAccess {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycle {
@@ -1777,6 +1866,7 @@ impl client::Part for BucketLifecycle {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRule {
@@ -1796,6 +1886,7 @@ impl client::Part for BucketLifecycleRule {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleAction {
@@ -1817,6 +1908,7 @@ impl client::Part for BucketLifecycleRuleAction {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLifecycleRuleCondition {
@@ -1877,6 +1969,7 @@ impl client::Part for BucketLifecycleRuleCondition {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketLogging {
@@ -1898,6 +1991,7 @@ impl client::Part for BucketLogging {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketObjectRetention {
@@ -1914,6 +2008,7 @@ impl client::Part for BucketObjectRetention {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketOwner {
@@ -1934,6 +2029,7 @@ impl client::Part for BucketOwner {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketRetentionPolicy {
@@ -1960,6 +2056,7 @@ impl client::Part for BucketRetentionPolicy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketSoftDeletePolicy {
@@ -1982,6 +2079,7 @@ impl client::Part for BucketSoftDeletePolicy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketVersioning {
@@ -1998,6 +2096,7 @@ impl client::Part for BucketVersioning {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketWebsite {
@@ -2019,6 +2118,7 @@ impl client::Part for BucketWebsite {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketAccessControlProjectTeam {
@@ -2035,10 +2135,46 @@ impl client::NestedType for BucketAccessControlProjectTeam {}
 impl client::Part for BucketAccessControlProjectTeam {}
 
 
+/// The bucket's custom placement configuration for Custom Dual Regions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketStorageLayoutCustomPlacementConfig {
+    /// The list of regional locations in which data is placed.
+    #[serde(rename="dataLocations")]
+    
+    pub data_locations: Option<Vec<String>>,
+}
+
+impl client::NestedType for BucketStorageLayoutCustomPlacementConfig {}
+impl client::Part for BucketStorageLayoutCustomPlacementConfig {}
+
+
+/// The bucket's hierarchical namespace configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketStorageLayoutHierarchicalNamespace {
+    /// When set to true, hierarchical namespace is enabled for this bucket.
+    
+    pub enabled: Option<bool>,
+}
+
+impl client::NestedType for BucketStorageLayoutHierarchicalNamespace {}
+impl client::Part for BucketStorageLayoutHierarchicalNamespace {}
+
+
 /// The list of source objects that will be concatenated into a single object.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ComposeRequestSourceObjects {
@@ -2063,6 +2199,7 @@ impl client::Part for ComposeRequestSourceObjects {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ComposeRequestSourceObjectsObjectPreconditions {
@@ -2081,6 +2218,7 @@ impl client::Part for ComposeRequestSourceObjectsObjectPreconditions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FolderPendingRenameInfo {
@@ -2098,6 +2236,7 @@ impl client::Part for FolderPendingRenameInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectCustomerEncryption {
@@ -2119,6 +2258,7 @@ impl client::Part for ObjectCustomerEncryption {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectOwner {
@@ -2139,6 +2279,7 @@ impl client::Part for ObjectOwner {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectRetention {
@@ -2159,6 +2300,7 @@ impl client::Part for ObjectRetention {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectAccessControlProjectTeam {
@@ -2179,6 +2321,7 @@ impl client::Part for ObjectAccessControlProjectTeam {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolicyBindings {
@@ -2242,7 +2385,7 @@ impl client::Part for PolicyBindings {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `disable(...)`, `get(...)`, `insert(...)`, `list(...)`, `pause(...)`, `resume(...)` and `update(...)`
 /// // to build up your call.
@@ -2418,7 +2561,7 @@ impl<'a, S> AnywhereCachMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -2581,9 +2724,9 @@ impl<'a, S> BucketAccessControlMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `lock_retention_policy(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)`, `patch(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `get_storage_layout(...)`, `insert(...)`, `list(...)`, `lock_retention_policy(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)`, `patch(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.buckets();
 /// # }
@@ -2652,6 +2795,24 @@ impl<'a, S> BucketMethods<'a, S> {
             _bucket: bucket.to_string(),
             _user_project: Default::default(),
             _options_requested_policy_version: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the storage layout configuration for the specified bucket. Note that this operation requires storage.objects.list permission.
+    /// 
+    /// # Arguments
+    ///
+    /// * `bucket` - Name of a bucket.
+    pub fn get_storage_layout(&self, bucket: &str) -> BucketGetStorageLayoutCall<'a, S> {
+        BucketGetStorageLayoutCall {
+            hub: self.hub,
+            _bucket: bucket.to_string(),
+            _prefix: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2896,7 +3057,7 @@ impl<'a, S> BucketMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `stop(...)`
 /// // to build up your call.
@@ -2954,7 +3115,7 @@ impl<'a, S> ChannelMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -3119,7 +3280,7 @@ impl<'a, S> DefaultObjectAccessControlMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)` and `rename(...)`
 /// // to build up your call.
@@ -3268,7 +3429,7 @@ impl<'a, S> FolderMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `set_iam_policy(...)` and `test_iam_permissions(...)`
 /// // to build up your call.
@@ -3300,6 +3461,7 @@ impl<'a, S> ManagedFolderMethods<'a, S> {
             _managed_folder: managed_folder.to_string(),
             _if_metageneration_not_match: Default::default(),
             _if_metageneration_match: Default::default(),
+            _allow_non_empty: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3455,7 +3617,7 @@ impl<'a, S> ManagedFolderMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
@@ -3574,7 +3736,7 @@ impl<'a, S> NotificationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -3755,7 +3917,7 @@ impl<'a, S> ObjectAccessControlMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `bulk_restore(...)`, `compose(...)`, `copy(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `insert(...)`, `list(...)`, `patch(...)`, `restore(...)`, `rewrite(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `update(...)` and `watch_all(...)`
 /// // to build up your call.
@@ -4023,14 +4185,12 @@ impl<'a, S> ObjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
     /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `generation` - Selects a specific revision of this object.
-    pub fn restore(&self, request: Object, bucket: &str, object: &str, generation: i64) -> ObjectRestoreCall<'a, S> {
+    pub fn restore(&self, bucket: &str, object: &str, generation: i64) -> ObjectRestoreCall<'a, S> {
         ObjectRestoreCall {
             hub: self.hub,
-            _request: request,
             _bucket: bucket.to_string(),
             _object: object.to_string(),
             _generation: generation,
@@ -4216,7 +4376,7 @@ impl<'a, S> ObjectMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `hmac_keys_create(...)`, `hmac_keys_delete(...)`, `hmac_keys_get(...)`, `hmac_keys_list(...)`, `hmac_keys_update(...)` and `service_account_get(...)`
 /// // to build up your call.
@@ -4386,7 +4546,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4486,6 +4646,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4657,7 +4818,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4757,6 +4918,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4929,7 +5091,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5217,7 +5379,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5325,6 +5487,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5500,7 +5663,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5600,6 +5763,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5771,7 +5935,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5871,6 +6035,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6043,7 +6208,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6343,7 +6508,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6447,6 +6612,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6615,7 +6781,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6720,6 +6886,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6899,7 +7066,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7199,7 +7366,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7302,6 +7469,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7471,7 +7639,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7784,7 +7952,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8096,7 +8264,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8208,6 +8376,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8380,7 +8549,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8498,6 +8667,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8687,7 +8857,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8795,6 +8965,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8948,6 +9119,278 @@ where
 }
 
 
+/// Returns the storage layout configuration for the specified bucket. Note that this operation requires storage.objects.list permission.
+///
+/// A builder for the *getStorageLayout* method supported by a *bucket* resource.
+/// It is not used directly, but through a [`BucketMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_storage1 as storage1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use storage1::{Storage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.buckets().get_storage_layout("bucket")
+///              .prefix("est")
+///              .doit().await;
+/// # }
+/// ```
+pub struct BucketGetStorageLayoutCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Storage<S>,
+    _bucket: String,
+    _prefix: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for BucketGetStorageLayoutCall<'a, S> {}
+
+impl<'a, S> BucketGetStorageLayoutCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BucketStorageLayout)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "storage.buckets.getStorageLayout",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "bucket", "prefix"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("bucket", self._bucket);
+        if let Some(value) = self._prefix.as_ref() {
+            params.push("prefix", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "b/{bucket}/storageLayout";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{bucket}", "bucket")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["bucket"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of a bucket.
+    ///
+    /// Sets the *bucket* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn bucket(mut self, new_value: &str) -> BucketGetStorageLayoutCall<'a, S> {
+        self._bucket = new_value.to_string();
+        self
+    }
+    /// An optional prefix used for permission check. It is useful when the caller only has storage.objects.list permission under a specific prefix.
+    ///
+    /// Sets the *prefix* query property to the given value.
+    pub fn prefix(mut self, new_value: &str) -> BucketGetStorageLayoutCall<'a, S> {
+        self._prefix = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BucketGetStorageLayoutCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *alt* (query-string) - Data format for the response.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *uploadType* (query-string) - Upload protocol for media (e.g. "media", "multipart", "resumable").
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    pub fn param<T>(mut self, name: T, value: T) -> BucketGetStorageLayoutCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> BucketGetStorageLayoutCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BucketGetStorageLayoutCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> BucketGetStorageLayoutCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates a new bucket.
 ///
 /// A builder for the *insert* method supported by a *bucket* resource.
@@ -8971,7 +9414,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8981,10 +9424,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().insert(req, "project")
-///              .user_project("est")
-///              .projection("At")
-///              .predefined_default_object_acl("sed")
-///              .predefined_acl("sit")
+///              .user_project("sed")
+///              .projection("sit")
+///              .predefined_default_object_acl("et")
+///              .predefined_acl("tempor")
 ///              .enable_object_retention(true)
 ///              .doit().await;
 /// # }
@@ -9312,16 +9755,16 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().list("project")
-///              .user_project("ipsum")
-///              .projection("et")
-///              .prefix("sanctus")
-///              .page_token("Lorem")
-///              .max_results(94)
+///              .user_project("sed")
+///              .projection("diam")
+///              .prefix("dolores")
+///              .page_token("dolores")
+///              .max_results(33)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9428,6 +9871,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9624,12 +10068,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.buckets().lock_retention_policy("bucket", -29)
-///              .user_project("dolores")
+/// let result = hub.buckets().lock_retention_policy("bucket", -11)
+///              .user_project("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9729,6 +10173,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9908,7 +10353,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9918,12 +10363,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().patch(req, "bucket")
-///              .user_project("et")
-///              .projection("sed")
-///              .predefined_default_object_acl("no")
-///              .predefined_acl("et")
-///              .if_metageneration_not_match(-94)
-///              .if_metageneration_match(-80)
+///              .user_project("sed")
+///              .projection("no")
+///              .predefined_default_object_acl("nonumy")
+///              .predefined_acl("At")
+///              .if_metageneration_not_match(-45)
+///              .if_metageneration_match(-32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10269,7 +10714,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10279,7 +10724,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().set_iam_policy(req, "bucket")
-///              .user_project("nonumy")
+///              .user_project("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10569,12 +11014,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.buckets().test_iam_permissions("bucket", &vec!["sadipscing".into()])
-///              .user_project("aliquyam")
+/// let result = hub.buckets().test_iam_permissions("bucket", &vec!["aliquyam".into()])
+///              .user_project("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10678,6 +11123,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10858,7 +11304,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10868,12 +11314,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().update(req, "bucket")
-///              .user_project("sadipscing")
-///              .projection("erat")
-///              .predefined_default_object_acl("aliquyam")
-///              .predefined_acl("amet")
-///              .if_metageneration_not_match(-57)
-///              .if_metageneration_match(-24)
+///              .user_project("et")
+///              .projection("sea")
+///              .predefined_default_object_acl("consetetur")
+///              .predefined_acl("consetetur")
+///              .if_metageneration_not_match(-65)
+///              .if_metageneration_match(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11218,7 +11664,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11317,6 +11763,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11478,7 +11925,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11578,6 +12025,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11749,14 +12197,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.buckets().operations_list("bucket")
-///              .page_token("aliquyam")
-///              .page_size(-94)
-///              .filter("duo")
+///              .page_token("sit")
+///              .page_size(-93)
+///              .filter("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11862,6 +12310,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12045,7 +12494,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12303,12 +12752,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().delete("bucket", "entity")
-///              .user_project("sit")
+///              .user_project("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12407,6 +12856,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12575,12 +13025,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().get("bucket", "entity")
-///              .user_project("Lorem")
+///              .user_project("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12680,6 +13130,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12859,7 +13310,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12869,7 +13320,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().insert(req, "bucket")
-///              .user_project("Stet")
+///              .user_project("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13159,14 +13610,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().list("bucket")
-///              .user_project("eos")
-///              .if_metageneration_not_match(-68)
-///              .if_metageneration_match(-10)
+///              .user_project("dolore")
+///              .if_metageneration_not_match(-40)
+///              .if_metageneration_match(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13272,6 +13723,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13455,7 +13907,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -13465,7 +13917,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.default_object_access_controls().patch(req, "bucket", "entity")
-///              .user_project("dolore")
+///              .user_project("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13768,7 +14220,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14080,13 +14532,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().delete("bucket", "folder")
-///              .if_metageneration_not_match(-69)
-///              .if_metageneration_match(-81)
+///              .if_metageneration_not_match(-51)
+///              .if_metageneration_match(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14189,6 +14641,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14364,13 +14817,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().get("bucket", "folder")
-///              .if_metageneration_not_match(-59)
-///              .if_metageneration_match(-51)
+///              .if_metageneration_not_match(-22)
+///              .if_metageneration_match(-48)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14474,6 +14927,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14660,7 +15114,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14670,7 +15124,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().insert(req, "bucket")
-///              .recursive(false)
+///              .recursive(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14960,17 +15414,17 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().list("bucket")
-///              .start_offset("et")
-///              .prefix("sit")
-///              .page_token("erat")
-///              .page_size(-10)
-///              .end_offset("nonumy")
-///              .delimiter("et")
+///              .start_offset("gubergren")
+///              .prefix("justo")
+///              .page_token("sea")
+///              .page_size(-96)
+///              .end_offset("sit")
+///              .delimiter("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15088,6 +15542,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15291,13 +15746,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().rename("bucket", "sourceFolder", "destinationFolder")
-///              .if_source_metageneration_not_match(-96)
-///              .if_source_metageneration_match(-98)
+///              .if_source_metageneration_not_match(-46)
+///              .if_source_metageneration_match(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15403,6 +15858,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15598,13 +16054,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().delete("bucket", "managedFolder")
-///              .if_metageneration_not_match(-77)
-///              .if_metageneration_match(-19)
+///              .if_metageneration_not_match(-61)
+///              .if_metageneration_match(-2)
+///              .allow_non_empty(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15616,6 +16073,7 @@ pub struct ManagedFolderDeleteCall<'a, S>
     _managed_folder: String,
     _if_metageneration_not_match: Option<i64>,
     _if_metageneration_match: Option<i64>,
+    _allow_non_empty: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>
@@ -15644,14 +16102,14 @@ where
         dlg.begin(client::MethodInfo { id: "storage.managedFolders.delete",
                                http_method: hyper::Method::DELETE });
 
-        for &field in ["bucket", "managedFolder", "ifMetagenerationNotMatch", "ifMetagenerationMatch"].iter() {
+        for &field in ["bucket", "managedFolder", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "allowNonEmpty"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("bucket", self._bucket);
         params.push("managedFolder", self._managed_folder);
         if let Some(value) = self._if_metageneration_not_match.as_ref() {
@@ -15659,6 +16117,9 @@ where
         }
         if let Some(value) = self._if_metageneration_match.as_ref() {
             params.push("ifMetagenerationMatch", value.to_string());
+        }
+        if let Some(value) = self._allow_non_empty.as_ref() {
+            params.push("allowNonEmpty", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -15707,6 +16168,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15785,6 +16247,13 @@ where
     /// Sets the *if metageneration match* query property to the given value.
     pub fn if_metageneration_match(mut self, new_value: i64) -> ManagedFolderDeleteCall<'a, S> {
         self._if_metageneration_match = Some(new_value);
+        self
+    }
+    /// Allows the deletion of a managed folder even if it is not empty. A managed folder is empty if there are no objects or managed folders that it applies to. Callers must have storage.managedFolders.setIamPolicy permission.
+    ///
+    /// Sets the *allow non empty* query property to the given value.
+    pub fn allow_non_empty(mut self, new_value: bool) -> ManagedFolderDeleteCall<'a, S> {
+        self._allow_non_empty = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -15882,13 +16351,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().get("bucket", "managedFolder")
-///              .if_metageneration_not_match(-4)
-///              .if_metageneration_match(-32)
+///              .if_metageneration_not_match(-62)
+///              .if_metageneration_match(-45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15992,6 +16461,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16177,13 +16647,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().get_iam_policy("bucket", "managedFolder")
-///              .user_project("ipsum")
-///              .options_requested_policy_version(-56)
+///              .user_project("duo")
+///              .options_requested_policy_version(-53)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16287,6 +16757,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16473,7 +16944,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16761,14 +17232,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().list("bucket")
-///              .prefix("sadipscing")
-///              .page_token("At")
-///              .page_size(-53)
+///              .prefix("rebum.")
+///              .page_token("dolor")
+///              .page_size(-6)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16874,6 +17345,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17057,7 +17529,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17067,7 +17539,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_folders().set_iam_policy(req, "bucket", "managedFolder")
-///              .user_project("magna")
+///              .user_project("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17369,11 +17841,11 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_folders().test_iam_permissions("bucket", "managedFolder", &vec!["dolor".into()])
+/// let result = hub.managed_folders().test_iam_permissions("bucket", "managedFolder", &vec!["kasd".into()])
 ///              .user_project("Lorem")
 ///              .doit().await;
 /// # }
@@ -17480,6 +17952,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17669,12 +18142,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().delete("bucket", "notification")
-///              .user_project("no")
+///              .user_project("rebum.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17773,6 +18246,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17941,12 +18415,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().get("bucket", "notification")
-///              .user_project("kasd")
+///              .user_project("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18046,6 +18520,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18225,7 +18700,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18235,7 +18710,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().insert(req, "bucket")
-///              .user_project("sanctus")
+///              .user_project("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18525,12 +19000,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.notifications().list("bucket")
-///              .user_project("rebum.")
+///              .user_project("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18628,6 +19103,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18796,13 +19272,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().delete("bucket", "object", "entity")
-///              .user_project("amet.")
-///              .generation(-84)
+///              .user_project("duo")
+///              .generation(-45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18907,6 +19383,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19092,13 +19569,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().get("bucket", "object", "entity")
-///              .user_project("sit")
-///              .generation(-76)
+///              .user_project("kasd")
+///              .generation(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19204,6 +19681,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19400,7 +19878,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19410,8 +19888,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().insert(req, "bucket", "object")
-///              .user_project("ut")
-///              .generation(-16)
+///              .user_project("et")
+///              .generation(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19724,13 +20202,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().list("bucket", "object")
-///              .user_project("sadipscing")
-///              .generation(-39)
+///              .user_project("rebum.")
+///              .generation(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19834,6 +20312,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20020,7 +20499,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20030,8 +20509,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().patch(req, "bucket", "object", "entity")
-///              .user_project("magna")
-///              .generation(-59)
+///              .user_project("aliquyam")
+///              .generation(-37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20357,7 +20836,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20367,8 +20846,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.object_access_controls().update(req, "bucket", "object", "entity")
-///              .user_project("clita")
-///              .generation(-15)
+///              .user_project("dolores")
+///              .generation(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20694,7 +21173,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20983,7 +21462,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -20993,11 +21472,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().compose(req, "destinationBucket", "destinationObject")
-///              .user_project("vero")
-///              .kms_key_name("rebum.")
-///              .if_metageneration_match(-19)
-///              .if_generation_match(-96)
-///              .destination_predefined_acl("dolores")
+///              .user_project("clita")
+///              .kms_key_name("dolor")
+///              .if_metageneration_match(-82)
+///              .if_generation_match(-83)
+///              .destination_predefined_acl("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21344,7 +21823,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -21354,19 +21833,19 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().copy(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("aliquyam")
-///              .source_generation(-83)
-///              .projection("diam")
-///              .if_source_metageneration_not_match(-91)
-///              .if_source_metageneration_match(-18)
-///              .if_source_generation_not_match(-8)
-///              .if_source_generation_match(-23)
-///              .if_metageneration_not_match(-39)
-///              .if_metageneration_match(-43)
-///              .if_generation_not_match(-7)
-///              .if_generation_match(-9)
-///              .destination_predefined_acl("dolor")
-///              .destination_kms_key_name("diam")
+///              .user_project("tempor")
+///              .source_generation(-43)
+///              .projection("est")
+///              .if_source_metageneration_not_match(-9)
+///              .if_source_metageneration_match(-99)
+///              .if_source_generation_not_match(-79)
+///              .if_source_generation_match(-77)
+///              .if_metageneration_not_match(-81)
+///              .if_metageneration_match(-71)
+///              .if_generation_not_match(-5)
+///              .if_generation_match(-73)
+///              .destination_predefined_acl("dolores")
+///              .destination_kms_key_name("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21824,17 +22303,17 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().delete("bucket", "object")
-///              .user_project("justo")
-///              .if_metageneration_not_match(-5)
-///              .if_metageneration_match(-73)
-///              .if_generation_not_match(-19)
-///              .if_generation_match(-96)
-///              .generation(-11)
+///              .user_project("sadipscing")
+///              .if_metageneration_not_match(-42)
+///              .if_metageneration_match(-10)
+///              .if_generation_not_match(-50)
+///              .if_generation_match(-15)
+///              .generation(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21953,6 +22432,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22161,19 +22641,19 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get("bucket", "object")
-///              .user_project("diam")
+///              .user_project("sit")
 ///              .soft_deleted(true)
-///              .projection("Stet")
-///              .if_metageneration_not_match(-62)
-///              .if_metageneration_match(-5)
-///              .if_generation_not_match(-61)
-///              .if_generation_match(-98)
-///              .generation(-13)
+///              .projection("Lorem")
+///              .if_metageneration_not_match(-21)
+///              .if_metageneration_match(-88)
+///              .if_generation_not_match(-1)
+///              .if_generation_match(-80)
+///              .generation(-91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22310,6 +22790,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22537,13 +23018,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().get_iam_policy("bucket", "object")
-///              .user_project("justo")
-///              .generation(-88)
+///              .user_project("kasd")
+///              .generation(-21)
 ///              .doit().await;
 /// # }
 /// ```
@@ -22647,6 +23128,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -22834,7 +23316,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -22844,16 +23326,16 @@ where
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().insert(req, "bucket")
-///              .user_project("nonumy")
-///              .projection("sea")
-///              .predefined_acl("ipsum")
-///              .name("kasd")
-///              .kms_key_name("justo")
-///              .if_metageneration_not_match(-17)
-///              .if_metageneration_match(-77)
-///              .if_generation_not_match(-81)
-///              .if_generation_match(-14)
-///              .content_encoding("vero")
+///              .user_project("At")
+///              .projection("erat")
+///              .predefined_acl("clita")
+///              .name("vero")
+///              .kms_key_name("invidunt")
+///              .if_metageneration_not_match(-91)
+///              .if_metageneration_match(-81)
+///              .if_generation_not_match(-31)
+///              .if_generation_match(-19)
+///              .content_encoding("ipsum")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -23351,24 +23833,24 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().list("bucket")
 ///              .versions(false)
-///              .user_project("erat")
-///              .start_offset("erat")
-///              .soft_deleted(true)
-///              .projection("voluptua.")
-///              .prefix("eos")
-///              .page_token("duo")
-///              .max_results(7)
-///              .match_glob("consetetur")
-///              .include_trailing_delimiter(false)
-///              .include_folders_as_prefixes(true)
-///              .end_offset("takimata")
-///              .delimiter("erat")
+///              .user_project("elitr")
+///              .start_offset("consetetur")
+///              .soft_deleted(false)
+///              .projection("clita")
+///              .prefix("sit")
+///              .page_token("takimata")
+///              .max_results(70)
+///              .match_glob("diam")
+///              .include_trailing_delimiter(true)
+///              .include_folders_as_prefixes(false)
+///              .end_offset("diam")
+///              .delimiter("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23514,6 +23996,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -23767,7 +24250,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -23777,15 +24260,15 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().patch(req, "bucket", "object")
-///              .user_project("Lorem")
-///              .projection("At")
-///              .predefined_acl("diam")
-///              .override_unlocked_retention(false)
-///              .if_metageneration_not_match(-93)
-///              .if_metageneration_match(-18)
-///              .if_generation_not_match(-17)
-///              .if_generation_match(-84)
-///              .generation(-55)
+///              .user_project("ea")
+///              .projection("dolore")
+///              .predefined_acl("ipsum")
+///              .override_unlocked_retention(true)
+///              .if_metageneration_not_match(-27)
+///              .if_metageneration_match(-53)
+///              .if_generation_not_match(-98)
+///              .if_generation_match(-101)
+///              .generation(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24166,7 +24649,6 @@ where
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
 /// # extern crate google_storage1 as storage1;
-/// use storage1::api::Object;
 /// # async fn dox() {
 /// # use std::default::Default;
 /// # use storage1::{Storage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
@@ -24176,23 +24658,18 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Object::default();
-/// 
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.objects().restore(req, "bucket", "object", -53)
-///              .user_project("sit")
-///              .projection("Lorem")
-///              .if_metageneration_not_match(-15)
-///              .if_metageneration_match(-70)
-///              .if_generation_not_match(-94)
-///              .if_generation_match(-32)
-///              .copy_source_acl(false)
+/// let result = hub.objects().restore("bucket", "object", -32)
+///              .user_project("erat")
+///              .projection("ut")
+///              .if_metageneration_not_match(-18)
+///              .if_metageneration_match(-51)
+///              .if_generation_not_match(-66)
+///              .if_generation_match(-35)
+///              .copy_source_acl(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24200,16 +24677,15 @@ pub struct ObjectRestoreCall<'a, S>
     where S: 'a {
 
     hub: &'a Storage<S>,
-    _request: Object,
     _bucket: String,
     _object: String,
+    _generation: i64,
     _user_project: Option<String>,
     _projection: Option<String>,
     _if_metageneration_not_match: Option<i64>,
     _if_metageneration_match: Option<i64>,
     _if_generation_not_match: Option<i64>,
     _if_generation_match: Option<i64>,
-    _generation: i64,
     _copy_source_acl: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -24239,16 +24715,17 @@ where
         dlg.begin(client::MethodInfo { id: "storage.objects.restore",
                                http_method: hyper::Method::POST });
 
-        for &field in ["alt", "bucket", "object", "userProject", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation", "copySourceAcl"].iter() {
+        for &field in ["alt", "bucket", "object", "generation", "userProject", "projection", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "copySourceAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        let mut params = Params::with_capacity(12 + self._additional_params.len());
         params.push("bucket", self._bucket);
         params.push("object", self._object);
+        params.push("generation", self._generation.to_string());
         if let Some(value) = self._user_project.as_ref() {
             params.push("userProject", value);
         }
@@ -24267,7 +24744,6 @@ where
         if let Some(value) = self._if_generation_match.as_ref() {
             params.push("ifGenerationMatch", value.to_string());
         }
-        params.push("generation", self._generation.to_string());
         if let Some(value) = self._copy_source_acl.as_ref() {
             params.push("copySourceAcl", value.to_string());
         }
@@ -24290,17 +24766,6 @@ where
 
         let url = params.parse_with_url(&url);
 
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -24316,7 +24781,6 @@ where
                     }
                 }
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -24331,9 +24795,8 @@ where
 
 
                         let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
 
@@ -24389,15 +24852,6 @@ where
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Object) -> ObjectRestoreCall<'a, S> {
-        self._request = new_value;
-        self
-    }
     /// Name of the bucket in which the object resides.
     ///
     /// Sets the *bucket* path property to the given value.
@@ -24416,6 +24870,16 @@ where
     /// we provide this method for API completeness.
     pub fn object(mut self, new_value: &str) -> ObjectRestoreCall<'a, S> {
         self._object = new_value.to_string();
+        self
+    }
+    /// Selects a specific revision of this object.
+    ///
+    /// Sets the *generation* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn generation(mut self, new_value: i64) -> ObjectRestoreCall<'a, S> {
+        self._generation = new_value;
         self
     }
     /// The project to be billed for this request. Required for Requester Pays buckets.
@@ -24458,16 +24922,6 @@ where
     /// Sets the *if generation match* query property to the given value.
     pub fn if_generation_match(mut self, new_value: i64) -> ObjectRestoreCall<'a, S> {
         self._if_generation_match = Some(new_value);
-        self
-    }
-    /// Selects a specific revision of this object.
-    ///
-    /// Sets the *generation* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn generation(mut self, new_value: i64) -> ObjectRestoreCall<'a, S> {
-        self._generation = new_value;
         self
     }
     /// If true, copies the source object's ACL; otherwise, uses the bucket's default object ACL. The default is false.
@@ -24573,7 +25027,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -24583,21 +25037,21 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-///              .user_project("sed")
-///              .source_generation(-65)
-///              .rewrite_token("aliquyam")
-///              .projection("kasd")
-///              .max_bytes_rewritten_per_call(-101)
-///              .if_source_metageneration_not_match(-48)
-///              .if_source_metageneration_match(-63)
-///              .if_source_generation_not_match(-39)
-///              .if_source_generation_match(-54)
-///              .if_metageneration_not_match(-97)
-///              .if_metageneration_match(-3)
-///              .if_generation_not_match(-16)
-///              .if_generation_match(-60)
-///              .destination_predefined_acl("ipsum")
-///              .destination_kms_key_name("ipsum")
+///              .user_project("kasd")
+///              .source_generation(-39)
+///              .rewrite_token("dolor")
+///              .projection("amet")
+///              .max_bytes_rewritten_per_call(-3)
+///              .if_source_metageneration_not_match(-16)
+///              .if_source_metageneration_match(-60)
+///              .if_source_generation_not_match(-100)
+///              .if_source_generation_match(-5)
+///              .if_metageneration_not_match(-24)
+///              .if_metageneration_match(-94)
+///              .if_generation_not_match(-90)
+///              .if_generation_match(-4)
+///              .destination_predefined_acl("sadipscing")
+///              .destination_kms_key_name("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25078,7 +25532,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25088,8 +25542,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().set_iam_policy(req, "bucket", "object")
-///              .user_project("eirmod")
-///              .generation(-4)
+///              .user_project("et")
+///              .generation(-48)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25402,13 +25856,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.objects().test_iam_permissions("bucket", "object", &vec!["dolor".into()])
-///              .user_project("consetetur")
-///              .generation(-22)
+/// let result = hub.objects().test_iam_permissions("bucket", "object", &vec!["diam".into()])
+///              .user_project("ipsum")
+///              .generation(-38)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25518,6 +25972,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -25715,7 +26170,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -25725,15 +26180,15 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().update(req, "bucket", "object")
-///              .user_project("nonumy")
+///              .user_project("At")
 ///              .projection("diam")
-///              .predefined_acl("ipsum")
-///              .override_unlocked_retention(true)
-///              .if_metageneration_not_match(-15)
-///              .if_metageneration_match(-78)
-///              .if_generation_not_match(-77)
-///              .if_generation_match(-92)
-///              .generation(-47)
+///              .predefined_acl("amet")
+///              .override_unlocked_retention(false)
+///              .if_metageneration_not_match(-90)
+///              .if_metageneration_match(-31)
+///              .if_generation_not_match(-20)
+///              .if_generation_match(-35)
+///              .generation(-1)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26124,7 +26579,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -26134,16 +26589,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.objects().watch_all(req, "bucket")
-///              .versions(false)
-///              .user_project("erat")
-///              .start_offset("duo")
-///              .projection("et")
-///              .prefix("erat")
-///              .page_token("sit")
-///              .max_results(28)
-///              .include_trailing_delimiter(false)
-///              .end_offset("accusam")
-///              .delimiter("ut")
+///              .versions(true)
+///              .user_project("accusam")
+///              .start_offset("et")
+///              .projection("nonumy")
+///              .prefix("accusam")
+///              .page_token("ut")
+///              .max_results(23)
+///              .include_trailing_delimiter(true)
+///              .end_offset("dolor")
+///              .delimiter("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26532,12 +26987,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_create("projectId", "serviceAccountEmail")
-///              .user_project("dolor")
+///              .user_project("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26637,6 +27092,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -26815,12 +27271,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_delete("projectId", "accessId")
-///              .user_project("aliquyam")
+///              .user_project("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26919,6 +27375,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -27087,12 +27544,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_get("projectId", "accessId")
-///              .user_project("invidunt")
+///              .user_project("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27192,6 +27649,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -27370,16 +27828,16 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_list("projectId")
-///              .user_project("duo")
+///              .user_project("no")
 ///              .show_deleted_keys(true)
-///              .service_account_email("Stet")
-///              .page_token("sadipscing")
-///              .max_results(90)
+///              .service_account_email("ipsum")
+///              .page_token("sea")
+///              .max_results(3)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27493,6 +27951,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -27690,7 +28149,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -27700,7 +28159,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().hmac_keys_update(req, "projectId", "accessId")
-///              .user_project("sea")
+///              .user_project("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -28002,12 +28461,12 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Storage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().service_account_get("projectId")
-///              .user_project("amet.")
+///              .user_project("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -28105,6 +28564,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await

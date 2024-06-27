@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Artifact Registry* API at revision *20240213*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Artifact Registry* API at revision *20240608*. The CLI is at version *5.0.5*.
 
 ```bash
 artifactregistry1 [options]
@@ -41,8 +41,11 @@ artifactregistry1 [options]
                 locations-repositories-delete <name> [-p <v>]... [-o <out>]
                 locations-repositories-docker-images-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-docker-images-list <parent> [-p <v>]... [-o <out>]
+                locations-repositories-files-delete <name> [-p <v>]... [-o <out>]
+                locations-repositories-files-download <name> [-p <v>]... [-o <out>]
                 locations-repositories-files-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-files-list <parent> [-p <v>]... [-o <out>]
+                locations-repositories-generic-artifacts-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 locations-repositories-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-repositories-go-modules-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
@@ -57,6 +60,7 @@ artifactregistry1 [options]
                 locations-repositories-packages-delete <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-list <parent> [-p <v>]... [-o <out>]
+                locations-repositories-packages-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-packages-tags-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-packages-tags-delete <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-tags-get <name> [-p <v>]... [-o <out>]

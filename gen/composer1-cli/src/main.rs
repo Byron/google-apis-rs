@@ -50,6 +50,91 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _projects_locations_environments_check_upgrade(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "image-version" => Some(("imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["image-version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CheckUpgradeRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_environments_check_upgrade(request, opt.value_of("environment").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_environments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2097,6 +2182,9 @@ where
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-environments-check-upgrade", Some(opt)) => {
+                        call_result = self._projects_locations_environments_check_upgrade(opt, dry_run, &mut err).await;
+                    },
                     ("locations-environments-create", Some(opt)) => {
                         call_result = self._projects_locations_environments_create(opt, dry_run, &mut err).await;
                     },
@@ -2257,7 +2345,35 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-environments-create', 'locations-environments-database-failover', 'locations-environments-delete', 'locations-environments-execute-airflow-command', 'locations-environments-fetch-database-properties', 'locations-environments-get', 'locations-environments-list', 'locations-environments-load-snapshot', 'locations-environments-patch', 'locations-environments-poll-airflow-command', 'locations-environments-save-snapshot', 'locations-environments-stop-airflow-command', 'locations-environments-user-workloads-config-maps-create', 'locations-environments-user-workloads-config-maps-delete', 'locations-environments-user-workloads-config-maps-get', 'locations-environments-user-workloads-config-maps-list', 'locations-environments-user-workloads-config-maps-update', 'locations-environments-user-workloads-secrets-create', 'locations-environments-user-workloads-secrets-delete', 'locations-environments-user-workloads-secrets-get', 'locations-environments-user-workloads-secrets-list', 'locations-environments-user-workloads-secrets-update', 'locations-environments-workloads-list', 'locations-image-versions-list', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+        ("projects", "methods: 'locations-environments-check-upgrade', 'locations-environments-create', 'locations-environments-database-failover', 'locations-environments-delete', 'locations-environments-execute-airflow-command', 'locations-environments-fetch-database-properties', 'locations-environments-get', 'locations-environments-list', 'locations-environments-load-snapshot', 'locations-environments-patch', 'locations-environments-poll-airflow-command', 'locations-environments-save-snapshot', 'locations-environments-stop-airflow-command', 'locations-environments-user-workloads-config-maps-create', 'locations-environments-user-workloads-config-maps-delete', 'locations-environments-user-workloads-config-maps-get', 'locations-environments-user-workloads-config-maps-list', 'locations-environments-user-workloads-config-maps-update', 'locations-environments-user-workloads-secrets-create', 'locations-environments-user-workloads-secrets-delete', 'locations-environments-user-workloads-secrets-get', 'locations-environments-user-workloads-secrets-list', 'locations-environments-user-workloads-secrets-update', 'locations-environments-workloads-list', 'locations-image-versions-list', 'locations-operations-delete', 'locations-operations-get' and 'locations-operations-list'", vec![
+            ("locations-environments-check-upgrade",
+                    Some(r##"Check if an upgrade operation on the environment will succeed. In case of problems detailed info can be found in the returned Operation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-check-upgrade",
+                  vec![
+                    (Some(r##"environment"##),
+                     None,
+                     Some(r##"Required. The resource name of the environment to check upgrade for, in the form: "projects/{projectId}/locations/{locationId}/environments/{environmentId}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-environments-create",
                     Some(r##"Create a new environment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_composer1_cli/projects_locations-environments-create",
@@ -2930,7 +3046,7 @@ async fn main() {
     
     let mut app = App::new("composer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240227")
+           .version("5.0.5+20240618")
            .about("Manages Apache Airflow environments on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_composer1_cli")
            .arg(Arg::with_name("url")
@@ -2994,6 +3110,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

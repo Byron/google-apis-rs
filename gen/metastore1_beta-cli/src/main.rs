@@ -1219,6 +1219,7 @@ where
                     "service-revision.artifact-gcs-uri" => Some(("serviceRevision.artifactGcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.create-time" => Some(("serviceRevision.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.database-type" => Some(("serviceRevision.databaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.deletion-protection" => Some(("serviceRevision.deletionProtection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-revision.encryption-config.kms-key" => Some(("serviceRevision.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.endpoint-uri" => Some(("serviceRevision.endpointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.hive-metastore-config.config-overrides" => Some(("serviceRevision.hiveMetastoreConfig.configOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1236,6 +1237,10 @@ where
                     "service-revision.network-config.custom-routes-enabled" => Some(("serviceRevision.networkConfig.customRoutesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-revision.port" => Some(("serviceRevision.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "service-revision.release-channel" => Some(("serviceRevision.releaseChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scaling-config.autoscaling-config.autoscaling-enabled" => Some(("serviceRevision.scalingConfig.autoscalingConfig.autoscalingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "service-revision.scaling-config.autoscaling-config.autoscaling-factor" => Some(("serviceRevision.scalingConfig.autoscalingConfig.autoscalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-revision.scaling-config.autoscaling-config.limit-config.max-scaling-factor" => Some(("serviceRevision.scalingConfig.autoscalingConfig.limitConfig.maxScalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-revision.scaling-config.autoscaling-config.limit-config.min-scaling-factor" => Some(("serviceRevision.scalingConfig.autoscalingConfig.limitConfig.minScalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-revision.scaling-config.instance-size" => Some(("serviceRevision.scalingConfig.instanceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.scaling-config.scaling-factor" => Some(("serviceRevision.scalingConfig.scalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "service-revision.scheduled-backup.backup-location" => Some(("serviceRevision.scheduledBackup.backupLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1255,7 +1260,7 @@ where
                     "service-revision.update-time" => Some(("serviceRevision.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "description", "duration", "enabled", "encryption-config", "end-time", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "log-format", "maintenance-window", "metadata-integration", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "restoring-services", "scaling-config", "scaling-factor", "scheduled-backup", "service-revision", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "autoscaling-config", "autoscaling-enabled", "autoscaling-factor", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "deletion-protection", "description", "duration", "enabled", "encryption-config", "end-time", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "limit-config", "log-format", "maintenance-window", "max-scaling-factor", "metadata-integration", "min-scaling-factor", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "restoring-services", "scaling-config", "scaling-factor", "scheduled-backup", "service-revision", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1723,6 +1728,174 @@ where
         }
     }
 
+    async fn _projects_locations_services_cancel_migration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelMigrationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_services_cancel_migration(request, opt.value_of("service").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_services_complete_migration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CompleteMigrationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_services_complete_migration(request, opt.value_of("service").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_services_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1749,6 +1922,7 @@ where
                     "artifact-gcs-uri" => Some(("artifactGcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database-type" => Some(("databaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deletion-protection" => Some(("deletionProtection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "endpoint-uri" => Some(("endpointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hive-metastore-config.config-overrides" => Some(("hiveMetastoreConfig.configOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1766,6 +1940,10 @@ where
                     "network-config.custom-routes-enabled" => Some(("networkConfig.customRoutesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "release-channel" => Some(("releaseChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.autoscaling-enabled" => Some(("scalingConfig.autoscalingConfig.autoscalingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.autoscaling-factor" => Some(("scalingConfig.autoscalingConfig.autoscalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.limit-config.max-scaling-factor" => Some(("scalingConfig.autoscalingConfig.limitConfig.maxScalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.limit-config.min-scaling-factor" => Some(("scalingConfig.autoscalingConfig.limitConfig.minScalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "scaling-config.instance-size" => Some(("scalingConfig.instanceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scaling-config.scaling-factor" => Some(("scalingConfig.scalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "scheduled-backup.backup-location" => Some(("scheduledBackup.backupLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1784,7 +1962,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "duration", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "log-format", "maintenance-window", "metadata-integration", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "scaling-config", "scaling-factor", "scheduled-backup", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "autoscaling-config", "autoscaling-enabled", "autoscaling-factor", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "deletion-protection", "duration", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "limit-config", "log-format", "maintenance-window", "max-scaling-factor", "metadata-integration", "min-scaling-factor", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "scaling-config", "scaling-factor", "scheduled-backup", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2998,6 +3176,123 @@ where
         }
     }
 
+    async fn _projects_locations_services_migration_executions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_services_migration_executions_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_services_migration_executions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_services_migration_executions_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_services_move_table_to_database(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3111,6 +3406,7 @@ where
                     "artifact-gcs-uri" => Some(("artifactGcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database-type" => Some(("databaseType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deletion-protection" => Some(("deletionProtection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "endpoint-uri" => Some(("endpointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hive-metastore-config.config-overrides" => Some(("hiveMetastoreConfig.configOverrides", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -3128,6 +3424,10 @@ where
                     "network-config.custom-routes-enabled" => Some(("networkConfig.customRoutesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "release-channel" => Some(("releaseChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.autoscaling-enabled" => Some(("scalingConfig.autoscalingConfig.autoscalingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.autoscaling-factor" => Some(("scalingConfig.autoscalingConfig.autoscalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.limit-config.max-scaling-factor" => Some(("scalingConfig.autoscalingConfig.limitConfig.maxScalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "scaling-config.autoscaling-config.limit-config.min-scaling-factor" => Some(("scalingConfig.autoscalingConfig.limitConfig.minScalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "scaling-config.instance-size" => Some(("scalingConfig.instanceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scaling-config.scaling-factor" => Some(("scalingConfig.scalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "scheduled-backup.backup-location" => Some(("scheduledBackup.backupLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3146,7 +3446,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "duration", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "log-format", "maintenance-window", "metadata-integration", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "scaling-config", "scaling-factor", "scheduled-backup", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "autoscaling-config", "autoscaling-enabled", "autoscaling-factor", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "deletion-protection", "duration", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "limit-config", "log-format", "maintenance-window", "max-scaling-factor", "metadata-integration", "min-scaling-factor", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "scaling-config", "scaling-factor", "scheduled-backup", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3558,6 +3858,112 @@ where
         }
     }
 
+    async fn _projects_locations_services_start_migration(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "migration-execution.cloud-sql-migration-config.cdc-config.bucket" => Some(("migrationExecution.cloudSqlMigrationConfig.cdcConfig.bucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cdc-config.password" => Some(("migrationExecution.cloudSqlMigrationConfig.cdcConfig.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cdc-config.reverse-proxy-subnet" => Some(("migrationExecution.cloudSqlMigrationConfig.cdcConfig.reverseProxySubnet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cdc-config.root-path" => Some(("migrationExecution.cloudSqlMigrationConfig.cdcConfig.rootPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cdc-config.subnet-ip-range" => Some(("migrationExecution.cloudSqlMigrationConfig.cdcConfig.subnetIpRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cdc-config.username" => Some(("migrationExecution.cloudSqlMigrationConfig.cdcConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cdc-config.vpc-network" => Some(("migrationExecution.cloudSqlMigrationConfig.cdcConfig.vpcNetwork", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.hive-database-name" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.hiveDatabaseName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.instance-connection-name" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.instanceConnectionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.ip-address" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.nat-subnet" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.natSubnet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.password" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.port" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.proxy-subnet" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.proxySubnet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.cloud-sql-migration-config.cloud-sql-connection-config.username" => Some(("migrationExecution.cloudSqlMigrationConfig.cloudSqlConnectionConfig.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.create-time" => Some(("migrationExecution.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.end-time" => Some(("migrationExecution.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.name" => Some(("migrationExecution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.phase" => Some(("migrationExecution.phase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.state" => Some(("migrationExecution.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-execution.state-message" => Some(("migrationExecution.stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "cdc-config", "cloud-sql-connection-config", "cloud-sql-migration-config", "create-time", "end-time", "hive-database-name", "instance-connection-name", "ip-address", "migration-execution", "name", "nat-subnet", "password", "phase", "port", "proxy-subnet", "request-id", "reverse-proxy-subnet", "root-path", "state", "state-message", "subnet-ip-range", "username", "vpc-network"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::StartMigrationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_services_start_migration(request, opt.value_of("service").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_services_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3719,6 +4125,12 @@ where
                     ("locations-services-backups-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_locations_services_backups_test_iam_permissions(opt, dry_run, &mut err).await;
                     },
+                    ("locations-services-cancel-migration", Some(opt)) => {
+                        call_result = self._projects_locations_services_cancel_migration(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-services-complete-migration", Some(opt)) => {
+                        call_result = self._projects_locations_services_complete_migration(opt, dry_run, &mut err).await;
+                    },
                     ("locations-services-create", Some(opt)) => {
                         call_result = self._projects_locations_services_create(opt, dry_run, &mut err).await;
                     },
@@ -3770,6 +4182,12 @@ where
                     ("locations-services-migration-executions-delete", Some(opt)) => {
                         call_result = self._projects_locations_services_migration_executions_delete(opt, dry_run, &mut err).await;
                     },
+                    ("locations-services-migration-executions-get", Some(opt)) => {
+                        call_result = self._projects_locations_services_migration_executions_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-services-migration-executions-list", Some(opt)) => {
+                        call_result = self._projects_locations_services_migration_executions_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-services-move-table-to-database", Some(opt)) => {
                         call_result = self._projects_locations_services_move_table_to_database(opt, dry_run, &mut err).await;
                     },
@@ -3787,6 +4205,9 @@ where
                     },
                     ("locations-services-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_services_set_iam_policy(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-services-start-migration", Some(opt)) => {
+                        call_result = self._projects_locations_services_start_migration(opt, dry_run, &mut err).await;
                     },
                     ("locations-services-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_locations_services_test_iam_permissions(opt, dry_run, &mut err).await;
@@ -3870,7 +4291,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-federations-create', 'locations-federations-delete', 'locations-federations-get', 'locations-federations-get-iam-policy', 'locations-federations-list', 'locations-federations-patch', 'locations-federations-set-iam-policy', 'locations-federations-test-iam-permissions', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-services-alter-location', 'locations-services-alter-table-properties', 'locations-services-backups-create', 'locations-services-backups-delete', 'locations-services-backups-get', 'locations-services-backups-get-iam-policy', 'locations-services-backups-list', 'locations-services-backups-set-iam-policy', 'locations-services-backups-test-iam-permissions', 'locations-services-create', 'locations-services-databases-get-iam-policy', 'locations-services-databases-set-iam-policy', 'locations-services-databases-tables-get-iam-policy', 'locations-services-databases-tables-set-iam-policy', 'locations-services-databases-tables-test-iam-permissions', 'locations-services-databases-test-iam-permissions', 'locations-services-delete', 'locations-services-export-metadata', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-metadata-imports-create', 'locations-services-metadata-imports-get', 'locations-services-metadata-imports-list', 'locations-services-metadata-imports-patch', 'locations-services-migration-executions-delete', 'locations-services-move-table-to-database', 'locations-services-patch', 'locations-services-query-metadata', 'locations-services-remove-iam-policy', 'locations-services-restore', 'locations-services-set-iam-policy' and 'locations-services-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-federations-create', 'locations-federations-delete', 'locations-federations-get', 'locations-federations-get-iam-policy', 'locations-federations-list', 'locations-federations-patch', 'locations-federations-set-iam-policy', 'locations-federations-test-iam-permissions', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-services-alter-location', 'locations-services-alter-table-properties', 'locations-services-backups-create', 'locations-services-backups-delete', 'locations-services-backups-get', 'locations-services-backups-get-iam-policy', 'locations-services-backups-list', 'locations-services-backups-set-iam-policy', 'locations-services-backups-test-iam-permissions', 'locations-services-cancel-migration', 'locations-services-complete-migration', 'locations-services-create', 'locations-services-databases-get-iam-policy', 'locations-services-databases-set-iam-policy', 'locations-services-databases-tables-get-iam-policy', 'locations-services-databases-tables-set-iam-policy', 'locations-services-databases-tables-test-iam-permissions', 'locations-services-databases-test-iam-permissions', 'locations-services-delete', 'locations-services-export-metadata', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-metadata-imports-create', 'locations-services-metadata-imports-get', 'locations-services-metadata-imports-list', 'locations-services-metadata-imports-patch', 'locations-services-migration-executions-delete', 'locations-services-migration-executions-get', 'locations-services-migration-executions-list', 'locations-services-move-table-to-database', 'locations-services-patch', 'locations-services-query-metadata', 'locations-services-remove-iam-policy', 'locations-services-restore', 'locations-services-set-iam-policy', 'locations-services-start-migration' and 'locations-services-test-iam-permissions'", vec![
             ("locations-federations-create",
                     Some(r##"Creates a metastore federation in a project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-federations-create",
@@ -4437,6 +4858,62 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-services-cancel-migration",
+                    Some(r##"Cancels the ongoing Managed Migration process."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-cancel-migration",
+                  vec![
+                    (Some(r##"service"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the metastore service to cancel the ongoing migration to, in the following format:projects/{project_id}/locations/{location_id}/services/{service_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-services-complete-migration",
+                    Some(r##"Completes the managed migration process. The Dataproc Metastore service will switch to using its own backend database after successful migration."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-complete-migration",
+                  vec![
+                    (Some(r##"service"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the metastore service to complete the migration to, in the following format:projects/{project_id}/locations/{location_id}/services/{service_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-services-create",
                     Some(r##"Creates a metastore service in a project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-create",
@@ -4859,6 +5336,50 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-services-migration-executions-get",
+                    Some(r##"Gets details of a single migration execution."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-migration-executions-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the migration execution to retrieve, in the following form:projects/{project_number}/locations/{location_id}/services/{service_id}/migrationExecutions/{migration_execution_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-services-migration-executions-list",
+                    Some(r##"Lists migration executions on a service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-migration-executions-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the service whose migration executions to list, in the following form:projects/{project_number}/locations/{location_id}/services/{service_id}/migrationExecutions."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-services-move-table-to-database",
                     Some(r##"Move a table to another database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-move-table-to-database",
@@ -4916,7 +5437,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-services-query-metadata",
-                    Some(r##"Query DPMS metadata."##),
+                    Some(r##"Query Dataproc Metastore metadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-query-metadata",
                   vec![
                     (Some(r##"service"##),
@@ -5027,6 +5548,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-services-start-migration",
+                    Some(r##"Starts the Managed Migration process."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-start-migration",
+                  vec![
+                    (Some(r##"service"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the metastore service to start migrating to, in the following format:projects/{project_id}/locations/{location_id}/services/{service_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-services-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-test-iam-permissions",
@@ -5061,7 +5610,7 @@ async fn main() {
     
     let mut app = App::new("metastore1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240228")
+           .version("5.0.5+20240613")
            .about("The Dataproc Metastore API is used to manage the lifecycle and configuration of metastore services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli")
            .arg(Arg::with_name("url")
@@ -5125,6 +5674,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

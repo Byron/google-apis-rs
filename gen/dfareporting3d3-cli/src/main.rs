@@ -23708,7 +23708,7 @@ async fn main() {
     
     let mut app = App::new("dfareporting3d3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20220104")
+           .version("5.0.5+20220104")
            .about("Build applications to efficiently manage large or complex trafficking, reporting, and attribution workflows for Campaign Manager 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting3d3_cli")
            .arg(Arg::with_name("url")
@@ -23783,6 +23783,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

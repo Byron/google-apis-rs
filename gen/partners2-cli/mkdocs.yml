@@ -1,4 +1,4 @@
-site_name: Partners v5.0.4+20180925
+site_name: Partners v5.0.5+20180925
 site_url: http://byron.github.io/google-apis-rs/google-partners2-cli
 site_description: A complete library to interact with Partners (protocol v2)
 
@@ -38,5 +38,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

@@ -1,4 +1,4 @@
-site_name: calendar v5.0.4+20240223
+site_name: calendar v5.0.5+20240523
 site_url: http://byron.github.io/google-apis-rs/google-calendar3-cli
 site_description: A complete library to interact with calendar (protocol v3)
 
@@ -57,5 +57,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

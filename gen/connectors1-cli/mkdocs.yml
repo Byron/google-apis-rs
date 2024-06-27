@@ -1,4 +1,4 @@
-site_name: Connectors v5.0.4+20240221
+site_name: Connectors v5.0.5+20240619
 site_url: http://byron.github.io/google-apis-rs/google-connectors1-cli
 site_description: A complete library to interact with Connectors (protocol v1)
 
@@ -32,8 +32,12 @@ nav:
     - 'Locations Connections Repair Eventing': 'projects_locations-connections-repair-eventing.md'
     - 'Locations Connections Runtime Action Schemas List': 'projects_locations-connections-runtime-action-schemas-list.md'
     - 'Locations Connections Runtime Entity Schemas List': 'projects_locations-connections-runtime-entity-schemas-list.md'
+    - 'Locations Connections Search': 'projects_locations-connections-search.md'
     - 'Locations Connections Set Iam Policy': 'projects_locations-connections-set-iam-policy.md'
     - 'Locations Connections Test Iam Permissions': 'projects_locations-connections-test-iam-permissions.md'
+    - 'Locations Custom Connectors Custom Connector Versions Delete': 'projects_locations-custom-connectors-custom-connector-versions-delete.md'
+    - 'Locations Custom Connectors Custom Connector Versions Deprecate': 'projects_locations-custom-connectors-custom-connector-versions-deprecate.md'
+    - 'Locations Custom Connectors Validate Custom Connector Spec': 'projects_locations-custom-connectors-validate-custom-connector-spec.md'
     - 'Locations Endpoint Attachments Create': 'projects_locations-endpoint-attachments-create.md'
     - 'Locations Endpoint Attachments Delete': 'projects_locations-endpoint-attachments-delete.md'
     - 'Locations Endpoint Attachments Get': 'projects_locations-endpoint-attachments-get.md'
@@ -44,10 +48,8 @@ nav:
     - 'Locations Get Runtime Config': 'projects_locations-get-runtime-config.md'
     - 'Locations Global Custom Connectors Create': 'projects_locations-global-custom-connectors-create.md'
     - 'Locations Global Custom Connectors Custom Connector Versions Create': 'projects_locations-global-custom-connectors-custom-connector-versions-create.md'
-    - 'Locations Global Custom Connectors Custom Connector Versions Delete': 'projects_locations-global-custom-connectors-custom-connector-versions-delete.md'
     - 'Locations Global Custom Connectors Custom Connector Versions Get': 'projects_locations-global-custom-connectors-custom-connector-versions-get.md'
     - 'Locations Global Custom Connectors Custom Connector Versions List': 'projects_locations-global-custom-connectors-custom-connector-versions-list.md'
-    - 'Locations Global Custom Connectors Custom Connector Versions Patch': 'projects_locations-global-custom-connectors-custom-connector-versions-patch.md'
     - 'Locations Global Custom Connectors Delete': 'projects_locations-global-custom-connectors-delete.md'
     - 'Locations Global Custom Connectors Get': 'projects_locations-global-custom-connectors-get.md'
     - 'Locations Global Custom Connectors List': 'projects_locations-global-custom-connectors-list.md'
@@ -79,5 +81,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

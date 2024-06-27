@@ -189,15 +189,22 @@ where
                 match &temp_cursor.to_string()[..] {
                     "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.endpointer-sensitivity" => Some(("advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.models" => Some(("advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "advanced-settings.speech-settings.no-speech-timeout" => Some(("advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "answer-feedback-settings.enable-answer-feedback" => Some(("answerFeedbackSettings.enableAnswerFeedback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "avatar-uri" => Some(("avatarUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-language-code" => Some(("defaultLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enable-multi-language-training" => Some(("enableMultiLanguageTraining", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-spell-correction" => Some(("enableSpellCorrection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-stackdriver-logging" => Some(("enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gen-app-builder-settings.engine" => Some(("genAppBuilderSettings.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -214,7 +221,7 @@ where
                     "supported-language-codes" => Some(("supportedLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "advanced-settings", "answer-feedback-settings", "audio-export-gcs-destination", "avatar-uri", "branches", "default-language-code", "description", "display-name", "dtmf-settings", "enable-answer-feedback", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "enabled", "engine", "finish-digit", "gen-app-builder-settings", "git-integration-settings", "github-settings", "locked", "logging-settings", "max-digits", "name", "repository-uri", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone", "tracking-branch", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "advanced-settings", "answer-feedback-settings", "audio-export-gcs-destination", "avatar-uri", "branches", "default-language-code", "description", "display-name", "dtmf-settings", "enable-answer-feedback", "enable-interaction-logging", "enable-multi-language-training", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "enabled", "endpointer-sensitivity", "endpointing-timeout-duration", "engine", "finish-digit", "gen-app-builder-settings", "git-integration-settings", "github-settings", "interdigit-timeout-duration", "locked", "logging-settings", "max-digits", "models", "name", "no-speech-timeout", "repository-uri", "security-settings", "speech-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone", "tracking-branch", "uri", "use-timeout-based-endpointing"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2207,11 +2214,12 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.populate-data-store-connection-signals" => Some(("queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "populate-data-store-connection-signals", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2668,6 +2676,7 @@ where
                     "match-intent-request.query-params.flow-versions" => Some(("matchIntentRequest.queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "match-intent-request.query-params.geo-location.latitude" => Some(("matchIntentRequest.queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.geo-location.longitude" => Some(("matchIntentRequest.queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-params.populate-data-store-connection-signals" => Some(("matchIntentRequest.queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.session-ttl" => Some(("matchIntentRequest.queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.time-zone" => Some(("matchIntentRequest.queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.webhook-headers" => Some(("matchIntentRequest.queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -2680,7 +2689,7 @@ where
                     "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "persist-parameter-changes", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "persist-parameter-changes", "phrase-hints", "pitch", "populate-data-store-connection-signals", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2788,11 +2797,12 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.populate-data-store-connection-signals" => Some(("queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "no-barge-in-duration", "opt-out-conformer-model-migration", "persist-parameter-changes", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "text", "time-zone", "total-duration", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "no-barge-in-duration", "opt-out-conformer-model-migration", "persist-parameter-changes", "phrase-hints", "populate-data-store-connection-signals", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "text", "time-zone", "total-duration", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2907,11 +2917,12 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.populate-data-store-connection-signals" => Some(("queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "populate-data-store-connection-signals", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3086,10 +3097,16 @@ where
                 match &temp_cursor.to_string()[..] {
                     "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.endpointer-sensitivity" => Some(("advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.models" => Some(("advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "advanced-settings.speech-settings.no-speech-timeout" => Some(("advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.enabled" => Some(("knowledgeConnectorSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3097,21 +3114,29 @@ where
                     "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.endpointer-sensitivity" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.models" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.no-speech-timeout" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.webhook" => Some(("knowledgeConnectorSettings.triggerFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "multi-language-settings.enable-multi-language-detection" => Some(("multiLanguageSettings.enableMultiLanguageDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "multi-language-settings.supported-response-language-codes" => Some(("multiLanguageSettings.supportedResponseLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.classification-threshold" => Some(("nluSettings.classificationThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "nlu-settings.model-training-mode" => Some(("nluSettings.modelTrainingMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.model-type" => Some(("nluSettings.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "classification-threshold", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "model-training-mode", "model-type", "name", "nlu-settings", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "classification-threshold", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-multi-language-detection", "enable-stackdriver-logging", "enabled", "endpointer-sensitivity", "endpointing-timeout-duration", "finish-digit", "interdigit-timeout-duration", "knowledge-connector-settings", "logging-settings", "max-digits", "model-training-mode", "model-type", "models", "multi-language-settings", "name", "nlu-settings", "no-speech-timeout", "return-partial-responses", "speech-settings", "supported-response-language-codes", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "use-timeout-based-endpointing", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3604,18 +3629,30 @@ where
                 match &temp_cursor.to_string()[..] {
                     "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.endpointer-sensitivity" => Some(("advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.models" => Some(("advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "advanced-settings.speech-settings.no-speech-timeout" => Some(("advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("entryFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("entryFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("entryFulfillment.advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("entryFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("entryFulfillment.advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("entryFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.speech-settings.endpointer-sensitivity" => Some(("entryFulfillment.advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.speech-settings.models" => Some(("entryFulfillment.advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "entry-fulfillment.advanced-settings.speech-settings.no-speech-timeout" => Some(("entryFulfillment.advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("entryFulfillment.advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.enable-generative-fallback" => Some(("entryFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.return-partial-responses" => Some(("entryFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.tag" => Some(("entryFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3625,10 +3662,16 @@ where
                     "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.endpointer-sensitivity" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.models" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.no-speech-timeout" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3636,7 +3679,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "entry-fulfillment", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "name", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "endpointer-sensitivity", "endpointing-timeout-duration", "entry-fulfillment", "finish-digit", "interdigit-timeout-duration", "knowledge-connector-settings", "logging-settings", "max-digits", "models", "name", "no-speech-timeout", "return-partial-responses", "speech-settings", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "use-timeout-based-endpointing", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3899,18 +3942,30 @@ where
                 match &temp_cursor.to_string()[..] {
                     "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.endpointer-sensitivity" => Some(("advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.models" => Some(("advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "advanced-settings.speech-settings.no-speech-timeout" => Some(("advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("entryFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("entryFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("entryFulfillment.advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("entryFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("entryFulfillment.advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("entryFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.speech-settings.endpointer-sensitivity" => Some(("entryFulfillment.advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.speech-settings.models" => Some(("entryFulfillment.advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "entry-fulfillment.advanced-settings.speech-settings.no-speech-timeout" => Some(("entryFulfillment.advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("entryFulfillment.advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.enable-generative-fallback" => Some(("entryFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.return-partial-responses" => Some(("entryFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.tag" => Some(("entryFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3920,10 +3975,16 @@ where
                     "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.endpointer-sensitivity" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.models" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.no-speech-timeout" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3931,7 +3992,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "entry-fulfillment", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "name", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "endpointer-sensitivity", "endpointing-timeout-duration", "entry-fulfillment", "finish-digit", "interdigit-timeout-duration", "knowledge-connector-settings", "logging-settings", "max-digits", "models", "name", "no-speech-timeout", "return-partial-responses", "speech-settings", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "use-timeout-based-endpointing", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4023,10 +4084,16 @@ where
                 match &temp_cursor.to_string()[..] {
                     "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.endpointer-sensitivity" => Some(("advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.models" => Some(("advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "advanced-settings.speech-settings.no-speech-timeout" => Some(("advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.enabled" => Some(("knowledgeConnectorSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -4034,21 +4101,29 @@ where
                     "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.endpointer-sensitivity" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.models" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.no-speech-timeout" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "knowledge-connector-settings.trigger-fulfillment.webhook" => Some(("knowledgeConnectorSettings.triggerFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "multi-language-settings.enable-multi-language-detection" => Some(("multiLanguageSettings.enableMultiLanguageDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "multi-language-settings.supported-response-language-codes" => Some(("multiLanguageSettings.supportedResponseLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.classification-threshold" => Some(("nluSettings.classificationThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "nlu-settings.model-training-mode" => Some(("nluSettings.modelTrainingMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.model-type" => Some(("nluSettings.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "classification-threshold", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "model-training-mode", "model-type", "name", "nlu-settings", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "classification-threshold", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-multi-language-detection", "enable-stackdriver-logging", "enabled", "endpointer-sensitivity", "endpointing-timeout-duration", "finish-digit", "interdigit-timeout-duration", "knowledge-connector-settings", "logging-settings", "max-digits", "model-training-mode", "model-type", "models", "multi-language-settings", "name", "nlu-settings", "no-speech-timeout", "return-partial-responses", "speech-settings", "supported-response-language-codes", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "use-timeout-based-endpointing", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6309,15 +6384,22 @@ where
                 match &temp_cursor.to_string()[..] {
                     "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.endpointing-timeout-duration" => Some(("advancedSettings.dtmfSettings.endpointingTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.interdigit-timeout-duration" => Some(("advancedSettings.dtmfSettings.interdigitTimeoutDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.endpointer-sensitivity" => Some(("advancedSettings.speechSettings.endpointerSensitivity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.models" => Some(("advancedSettings.speechSettings.models", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "advanced-settings.speech-settings.no-speech-timeout" => Some(("advancedSettings.speechSettings.noSpeechTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.speech-settings.use-timeout-based-endpointing" => Some(("advancedSettings.speechSettings.useTimeoutBasedEndpointing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "answer-feedback-settings.enable-answer-feedback" => Some(("answerFeedbackSettings.enableAnswerFeedback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "avatar-uri" => Some(("avatarUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-language-code" => Some(("defaultLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enable-multi-language-training" => Some(("enableMultiLanguageTraining", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-spell-correction" => Some(("enableSpellCorrection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-stackdriver-logging" => Some(("enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "gen-app-builder-settings.engine" => Some(("genAppBuilderSettings.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6334,7 +6416,7 @@ where
                     "supported-language-codes" => Some(("supportedLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "advanced-settings", "answer-feedback-settings", "audio-export-gcs-destination", "avatar-uri", "branches", "default-language-code", "description", "display-name", "dtmf-settings", "enable-answer-feedback", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "enabled", "engine", "finish-digit", "gen-app-builder-settings", "git-integration-settings", "github-settings", "locked", "logging-settings", "max-digits", "name", "repository-uri", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone", "tracking-branch", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "advanced-settings", "answer-feedback-settings", "audio-export-gcs-destination", "avatar-uri", "branches", "default-language-code", "description", "display-name", "dtmf-settings", "enable-answer-feedback", "enable-interaction-logging", "enable-multi-language-training", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "enabled", "endpointer-sensitivity", "endpointing-timeout-duration", "engine", "finish-digit", "gen-app-builder-settings", "git-integration-settings", "github-settings", "interdigit-timeout-duration", "locked", "logging-settings", "max-digits", "models", "name", "no-speech-timeout", "repository-uri", "security-settings", "speech-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone", "tracking-branch", "uri", "use-timeout-based-endpointing"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6541,11 +6623,12 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.populate-data-store-connection-signals" => Some(("queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "populate-data-store-connection-signals", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7002,6 +7085,7 @@ where
                     "match-intent-request.query-params.flow-versions" => Some(("matchIntentRequest.queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "match-intent-request.query-params.geo-location.latitude" => Some(("matchIntentRequest.queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.geo-location.longitude" => Some(("matchIntentRequest.queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-params.populate-data-store-connection-signals" => Some(("matchIntentRequest.queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.session-ttl" => Some(("matchIntentRequest.queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.time-zone" => Some(("matchIntentRequest.queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.webhook-headers" => Some(("matchIntentRequest.queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -7014,7 +7098,7 @@ where
                     "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "persist-parameter-changes", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "persist-parameter-changes", "phrase-hints", "pitch", "populate-data-store-connection-signals", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7122,11 +7206,12 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.populate-data-store-connection-signals" => Some(("queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "no-barge-in-duration", "opt-out-conformer-model-migration", "persist-parameter-changes", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "text", "time-zone", "total-duration", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "no-barge-in-duration", "opt-out-conformer-model-migration", "persist-parameter-changes", "phrase-hints", "populate-data-store-connection-signals", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "text", "time-zone", "total-duration", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7241,11 +7326,12 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.populate-data-store-connection-signals" => Some(("queryParams.populateDataStoreConnectionSignals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "populate-data-store-connection-signals", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8870,27 +8956,37 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.allowed-ca-certs" => Some(("genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "generic-web-service.http-method" => Some(("genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.oauth-config.client-id" => Some(("genericWebService.oauthConfig.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.oauth-config.client-secret" => Some(("genericWebService.oauthConfig.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.oauth-config.scopes" => Some(("genericWebService.oauthConfig.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "generic-web-service.oauth-config.token-endpoint" => Some(("genericWebService.oauthConfig.tokenEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.parameter-mapping" => Some(("genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "generic-web-service.password" => Some(("genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.request-body" => Some(("genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.request-headers" => Some(("genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "generic-web-service.service-agent-auth" => Some(("genericWebService.serviceAgentAuth", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.uri" => Some(("genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.username" => Some(("genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.webhook-type" => Some(("genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.allowed-ca-certs" => Some(("serviceDirectory.genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "service-directory.generic-web-service.http-method" => Some(("serviceDirectory.genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.oauth-config.client-id" => Some(("serviceDirectory.genericWebService.oauthConfig.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.oauth-config.client-secret" => Some(("serviceDirectory.genericWebService.oauthConfig.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.oauth-config.scopes" => Some(("serviceDirectory.genericWebService.oauthConfig.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-directory.generic-web-service.oauth-config.token-endpoint" => Some(("serviceDirectory.genericWebService.oauthConfig.tokenEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.parameter-mapping" => Some(("serviceDirectory.genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-directory.generic-web-service.password" => Some(("serviceDirectory.genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.request-body" => Some(("serviceDirectory.genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.request-headers" => Some(("serviceDirectory.genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "service-directory.generic-web-service.service-agent-auth" => Some(("serviceDirectory.genericWebService.serviceAgentAuth", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.uri" => Some(("serviceDirectory.genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.username" => Some(("serviceDirectory.genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.webhook-type" => Some(("serviceDirectory.genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.service" => Some(("serviceDirectory.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "disabled", "display-name", "generic-web-service", "http-method", "name", "parameter-mapping", "password", "request-body", "request-headers", "service", "service-directory", "timeout", "uri", "username", "webhook-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "client-id", "client-secret", "disabled", "display-name", "generic-web-service", "http-method", "name", "oauth-config", "parameter-mapping", "password", "request-body", "request-headers", "scopes", "service", "service-agent-auth", "service-directory", "timeout", "token-endpoint", "uri", "username", "webhook-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9144,27 +9240,37 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.allowed-ca-certs" => Some(("genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "generic-web-service.http-method" => Some(("genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.oauth-config.client-id" => Some(("genericWebService.oauthConfig.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.oauth-config.client-secret" => Some(("genericWebService.oauthConfig.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.oauth-config.scopes" => Some(("genericWebService.oauthConfig.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "generic-web-service.oauth-config.token-endpoint" => Some(("genericWebService.oauthConfig.tokenEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.parameter-mapping" => Some(("genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "generic-web-service.password" => Some(("genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.request-body" => Some(("genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.request-headers" => Some(("genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "generic-web-service.service-agent-auth" => Some(("genericWebService.serviceAgentAuth", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.uri" => Some(("genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.username" => Some(("genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.webhook-type" => Some(("genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.allowed-ca-certs" => Some(("serviceDirectory.genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "service-directory.generic-web-service.http-method" => Some(("serviceDirectory.genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.oauth-config.client-id" => Some(("serviceDirectory.genericWebService.oauthConfig.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.oauth-config.client-secret" => Some(("serviceDirectory.genericWebService.oauthConfig.clientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.oauth-config.scopes" => Some(("serviceDirectory.genericWebService.oauthConfig.scopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-directory.generic-web-service.oauth-config.token-endpoint" => Some(("serviceDirectory.genericWebService.oauthConfig.tokenEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.parameter-mapping" => Some(("serviceDirectory.genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-directory.generic-web-service.password" => Some(("serviceDirectory.genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.request-body" => Some(("serviceDirectory.genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.request-headers" => Some(("serviceDirectory.genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "service-directory.generic-web-service.service-agent-auth" => Some(("serviceDirectory.genericWebService.serviceAgentAuth", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.uri" => Some(("serviceDirectory.genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.username" => Some(("serviceDirectory.genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.webhook-type" => Some(("serviceDirectory.genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.service" => Some(("serviceDirectory.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "disabled", "display-name", "generic-web-service", "http-method", "name", "parameter-mapping", "password", "request-body", "request-headers", "service", "service-directory", "timeout", "uri", "username", "webhook-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "client-id", "client-secret", "disabled", "display-name", "generic-web-service", "http-method", "name", "oauth-config", "parameter-mapping", "password", "request-body", "request-headers", "scopes", "service", "service-agent-auth", "service-directory", "timeout", "token-endpoint", "uri", "username", "webhook-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9535,6 +9641,7 @@ where
                     "audio-export-settings.audio-format" => Some(("audioExportSettings.audioFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-export-settings.enable-audio-redaction" => Some(("audioExportSettings.enableAudioRedaction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audio-export-settings.gcs-bucket" => Some(("audioExportSettings.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-export-settings.store-tts-audio" => Some(("audioExportSettings.storeTtsAudio", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "deidentify-template" => Some(("deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insights-export-settings.enable-insights-export" => Some(("insightsExportSettings.enableInsightsExport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -9546,7 +9653,7 @@ where
                     "retention-strategy" => Some(("retentionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-window-days" => Some(("retentionWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-strategy", "retention-window-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-strategy", "retention-window-days", "store-tts-audio"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9796,6 +9903,7 @@ where
                     "audio-export-settings.audio-format" => Some(("audioExportSettings.audioFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-export-settings.enable-audio-redaction" => Some(("audioExportSettings.enableAudioRedaction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "audio-export-settings.gcs-bucket" => Some(("audioExportSettings.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audio-export-settings.store-tts-audio" => Some(("audioExportSettings.storeTtsAudio", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "deidentify-template" => Some(("deidentifyTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "insights-export-settings.enable-insights-export" => Some(("insightsExportSettings.enableInsightsExport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -9807,7 +9915,7 @@ where
                     "retention-strategy" => Some(("retentionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-window-days" => Some(("retentionWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-strategy", "retention-window-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-strategy", "retention-window-days", "store-tts-audio"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13789,7 +13897,7 @@ async fn main() {
     
     let mut app = App::new("dialogflow3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240227")
+           .version("5.0.5+20240614")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow3_cli")
            .arg(Arg::with_name("url")
@@ -13853,6 +13961,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

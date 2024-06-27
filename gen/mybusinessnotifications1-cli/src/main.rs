@@ -336,7 +336,7 @@ async fn main() {
     
     let mut app = App::new("mybusinessnotifications1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240304")
+           .version("5.0.5+20240625")
            .about("The My Business Notification Settings API enables managing notification settings for business accounts. Note - If you have a quota of 0 after enabling the API, please request for GBP API access.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusinessnotifications1_cli")
            .arg(Arg::with_name("folder")
@@ -395,6 +395,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

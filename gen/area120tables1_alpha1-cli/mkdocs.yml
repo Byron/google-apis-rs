@@ -1,4 +1,4 @@
-site_name: Area120 Tables v5.0.4+20240304
+site_name: Area120 Tables v5.0.5+20240625
 site_url: http://byron.github.io/google-apis-rs/google-area120tables1_alpha1-cli
 site_description: A complete library to interact with Area120 Tables (protocol v1alpha1)
 
@@ -26,5 +26,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

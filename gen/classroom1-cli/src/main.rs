@@ -246,6 +246,379 @@ where
         }
     }
 
+    async fn _courses_announcements_add_on_attachments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().announcements_add_on_attachments_create(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_announcements_add_on_attachments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().announcements_add_on_attachments_delete(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_announcements_add_on_attachments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().announcements_add_on_attachments_get(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_announcements_add_on_attachments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().announcements_add_on_attachments_list(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_announcements_add_on_attachments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().announcements_add_on_attachments_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _courses_announcements_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -425,6 +798,65 @@ where
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_announcements_get_add_on_context(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().announcements_get_add_on_context(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "attachment-id" => {
+                    call = call.attachment_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "attachment-id", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -696,6 +1128,525 @@ where
         }
     }
 
+    async fn _courses_course_work_add_on_attachments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().course_work_add_on_attachments_create(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_add_on_attachments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_add_on_attachments_delete(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_add_on_attachments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_add_on_attachments_get(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_add_on_attachments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_add_on_attachments_list(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_add_on_attachments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().course_work_add_on_attachments_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_add_on_attachments_student_submissions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_add_on_attachments_student_submissions_get(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""), opt.value_of("submission-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_add_on_attachments_student_submissions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "points-earned" => Some(("pointsEarned", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-submission-state" => Some(("postSubmissionState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["points-earned", "post-submission-state"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachmentStudentSubmission = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().course_work_add_on_attachments_student_submissions_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""), opt.value_of("submission-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _courses_course_work_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -896,6 +1847,65 @@ where
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_get_add_on_context(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_get_add_on_context(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "attachment-id" => {
+                    call = call.attachment_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "attachment-id", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1747,6 +2757,379 @@ where
         }
     }
 
+    async fn _courses_course_work_materials_add_on_attachments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().course_work_materials_add_on_attachments_create(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_materials_add_on_attachments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_materials_add_on_attachments_delete(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_materials_add_on_attachments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_materials_add_on_attachments_get(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_materials_add_on_attachments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_materials_add_on_attachments_list(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_materials_add_on_attachments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().course_work_materials_add_on_attachments_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["post-id", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _courses_course_work_materials_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1928,6 +3311,65 @@ where
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_course_work_materials_get_add_on_context(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().course_work_materials_get_add_on_context(opt.value_of("course-id").unwrap_or(""), opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "post-id" => {
+                    call = call.post_id(value.unwrap_or(""));
+                },
+                "attachment-id" => {
+                    call = call.attachment_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "attachment-id", "post-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -2486,6 +3928,584 @@ where
             for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
                 call = call.add_scope(scope);
             }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_add_on_attachments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().posts_add_on_attachments_create(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "item-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_add_on_attachments_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().posts_add_on_attachments_delete(opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["item-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_add_on_attachments_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().posts_add_on_attachments_get(opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["item-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_add_on_attachments_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().posts_add_on_attachments_list(opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["item-id", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_add_on_attachments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.minutes" => Some(("dueTime.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "item-id" => Some(("itemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-id" => Some(("postId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-view-uri.uri" => Some(("studentViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "student-work-review-uri.uri" => Some(("studentWorkReviewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "teacher-view-uri.uri" => Some(("teacherViewUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "day", "due-date", "due-time", "hours", "id", "item-id", "max-points", "minutes", "month", "nanos", "post-id", "seconds", "student-view-uri", "student-work-review-uri", "teacher-view-uri", "title", "uri", "year"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachment = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().posts_add_on_attachments_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["item-id", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_add_on_attachments_student_submissions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().posts_add_on_attachments_student_submissions_get(opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""), opt.value_of("submission-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["item-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_add_on_attachments_student_submissions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "points-earned" => Some(("pointsEarned", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "post-submission-state" => Some(("postSubmissionState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["points-earned", "post-submission-state"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddOnAttachmentStudentSubmission = json::value::from_value(object).unwrap();
+        let mut call = self.hub.courses().posts_add_on_attachments_student_submissions_patch(request, opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""), opt.value_of("submission-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["item-id", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _courses_posts_get_add_on_context(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.courses().posts_get_add_on_context(opt.value_of("course-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "item-id" => {
+                    call = call.item_id(value.unwrap_or(""));
+                },
+                "attachment-id" => {
+                    call = call.attachment_id(value.unwrap_or(""));
+                },
+                "add-on-token" => {
+                    call = call.add_on_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["add-on-token", "attachment-id", "item-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -4457,6 +6477,21 @@ where
                     ("aliases-list", Some(opt)) => {
                         call_result = self._courses_aliases_list(opt, dry_run, &mut err).await;
                     },
+                    ("announcements-add-on-attachments-create", Some(opt)) => {
+                        call_result = self._courses_announcements_add_on_attachments_create(opt, dry_run, &mut err).await;
+                    },
+                    ("announcements-add-on-attachments-delete", Some(opt)) => {
+                        call_result = self._courses_announcements_add_on_attachments_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("announcements-add-on-attachments-get", Some(opt)) => {
+                        call_result = self._courses_announcements_add_on_attachments_get(opt, dry_run, &mut err).await;
+                    },
+                    ("announcements-add-on-attachments-list", Some(opt)) => {
+                        call_result = self._courses_announcements_add_on_attachments_list(opt, dry_run, &mut err).await;
+                    },
+                    ("announcements-add-on-attachments-patch", Some(opt)) => {
+                        call_result = self._courses_announcements_add_on_attachments_patch(opt, dry_run, &mut err).await;
+                    },
                     ("announcements-create", Some(opt)) => {
                         call_result = self._courses_announcements_create(opt, dry_run, &mut err).await;
                     },
@@ -4465,6 +6500,9 @@ where
                     },
                     ("announcements-get", Some(opt)) => {
                         call_result = self._courses_announcements_get(opt, dry_run, &mut err).await;
+                    },
+                    ("announcements-get-add-on-context", Some(opt)) => {
+                        call_result = self._courses_announcements_get_add_on_context(opt, dry_run, &mut err).await;
                     },
                     ("announcements-list", Some(opt)) => {
                         call_result = self._courses_announcements_list(opt, dry_run, &mut err).await;
@@ -4475,6 +6513,27 @@ where
                     ("announcements-patch", Some(opt)) => {
                         call_result = self._courses_announcements_patch(opt, dry_run, &mut err).await;
                     },
+                    ("course-work-add-on-attachments-create", Some(opt)) => {
+                        call_result = self._courses_course_work_add_on_attachments_create(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-add-on-attachments-delete", Some(opt)) => {
+                        call_result = self._courses_course_work_add_on_attachments_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-add-on-attachments-get", Some(opt)) => {
+                        call_result = self._courses_course_work_add_on_attachments_get(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-add-on-attachments-list", Some(opt)) => {
+                        call_result = self._courses_course_work_add_on_attachments_list(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-add-on-attachments-patch", Some(opt)) => {
+                        call_result = self._courses_course_work_add_on_attachments_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-add-on-attachments-student-submissions-get", Some(opt)) => {
+                        call_result = self._courses_course_work_add_on_attachments_student_submissions_get(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-add-on-attachments-student-submissions-patch", Some(opt)) => {
+                        call_result = self._courses_course_work_add_on_attachments_student_submissions_patch(opt, dry_run, &mut err).await;
+                    },
                     ("course-work-create", Some(opt)) => {
                         call_result = self._courses_course_work_create(opt, dry_run, &mut err).await;
                     },
@@ -4483,6 +6542,9 @@ where
                     },
                     ("course-work-get", Some(opt)) => {
                         call_result = self._courses_course_work_get(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-get-add-on-context", Some(opt)) => {
+                        call_result = self._courses_course_work_get_add_on_context(opt, dry_run, &mut err).await;
                     },
                     ("course-work-list", Some(opt)) => {
                         call_result = self._courses_course_work_list(opt, dry_run, &mut err).await;
@@ -4514,6 +6576,21 @@ where
                     ("course-work-student-submissions-turn-in", Some(opt)) => {
                         call_result = self._courses_course_work_student_submissions_turn_in(opt, dry_run, &mut err).await;
                     },
+                    ("course-work-materials-add-on-attachments-create", Some(opt)) => {
+                        call_result = self._courses_course_work_materials_add_on_attachments_create(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-materials-add-on-attachments-delete", Some(opt)) => {
+                        call_result = self._courses_course_work_materials_add_on_attachments_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-materials-add-on-attachments-get", Some(opt)) => {
+                        call_result = self._courses_course_work_materials_add_on_attachments_get(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-materials-add-on-attachments-list", Some(opt)) => {
+                        call_result = self._courses_course_work_materials_add_on_attachments_list(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-materials-add-on-attachments-patch", Some(opt)) => {
+                        call_result = self._courses_course_work_materials_add_on_attachments_patch(opt, dry_run, &mut err).await;
+                    },
                     ("course-work-materials-create", Some(opt)) => {
                         call_result = self._courses_course_work_materials_create(opt, dry_run, &mut err).await;
                     },
@@ -4522,6 +6599,9 @@ where
                     },
                     ("course-work-materials-get", Some(opt)) => {
                         call_result = self._courses_course_work_materials_get(opt, dry_run, &mut err).await;
+                    },
+                    ("course-work-materials-get-add-on-context", Some(opt)) => {
+                        call_result = self._courses_course_work_materials_get_add_on_context(opt, dry_run, &mut err).await;
                     },
                     ("course-work-materials-list", Some(opt)) => {
                         call_result = self._courses_course_work_materials_list(opt, dry_run, &mut err).await;
@@ -4543,6 +6623,30 @@ where
                     },
                     ("patch", Some(opt)) => {
                         call_result = self._courses_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-add-on-attachments-create", Some(opt)) => {
+                        call_result = self._courses_posts_add_on_attachments_create(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-add-on-attachments-delete", Some(opt)) => {
+                        call_result = self._courses_posts_add_on_attachments_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-add-on-attachments-get", Some(opt)) => {
+                        call_result = self._courses_posts_add_on_attachments_get(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-add-on-attachments-list", Some(opt)) => {
+                        call_result = self._courses_posts_add_on_attachments_list(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-add-on-attachments-patch", Some(opt)) => {
+                        call_result = self._courses_posts_add_on_attachments_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-add-on-attachments-student-submissions-get", Some(opt)) => {
+                        call_result = self._courses_posts_add_on_attachments_student_submissions_get(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-add-on-attachments-student-submissions-patch", Some(opt)) => {
+                        call_result = self._courses_posts_add_on_attachments_student_submissions_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("posts-get-add-on-context", Some(opt)) => {
+                        call_result = self._courses_posts_get_add_on_context(opt, dry_run, &mut err).await;
                     },
                     ("students-create", Some(opt)) => {
                         call_result = self._courses_students_create(opt, dry_run, &mut err).await;
@@ -4734,7 +6838,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("courses", "methods: 'aliases-create', 'aliases-delete', 'aliases-list', 'announcements-create', 'announcements-delete', 'announcements-get', 'announcements-list', 'announcements-modify-assignees', 'announcements-patch', 'course-work-create', 'course-work-delete', 'course-work-get', 'course-work-list', 'course-work-modify-assignees', 'course-work-patch', 'course-work-student-submissions-get', 'course-work-student-submissions-list', 'course-work-student-submissions-modify-attachments', 'course-work-student-submissions-patch', 'course-work-student-submissions-reclaim', 'course-work-student-submissions-return', 'course-work-student-submissions-turn-in', 'course-work-materials-create', 'course-work-materials-delete', 'course-work-materials-get', 'course-work-materials-list', 'course-work-materials-patch', 'create', 'delete', 'get', 'list', 'patch', 'students-create', 'students-delete', 'students-get', 'students-list', 'teachers-create', 'teachers-delete', 'teachers-get', 'teachers-list', 'topics-create', 'topics-delete', 'topics-get', 'topics-list', 'topics-patch' and 'update'", vec![
+        ("courses", "methods: 'aliases-create', 'aliases-delete', 'aliases-list', 'announcements-add-on-attachments-create', 'announcements-add-on-attachments-delete', 'announcements-add-on-attachments-get', 'announcements-add-on-attachments-list', 'announcements-add-on-attachments-patch', 'announcements-create', 'announcements-delete', 'announcements-get', 'announcements-get-add-on-context', 'announcements-list', 'announcements-modify-assignees', 'announcements-patch', 'course-work-add-on-attachments-create', 'course-work-add-on-attachments-delete', 'course-work-add-on-attachments-get', 'course-work-add-on-attachments-list', 'course-work-add-on-attachments-patch', 'course-work-add-on-attachments-student-submissions-get', 'course-work-add-on-attachments-student-submissions-patch', 'course-work-create', 'course-work-delete', 'course-work-get', 'course-work-get-add-on-context', 'course-work-list', 'course-work-modify-assignees', 'course-work-patch', 'course-work-student-submissions-get', 'course-work-student-submissions-list', 'course-work-student-submissions-modify-attachments', 'course-work-student-submissions-patch', 'course-work-student-submissions-reclaim', 'course-work-student-submissions-return', 'course-work-student-submissions-turn-in', 'course-work-materials-add-on-attachments-create', 'course-work-materials-add-on-attachments-delete', 'course-work-materials-add-on-attachments-get', 'course-work-materials-add-on-attachments-list', 'course-work-materials-add-on-attachments-patch', 'course-work-materials-create', 'course-work-materials-delete', 'course-work-materials-get', 'course-work-materials-get-add-on-context', 'course-work-materials-list', 'course-work-materials-patch', 'create', 'delete', 'get', 'list', 'patch', 'posts-add-on-attachments-create', 'posts-add-on-attachments-delete', 'posts-add-on-attachments-get', 'posts-add-on-attachments-list', 'posts-add-on-attachments-patch', 'posts-add-on-attachments-student-submissions-get', 'posts-add-on-attachments-student-submissions-patch', 'posts-get-add-on-context', 'students-create', 'students-delete', 'students-get', 'students-list', 'teachers-create', 'teachers-delete', 'teachers-get', 'teachers-list', 'topics-create', 'topics-delete', 'topics-get', 'topics-list', 'topics-patch' and 'update'", vec![
             ("aliases-create",
                     Some(r##"Creates an alias for a course. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create the alias or for access errors. * `NOT_FOUND` if the course does not exist. * `ALREADY_EXISTS` if the alias already exists. * `FAILED_PRECONDITION` if the alias requested does not make sense for the requesting user or course (for example, if a user not in a domain attempts to access a domain-scoped alias)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_aliases-create",
@@ -4800,6 +6904,176 @@ async fn main() {
                      Some(r##"The identifier of the course. This identifier can be either the Classroom-assigned identifier or an alias."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("announcements-add-on-attachments-create",
+                    Some(r##"Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_announcements-add-on-attachments-create",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("announcements-add-on-attachments-delete",
+                    Some(r##"Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_announcements-add-on-attachments-delete",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("announcements-add-on-attachments-get",
+                    Some(r##"Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_announcements-add-on-attachments-get",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("announcements-add-on-attachments-list",
+                    Some(r##"Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_announcements-add-on-attachments-list",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("announcements-add-on-attachments-patch",
+                    Some(r##"Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_announcements-add-on-attachments-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the post under which the attachment is attached."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4882,6 +7156,34 @@ async fn main() {
                     (Some(r##"id"##),
                      None,
                      Some(r##"Identifier of the announcement."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("announcements-get-add-on-context",
+                    Some(r##"Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_announcements-get-add-on-context",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
                      Some(true),
                      Some(false)),
         
@@ -4987,6 +7289,262 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("course-work-add-on-attachments-create",
+                    Some(r##"Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-add-on-attachments-create",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-add-on-attachments-delete",
+                    Some(r##"Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-add-on-attachments-delete",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-add-on-attachments-get",
+                    Some(r##"Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-add-on-attachments-get",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-add-on-attachments-list",
+                    Some(r##"Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-add-on-attachments-list",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-add-on-attachments-patch",
+                    Some(r##"Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-add-on-attachments-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the post under which the attachment is attached."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-add-on-attachments-student-submissions-get",
+                    Some(r##"Returns a student submission for an add-on attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-add-on-attachments-student-submissions-get",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"submission-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the student’s submission."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-add-on-attachments-student-submissions-patch",
+                    Some(r##"Updates data associated with an add-on attachment submission. Requires the add-on to have been the original creator of the attachment and the attachment to have a positive `max_points` value set. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-add-on-attachments-student-submissions-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"submission-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the student's submission."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("course-work-create",
                     Some(r##"Creates course work. The resulting course work (and corresponding student submissions) are associated with the Developer Console project of the [OAuth client ID](https://support.google.com/cloud/answer/6158849) used to make the request. Classroom API requests to modify course work and student submissions must be made with an OAuth client ID from the associated Developer Console project. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create course work in the requested course, share a Drive attachment, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist. * `FAILED_PRECONDITION` for the following request error: * AttachmentNotVisible"##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-create",
@@ -5056,6 +7614,34 @@ async fn main() {
                     (Some(r##"id"##),
                      None,
                      Some(r##"Identifier of the course work."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-get-add-on-context",
+                    Some(r##"Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-get-add-on-context",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
                      Some(true),
                      Some(false)),
         
@@ -5423,6 +8009,176 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("course-work-materials-add-on-attachments-create",
+                    Some(r##"Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-materials-add-on-attachments-create",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-materials-add-on-attachments-delete",
+                    Some(r##"Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-materials-add-on-attachments-delete",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-materials-add-on-attachments-get",
+                    Some(r##"Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-materials-add-on-attachments-get",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-materials-add-on-attachments-list",
+                    Some(r##"Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-materials-add-on-attachments-list",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-materials-add-on-attachments-patch",
+                    Some(r##"Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-materials-add-on-attachments-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the post under which the attachment is attached."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("course-work-materials-create",
                     Some(r##"Creates a course work material. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create course work material in the requested course, share a Drive attachment, or for access errors. * `INVALID_ARGUMENT` if the request is malformed or if more than 20 * materials are provided. * `NOT_FOUND` if the requested course does not exist. * `FAILED_PRECONDITION` for the following request error: * AttachmentNotVisible"##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-materials-create",
@@ -5492,6 +8248,34 @@ async fn main() {
                     (Some(r##"id"##),
                      None,
                      Some(r##"Identifier of the course work material."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("course-work-materials-get-add-on-context",
+                    Some(r##"Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_course-work-materials-get-add-on-context",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id."##),
                      Some(true),
                      Some(false)),
         
@@ -5660,6 +8444,290 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-add-on-attachments-create",
+                    Some(r##"Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-add-on-attachments-create",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Optional. Deprecated, use item_id instead."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-add-on-attachments-delete",
+                    Some(r##"Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-add-on-attachments-delete",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Optional. Deprecated, use item_id instead."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-add-on-attachments-get",
+                    Some(r##"Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-add-on-attachments-get",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Optional. Deprecated, use item_id instead."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-add-on-attachments-list",
+                    Some(r##"Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-add-on-attachments-list",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-add-on-attachments-patch",
+                    Some(r##"Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-add-on-attachments-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the post under which the attachment is attached."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-add-on-attachments-student-submissions-get",
+                    Some(r##"Returns a student submission for an add-on attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-add-on-attachments-student-submissions-get",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Optional. Deprecated, use item_id instead."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"submission-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the student’s submission."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-add-on-attachments-student-submissions-patch",
+                    Some(r##"Updates data associated with an add-on attachment submission. Requires the add-on to have been the original creator of the attachment and the attachment to have a positive `max_points` value set. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-add-on-attachments-student-submissions-patch",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Optional. Deprecated, use item_id instead."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"submission-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the student's submission."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("posts-get-add-on-context",
+                    Some(r##"Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/courses_posts-get-add-on-context",
+                  vec![
+                    (Some(r##"course-id"##),
+                     None,
+                     Some(r##"Required. Identifier of the course."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"Optional. Deprecated, use item_id instead."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6428,7 +9496,7 @@ async fn main() {
     
     let mut app = App::new("classroom1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240227")
+           .version("5.0.5+20240617")
            .about("Manages classes, rosters, and invitations in Google Classroom.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_classroom1_cli")
            .arg(Arg::with_name("url")
@@ -6492,6 +9560,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

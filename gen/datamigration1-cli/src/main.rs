@@ -159,10 +159,29 @@ where
                     "postgresql.ssl.type" => Some(("postgresql.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "postgresql.username" => Some(("postgresql.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-bucket" => Some(("sqlserver.backups.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-prefix" => Some(("sqlserver.backups.gcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.cloud-sql-id" => Some(("sqlserver.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.hostname" => Some(("sqlserver.forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.password" => Some(("sqlserver.forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.port" => Some(("sqlserver.forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.private-key" => Some(("sqlserver.forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.username" => Some(("sqlserver.forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.host" => Some(("sqlserver.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password" => Some(("sqlserver.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password-set" => Some(("sqlserver.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver.port" => Some(("sqlserver.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.private-connectivity.private-connection" => Some(("sqlserver.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.private-service-connect-connectivity.service-attachment" => Some(("sqlserver.privateServiceConnectConnectivity.serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.ca-certificate" => Some(("sqlserver.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-certificate" => Some(("sqlserver.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-key" => Some(("sqlserver.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.type" => Some(("sqlserver.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.username" => Some(("sqlserver.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "additional-public-ip", "allocated-ip-range", "alloydb", "alloydb-cluster-id", "auto-storage-increase", "availability-type", "ca-certificate", "client-certificate", "client-key", "cloud-sql-id", "cloudsql", "cluster-id", "cmek-key-name", "code", "collation", "cpu-count", "create-time", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-flags", "database-service", "database-version", "display-name", "edition", "enable-ipv4", "encryption-config", "error", "forward-ssh-connectivity", "host", "hostname", "id", "initial-user", "ip-config", "kms-key-name", "labels", "machine-config", "message", "mysql", "name", "network-architecture", "oracle", "password", "password-set", "port", "postgresql", "primary-instance-settings", "private-connection", "private-connectivity", "private-ip", "private-key", "private-network", "private-service-connect-connectivity", "provider", "public-ip", "require-ssl", "root-password", "root-password-set", "secondary-zone", "service-attachment", "settings", "source-id", "ssl", "state", "storage-auto-resize-limit", "tier", "type", "update-time", "user", "user-labels", "username", "vpc-network", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "additional-public-ip", "allocated-ip-range", "alloydb", "alloydb-cluster-id", "auto-storage-increase", "availability-type", "backups", "ca-certificate", "client-certificate", "client-key", "cloud-sql-id", "cloudsql", "cluster-id", "cmek-key-name", "code", "collation", "cpu-count", "create-time", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-flags", "database-service", "database-version", "display-name", "edition", "enable-ipv4", "encryption-config", "error", "forward-ssh-connectivity", "gcs-bucket", "gcs-prefix", "host", "hostname", "id", "initial-user", "ip-config", "kms-key-name", "labels", "machine-config", "message", "mysql", "name", "network-architecture", "oracle", "password", "password-set", "port", "postgresql", "primary-instance-settings", "private-connection", "private-connectivity", "private-ip", "private-key", "private-network", "private-service-connect-connectivity", "provider", "public-ip", "require-ssl", "root-password", "root-password-set", "secondary-zone", "service-attachment", "settings", "source-id", "sqlserver", "ssl", "state", "storage-auto-resize-limit", "tier", "type", "update-time", "user", "user-labels", "username", "vpc-network", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -576,10 +595,29 @@ where
                     "postgresql.ssl.type" => Some(("postgresql.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "postgresql.username" => Some(("postgresql.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "provider" => Some(("provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-bucket" => Some(("sqlserver.backups.gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.backups.gcs-prefix" => Some(("sqlserver.backups.gcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.cloud-sql-id" => Some(("sqlserver.cloudSqlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.hostname" => Some(("sqlserver.forwardSshConnectivity.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.password" => Some(("sqlserver.forwardSshConnectivity.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.port" => Some(("sqlserver.forwardSshConnectivity.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.private-key" => Some(("sqlserver.forwardSshConnectivity.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.forward-ssh-connectivity.username" => Some(("sqlserver.forwardSshConnectivity.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.host" => Some(("sqlserver.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password" => Some(("sqlserver.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.password-set" => Some(("sqlserver.passwordSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "sqlserver.port" => Some(("sqlserver.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sqlserver.private-connectivity.private-connection" => Some(("sqlserver.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.private-service-connect-connectivity.service-attachment" => Some(("sqlserver.privateServiceConnectConnectivity.serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.ca-certificate" => Some(("sqlserver.ssl.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-certificate" => Some(("sqlserver.ssl.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.client-key" => Some(("sqlserver.ssl.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.ssl.type" => Some(("sqlserver.ssl.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver.username" => Some(("sqlserver.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "additional-public-ip", "allocated-ip-range", "alloydb", "alloydb-cluster-id", "auto-storage-increase", "availability-type", "ca-certificate", "client-certificate", "client-key", "cloud-sql-id", "cloudsql", "cluster-id", "cmek-key-name", "code", "collation", "cpu-count", "create-time", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-flags", "database-service", "database-version", "display-name", "edition", "enable-ipv4", "encryption-config", "error", "forward-ssh-connectivity", "host", "hostname", "id", "initial-user", "ip-config", "kms-key-name", "labels", "machine-config", "message", "mysql", "name", "network-architecture", "oracle", "password", "password-set", "port", "postgresql", "primary-instance-settings", "private-connection", "private-connectivity", "private-ip", "private-key", "private-network", "private-service-connect-connectivity", "provider", "public-ip", "require-ssl", "root-password", "root-password-set", "secondary-zone", "service-attachment", "settings", "source-id", "ssl", "state", "storage-auto-resize-limit", "tier", "type", "update-time", "user", "user-labels", "username", "vpc-network", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "additional-public-ip", "allocated-ip-range", "alloydb", "alloydb-cluster-id", "auto-storage-increase", "availability-type", "backups", "ca-certificate", "client-certificate", "client-key", "cloud-sql-id", "cloudsql", "cluster-id", "cmek-key-name", "code", "collation", "cpu-count", "create-time", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-flags", "database-service", "database-version", "display-name", "edition", "enable-ipv4", "encryption-config", "error", "forward-ssh-connectivity", "gcs-bucket", "gcs-prefix", "host", "hostname", "id", "initial-user", "ip-config", "kms-key-name", "labels", "machine-config", "message", "mysql", "name", "network-architecture", "oracle", "password", "password-set", "port", "postgresql", "primary-instance-settings", "private-connection", "private-connectivity", "private-ip", "private-key", "private-network", "private-service-connect-connectivity", "provider", "public-ip", "require-ssl", "root-password", "root-password-set", "secondary-zone", "service-attachment", "settings", "source-id", "sqlserver", "ssl", "state", "storage-auto-resize-limit", "tier", "type", "update-time", "user", "user-labels", "username", "vpc-network", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2670,6 +2708,7 @@ where
                     "destination-database.provider" => Some(("destinationDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dump-path" => Some(("dumpPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dump-type" => Some(("dumpType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2686,12 +2725,14 @@ where
                     "source" => Some(("source", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-database.engine" => Some(("sourceDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-database.provider" => Some(("sourceDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some(("sqlserverHomogeneousMigrationJobConfig.backupFilePattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some(("sqlserverHomogeneousMigrationJobConfig.useDiffBackup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vpc-peering-connectivity.vpc" => Some(("vpcPeeringConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "duration", "end-time", "engine", "error", "filter", "labels", "message", "name", "performance-config", "phase", "provider", "reverse-ssh-connectivity", "source", "source-database", "state", "type", "update-time", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-file-pattern", "cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "dump-type", "duration", "end-time", "engine", "error", "filter", "labels", "message", "name", "performance-config", "phase", "provider", "reverse-ssh-connectivity", "source", "source-database", "sqlserver-homogeneous-migration-job-config", "state", "type", "update-time", "use-diff-backup", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3284,6 +3325,7 @@ where
                     "destination-database.provider" => Some(("destinationDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dump-path" => Some(("dumpPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dump-type" => Some(("dumpType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.code" => Some(("error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3300,12 +3342,14 @@ where
                     "source" => Some(("source", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-database.engine" => Some(("sourceDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-database.provider" => Some(("sourceDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some(("sqlserverHomogeneousMigrationJobConfig.backupFilePattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some(("sqlserverHomogeneousMigrationJobConfig.useDiffBackup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vpc-peering-connectivity.vpc" => Some(("vpcPeeringConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "duration", "end-time", "engine", "error", "filter", "labels", "message", "name", "performance-config", "phase", "provider", "reverse-ssh-connectivity", "source", "source-database", "state", "type", "update-time", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-file-pattern", "cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "dump-type", "duration", "end-time", "engine", "error", "filter", "labels", "message", "name", "performance-config", "phase", "provider", "reverse-ssh-connectivity", "source", "source-database", "sqlserver-homogeneous-migration-job-config", "state", "type", "update-time", "use-diff-backup", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3564,8 +3608,9 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "skip-validation" => Some(("skipValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["skip-validation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3998,6 +4043,7 @@ where
                     "migration-job.destination-database.provider" => Some(("migrationJob.destinationDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.display-name" => Some(("migrationJob.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.dump-path" => Some(("migrationJob.dumpPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.dump-type" => Some(("migrationJob.dumpType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.duration" => Some(("migrationJob.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.end-time" => Some(("migrationJob.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.error.code" => Some(("migrationJob.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -4014,13 +4060,15 @@ where
                     "migration-job.source" => Some(("migrationJob.source", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.source-database.engine" => Some(("migrationJob.sourceDatabase.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.source-database.provider" => Some(("migrationJob.sourceDatabase.provider", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-homogeneous-migration-job-config.backup-file-pattern" => Some(("migrationJob.sqlserverHomogeneousMigrationJobConfig.backupFilePattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "migration-job.sqlserver-homogeneous-migration-job-config.use-diff-backup" => Some(("migrationJob.sqlserverHomogeneousMigrationJobConfig.useDiffBackup", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "migration-job.state" => Some(("migrationJob.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.type" => Some(("migrationJob.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.update-time" => Some(("migrationJob.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "migration-job.vpc-peering-connectivity.vpc" => Some(("migrationJob.vpcPeeringConnectivity.vpc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "duration", "end-time", "engine", "error", "filter", "labels", "message", "migration-job", "name", "performance-config", "phase", "provider", "reverse-ssh-connectivity", "source", "source-database", "state", "type", "update-mask", "update-time", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-file-pattern", "cmek-key-name", "code", "commit-id", "conversion-workspace", "create-time", "destination", "destination-database", "display-name", "dump-parallel-level", "dump-path", "dump-type", "duration", "end-time", "engine", "error", "filter", "labels", "message", "migration-job", "name", "performance-config", "phase", "provider", "reverse-ssh-connectivity", "source", "source-database", "sqlserver-homogeneous-migration-job-config", "state", "type", "update-mask", "update-time", "use-diff-backup", "vm", "vm-ip", "vm-port", "vpc", "vpc-peering-connectivity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6620,7 +6668,7 @@ async fn main() {
     
     let mut app = App::new("datamigration1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240221")
+           .version("5.0.5+20240621")
            .about("Manage Cloud Database Migration Service resources on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datamigration1_cli")
            .arg(Arg::with_name("url")
@@ -6684,6 +6732,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

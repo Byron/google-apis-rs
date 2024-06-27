@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Composer* crate version *5.0.4+20240227*, where *20240227* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *Cloud Composer* crate version *5.0.5+20240618*, where *20240618* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *Cloud Composer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/composer/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudComposer) ... 
 //! 
 //! * projects
-//!  * [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments database failover*](api::ProjectLocationEnvironmentDatabaseFailoverCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments execute airflow command*](api::ProjectLocationEnvironmentExecuteAirflowCommandCall), [*locations environments fetch database properties*](api::ProjectLocationEnvironmentFetchDatabasePropertyCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations environments load snapshot*](api::ProjectLocationEnvironmentLoadSnapshotCall), [*locations environments patch*](api::ProjectLocationEnvironmentPatchCall), [*locations environments poll airflow command*](api::ProjectLocationEnvironmentPollAirflowCommandCall), [*locations environments save snapshot*](api::ProjectLocationEnvironmentSaveSnapshotCall), [*locations environments stop airflow command*](api::ProjectLocationEnvironmentStopAirflowCommandCall), [*locations environments user workloads config maps create*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapCreateCall), [*locations environments user workloads config maps delete*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapDeleteCall), [*locations environments user workloads config maps get*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapGetCall), [*locations environments user workloads config maps list*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapListCall), [*locations environments user workloads config maps update*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapUpdateCall), [*locations environments user workloads secrets create*](api::ProjectLocationEnvironmentUserWorkloadsSecretCreateCall), [*locations environments user workloads secrets delete*](api::ProjectLocationEnvironmentUserWorkloadsSecretDeleteCall), [*locations environments user workloads secrets get*](api::ProjectLocationEnvironmentUserWorkloadsSecretGetCall), [*locations environments user workloads secrets list*](api::ProjectLocationEnvironmentUserWorkloadsSecretListCall), [*locations environments user workloads secrets update*](api::ProjectLocationEnvironmentUserWorkloadsSecretUpdateCall), [*locations environments workloads list*](api::ProjectLocationEnvironmentWorkloadListCall), [*locations image versions list*](api::ProjectLocationImageVersionListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations environments check upgrade*](api::ProjectLocationEnvironmentCheckUpgradeCall), [*locations environments create*](api::ProjectLocationEnvironmentCreateCall), [*locations environments database failover*](api::ProjectLocationEnvironmentDatabaseFailoverCall), [*locations environments delete*](api::ProjectLocationEnvironmentDeleteCall), [*locations environments execute airflow command*](api::ProjectLocationEnvironmentExecuteAirflowCommandCall), [*locations environments fetch database properties*](api::ProjectLocationEnvironmentFetchDatabasePropertyCall), [*locations environments get*](api::ProjectLocationEnvironmentGetCall), [*locations environments list*](api::ProjectLocationEnvironmentListCall), [*locations environments load snapshot*](api::ProjectLocationEnvironmentLoadSnapshotCall), [*locations environments patch*](api::ProjectLocationEnvironmentPatchCall), [*locations environments poll airflow command*](api::ProjectLocationEnvironmentPollAirflowCommandCall), [*locations environments save snapshot*](api::ProjectLocationEnvironmentSaveSnapshotCall), [*locations environments stop airflow command*](api::ProjectLocationEnvironmentStopAirflowCommandCall), [*locations environments user workloads config maps create*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapCreateCall), [*locations environments user workloads config maps delete*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapDeleteCall), [*locations environments user workloads config maps get*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapGetCall), [*locations environments user workloads config maps list*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapListCall), [*locations environments user workloads config maps update*](api::ProjectLocationEnvironmentUserWorkloadsConfigMapUpdateCall), [*locations environments user workloads secrets create*](api::ProjectLocationEnvironmentUserWorkloadsSecretCreateCall), [*locations environments user workloads secrets delete*](api::ProjectLocationEnvironmentUserWorkloadsSecretDeleteCall), [*locations environments user workloads secrets get*](api::ProjectLocationEnvironmentUserWorkloadsSecretGetCall), [*locations environments user workloads secrets list*](api::ProjectLocationEnvironmentUserWorkloadsSecretListCall), [*locations environments user workloads secrets update*](api::ProjectLocationEnvironmentUserWorkloadsSecretUpdateCall), [*locations environments workloads list*](api::ProjectLocationEnvironmentWorkloadListCall), [*locations image versions list*](api::ProjectLocationImageVersionListCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_environments_check_upgrade(...).doit().await
 //! let r = hub.projects().locations_environments_create(...).doit().await
 //! let r = hub.projects().locations_environments_database_failover(...).doit().await
 //! let r = hub.projects().locations_environments_delete(...).doit().await
@@ -98,7 +99,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = CloudComposer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = CloudComposer::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -108,7 +109,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().locations_environments_patch(req, "name")
-//!              .update_mask(&Default::default())
+//!              .update_mask(FieldMask::new::<&str>(&[]))
 //!              .doit().await;
 //! 
 //! match result {
@@ -181,6 +182,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

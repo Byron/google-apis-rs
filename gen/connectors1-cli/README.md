@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Connectors* API at revision *20240221*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Connectors* API at revision *20240619*. The CLI is at version *5.0.5*.
 
 ```bash
 connectors1 [options]
@@ -52,8 +52,12 @@ connectors1 [options]
                 locations-connections-repair-eventing <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-runtime-action-schemas-list <parent> [-p <v>]... [-o <out>]
                 locations-connections-runtime-entity-schemas-list <parent> [-p <v>]... [-o <out>]
+                locations-connections-search <name> [-p <v>]... [-o <out>]
                 locations-connections-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-connections-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-custom-connectors-custom-connector-versions-delete <name> [-p <v>]... [-o <out>]
+                locations-custom-connectors-custom-connector-versions-deprecate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-custom-connectors-validate-custom-connector-spec <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-endpoint-attachments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-endpoint-attachments-delete <name> [-p <v>]... [-o <out>]
                 locations-endpoint-attachments-get <name> [-p <v>]... [-o <out>]
@@ -64,10 +68,8 @@ connectors1 [options]
                 locations-get-runtime-config <name> [-p <v>]... [-o <out>]
                 locations-global-custom-connectors-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-custom-connectors-custom-connector-versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-global-custom-connectors-custom-connector-versions-delete <name> [-p <v>]... [-o <out>]
                 locations-global-custom-connectors-custom-connector-versions-get <name> [-p <v>]... [-o <out>]
                 locations-global-custom-connectors-custom-connector-versions-list <parent> [-p <v>]... [-o <out>]
-                locations-global-custom-connectors-custom-connector-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-custom-connectors-delete <name> [-p <v>]... [-o <out>]
                 locations-global-custom-connectors-get <name> [-p <v>]... [-o <out>]
                 locations-global-custom-connectors-list <parent> [-p <v>]... [-o <out>]

@@ -5,24 +5,24 @@ DO NOT EDIT !
 -->
 The `google-gamesmanagement1_management` library allows access to all features of the *Google Games Management* service.
 
-This documentation was generated from *Games Management* crate version *5.0.4+20240228*, where *20240228* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+This documentation was generated from *Games Management* crate version *5.0.5+20240618*, where *20240618* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 
 Everything else about the *Games Management* *v1_management* API can be found at the
 [official documentation site](https://developers.google.com/games/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/GamesManagement) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/GamesManagement) ... 
 
 * achievements
- * [*reset*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::AchievementResetCall), [*reset all*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::AchievementResetAllCall), [*reset all for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::AchievementResetAllForAllPlayerCall), [*reset for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::AchievementResetForAllPlayerCall) and [*reset multiple for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::AchievementResetMultipleForAllPlayerCall)
+ * [*reset*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::AchievementResetCall), [*reset all*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::AchievementResetAllCall), [*reset all for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::AchievementResetAllForAllPlayerCall), [*reset for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::AchievementResetForAllPlayerCall) and [*reset multiple for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::AchievementResetMultipleForAllPlayerCall)
 * applications
- * [*list hidden*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::ApplicationListHiddenCall)
+ * [*list hidden*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::ApplicationListHiddenCall)
 * events
- * [*reset*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::EventResetCall), [*reset all*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::EventResetAllCall), [*reset all for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::EventResetAllForAllPlayerCall), [*reset for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::EventResetForAllPlayerCall) and [*reset multiple for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::EventResetMultipleForAllPlayerCall)
-* [players](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::Player)
- * [*hide*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::PlayerHideCall) and [*unhide*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::PlayerUnhideCall)
+ * [*reset*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::EventResetCall), [*reset all*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::EventResetAllCall), [*reset all for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::EventResetAllForAllPlayerCall), [*reset for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::EventResetForAllPlayerCall) and [*reset multiple for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::EventResetMultipleForAllPlayerCall)
+* [players](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::Player)
+ * [*hide*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::PlayerHideCall) and [*unhide*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::PlayerUnhideCall)
 * scores
- * [*reset*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::ScoreResetCall), [*reset all*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::ScoreResetAllCall), [*reset all for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::ScoreResetAllForAllPlayerCall), [*reset for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::ScoreResetForAllPlayerCall) and [*reset multiple for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/api::ScoreResetMultipleForAllPlayerCall)
+ * [*reset*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::ScoreResetCall), [*reset all*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::ScoreResetAllCall), [*reset all for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::ScoreResetAllForAllPlayerCall), [*reset for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::ScoreResetForAllPlayerCall) and [*reset multiple for all players*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/api::ScoreResetMultipleForAllPlayerCall)
 
 
 
@@ -31,17 +31,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/GamesManagement)**
+* **[Hub](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/GamesManagement)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::CallBuilder)
-* **[Resources](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::CallBuilder)
+* **[Resources](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Part)**
+    * **[Parts](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -99,7 +99,7 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+let mut hub = GamesManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
@@ -127,17 +127,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -147,35 +147,42 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::RequestValue) and 
-[decodable](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::RequestValue) and 
+[decodable](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-gamesmanagement1_management/5.0.4+20240228/google_gamesmanagement1_management/client::RequestValue) are moved
+* [request values](https://docs.rs/google-gamesmanagement1_management/5.0.5+20240618/google_gamesmanagement1_management/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
 [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
+
+## Cargo Features
+
+* `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+generated `openapi` spec would be invalid.
+
 
 # License
 The **gamesmanagement1_management** library was generated by Sebastian Thiel, and is placed 

@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-ml1` library allows access to all features of the *Google Cloud Machine Learning Engine* service.
 
-This documentation was generated from *Cloud Machine Learning Engine* crate version *5.0.4+20240127*, where *20240127* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+This documentation was generated from *Cloud Machine Learning Engine* crate version *5.0.5+20240607*, where *20240607* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 
 Everything else about the *Cloud Machine Learning Engine* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/ml/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/CloudMachineLearningEngine) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/CloudMachineLearningEngine) ... 
 
 * projects
- * [*explain*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectExplainCall), [*get config*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectGetConfigCall), [*jobs cancel*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobCancelCall), [*jobs create*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobCreateCall), [*jobs get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobGetCall), [*jobs get iam policy*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobGetIamPolicyCall), [*jobs list*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobListCall), [*jobs patch*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobPatchCall), [*jobs set iam policy*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobSetIamPolicyCall), [*jobs test iam permissions*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectJobTestIamPermissionCall), [*locations get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationOperationCancelCall), [*locations operations get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationOperationGetCall), [*locations studies create*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyCreateCall), [*locations studies delete*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyDeleteCall), [*locations studies get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyGetCall), [*locations studies list*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyListCall), [*locations studies trials add measurement*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialAddMeasurementCall), [*locations studies trials check early stopping state*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialCheckEarlyStoppingStateCall), [*locations studies trials complete*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialCompleteCall), [*locations studies trials create*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialCreateCall), [*locations studies trials delete*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialDeleteCall), [*locations studies trials get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialGetCall), [*locations studies trials list*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialListCall), [*locations studies trials list optimal trials*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialListOptimalTrialCall), [*locations studies trials stop*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialStopCall), [*locations studies trials suggest*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectLocationStudyTrialSuggestCall), [*models create*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelCreateCall), [*models delete*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelDeleteCall), [*models get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelGetCall), [*models get iam policy*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelGetIamPolicyCall), [*models list*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelListCall), [*models patch*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelPatchCall), [*models set iam policy*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelSetIamPolicyCall), [*models test iam permissions*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelTestIamPermissionCall), [*models versions create*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelVersionCreateCall), [*models versions delete*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelVersionDeleteCall), [*models versions get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelVersionGetCall), [*models versions list*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelVersionListCall), [*models versions patch*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelVersionPatchCall), [*models versions set default*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectModelVersionSetDefaultCall), [*operations cancel*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectOperationCancelCall), [*operations get*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectOperationGetCall), [*operations list*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectOperationListCall) and [*predict*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/api::ProjectPredictCall)
+ * [*explain*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectExplainCall), [*get config*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectGetConfigCall), [*jobs cancel*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobCancelCall), [*jobs create*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobCreateCall), [*jobs get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobGetCall), [*jobs get iam policy*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobGetIamPolicyCall), [*jobs list*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobListCall), [*jobs patch*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobPatchCall), [*jobs set iam policy*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobSetIamPolicyCall), [*jobs test iam permissions*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectJobTestIamPermissionCall), [*locations get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationOperationCancelCall), [*locations operations get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationOperationGetCall), [*locations studies create*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyCreateCall), [*locations studies delete*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyDeleteCall), [*locations studies get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyGetCall), [*locations studies list*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyListCall), [*locations studies trials add measurement*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialAddMeasurementCall), [*locations studies trials check early stopping state*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialCheckEarlyStoppingStateCall), [*locations studies trials complete*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialCompleteCall), [*locations studies trials create*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialCreateCall), [*locations studies trials delete*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialDeleteCall), [*locations studies trials get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialGetCall), [*locations studies trials list*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialListCall), [*locations studies trials list optimal trials*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialListOptimalTrialCall), [*locations studies trials stop*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialStopCall), [*locations studies trials suggest*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectLocationStudyTrialSuggestCall), [*models create*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelCreateCall), [*models delete*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelDeleteCall), [*models get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelGetCall), [*models get iam policy*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelGetIamPolicyCall), [*models list*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelListCall), [*models patch*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelPatchCall), [*models set iam policy*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelSetIamPolicyCall), [*models test iam permissions*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelTestIamPermissionCall), [*models versions create*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelVersionCreateCall), [*models versions delete*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelVersionDeleteCall), [*models versions get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelVersionGetCall), [*models versions list*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelVersionListCall), [*models versions patch*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelVersionPatchCall), [*models versions set default*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectModelVersionSetDefaultCall), [*operations cancel*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectOperationCancelCall), [*operations get*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectOperationGetCall), [*operations list*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectOperationListCall) and [*predict*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/api::ProjectPredictCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/CloudMachineLearningEngine)**
+* **[Hub](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/CloudMachineLearningEngine)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Part)**
+    * **[Parts](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -99,7 +99,7 @@ let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
-let mut hub = CloudMachineLearningEngine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+let mut hub = CloudMachineLearningEngine::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
@@ -109,7 +109,7 @@ let mut req = GoogleCloudMlV1__Version::default();
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
 let result = hub.projects().models_versions_patch(req, "name")
-             .update_mask(&Default::default())
+             .update_mask(FieldMask::new::<&str>(&[]))
              .doit().await;
 
 match result {
@@ -133,17 +133,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -153,35 +153,42 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::RequestValue) and 
-[decodable](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::RequestValue) and 
+[decodable](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-ml1/5.0.4+20240127/google_ml1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-ml1/5.0.5+20240607/google_ml1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
 [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
+
+## Cargo Features
+
+* `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+generated `openapi` spec would be invalid.
+
 
 # License
 The **ml1** library was generated by Sebastian Thiel, and is placed 

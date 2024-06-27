@@ -1249,8 +1249,8 @@ async fn main() {
     
     let mut app = App::new("sourcerepo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240304")
-           .about("Accesses source code repositories hosted by Google.")
+           .version("5.0.5+20240623")
+           .about("Accesses source code repositories hosted by Google. Important: Cloud Source Repositories is scheduled for end of sales starting June 17, 2024. Customers who have enabled the API prior to this date will not be affected and can continue to use Cloud Source Repositories. Organizations or projects who have not previously enabled the API cannot use Cloud Source Repositories after this date. View Cloud Source Repositories documentation for more info. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -1313,6 +1313,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

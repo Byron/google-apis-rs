@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Domains* API at revision *20240221*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Domains* API at revision *20240610*. The CLI is at version *5.0.5*.
 
 ```bash
 domains1 [options]
@@ -42,11 +42,15 @@ domains1 [options]
                 locations-registrations-get <name> [-p <v>]... [-o <out>]
                 locations-registrations-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-registrations-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registrations-initiate-push-transfer <registration> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-list <parent> [-p <v>]... [-o <out>]
                 locations-registrations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-register <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registrations-renew-domain <registration> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-reset-authorization-code <registration> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registrations-retrieve-authorization-code <registration> [-p <v>]... [-o <out>]
+                locations-registrations-retrieve-google-domains-dns-records <registration> [-p <v>]... [-o <out>]
+                locations-registrations-retrieve-google-domains-forwarding-config <registration> [-p <v>]... [-o <out>]
                 locations-registrations-retrieve-importable-domains <location> [-p <v>]... [-o <out>]
                 locations-registrations-retrieve-register-parameters <location> [-p <v>]... [-o <out>]
                 locations-registrations-retrieve-transfer-parameters <location> [-p <v>]... [-o <out>]

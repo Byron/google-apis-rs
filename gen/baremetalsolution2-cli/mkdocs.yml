@@ -1,4 +1,4 @@
-site_name: baremetalsolution v5.0.4+20240228
+site_name: baremetalsolution v5.0.5+20240617
 site_url: http://byron.github.io/google-apis-rs/google-baremetalsolution2-cli
 site_description: A complete library to interact with baremetalsolution (protocol v2)
 
@@ -12,12 +12,15 @@ nav:
 - 'Projects':
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Instances Detach Lun': 'projects_locations-instances-detach-lun.md'
+    - 'Locations Instances Disable Hyperthreading': 'projects_locations-instances-disable-hyperthreading.md'
     - 'Locations Instances Disable Interactive Serial Console': 'projects_locations-instances-disable-interactive-serial-console.md'
+    - 'Locations Instances Enable Hyperthreading': 'projects_locations-instances-enable-hyperthreading.md'
     - 'Locations Instances Enable Interactive Serial Console': 'projects_locations-instances-enable-interactive-serial-console.md'
     - 'Locations Instances Get': 'projects_locations-instances-get.md'
     - 'Locations Instances List': 'projects_locations-instances-list.md'
     - 'Locations Instances Load Auth Info': 'projects_locations-instances-load-auth-info.md'
     - 'Locations Instances Patch': 'projects_locations-instances-patch.md'
+    - 'Locations Instances Reimage': 'projects_locations-instances-reimage.md'
     - 'Locations Instances Rename': 'projects_locations-instances-rename.md'
     - 'Locations Instances Reset': 'projects_locations-instances-reset.md'
     - 'Locations Instances Start': 'projects_locations-instances-start.md'
@@ -62,5 +65,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

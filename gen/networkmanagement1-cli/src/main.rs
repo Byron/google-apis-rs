@@ -125,6 +125,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "bypass-firewall-checks" => Some(("bypassFirewallChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.app-engine-version.uri" => Some(("destination.appEngineVersion.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -184,7 +185,7 @@ where
                     "source.project-id" => Some(("source.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abort-cause", "app-engine-version", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "destination-egress-location", "destination-ip", "destination-network-uri", "destination-port", "display-name", "endpoint-info", "error", "forwarding-rule", "forwarding-rule-target", "gke-master-cluster", "instance", "ip-address", "labels", "load-balancer-id", "load-balancer-type", "message", "metropolitan-area", "name", "network", "network-type", "port", "probing-details", "project-id", "protocol", "reachability-details", "related-projects", "result", "sent-probe-count", "source", "source-agent-uri", "source-ip", "source-network-uri", "source-port", "successful-probe-count", "update-time", "uri", "verify-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abort-cause", "app-engine-version", "bypass-firewall-checks", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "destination-egress-location", "destination-ip", "destination-network-uri", "destination-port", "display-name", "endpoint-info", "error", "forwarding-rule", "forwarding-rule-target", "gke-master-cluster", "instance", "ip-address", "labels", "load-balancer-id", "load-balancer-type", "message", "metropolitan-area", "name", "network", "network-type", "port", "probing-details", "project-id", "protocol", "reachability-details", "related-projects", "result", "sent-probe-count", "source", "source-agent-uri", "source-ip", "source-network-uri", "source-port", "successful-probe-count", "update-time", "uri", "verify-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -496,6 +497,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "bypass-firewall-checks" => Some(("bypassFirewallChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.app-engine-version.uri" => Some(("destination.appEngineVersion.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -555,7 +557,7 @@ where
                     "source.project-id" => Some(("source.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abort-cause", "app-engine-version", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "destination-egress-location", "destination-ip", "destination-network-uri", "destination-port", "display-name", "endpoint-info", "error", "forwarding-rule", "forwarding-rule-target", "gke-master-cluster", "instance", "ip-address", "labels", "load-balancer-id", "load-balancer-type", "message", "metropolitan-area", "name", "network", "network-type", "port", "probing-details", "project-id", "protocol", "reachability-details", "related-projects", "result", "sent-probe-count", "source", "source-agent-uri", "source-ip", "source-network-uri", "source-port", "successful-probe-count", "update-time", "uri", "verify-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abort-cause", "app-engine-version", "bypass-firewall-checks", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "destination-egress-location", "destination-ip", "destination-network-uri", "destination-port", "display-name", "endpoint-info", "error", "forwarding-rule", "forwarding-rule-target", "gke-master-cluster", "instance", "ip-address", "labels", "load-balancer-id", "load-balancer-type", "message", "metropolitan-area", "name", "network", "network-type", "port", "probing-details", "project-id", "protocol", "reachability-details", "related-projects", "result", "sent-probe-count", "source", "source-agent-uri", "source-ip", "source-network-uri", "source-port", "successful-probe-count", "update-time", "uri", "verify-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1458,12 +1460,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-global-connectivity-tests-patch",
-                    Some(r##"Updates the configuration of an existing `ConnectivityTest`. After you update a test, the reachability analysis is performed as part of the long running operation, which completes when the analysis completes. The Reachability state in the test resource is updated with the new result. If the endpoint specifications in `ConnectivityTest` are invalid (for example, they contain non-existent resources in the network, or the user does not have read permissions to the network configurations of listed projects), then the reachability result returns a value of UNKNOWN. If the endpoint specifications in `ConnectivityTest` are incomplete, the reachability result returns a value of `AMBIGUOUS`. See the documentation in `ConnectivityTest` for for more details."##),
+                    Some(r##"Updates the configuration of an existing `ConnectivityTest`. After you update a test, the reachability analysis is performed as part of the long running operation, which completes when the analysis completes. The Reachability state in the test resource is updated with the new result. If the endpoint specifications in `ConnectivityTest` are invalid (for example, they contain non-existent resources in the network, or the user does not have read permissions to the network configurations of listed projects), then the reachability result returns a value of UNKNOWN. If the endpoint specifications in `ConnectivityTest` are incomplete, the reachability result returns a value of `AMBIGUOUS`. See the documentation in `ConnectivityTest` for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_networkmanagement1_cli/projects_locations-global-connectivity-tests-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Unique name of the resource using the form: `projects/{project_id}/locations/global/connectivityTests/{test_id}`"##),
+                     Some(r##"Identifier. Unique name of the resource using the form: `projects/{project_id}/locations/global/connectivityTests/{test_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -1691,7 +1693,7 @@ async fn main() {
     
     let mut app = App::new("networkmanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240221")
+           .version("5.0.5+20240619")
            .about("The Network Management API provides a collection of network performance monitoring and diagnostic capabilities.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_networkmanagement1_cli")
            .arg(Arg::with_name("url")
@@ -1755,6 +1757,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

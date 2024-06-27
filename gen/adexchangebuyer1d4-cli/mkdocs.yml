@@ -1,4 +1,4 @@
-site_name: Ad Exchange Buyer v5.0.4+20210330
+site_name: Ad Exchange Buyer v5.0.5+20210330
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d4-cli
 site_description: A complete library to interact with Ad Exchange Buyer (protocol v1.4)
 
@@ -62,5 +62,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

@@ -4167,7 +4167,8 @@ async fn main() {
                      Some(false)),
                   ]),
             ("import",
-                    Some(r##"Imports an event. This operation is used to add a private copy of an existing event to a calendar."##),
+                    Some(r##"Imports an event. This operation is used to add a private copy of an existing event to a calendar. Only events with an eventType of default may be imported.
+        Deprecated behavior: If a non-default event is imported, its type will be changed to default and any event-type-specific properties it may have will be dropped."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_import",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -4273,7 +4274,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("move",
-                    Some(r##"Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime and workingLocation events cannot be moved."##),
+                    Some(r##"Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime, workingLocation and fromGmail events cannot be moved."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_move",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -4524,7 +4525,7 @@ async fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240523")
            .about("Manipulates events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")
@@ -4588,6 +4589,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

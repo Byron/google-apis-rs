@@ -25,6 +25,9 @@ use crate::{client, client::GetToken, client::serde_with};
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
+    /// Read, create, update, and delete your ClaimReview data.
+    Full,
+
     /// See your primary Google Account email address
     UserinfoEmail,
 }
@@ -32,6 +35,7 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
+            Scope::Full => "https://www.googleapis.com/auth/factchecktools",
             Scope::UserinfoEmail => "https://www.googleapis.com/auth/userinfo.email",
         }
     }
@@ -39,7 +43,7 @@ impl AsRef<str> for Scope {
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::UserinfoEmail
+        Scope::Full
     }
 }
 
@@ -77,7 +81,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -125,7 +129,7 @@ impl<'a, S> FactCheckTools<S> {
         FactCheckTools {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://factchecktools.googleapis.com/".to_string(),
             _root_url: "https://factchecktools.googleapis.com/".to_string(),
         }
@@ -139,7 +143,7 @@ impl<'a, S> FactCheckTools<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -171,6 +175,7 @@ impl<'a, S> FactCheckTools<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1Claim {
@@ -197,6 +202,7 @@ impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1Claim {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimAuthor {
@@ -224,6 +230,7 @@ impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimAuthor {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating {
@@ -260,6 +267,7 @@ impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimRating {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReview {
@@ -293,6 +301,7 @@ impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReview {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewAuthor {
@@ -312,6 +321,7 @@ impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewAuthor 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkup {
@@ -360,6 +370,7 @@ impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkup 
 /// * [create pages](PageCreateCall) (request|response)
 /// * [get pages](PageGetCall) (response)
 /// * [update pages](PageUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage {
@@ -392,6 +403,46 @@ impl client::RequestValue for GoogleFactcheckingFactchecktoolsV1alpha1ClaimRevie
 impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1ClaimReviewMarkupPage {}
 
 
+/// Response from searching fact-checked claims by image.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [image search claims](ClaimImageSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimImageSearchResponse {
+    /// The next pagination token in the Search response. It should be used as the `page_token` for the following request. An empty value means no more results.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+    /// The list of claims and all of their associated information.
+    
+    pub results: Option<Vec<GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimImageSearchResponseResult>>,
+}
+
+impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimImageSearchResponse {}
+
+
+/// A claim and its associated information.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimImageSearchResponseResult {
+    /// A claim which matched the query.
+    
+    pub claim: Option<GoogleFactcheckingFactchecktoolsV1alpha1Claim>,
+}
+
+impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimImageSearchResponseResult {}
+
+
 /// Response from searching fact-checked claims.
 /// 
 /// # Activities
@@ -400,6 +451,7 @@ impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1ClaimRev
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [search claims](ClaimSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimSearchResponse {
@@ -423,6 +475,7 @@ impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1FactChec
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list pages](PageListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1ListClaimReviewMarkupPagesResponse {
@@ -443,6 +496,7 @@ impl client::ResponseResult for GoogleFactcheckingFactchecktoolsV1alpha1ListClai
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFactcheckingFactchecktoolsV1alpha1Publisher {
@@ -465,6 +519,7 @@ impl client::Part for GoogleFactcheckingFactchecktoolsV1alpha1Publisher {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [delete pages](PageDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
@@ -498,9 +553,9 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `search(...)`
+/// // like `image_search(...)` and `search(...)`
 /// // to build up your call.
 /// let rb = hub.claims();
 /// # }
@@ -514,6 +569,22 @@ pub struct ClaimMethods<'a, S>
 impl<'a, S> client::MethodsBuilder for ClaimMethods<'a, S> {}
 
 impl<'a, S> ClaimMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Search through fact-checked claims using an image as the query.
+    pub fn image_search(&self) -> ClaimImageSearchCall<'a, S> {
+        ClaimImageSearchCall {
+            hub: self.hub,
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _offset: Default::default(),
+            _language_code: Default::default(),
+            _image_uri: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -557,7 +628,7 @@ impl<'a, S> ClaimMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
@@ -670,6 +741,265 @@ impl<'a, S> PageMethods<'a, S> {
 // CallBuilders   ###
 // #################
 
+/// Search through fact-checked claims using an image as the query.
+///
+/// A builder for the *imageSearch* method supported by a *claim* resource.
+/// It is not used directly, but through a [`ClaimMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_factchecktools1_alpha1 as factchecktools1_alpha1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use factchecktools1_alpha1::{FactCheckTools, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.claims().image_search()
+///              .page_token("ipsum")
+///              .page_size(-28)
+///              .offset(-27)
+///              .language_code("sanctus")
+///              .image_uri("sed")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ClaimImageSearchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a FactCheckTools<S>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _offset: Option<i32>,
+    _language_code: Option<String>,
+    _image_uri: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for ClaimImageSearchCall<'a, S> {}
+
+impl<'a, S> ClaimImageSearchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleFactcheckingFactchecktoolsV1alpha1FactCheckedClaimImageSearchResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "factchecktools.claims.imageSearch",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "pageToken", "pageSize", "offset", "languageCode", "imageUri"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._offset.as_ref() {
+            params.push("offset", value.to_string());
+        }
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+        if let Some(value) = self._image_uri.as_ref() {
+            params.push("imageUri", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1alpha1/claims:imageSearch";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Optional. The pagination token. You may provide the `next_page_token` returned from a previous List request, if any, in order to get the next page. All other fields must have the same values as in the previous request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ClaimImageSearchCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The pagination size. We will return up to that many results. Defaults to 10 if not set.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ClaimImageSearchCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Optional. An integer that specifies the current offset (that is, starting result location) in search results. This field is only considered if `page_token` is unset. For example, 0 means to return results starting from the first matching result, and 10 means to return from the 11th result.
+    ///
+    /// Sets the *offset* query property to the given value.
+    pub fn offset(mut self, new_value: i32) -> ClaimImageSearchCall<'a, S> {
+        self._offset = Some(new_value);
+        self
+    }
+    /// Optional. The BCP-47 language code, such as "en-US" or "sr-Latn". Can be used to restrict results by language, though we do not currently consider the region.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ClaimImageSearchCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// Required. The URI of the source image. This must be a publicly-accessible image HTTP/HTTPS URL. When fetching images from HTTP/HTTPS URLs, Google cannot guarantee that the request will be completed. Your request may fail if the specified host denies the request (e.g. due to request throttling or DOS prevention), or if Google throttles requests to the site for abuse prevention. You should not depend on externally-hosted images for production applications.
+    ///
+    /// Sets the *image uri* query property to the given value.
+    pub fn image_uri(mut self, new_value: &str) -> ClaimImageSearchCall<'a, S> {
+        self._image_uri = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ClaimImageSearchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ClaimImageSearchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Search through fact-checked claims.
 ///
 /// A builder for the *search* method supported by a *claim* resource.
@@ -692,18 +1022,18 @@ impl<'a, S> PageMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.claims().search()
-///              .review_publisher_site_filter("ipsum")
-///              .query("voluptua.")
-///              .page_token("At")
-///              .page_size(-8)
-///              .offset(-80)
-///              .max_age_days(-2)
-///              .language_code("takimata")
+///              .review_publisher_site_filter("amet.")
+///              .query("takimata")
+///              .page_token("amet.")
+///              .page_size(-20)
+///              .offset(-55)
+///              .max_age_days(-62)
+///              .language_code("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -805,6 +1135,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -975,7 +1306,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1035,7 +1366,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1alpha1/pages";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string());
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -1191,7 +1522,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::UserinfoEmail`].
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1247,7 +1578,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1303,7 +1634,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1alpha1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string());
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -1345,6 +1676,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1453,7 +1785,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::UserinfoEmail`].
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1509,7 +1841,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1565,7 +1897,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1alpha1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string());
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -1607,6 +1939,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1715,7 +2048,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::UserinfoEmail`].
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1771,16 +2104,16 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pages().list()
-///              .url("ipsum")
-///              .page_token("gubergren")
-///              .page_size(-51)
-///              .organization("gubergren")
-///              .offset(-75)
+///              .url("dolor")
+///              .page_token("ea")
+///              .page_size(-55)
+///              .organization("invidunt")
+///              .offset(-47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1850,7 +2183,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1alpha1/pages";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string());
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
 
@@ -1885,6 +2218,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2018,7 +2352,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::UserinfoEmail`].
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2075,7 +2409,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = FactCheckTools::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2137,7 +2471,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1alpha1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserinfoEmail.as_ref().to_string());
+            self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -2310,7 +2644,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::UserinfoEmail`].
+    /// [`Scope::Full`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

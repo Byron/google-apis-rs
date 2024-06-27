@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Security Command Center* API at revision *20240302*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Security Command Center* API at revision *20240622*. The CLI is at version *5.0.5*.
 
 ```bash
 securitycenter1 [options]
@@ -48,8 +48,10 @@ securitycenter1 [options]
                 event-threat-detection-settings-effective-custom-modules-list <parent> [-p <v>]... [-o <out>]
                 event-threat-detection-settings-validate-custom-module <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 findings-bulk-mute <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-mute-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-mute-configs-delete <name> [-p <v>]... [-o <out>]
                 locations-mute-configs-get <name> [-p <v>]... [-o <out>]
+                locations-mute-configs-list <parent> [-p <v>]... [-o <out>]
                 locations-mute-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 mute-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 mute-configs-delete <name> [-p <v>]... [-o <out>]
@@ -99,8 +101,10 @@ securitycenter1 [options]
                 event-threat-detection-settings-validate-custom-module <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 findings-bulk-mute <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 get-organization-settings <name> [-p <v>]... [-o <out>]
+                locations-mute-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-mute-configs-delete <name> [-p <v>]... [-o <out>]
                 locations-mute-configs-get <name> [-p <v>]... [-o <out>]
+                locations-mute-configs-list <parent> [-p <v>]... [-o <out>]
                 locations-mute-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 mute-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 mute-configs-delete <name> [-p <v>]... [-o <out>]
@@ -172,8 +176,10 @@ securitycenter1 [options]
                 event-threat-detection-settings-effective-custom-modules-list <parent> [-p <v>]... [-o <out>]
                 event-threat-detection-settings-validate-custom-module <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 findings-bulk-mute <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-mute-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-mute-configs-delete <name> [-p <v>]... [-o <out>]
                 locations-mute-configs-get <name> [-p <v>]... [-o <out>]
+                locations-mute-configs-list <parent> [-p <v>]... [-o <out>]
                 locations-mute-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 mute-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 mute-configs-delete <name> [-p <v>]... [-o <out>]

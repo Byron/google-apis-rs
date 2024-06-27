@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Authorized Buyers Marketplace* crate version *5.0.4+20240305*, where *20240305* is the exact revision of the *authorizedbuyersmarketplace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *Authorized Buyers Marketplace* crate version *5.0.5+20240625*, where *20240625* is the exact revision of the *authorizedbuyersmarketplace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *Authorized Buyers Marketplace* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/marketplace/reference/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](AuthorizedBuyersMarketplace) ... 
 //! 
 //! * bidders
-//!  * [*finalized deals list*](api::BidderFinalizedDealListCall)
+//!  * [*auction packages list*](api::BidderAuctionPackageListCall) and [*finalized deals list*](api::BidderFinalizedDealListCall)
 //! * buyers
 //!  * [*auction packages get*](api::BuyerAuctionPackageGetCall), [*auction packages list*](api::BuyerAuctionPackageListCall), [*auction packages subscribe*](api::BuyerAuctionPackageSubscribeCall), [*auction packages subscribe clients*](api::BuyerAuctionPackageSubscribeClientCall), [*auction packages unsubscribe*](api::BuyerAuctionPackageUnsubscribeCall), [*auction packages unsubscribe clients*](api::BuyerAuctionPackageUnsubscribeClientCall), [*clients activate*](api::BuyerClientActivateCall), [*clients create*](api::BuyerClientCreateCall), [*clients deactivate*](api::BuyerClientDeactivateCall), [*clients get*](api::BuyerClientGetCall), [*clients list*](api::BuyerClientListCall), [*clients patch*](api::BuyerClientPatchCall), [*clients users activate*](api::BuyerClientUserActivateCall), [*clients users create*](api::BuyerClientUserCreateCall), [*clients users deactivate*](api::BuyerClientUserDeactivateCall), [*clients users delete*](api::BuyerClientUserDeleteCall), [*clients users get*](api::BuyerClientUserGetCall), [*clients users list*](api::BuyerClientUserListCall), [*finalized deals add creative*](api::BuyerFinalizedDealAddCreativeCall), [*finalized deals get*](api::BuyerFinalizedDealGetCall), [*finalized deals list*](api::BuyerFinalizedDealListCall), [*finalized deals pause*](api::BuyerFinalizedDealPauseCall), [*finalized deals resume*](api::BuyerFinalizedDealResumeCall), [*finalized deals set ready to serve*](api::BuyerFinalizedDealSetReadyToServeCall), [*proposals accept*](api::BuyerProposalAcceptCall), [*proposals add note*](api::BuyerProposalAddNoteCall), [*proposals cancel negotiation*](api::BuyerProposalCancelNegotiationCall), [*proposals deals batch update*](api::BuyerProposalDealBatchUpdateCall), [*proposals deals get*](api::BuyerProposalDealGetCall), [*proposals deals list*](api::BuyerProposalDealListCall), [*proposals deals patch*](api::BuyerProposalDealPatchCall), [*proposals get*](api::BuyerProposalGetCall), [*proposals list*](api::BuyerProposalListCall), [*proposals patch*](api::BuyerProposalPatchCall), [*proposals send rfp*](api::BuyerProposalSendRfpCall), [*publisher profiles get*](api::BuyerPublisherProfileGetCall) and [*publisher profiles list*](api::BuyerPublisherProfileListCall)
 //! 
@@ -99,7 +99,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = AuthorizedBuyersMarketplace::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -109,7 +109,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.buyers().proposals_patch(req, "name")
-//!              .update_mask(&Default::default())
+//!              .update_mask(FieldMask::new::<&str>(&[]))
 //!              .doit().await;
 //! 
 //! match result {
@@ -182,6 +182,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

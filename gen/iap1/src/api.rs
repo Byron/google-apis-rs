@@ -77,7 +77,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -125,7 +125,7 @@ impl<'a, S> CloudIAP<S> {
         CloudIAP {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://iap.googleapis.com/".to_string(),
             _root_url: "https://iap.googleapis.com/".to_string(),
         }
@@ -139,7 +139,7 @@ impl<'a, S> CloudIAP<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -171,6 +171,7 @@ impl<'a, S> CloudIAP<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessDeniedPageSettings {
@@ -195,33 +196,42 @@ impl client::Part for AccessDeniedPageSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccessSettings {
-    /// Settings to configure and enable allowed domains.
+    /// Optional. Settings to configure and enable allowed domains.
     #[serde(rename="allowedDomainsSettings")]
     
     pub allowed_domains_settings: Option<AllowedDomainsSettings>,
-    /// Configuration to allow cross-origin requests via IAP.
+    /// Optional. Configuration to allow cross-origin requests via IAP.
     #[serde(rename="corsSettings")]
     
     pub cors_settings: Option<CorsSettings>,
-    /// GCIP claims and endpoint configurations for 3p identity providers.
+    /// Optional. GCIP claims and endpoint configurations for 3p identity providers.
     #[serde(rename="gcipSettings")]
     
     pub gcip_settings: Option<GcipSettings>,
-    /// Settings to configure IAP's OAuth behavior.
+    /// Optional. Identity sources that IAP can use to authenticate the end user. Only one identity source can be configured.
+    #[serde(rename="identitySources")]
+    
+    pub identity_sources: Option<Vec<String>>,
+    /// Optional. Settings to configure IAP's OAuth behavior.
     #[serde(rename="oauthSettings")]
     
     pub oauth_settings: Option<OAuthSettings>,
-    /// Settings to configure Policy delegation for apps hosted in tenant projects. INTERNAL_ONLY.
+    /// Optional. Settings to configure Policy delegation for apps hosted in tenant projects. INTERNAL_ONLY.
     #[serde(rename="policyDelegationSettings")]
     
     pub policy_delegation_settings: Option<PolicyDelegationSettings>,
-    /// Settings to configure reauthentication policies in IAP.
+    /// Optional. Settings to configure reauthentication policies in IAP.
     #[serde(rename="reauthSettings")]
     
     pub reauth_settings: Option<ReauthSettings>,
+    /// Optional. Settings to configure the workforce identity federation, including workforce pools and OAuth 2.0 settings.
+    #[serde(rename="workforceIdentitySettings")]
+    
+    pub workforce_identity_settings: Option<WorkforceIdentitySettings>,
 }
 
 impl client::Part for AccessSettings {}
@@ -231,13 +241,14 @@ impl client::Part for AccessSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AllowedDomainsSettings {
-    /// List of trusted domains.
+    /// Optional. List of trusted domains.
     
     pub domains: Option<Vec<String>>,
-    /// Configuration for customers to opt in for the feature.
+    /// Optional. Configuration for customers to opt in for the feature.
     
     pub enable: Option<bool>,
 }
@@ -249,14 +260,15 @@ impl client::Part for AllowedDomainsSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ApplicationSettings {
-    /// Customization for Access Denied page.
+    /// Optional. Customization for Access Denied page.
     #[serde(rename="accessDeniedPageSettings")]
     
     pub access_denied_page_settings: Option<AccessDeniedPageSettings>,
-    /// Settings to configure attribute propagation.
+    /// Optional. Settings to configure attribute propagation.
     #[serde(rename="attributePropagationSettings")]
     
     pub attribute_propagation_settings: Option<AttributePropagationSettings>,
@@ -264,7 +276,7 @@ pub struct ApplicationSettings {
     #[serde(rename="cookieDomain")]
     
     pub cookie_domain: Option<String>,
-    /// Settings to configure IAP's behavior for a service mesh.
+    /// Optional. Settings to configure IAP's behavior for a service mesh.
     #[serde(rename="csmSettings")]
     
     pub csm_settings: Option<CsmSettings>,
@@ -277,16 +289,17 @@ impl client::Part for ApplicationSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttributePropagationSettings {
-    /// Whether the provided attribute propagation settings should be evaluated on user requests. If set to true, attributes returned from the expression will be propagated in the set output credentials.
+    /// Optional. Whether the provided attribute propagation settings should be evaluated on user requests. If set to true, attributes returned from the expression will be propagated in the set output credentials.
     
     pub enable: Option<bool>,
-    /// Raw string CEL expression. Must return a list of attributes. A maximum of 45 attributes can be selected. Expressions can select different attribute types from `attributes`: `attributes.saml_attributes`, `attributes.iap_attributes`. The following functions are supported: - filter `.filter(, )`: Returns a subset of `` where `` is true for every item. - in ` in `: Returns true if `` contains ``. - selectByName `.selectByName()`: Returns the attribute in `` with the given `` name, otherwise returns empty. - emitAs `.emitAs()`: Sets the `` name field to the given `` for propagation in selected output credentials. - strict `.strict()`: Ignores the `x-goog-iap-attr-` prefix for the provided `` when propagating with the `HEADER` output credential, such as request headers. - append `.append()` OR `.append()`: Appends the provided `` or `` to the end of ``. Example expression: `attributes.saml_attributes.filter(x, x.name in ['test']).append(attributes.iap_attributes.selectByName('exact').emitAs('custom').strict())`
+    /// Optional. Raw string CEL expression. Must return a list of attributes. A maximum of 45 attributes can be selected. Expressions can select different attribute types from `attributes`: `attributes.saml_attributes`, `attributes.iap_attributes`. The following functions are supported: - filter `.filter(, )`: Returns a subset of `` where `` is true for every item. - in ` in `: Returns true if `` contains ``. - selectByName `.selectByName()`: Returns the attribute in `` with the given `` name, otherwise returns empty. - emitAs `.emitAs()`: Sets the `` name field to the given `` for propagation in selected output credentials. - strict `.strict()`: Ignores the `x-goog-iap-attr-` prefix for the provided `` when propagating with the `HEADER` output credential, such as request headers. - append `.append()` OR `.append()`: Appends the provided `` or `` to the end of ``. Example expression: `attributes.saml_attributes.filter(x, x.name in ['test']).append(attributes.iap_attributes.selectByName('exact').emitAs('custom').strict())`
     
     pub expression: Option<String>,
-    /// Which output credentials attributes selected by the CEL expression should be propagated in. All attributes will be fully duplicated in each selected output credential.
+    /// Optional. Which output credentials attributes selected by the CEL expression should be propagated in. All attributes will be fully duplicated in each selected output credential.
     #[serde(rename="outputCredentials")]
     
     pub output_credentials: Option<Vec<String>>,
@@ -299,6 +312,7 @@ impl client::Part for AttributePropagationSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Binding {
@@ -325,6 +339,7 @@ impl client::Part for Binding {}
 /// 
 /// * [brands create projects](ProjectBrandCreateCall) (request|response)
 /// * [brands get projects](ProjectBrandGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Brand {
@@ -353,6 +368,7 @@ impl client::ResponseResult for Brand {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CorsSettings {
@@ -369,6 +385,7 @@ impl client::Part for CorsSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CsmSettings {
@@ -390,6 +407,7 @@ impl client::Part for CsmSettings {}
 /// 
 /// * [brands identity aware proxy clients delete projects](ProjectBrandIdentityAwareProxyClientDeleteCall) (response)
 /// * [iap_tunnel locations dest groups delete projects](ProjectIapTunnelLocationDestGroupDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -401,6 +419,7 @@ impl client::ResponseResult for Empty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Expr {
@@ -425,6 +444,7 @@ impl client::Part for Expr {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GcipSettings {
@@ -432,7 +452,7 @@ pub struct GcipSettings {
     #[serde(rename="loginPageUri")]
     
     pub login_page_uri: Option<String>,
-    /// GCIP tenant ids that are linked to the IAP resource. tenant_ids could be a string beginning with a number character to indicate authenticating with GCIP tenant flow, or in the format of _ to indicate authenticating with GCIP agent flow. If agent flow is used, tenant_ids should only contain one single element, while for tenant flow, tenant_ids can contain multiple elements.
+    /// Optional. GCIP tenant ids that are linked to the IAP resource. tenant_ids could be a string beginning with a number character to indicate authenticating with GCIP tenant flow, or in the format of _ to indicate authenticating with GCIP agent flow. If agent flow is used, tenant_ids should only contain one single element, while for tenant flow, tenant_ids can contain multiple elements.
     #[serde(rename="tenantIds")]
     
     pub tenant_ids: Option<Vec<String>>,
@@ -449,6 +469,7 @@ impl client::Part for GcipSettings {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get iam policy](MethodGetIamPolicyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetIamPolicyRequest {
@@ -464,6 +485,7 @@ impl client::RequestValue for GetIamPolicyRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetPolicyOptions {
@@ -485,14 +507,15 @@ impl client::Part for GetPolicyOptions {}
 /// 
 /// * [get iap settings](MethodGetIapSettingCall) (response)
 /// * [update iap settings](MethodUpdateIapSettingCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IapSettings {
-    /// Top level wrapper for all access related setting in IAP
+    /// Optional. Top level wrapper for all access related setting in IAP
     #[serde(rename="accessSettings")]
     
     pub access_settings: Option<AccessSettings>,
-    /// Top level wrapper for all application related settings in IAP
+    /// Optional. Top level wrapper for all application related settings in IAP
     #[serde(rename="applicationSettings")]
     
     pub application_settings: Option<ApplicationSettings>,
@@ -515,6 +538,7 @@ impl client::ResponseResult for IapSettings {}
 /// * [brands identity aware proxy clients create projects](ProjectBrandIdentityAwareProxyClientCreateCall) (request|response)
 /// * [brands identity aware proxy clients get projects](ProjectBrandIdentityAwareProxyClientGetCall) (response)
 /// * [brands identity aware proxy clients reset secret projects](ProjectBrandIdentityAwareProxyClientResetSecretCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentityAwareProxyClient {
@@ -542,6 +566,7 @@ impl client::ResponseResult for IdentityAwareProxyClient {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [brands list projects](ProjectBrandListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListBrandsResponse {
@@ -561,6 +586,7 @@ impl client::ResponseResult for ListBrandsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [brands identity aware proxy clients list projects](ProjectBrandIdentityAwareProxyClientListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListIdentityAwareProxyClientsResponse {
@@ -585,6 +611,7 @@ impl client::ResponseResult for ListIdentityAwareProxyClientsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [iap_tunnel locations dest groups list projects](ProjectIapTunnelLocationDestGroupListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTunnelDestGroupsResponse {
@@ -601,10 +628,61 @@ pub struct ListTunnelDestGroupsResponse {
 impl client::ResponseResult for ListTunnelDestGroupsResponse {}
 
 
+/// Used for calculating the next state of tags on the resource being passed for the CheckCustomConstraints RPC call. The detail evaluation of each field is described in go/op-create-update-time-tags and go/tags-in-orgpolicy-requests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NextStateOfTags {
+    /// no description provided
+    #[serde(rename="tagsFullState")]
+    
+    pub tags_full_state: Option<TagsFullState>,
+    /// no description provided
+    #[serde(rename="tagsFullStateForChildResource")]
+    
+    pub tags_full_state_for_child_resource: Option<TagsFullStateForChildResource>,
+    /// no description provided
+    #[serde(rename="tagsPartialState")]
+    
+    pub tags_partial_state: Option<TagsPartialState>,
+}
+
+impl client::Part for NextStateOfTags {}
+
+
+/// The OAuth 2.0 Settings
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OAuth2 {
+    /// The OAuth 2.0 client ID registered in the workforce identity federation OAuth 2.0 Server.
+    #[serde(rename="clientId")]
+    
+    pub client_id: Option<String>,
+    /// Input only. The OAuth 2.0 client secret created while registering the client ID.
+    #[serde(rename="clientSecret")]
+    
+    pub client_secret: Option<String>,
+    /// Output only. SHA256 hash value for the client secret. This field is returned by IAP when the settings are retrieved.
+    #[serde(rename="clientSecretSha256")]
+    
+    pub client_secret_sha256: Option<String>,
+}
+
+impl client::Part for OAuth2 {}
+
+
 /// Configuration for OAuth login&consent flow behavior as well as for OAuth Credentials.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OAuthSettings {
@@ -612,7 +690,7 @@ pub struct OAuthSettings {
     #[serde(rename="loginHint")]
     
     pub login_hint: Option<String>,
-    /// List of client ids allowed to use IAP programmatically.
+    /// Optional. List of client ids allowed to use IAP programmatically.
     #[serde(rename="programmaticClients")]
     
     pub programmatic_clients: Option<Vec<String>>,
@@ -630,6 +708,7 @@ impl client::Part for OAuthSettings {}
 /// 
 /// * [get iam policy](MethodGetIamPolicyCall) (response)
 /// * [set iam policy](MethodSetIamPolicyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
@@ -652,6 +731,7 @@ impl client::ResponseResult for Policy {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolicyDelegationSettings {
@@ -679,6 +759,7 @@ impl client::Part for PolicyDelegationSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PolicyName {
@@ -688,7 +769,7 @@ pub struct PolicyName {
     /// For Cloud IAM: The location of the Policy. Must be empty or "global" for Policies owned by global IAM. Must name a region from prodspec/cloud-iam-cloudspec for Regional IAM Policies, see go/iam-faq#where-is-iam-currently-deployed. For Local IAM: This field should be set to "local".
     
     pub region: Option<String>,
-    /// Resource type. Types are defined in IAM's .service files. Valid values for type might be 'gce', 'gcs', 'project', 'account' etc.
+    /// Resource type. Types are defined in IAM's .service files. Valid values for type might be 'storage_buckets', 'compute_instances', 'resourcemanager_customers', 'billing_accounts', etc.
     #[serde(rename="type")]
     
     pub type_: Option<String>,
@@ -701,10 +782,11 @@ impl client::Part for PolicyName {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReauthSettings {
-    /// Reauth session lifetime, how long before a user has to reauthenticate again.
+    /// Optional. Reauth session lifetime, how long before a user has to reauthenticate again.
     #[serde(rename="maxAge")]
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
@@ -712,7 +794,7 @@ pub struct ReauthSettings {
     /// Reauth method requested.
     
     pub method: Option<String>,
-    /// How IAP determines the effective policy in cases of hierarchical policies. Policies are merged from higher in the hierarchy to lower in the hierarchy.
+    /// Optional. How IAP determines the effective policy in cases of hierarchical policies. Policies are merged from higher in the hierarchy to lower in the hierarchy.
     #[serde(rename="policyType")]
     
     pub policy_type: Option<String>,
@@ -729,6 +811,7 @@ impl client::Part for ReauthSettings {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [brands identity aware proxy clients reset secret projects](ProjectBrandIdentityAwareProxyClientResetSecretCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResetIdentityAwareProxyClientSecretRequest { _never_set: Option<bool> }
@@ -740,6 +823,7 @@ impl client::RequestValue for ResetIdentityAwareProxyClientSecretRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Resource {
@@ -750,13 +834,17 @@ pub struct Resource {
     /// The service defined labels of the resource on which the conditions will be evaluated. The semantics - including the key names - are vague to IAM. If the effective condition has a reference to a `resource.labels[foo]` construct, IAM consults with this map to retrieve the values associated with `foo` key for Conditions evaluation. If the provided key is not found in the labels map, the condition would evaluate to false. This field is in limited use. If your intended use case is not expected to express resource.labels attribute in IAM Conditions, leave this field empty. Before planning on using this attribute please: * Read go/iam-conditions-labels-comm and ensure your service can meet the data availability and management requirements. * Talk to iam-conditions-eng@ about your use case.
     
     pub labels: Option<HashMap<String, String>>,
-    /// Name of the resource on which conditions will be evaluated. Must use the Relative Resource Name of the resource, which is the URI path of the resource without the leading "/". Examples are "projects/_/buckets/[BUCKET-ID]" for storage buckets or "projects/[PROJECT-ID]/global/firewalls/[FIREWALL-ID]" for a firewall. This field is required for evaluating conditions with rules on resource names. For a `list` permission check, the resource.name value must be set to the parent resource. If the parent resource is a project, this field should be left unset.
+    /// The **relative** name of the resource, which is the URI path of the resource without the leading "/". See https://cloud.google.com/iam/docs/conditions-resource-attributes#resource-name for examples used by other GCP Services. This field is **required** for services integrated with resource-attribute-based IAM conditions and/or CustomOrgPolicy. This field requires special handling for parents-only permissions such as `create` and `list`. See the document linked below for further details. See go/iam-conditions-sig-g3#populate-resource-attributes for specific details on populating this field.
     
     pub name: Option<String>,
-    /// The name of the service this resource belongs to. It is configured using the official_service_name of the Service as defined in service configurations under //configs/cloud/resourcetypes. For example, the official_service_name of cloud resource manager service is set as 'cloudresourcemanager.googleapis.com' according to //configs/cloud/resourcetypes/google/cloud/resourcemanager/prod.yaml
+    /// Used for calculating the next state of tags on the resource being passed for Custom Org Policy enforcement. NOTE: Only one of the tags representations (i.e. numeric or namespaced) should be populated. The input tags will be converted to the same representation before the calculation. This behavior intentionally may differ from other tags related fields in CheckPolicy request, which may require both formats to be passed in. IMPORTANT: If tags are unchanged, this field should not be set.
+    #[serde(rename="nextStateOfTags")]
+    
+    pub next_state_of_tags: Option<NextStateOfTags>,
+    /// The name of the service this resource belongs to. It is configured using the official_service_name of the Service as defined in service configurations under //configs/cloud/resourcetypes. For example, the official_service_name of cloud resource manager service is set as 'cloudresourcemanager.googleapis.com' according to //configs/cloud/resourcetypes/google/cloud/resourcemanager/prod.yaml This field is **required** for services integrated with resource-attribute-based IAM conditions and/or CustomOrgPolicy. This field requires special handling for parents-only permissions such as `create` and `list`. See the document linked below for further details. See go/iam-conditions-sig-g3#populate-resource-attributes for specific details on populating this field.
     
     pub service: Option<String>,
-    /// The public resource type name of the resource on which conditions will be evaluated. It is configured using the official_name of the ResourceType as defined in service configurations under //configs/cloud/resourcetypes. For example, the official_name for GCP projects is set as 'cloudresourcemanager.googleapis.com/Project' according to //configs/cloud/resourcetypes/google/cloud/resourcemanager/prod.yaml For details see go/iam-conditions-integration-guide.
+    /// The public resource type name of the resource. It is configured using the official_name of the ResourceType as defined in service configurations under //configs/cloud/resourcetypes. For example, the official_name for GCP projects is set as 'cloudresourcemanager.googleapis.com/Project' according to //configs/cloud/resourcetypes/google/cloud/resourcemanager/prod.yaml This field is **required** for services integrated with resource-attribute-based IAM conditions and/or CustomOrgPolicy. This field requires special handling for parents-only permissions such as `create` and `list`. See the document linked below for further details. See go/iam-conditions-sig-g3#populate-resource-attributes for specific details on populating this field.
     #[serde(rename="type")]
     
     pub type_: Option<String>,
@@ -773,6 +861,7 @@ impl client::Part for Resource {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [set iam policy](MethodSetIamPolicyCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetIamPolicyRequest {
@@ -784,6 +873,59 @@ pub struct SetIamPolicyRequest {
 impl client::RequestValue for SetIamPolicyRequest {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TagsFullState {
+    /// If TagsFullState is initialized, the values in this field fully represent all the tags in the next state (the current tag values are not used). If tags.size() == 0, the next state of tags would be no tags for evaluation purposes. Only one type of tags reference (numeric or namespace) is required to be passed.
+    
+    pub tags: Option<HashMap<String, String>>,
+}
+
+impl client::Part for TagsFullState {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TagsFullStateForChildResource {
+    /// If TagsFullStateForChildResource is initialized, the values in this field represent all the tags in the next state for the child resource. Only one type of tags reference (numeric or namespace) is required to be passed. IMPORTANT: This field should only be used when the target resource IAM policy name is UNKNOWN and the resource's parent IAM policy name is being passed in the request.
+    
+    pub tags: Option<HashMap<String, String>>,
+}
+
+impl client::Part for TagsFullStateForChildResource {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TagsPartialState {
+    /// Keys of the tags that should be removed for evaluation purposes. IMPORTANT: Currently only numeric references are supported. Once support for namespace references is added, both the tag references (numeric and namespace) will be removed.
+    #[serde(rename="tagKeysToRemove")]
+    
+    pub tag_keys_to_remove: Option<Vec<String>>,
+    /// Tags that’ll be updated or added to the current state of tags for evaluation purposes. If a key exists in both "tags_to_upsert" and "tag_keys_to_remove", the one in "tag_keys_to_remove" is ignored. Only one type of tags reference (numeric or namespace) is required to be passed.
+    #[serde(rename="tagsToUpsert")]
+    
+    pub tags_to_upsert: Option<HashMap<String, String>>,
+}
+
+impl client::Part for TagsPartialState {}
+
+
 /// Request message for `TestIamPermissions` method.
 /// 
 /// # Activities
@@ -792,6 +934,7 @@ impl client::RequestValue for SetIamPolicyRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [test iam permissions](MethodTestIamPermissionCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsRequest {
@@ -811,6 +954,7 @@ impl client::RequestValue for TestIamPermissionsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [test iam permissions](MethodTestIamPermissionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestIamPermissionsResponse {
@@ -832,16 +976,17 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 /// * [iap_tunnel locations dest groups create projects](ProjectIapTunnelLocationDestGroupCreateCall) (request|response)
 /// * [iap_tunnel locations dest groups get projects](ProjectIapTunnelLocationDestGroupGetCall) (response)
 /// * [iap_tunnel locations dest groups patch projects](ProjectIapTunnelLocationDestGroupPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TunnelDestGroup {
-    /// Unordered list. List of CIDRs that this group applies to.
+    /// Optional. Unordered list. List of CIDRs that this group applies to.
     
     pub cidrs: Option<Vec<String>>,
-    /// Unordered list. List of FQDNs that this group applies to.
+    /// Optional. Unordered list. List of FQDNs that this group applies to.
     
     pub fqdns: Option<Vec<String>>,
-    /// Required. Immutable. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-).
+    /// Identifier. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-).
     
     pub name: Option<String>,
 }
@@ -850,7 +995,7 @@ impl client::RequestValue for TunnelDestGroup {}
 impl client::ResponseResult for TunnelDestGroup {}
 
 
-/// API requires a return message, but currently all response strings will fit in the status and public message. In the future, this response can hold AST validation info.
+/// IAP Expression Linter endpoint returns empty response body.
 /// 
 /// # Activities
 /// 
@@ -858,11 +1003,32 @@ impl client::ResponseResult for TunnelDestGroup {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [validate attribute expression](MethodValidateAttributeExpressionCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ValidateIapAttributeExpressionResponse { _never_set: Option<bool> }
 
 impl client::ResponseResult for ValidateIapAttributeExpressionResponse {}
+
+
+/// WorkforceIdentitySettings allows customers to configure workforce pools and OAuth 2.0 settings to gate their applications using a third-party IdP with access control.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WorkforceIdentitySettings {
+    /// OAuth 2.0 settings for IAP to perform OIDC flow with workforce identity federation services.
+    
+    pub oauth2: Option<OAuth2>,
+    /// The workforce pool resources. Only one workforce pool is accepted.
+    #[serde(rename="workforcePools")]
+    
+    pub workforce_pools: Option<Vec<String>>,
+}
+
+impl client::Part for WorkforceIdentitySettings {}
 
 
 
@@ -891,7 +1057,7 @@ impl client::ResponseResult for ValidateIapAttributeExpressionResponse {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `brands_create(...)`, `brands_get(...)`, `brands_identity_aware_proxy_clients_create(...)`, `brands_identity_aware_proxy_clients_delete(...)`, `brands_identity_aware_proxy_clients_get(...)`, `brands_identity_aware_proxy_clients_list(...)`, `brands_identity_aware_proxy_clients_reset_secret(...)`, `brands_list(...)`, `iap_tunnel_locations_dest_groups_create(...)`, `iap_tunnel_locations_dest_groups_delete(...)`, `iap_tunnel_locations_dest_groups_get(...)`, `iap_tunnel_locations_dest_groups_list(...)` and `iap_tunnel_locations_dest_groups_patch(...)`
 /// // to build up your call.
@@ -1132,7 +1298,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. Immutable. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-).
+    /// * `name` - Identifier. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-).
     pub fn iap_tunnel_locations_dest_groups_patch(&self, request: TunnelDestGroup, name: &str) -> ProjectIapTunnelLocationDestGroupPatchCall<'a, S> {
         ProjectIapTunnelLocationDestGroupPatchCall {
             hub: self.hub,
@@ -1169,7 +1335,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_iam_policy(...)`, `get_iap_settings(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `update_iap_settings(...)` and `validate_attribute_expression(...)`
 /// // to build up your call.
@@ -1282,7 +1448,7 @@ impl<'a, S> MethodMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Validates a given CEL expression conforms to IAP restrictions.
+    /// Validates that a given CEL expression conforms to IAP restrictions.
     /// 
     /// # Arguments
     ///
@@ -1330,7 +1496,7 @@ impl<'a, S> MethodMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1621,7 +1787,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1719,6 +1885,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1883,7 +2050,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1981,6 +2148,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2145,7 +2313,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2253,6 +2421,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2432,7 +2601,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2724,7 +2893,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3015,7 +3184,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3113,6 +3282,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3277,7 +3447,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3375,6 +3545,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3540,7 +3711,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3843,7 +4014,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3941,6 +4112,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4105,7 +4277,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4203,6 +4375,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4367,7 +4540,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4475,6 +4648,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4654,7 +4828,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4664,7 +4838,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().iap_tunnel_locations_dest_groups_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -4842,7 +5016,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Immutable. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-).
+    /// Identifier. Identifier for the TunnelDestGroup. Must be unique within the project and contain only lower case letters (a-z) and dashes (-).
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4958,7 +5132,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5249,7 +5423,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5347,6 +5521,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5512,7 +5687,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5804,7 +5979,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6096,7 +6271,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6106,7 +6281,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().update_iap_settings(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -6377,7 +6552,7 @@ where
 }
 
 
-/// Validates a given CEL expression conforms to IAP restrictions.
+/// Validates that a given CEL expression conforms to IAP restrictions.
 ///
 /// A builder for the *validateAttributeExpression* method.
 /// It is not used directly, but through a [`MethodMethods`] instance.
@@ -6399,7 +6574,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CloudIAP::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6502,6 +6677,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6568,7 +6744,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// Required. User input string expression. Should be of the form 'attributes.saml_attributes.filter(attribute, attribute.name in ['{attribute_name}', '{attribute_name}'])'
+    /// Required. User input string expression. Should be of the form `attributes.saml_attributes.filter(attribute, attribute.name in ['{attribute_name}', '{attribute_name}'])`
     ///
     /// Sets the *expression* query property to the given value.
     pub fn expression(mut self, new_value: &str) -> MethodValidateAttributeExpressionCall<'a, S> {

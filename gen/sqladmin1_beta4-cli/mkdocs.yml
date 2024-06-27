@@ -1,4 +1,4 @@
-site_name: SQL Admin v5.0.4+20240219
+site_name: SQL Admin v5.0.5+20240618
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 
@@ -27,6 +27,7 @@ nav:
 - 'Flags':
     - 'List': 'flags_list.md'
 - 'Instances':
+    - 'Acquire Ssrs Lease': 'instances_acquire-ssrs-lease.md'
     - 'Add Server Ca': 'instances_add-server-ca.md'
     - 'Clone': 'instances_clone.md'
     - 'Delete': 'instances_delete.md'
@@ -42,6 +43,7 @@ nav:
     - 'Patch': 'instances_patch.md'
     - 'Promote Replica': 'instances_promote-replica.md'
     - 'Reencrypt': 'instances_reencrypt.md'
+    - 'Release Ssrs Lease': 'instances_release-ssrs-lease.md'
     - 'Reset Ssl Config': 'instances_reset-ssl-config.md'
     - 'Restart': 'instances_restart.md'
     - 'Restore Backup': 'instances_restore-backup.md'
@@ -80,5 +82,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

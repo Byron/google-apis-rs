@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20240218*. The CLI is at version *5.0.4*.
+This documentation was generated from the *compute* API at revision *20240604*. The CLI is at version *5.0.5*.
 
 ```bash
 compute1 [options]
@@ -219,6 +219,12 @@ compute1 [options]
                 set-iam-policy <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-labels <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <project> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        instance-group-manager-resize-requests
+                cancel <project> <zone> <instance-group-manager> <resize-request> [-p <v>]... [-o <out>]
+                delete <project> <zone> <instance-group-manager> <resize-request> [-p <v>]... [-o <out>]
+                get <project> <zone> <instance-group-manager> <resize-request> [-p <v>]... [-o <out>]
+                insert <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
         instance-group-managers
                 abandon-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
                 aggregated-list <project> [-p <v>]... [-o <out>]
@@ -250,6 +256,9 @@ compute1 [options]
                 list-instances <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 remove-instances <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-named-ports <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
+        instance-settings
+                get <project> <zone> [-p <v>]... [-o <out>]
+                patch <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
         instance-templates
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 delete <project> <instance-template> [-p <v>]... [-o <out>]
@@ -430,6 +439,7 @@ compute1 [options]
                 list <project> <zone> [-p <v>]... [-o <out>]
                 list-nodes <project> <zone> <node-group> [-p <v>]... [-o <out>]
                 patch <project> <zone> <node-group> (-r <kv>)... [-p <v>]... [-o <out>]
+                perform-maintenance <project> <zone> <node-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-iam-policy <project> <zone> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-node-template <project> <zone> <node-group> (-r <kv>)... [-p <v>]... [-o <out>]
                 simulate-maintenance-event <project> <zone> <node-group> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -765,6 +775,21 @@ compute1 [options]
                 list <project> [-p <v>]... [-o <out>]
                 list-available-features <project> [-p <v>]... [-o <out>]
                 patch <project> <ssl-policy> (-r <kv>)... [-p <v>]... [-o <out>]
+        storage-pool-types
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                get <project> <zone> <storage-pool-type> [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+        storage-pools
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <zone> <storage-pool> [-p <v>]... [-o <out>]
+                get <project> <zone> <storage-pool> [-p <v>]... [-o <out>]
+                get-iam-policy <project> <zone> <resource> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                list-disks <project> <zone> <storage-pool> [-p <v>]... [-o <out>]
+                set-iam-policy <project> <zone> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <project> <zone> <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <zone> <storage-pool> (-r <kv>)... [-p <v>]... [-o <out>]
         subnetworks
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 delete <project> <region> <subnetwork> [-p <v>]... [-o <out>]

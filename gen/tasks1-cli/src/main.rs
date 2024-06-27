@@ -652,8 +652,9 @@ where
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["completed", "deleted", "due", "etag", "hidden", "id", "kind", "notes", "parent", "position", "self-link", "status", "title", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["completed", "deleted", "due", "etag", "hidden", "id", "kind", "notes", "parent", "position", "self-link", "status", "title", "updated", "web-view-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -899,8 +900,9 @@ where
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["completed", "deleted", "due", "etag", "hidden", "id", "kind", "notes", "parent", "position", "self-link", "status", "title", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["completed", "deleted", "due", "etag", "hidden", "id", "kind", "notes", "parent", "position", "self-link", "status", "title", "updated", "web-view-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -997,8 +999,9 @@ where
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["completed", "deleted", "due", "etag", "hidden", "id", "kind", "notes", "parent", "position", "self-link", "status", "title", "updated"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["completed", "deleted", "due", "etag", "hidden", "id", "kind", "notes", "parent", "position", "self-link", "status", "title", "updated", "web-view-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1234,7 +1237,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a new task list and adds it to the authenticated user's task lists."##),
+                    Some(r##"Creates a new task list and adds it to the authenticated user's task lists. A user can have up to 2000 lists at a time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasklists_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -1256,7 +1259,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns all the authenticated user's task lists."##),
+                    Some(r##"Returns all the authenticated user's task lists. A user can have up to 2000 lists at a time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasklists_list",
                   vec![
                     (Some(r##"v"##),
@@ -1397,7 +1400,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Creates a new task on the specified task list."##),
+                    Some(r##"Creates a new task on the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_insert",
                   vec![
                     (Some(r##"tasklist"##),
@@ -1425,7 +1428,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns all tasks in the specified task list."##),
+                    Some(r##"Returns all tasks in the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_list",
                   vec![
                     (Some(r##"tasklist"##),
@@ -1447,7 +1450,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("move",
-                    Some(r##"Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks."##),
+                    Some(r##"Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tasks1_cli/tasks_move",
                   vec![
                     (Some(r##"tasklist"##),
@@ -1548,7 +1551,7 @@ async fn main() {
     
     let mut app = App::new("tasks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240303")
+           .version("5.0.5+20240625")
            .about("The Google Tasks API lets you manage your tasks and task lists.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tasks1_cli")
            .arg(Arg::with_name("url")
@@ -1612,6 +1615,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

@@ -89,6 +89,7 @@ where
                     "attributes.origin.region-code" => Some(("attributes.origin.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attributes.request.auth.access-levels" => Some(("attributes.request.auth.accessLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attributes.request.auth.audiences" => Some(("attributes.request.auth.audiences", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "attributes.request.auth.credential-id" => Some(("attributes.request.auth.credentialId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attributes.request.auth.presenter" => Some(("attributes.request.auth.presenter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attributes.request.auth.principal" => Some(("attributes.request.auth.principal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attributes.request.headers" => Some(("attributes.request.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -127,7 +128,7 @@ where
                     "flags" => Some(("flags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-config-id" => Some(("serviceConfigId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "annotations", "api", "attributes", "audiences", "auth", "backend-latency", "code", "create-time", "delete-time", "destination", "display-name", "etag", "flags", "headers", "host", "id", "ip", "labels", "location", "method", "name", "operation", "origin", "path", "port", "presenter", "principal", "protocol", "query", "reason", "region-code", "request", "resource", "response", "scheme", "service", "service-config-id", "size", "source", "time", "type", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-levels", "annotations", "api", "attributes", "audiences", "auth", "backend-latency", "code", "create-time", "credential-id", "delete-time", "destination", "display-name", "etag", "flags", "headers", "host", "id", "ip", "labels", "location", "method", "name", "operation", "origin", "path", "port", "presenter", "principal", "protocol", "query", "reason", "region-code", "request", "resource", "response", "scheme", "service", "service-config-id", "size", "source", "time", "type", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -427,7 +428,7 @@ async fn main() {
     
     let mut app = App::new("servicecontrol2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240223")
+           .version("5.0.5+20240607")
            .about("Provides admission control and telemetry reporting for services integrated with Service Infrastructure. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_servicecontrol2_cli")
            .arg(Arg::with_name("url")
@@ -491,6 +492,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

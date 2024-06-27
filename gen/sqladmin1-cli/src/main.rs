@@ -956,6 +956,94 @@ where
         }
     }
 
+    async fn _instances_acquire_ssrs_lease(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "acquire-ssrs-lease-context.duration" => Some(("acquireSsrsLeaseContext.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "acquire-ssrs-lease-context.report-database" => Some(("acquireSsrsLeaseContext.reportDatabase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "acquire-ssrs-lease-context.service-login" => Some(("acquireSsrsLeaseContext.serviceLogin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "acquire-ssrs-lease-context.setup-login" => Some(("acquireSsrsLeaseContext.setupLogin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acquire-ssrs-lease-context", "duration", "report-database", "service-login", "setup-login"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InstancesAcquireSsrsLeaseRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.instances().acquire_ssrs_lease(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _instances_add_server_ca(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.instances().add_server_ca(opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
@@ -1619,9 +1707,11 @@ where
                     "import-context.file-type" => Some(("importContext.fileType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-context.import-user" => Some(("importContext.importUser", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-context.kind" => Some(("importContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-context.sql-import-options.parallel" => Some(("importContext.sqlImportOptions.parallel", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "import-context.sql-import-options.threads" => Some(("importContext.sqlImportOptions.threads", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "import-context.uri" => Some(("importContext.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bak-import-options", "bak-type", "cert-path", "columns", "csv-import-options", "database", "encryption-options", "escape-character", "fields-terminated-by", "file-type", "import-context", "import-user", "kind", "lines-terminated-by", "no-recovery", "pvk-password", "pvk-path", "quote-character", "recovery-only", "stop-at", "stop-at-mark", "striped", "table", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bak-import-options", "bak-type", "cert-path", "columns", "csv-import-options", "database", "encryption-options", "escape-character", "fields-terminated-by", "file-type", "import-context", "import-user", "kind", "lines-terminated-by", "no-recovery", "parallel", "pvk-password", "pvk-path", "quote-character", "recovery-only", "sql-import-options", "stop-at", "stop-at-mark", "striped", "table", "threads", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1720,6 +1810,12 @@ where
                     "failover-replica.available" => Some(("failoverReplica.available", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "failover-replica.name" => Some(("failoverReplica.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gce-zone" => Some(("gceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gemini-config.active-query-enabled" => Some(("geminiConfig.activeQueryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.entitled" => Some(("geminiConfig.entitled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.flag-recommender-enabled" => Some(("geminiConfig.flagRecommenderEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.google-vacuum-mgmt-enabled" => Some(("geminiConfig.googleVacuumMgmtEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.index-advisor-enabled" => Some(("geminiConfig.indexAdvisorEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.oom-session-cancel-enabled" => Some(("geminiConfig.oomSessionCancelEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "instance-type" => Some(("instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1759,6 +1855,9 @@ where
                     "replica-configuration.mysql-replica-configuration.username" => Some(("replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "replication-cluster.dr-replica" => Some(("replicationCluster.drReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-cluster.failover-dr-replica-name" => Some(("replicationCluster.failoverDrReplicaName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-cluster.psa-write-endpoint" => Some(("replicationCluster.psaWriteEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "root-password" => Some(("rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "scheduled-maintenance.can-defer" => Some(("scheduledMaintenance.canDefer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1793,6 +1892,7 @@ where
                     "settings.backup-configuration.replication-log-archiving-enabled" => Some(("settings.backupConfiguration.replicationLogArchivingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.transaction-log-retention-days" => Some(("settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.transactional-log-storage-state" => Some(("settings.backupConfiguration.transactionalLogStorageState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.collation" => Some(("settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.connector-enforcement" => Some(("settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1802,6 +1902,8 @@ where
                     "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.deletion-protection-enabled" => Some(("settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.edition" => Some(("settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.enable-dataplex-integration" => Some(("settings.enableDataplexIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.enable-google-ml-integration" => Some(("settings.enableGoogleMlIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-insights-enabled" => Some(("settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-plans-per-minute" => Some(("settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-string-length" => Some(("settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1848,7 +1950,7 @@ where
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "write-endpoint" => Some(("writeEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "domain", "dump-file-path", "edition", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "primary-dns-name", "private-network", "project", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "threads-per-core", "tier", "time-zone", "transaction-log-retention-days", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "active-query-enabled", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "domain", "dr-replica", "dump-file-path", "edition", "enable-dataplex-integration", "enable-google-ml-integration", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "entitled", "etag", "expiration-time", "failover-dr-replica-name", "failover-replica", "failover-target", "flag-recommender-enabled", "follow-gae-application", "gce-zone", "gemini-config", "google-vacuum-mgmt-enabled", "host-port", "hour", "index-advisor-enabled", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "oom-session-cancel-enabled", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "primary-dns-name", "private-network", "project", "psa-write-endpoint", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-cluster", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "threads-per-core", "tier", "time-zone", "transaction-log-retention-days", "transactional-log-storage-state", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2061,6 +2163,12 @@ where
                     "failover-replica.available" => Some(("failoverReplica.available", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "failover-replica.name" => Some(("failoverReplica.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gce-zone" => Some(("gceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gemini-config.active-query-enabled" => Some(("geminiConfig.activeQueryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.entitled" => Some(("geminiConfig.entitled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.flag-recommender-enabled" => Some(("geminiConfig.flagRecommenderEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.google-vacuum-mgmt-enabled" => Some(("geminiConfig.googleVacuumMgmtEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.index-advisor-enabled" => Some(("geminiConfig.indexAdvisorEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.oom-session-cancel-enabled" => Some(("geminiConfig.oomSessionCancelEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "instance-type" => Some(("instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2100,6 +2208,9 @@ where
                     "replica-configuration.mysql-replica-configuration.username" => Some(("replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "replication-cluster.dr-replica" => Some(("replicationCluster.drReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-cluster.failover-dr-replica-name" => Some(("replicationCluster.failoverDrReplicaName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-cluster.psa-write-endpoint" => Some(("replicationCluster.psaWriteEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "root-password" => Some(("rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "scheduled-maintenance.can-defer" => Some(("scheduledMaintenance.canDefer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2134,6 +2245,7 @@ where
                     "settings.backup-configuration.replication-log-archiving-enabled" => Some(("settings.backupConfiguration.replicationLogArchivingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.transaction-log-retention-days" => Some(("settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.transactional-log-storage-state" => Some(("settings.backupConfiguration.transactionalLogStorageState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.collation" => Some(("settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.connector-enforcement" => Some(("settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2143,6 +2255,8 @@ where
                     "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.deletion-protection-enabled" => Some(("settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.edition" => Some(("settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.enable-dataplex-integration" => Some(("settings.enableDataplexIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.enable-google-ml-integration" => Some(("settings.enableGoogleMlIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-insights-enabled" => Some(("settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-plans-per-minute" => Some(("settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-string-length" => Some(("settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2189,7 +2303,7 @@ where
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "write-endpoint" => Some(("writeEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "domain", "dump-file-path", "edition", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "primary-dns-name", "private-network", "project", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "threads-per-core", "tier", "time-zone", "transaction-log-retention-days", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "active-query-enabled", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "domain", "dr-replica", "dump-file-path", "edition", "enable-dataplex-integration", "enable-google-ml-integration", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "entitled", "etag", "expiration-time", "failover-dr-replica-name", "failover-replica", "failover-target", "flag-recommender-enabled", "follow-gae-application", "gce-zone", "gemini-config", "google-vacuum-mgmt-enabled", "host-port", "hour", "index-advisor-enabled", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "oom-session-cancel-enabled", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "primary-dns-name", "private-network", "project", "psa-write-endpoint", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-cluster", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "threads-per-core", "tier", "time-zone", "transaction-log-retention-days", "transactional-log-storage-state", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2342,6 +2456,58 @@ where
         }
         let mut request: api::InstancesReencryptRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().reencrypt(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _instances_release_ssrs_lease(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.instances().release_ssrs_lease(opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2954,6 +3120,12 @@ where
                     "failover-replica.available" => Some(("failoverReplica.available", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "failover-replica.name" => Some(("failoverReplica.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gce-zone" => Some(("gceZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gemini-config.active-query-enabled" => Some(("geminiConfig.activeQueryEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.entitled" => Some(("geminiConfig.entitled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.flag-recommender-enabled" => Some(("geminiConfig.flagRecommenderEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.google-vacuum-mgmt-enabled" => Some(("geminiConfig.googleVacuumMgmtEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.index-advisor-enabled" => Some(("geminiConfig.indexAdvisorEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gemini-config.oom-session-cancel-enabled" => Some(("geminiConfig.oomSessionCancelEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "instance-type" => Some(("instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2993,6 +3165,9 @@ where
                     "replica-configuration.mysql-replica-configuration.username" => Some(("replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "replication-cluster.dr-replica" => Some(("replicationCluster.drReplica", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replication-cluster.failover-dr-replica-name" => Some(("replicationCluster.failoverDrReplicaName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replication-cluster.psa-write-endpoint" => Some(("replicationCluster.psaWriteEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "root-password" => Some(("rootPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "scheduled-maintenance.can-defer" => Some(("scheduledMaintenance.canDefer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3027,6 +3202,7 @@ where
                     "settings.backup-configuration.replication-log-archiving-enabled" => Some(("settings.backupConfiguration.replicationLogArchivingEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.backup-configuration.transaction-log-retention-days" => Some(("settings.backupConfiguration.transactionLogRetentionDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.transactional-log-storage-state" => Some(("settings.backupConfiguration.transactionalLogStorageState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.collation" => Some(("settings.collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.connector-enforcement" => Some(("settings.connectorEnforcement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3036,6 +3212,8 @@ where
                     "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.deletion-protection-enabled" => Some(("settings.deletionProtectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.edition" => Some(("settings.edition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.enable-dataplex-integration" => Some(("settings.enableDataplexIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.enable-google-ml-integration" => Some(("settings.enableGoogleMlIntegration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-insights-enabled" => Some(("settings.insightsConfig.queryInsightsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-plans-per-minute" => Some(("settings.insightsConfig.queryPlansPerMinute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "settings.insights-config.query-string-length" => Some(("settings.insightsConfig.queryStringLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3082,7 +3260,7 @@ where
                     "suspension-reason" => Some(("suspensionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "write-endpoint" => Some(("writeEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "domain", "dump-file-path", "edition", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "etag", "expiration-time", "failover-replica", "failover-target", "follow-gae-application", "gce-zone", "host-port", "hour", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "primary-dns-name", "private-network", "project", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "threads-per-core", "tier", "time-zone", "transaction-log-retention-days", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "active-directory-config", "active-query-enabled", "advanced-machine-features", "allocated-ip-range", "allowed-consumer-projects", "authorized-gae-applications", "availability-type", "available", "available-maintenance-versions", "backend-type", "backup-configuration", "backup-retention-settings", "binary-log-enabled", "bucket", "ca-certificate", "can-defer", "can-reschedule", "cascadable-replica", "cert", "cert-serial-number", "client-certificate", "client-key", "collation", "common-name", "complexity", "connect-retry-interval", "connection-name", "connector-enforcement", "crash-safe-replication-enabled", "create-time", "current-disk-size", "data-cache-config", "data-cache-enabled", "data-disk-size-gb", "data-disk-type", "database-installed-version", "database-replication-enabled", "database-version", "day", "deletion-protection-enabled", "disallow-compromised-credentials", "disallow-username-substring", "disk-encryption-configuration", "disk-encryption-status", "dns-name", "domain", "dr-replica", "dump-file-path", "edition", "enable-dataplex-integration", "enable-google-ml-integration", "enable-password-policy", "enable-private-path-for-google-cloud-services", "enabled", "entitled", "etag", "expiration-time", "failover-dr-replica-name", "failover-replica", "failover-target", "flag-recommender-enabled", "follow-gae-application", "gce-zone", "gemini-config", "google-vacuum-mgmt-enabled", "host-port", "hour", "index-advisor-enabled", "insights-config", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "kms-key-name", "kms-key-version-name", "location", "location-preference", "maintenance-version", "maintenance-window", "master-heartbeat-period", "master-instance-name", "max-disk-size", "min-length", "mysql-replica-configuration", "name", "on-premises-configuration", "oom-session-cancel-enabled", "out-of-disk-report", "password", "password-change-interval", "password-validation-policy", "point-in-time-recovery-enabled", "pricing-plan", "primary-dns-name", "private-network", "project", "psa-write-endpoint", "psc-config", "psc-enabled", "psc-service-attachment-link", "query-insights-enabled", "query-plans-per-minute", "query-string-length", "record-application-tags", "record-client-address", "region", "replica-configuration", "replica-names", "replication-cluster", "replication-log-archiving-enabled", "replication-type", "require-ssl", "retained-backups", "retention-interval", "retention-unit", "reuse-interval", "root-password", "satisfies-pzs", "schedule-deadline-time", "scheduled-maintenance", "secondary-gce-zone", "secondary-zone", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "source-instance", "sql-min-recommended-increase-size-gb", "sql-network-architecture", "sql-out-of-disk-state", "sql-server-audit-config", "ssl-cipher", "ssl-mode", "start-time", "state", "storage-auto-resize", "storage-auto-resize-limit", "suspension-reason", "threads-per-core", "tier", "time-zone", "transaction-log-retention-days", "transactional-log-storage-state", "update-track", "upload-interval", "user-labels", "username", "verify-server-certificate", "write-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3690,11 +3868,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "migration-type" => Some(("migrationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-verification" => Some(("skipVerification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "sync-mode" => Some(("syncMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sync-parallel-level" => Some(("syncParallelLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["skip-verification", "sync-mode", "sync-parallel-level"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["migration-type", "skip-verification", "sync-mode", "sync-parallel-level"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3777,11 +3956,13 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "migration-type" => Some(("migrationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sync-mode" => Some(("syncMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sync-parallel-level" => Some(("syncParallelLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "verify-connection-only" => Some(("verifyConnectionOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "verify-replication-only" => Some(("verifyReplicationOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["sync-mode", "verify-connection-only", "verify-replication-only"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["migration-type", "sync-mode", "sync-parallel-level", "verify-connection-only", "verify-replication-only"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4674,6 +4855,9 @@ where
             },
             ("instances", Some(opt)) => {
                 match opt.subcommand() {
+                    ("acquire-ssrs-lease", Some(opt)) => {
+                        call_result = self._instances_acquire_ssrs_lease(opt, dry_run, &mut err).await;
+                    },
                     ("add-server-ca", Some(opt)) => {
                         call_result = self._instances_add_server_ca(opt, dry_run, &mut err).await;
                     },
@@ -4718,6 +4902,9 @@ where
                     },
                     ("reencrypt", Some(opt)) => {
                         call_result = self._instances_reencrypt(opt, dry_run, &mut err).await;
+                    },
+                    ("release-ssrs-lease", Some(opt)) => {
+                        call_result = self._instances_release_ssrs_lease(opt, dry_run, &mut err).await;
                     },
                     ("reset-ssl-config", Some(opt)) => {
                         call_result = self._instances_reset_ssl_config(opt, dry_run, &mut err).await;
@@ -5358,7 +5545,41 @@ async fn main() {
                   ]),
             ]),
         
-        ("instances", "methods: 'add-server-ca', 'clone', 'delete', 'demote', 'demote-master', 'export', 'failover', 'get', 'import', 'insert', 'list', 'list-server-cas', 'patch', 'promote-replica', 'reencrypt', 'reset-ssl-config', 'restart', 'restore-backup', 'rotate-server-ca', 'start-replica', 'stop-replica', 'switchover', 'truncate-log' and 'update'", vec![
+        ("instances", "methods: 'acquire-ssrs-lease', 'add-server-ca', 'clone', 'delete', 'demote', 'demote-master', 'export', 'failover', 'get', 'import', 'insert', 'list', 'list-server-cas', 'patch', 'promote-replica', 'reencrypt', 'release-ssrs-lease', 'reset-ssl-config', 'restart', 'restore-backup', 'rotate-server-ca', 'start-replica', 'stop-replica', 'switchover', 'truncate-log' and 'update'", vec![
+            ("acquire-ssrs-lease",
+                    Some(r##"Acquire a lease for the setup of SQL Server Reporting Services (SSRS)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_acquire-ssrs-lease",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. Project ID of the project that contains the instance (Example: project-id)."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. Cloud SQL instance ID. This doesn't include the project ID. It's composed of lowercase letters, numbers, and hyphens, and it must start with a letter. The total length must be 98 characters or less (Example: instance-id)."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("add-server-ca",
                     Some(r##"Adds a new trusted Certificate Authority (CA) version for the specified instance. Required to prepare for a certificate rotation. If a CA version was previously added but never used in a certificate rotation, this operation replaces that version. There cannot be more than one CA version waiting to be rotated in."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_add-server-ca",
@@ -5760,7 +5981,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("promote-replica",
-                    Some(r##"Promotes the read replica instance to be a stand-alone Cloud SQL instance. Using this operation might cause your instance to restart."##),
+                    Some(r##"Promotes the read replica instance to be an independent Cloud SQL primary instance. Using this operation might cause your instance to restart."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_promote-replica",
                   vec![
                     (Some(r##"project"##),
@@ -5808,6 +6029,34 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("release-ssrs-lease",
+                    Some(r##"Release a lease for the setup of SQL Server Reporting Services (SSRS)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_release-ssrs-lease",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Required. The project ID that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Required. The Cloud SQL instance ID. This doesn't include the project ID. The instance ID contains lowercase letters, numbers, and hyphens, and it must start with a letter. This ID can have a maximum length of 98 characters."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6002,7 +6251,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("switchover",
-                    Some(r##"Switches over from the primary instance to the replica instance."##),
+                    Some(r##"Switches over from the primary instance to the designated DR replica instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_cli/instances_switchover",
                   vec![
                     (Some(r##"project"##),
@@ -6766,7 +7015,7 @@ async fn main() {
     
     let mut app = App::new("sqladmin1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240219")
+           .version("5.0.5+20240618")
            .about("API for Cloud SQL database instance management")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_cli")
            .arg(Arg::with_name("url")
@@ -6830,6 +7079,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

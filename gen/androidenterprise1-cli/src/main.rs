@@ -5398,7 +5398,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("create-web-token",
-                    Some(r##"Returns a unique token to access an embeddable UI. To generate a web UI, pass the generated token into the managed Google Play javascript API. Each token may only be used to start one UI session. See the javascript API documentation for further information."##),
+                    Some(r##"Returns a unique token to access an embeddable UI. To generate a web UI, pass the generated token into the managed Google Play javascript API. Each token may only be used to start one UI session. See the JavaScript API documentation for further information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_create-web-token",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7351,7 +7351,7 @@ async fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240304")
+           .version("5.0.5+20240625")
            .about("Manages the deployment of apps to Android Enterprise devices.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")
@@ -7415,6 +7415,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

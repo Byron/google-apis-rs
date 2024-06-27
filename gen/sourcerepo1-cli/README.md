@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloud Source Repositories* API can be found at the
-[official documentation site](https://cloud.google.com/source-repositories/docs/apis).
+[official documentation site](https://cloud.google.com/source-repositories/docs).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Source Repositories* API at revision *20240304*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Cloud Source Repositories* API at revision *20240623*. The CLI is at version *5.0.5*.
 
 ```bash
 sourcerepo1 [options]

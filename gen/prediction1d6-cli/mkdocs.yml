@@ -1,4 +1,4 @@
-site_name: prediction v5.0.4+20160511
+site_name: prediction v5.0.5+20160511
 site_url: http://byron.github.io/google-apis-rs/google-prediction1d6-cli
 site_description: A complete library to interact with prediction (protocol v1.6)
 
@@ -22,5 +22,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

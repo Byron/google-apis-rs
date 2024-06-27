@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *VM Migration Service* API at revision *20240222*. The CLI is at version *5.0.4*.
+This documentation was generated from the *VM Migration Service* API at revision *20240613*. The CLI is at version *5.0.5*.
 
 ```bash
 vmmigration1 [options]

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *adsense* crate version *5.0.4+20240305*, where *20240305* is the exact revision of the *adsense:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *adsense* crate version *5.0.5+20240626*, where *20240626* is the exact revision of the *adsense:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *adsense* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/adsense/management/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Adsense) ... 
 //! 
 //! * [accounts](api::Account)
-//!  * [*adclients adunits create*](api::AccountAdclientAdunitCreateCall), [*adclients adunits get*](api::AccountAdclientAdunitGetCall), [*adclients adunits get adcode*](api::AccountAdclientAdunitGetAdcodeCall), [*adclients adunits list*](api::AccountAdclientAdunitListCall), [*adclients adunits list linked custom channels*](api::AccountAdclientAdunitListLinkedCustomChannelCall), [*adclients adunits patch*](api::AccountAdclientAdunitPatchCall), [*adclients customchannels create*](api::AccountAdclientCustomchannelCreateCall), [*adclients customchannels delete*](api::AccountAdclientCustomchannelDeleteCall), [*adclients customchannels get*](api::AccountAdclientCustomchannelGetCall), [*adclients customchannels list*](api::AccountAdclientCustomchannelListCall), [*adclients customchannels list linked ad units*](api::AccountAdclientCustomchannelListLinkedAdUnitCall), [*adclients customchannels patch*](api::AccountAdclientCustomchannelPatchCall), [*adclients get*](api::AccountAdclientGetCall), [*adclients get adcode*](api::AccountAdclientGetAdcodeCall), [*adclients list*](api::AccountAdclientListCall), [*adclients urlchannels get*](api::AccountAdclientUrlchannelGetCall), [*adclients urlchannels list*](api::AccountAdclientUrlchannelListCall), [*alerts list*](api::AccountAlertListCall), [*get*](api::AccountGetCall), [*get ad blocking recovery tag*](api::AccountGetAdBlockingRecoveryTagCall), [*list*](api::AccountListCall), [*list child accounts*](api::AccountListChildAccountCall), [*payments list*](api::AccountPaymentListCall), [*reports generate*](api::AccountReportGenerateCall), [*reports generate csv*](api::AccountReportGenerateCsvCall), [*reports get saved*](api::AccountReportGetSavedCall), [*reports saved generate*](api::AccountReportSavedGenerateCall), [*reports saved generate csv*](api::AccountReportSavedGenerateCsvCall), [*reports saved list*](api::AccountReportSavedListCall), [*sites get*](api::AccountSiteGetCall) and [*sites list*](api::AccountSiteListCall)
+//!  * [*adclients adunits create*](api::AccountAdclientAdunitCreateCall), [*adclients adunits get*](api::AccountAdclientAdunitGetCall), [*adclients adunits get adcode*](api::AccountAdclientAdunitGetAdcodeCall), [*adclients adunits list*](api::AccountAdclientAdunitListCall), [*adclients adunits list linked custom channels*](api::AccountAdclientAdunitListLinkedCustomChannelCall), [*adclients adunits patch*](api::AccountAdclientAdunitPatchCall), [*adclients customchannels create*](api::AccountAdclientCustomchannelCreateCall), [*adclients customchannels delete*](api::AccountAdclientCustomchannelDeleteCall), [*adclients customchannels get*](api::AccountAdclientCustomchannelGetCall), [*adclients customchannels list*](api::AccountAdclientCustomchannelListCall), [*adclients customchannels list linked ad units*](api::AccountAdclientCustomchannelListLinkedAdUnitCall), [*adclients customchannels patch*](api::AccountAdclientCustomchannelPatchCall), [*adclients get*](api::AccountAdclientGetCall), [*adclients get adcode*](api::AccountAdclientGetAdcodeCall), [*adclients list*](api::AccountAdclientListCall), [*adclients urlchannels get*](api::AccountAdclientUrlchannelGetCall), [*adclients urlchannels list*](api::AccountAdclientUrlchannelListCall), [*alerts list*](api::AccountAlertListCall), [*get*](api::AccountGetCall), [*get ad blocking recovery tag*](api::AccountGetAdBlockingRecoveryTagCall), [*list*](api::AccountListCall), [*list child accounts*](api::AccountListChildAccountCall), [*payments list*](api::AccountPaymentListCall), [*policy issues get*](api::AccountPolicyIssueGetCall), [*policy issues list*](api::AccountPolicyIssueListCall), [*reports generate*](api::AccountReportGenerateCall), [*reports generate csv*](api::AccountReportGenerateCsvCall), [*reports get saved*](api::AccountReportGetSavedCall), [*reports saved generate*](api::AccountReportSavedGenerateCall), [*reports saved generate csv*](api::AccountReportSavedGenerateCsvCall), [*reports saved list*](api::AccountReportSavedListCall), [*sites get*](api::AccountSiteGetCall) and [*sites list*](api::AccountSiteListCall)
 //! 
 //! 
 //! 
@@ -66,6 +66,8 @@
 //! let r = hub.accounts().adclients_list(...).doit().await
 //! let r = hub.accounts().alerts_list(...).doit().await
 //! let r = hub.accounts().payments_list(...).doit().await
+//! let r = hub.accounts().policy_issues_get(...).doit().await
+//! let r = hub.accounts().policy_issues_list(...).doit().await
 //! let r = hub.accounts().reports_saved_generate(...).doit().await
 //! let r = hub.accounts().reports_saved_generate_csv(...).doit().await
 //! let r = hub.accounts().reports_saved_list(...).doit().await
@@ -121,7 +123,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Adsense::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = Adsense::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
@@ -213,6 +215,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Iam* API at revision *20240220*. The CLI is at version *5.0.4*.
+This documentation was generated from the *Iam* API at revision *20240621*. The CLI is at version *5.0.5*.
 
 ```bash
 iam1 [options]
@@ -69,6 +69,17 @@ iam1 [options]
         permissions
                 query-testable-permissions (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                locations-oauth-clients-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-oauth-clients-credentials-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-oauth-clients-credentials-delete <name> [-p <v>]... [-o <out>]
+                locations-oauth-clients-credentials-get <name> [-p <v>]... [-o <out>]
+                locations-oauth-clients-credentials-list <parent> [-p <v>]... [-o <out>]
+                locations-oauth-clients-credentials-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-oauth-clients-delete <name> [-p <v>]... [-o <out>]
+                locations-oauth-clients-get <name> [-p <v>]... [-o <out>]
+                locations-oauth-clients-list <parent> [-p <v>]... [-o <out>]
+                locations-oauth-clients-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-oauth-clients-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workload-identity-pools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-workload-identity-pools-delete <name> [-p <v>]... [-o <out>]
                 locations-workload-identity-pools-get <name> [-p <v>]... [-o <out>]
@@ -110,6 +121,7 @@ iam1 [options]
                 service-accounts-keys-enable <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-keys-get <name> [-p <v>]... [-o <out>]
                 service-accounts-keys-list <name> [-p <v>]... [-o <out>]
+                service-accounts-keys-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-keys-upload <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-list <name> [-p <v>]... [-o <out>]
                 service-accounts-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -1,4 +1,4 @@
-site_name: Chrome Management v5.0.4+20240303
+site_name: Chrome Management v5.0.5+20240624
 site_url: http://byron.github.io/google-apis-rs/google-chromemanagement1-cli
 site_description: A complete library to interact with Chrome Management (protocol v1)
 
@@ -13,8 +13,11 @@ nav:
     - 'Apps Android Get': 'customers_apps-android-get.md'
     - 'Apps Chrome Get': 'customers_apps-chrome-get.md'
     - 'Apps Count Chrome App Requests': 'customers_apps-count-chrome-app-requests.md'
+    - 'Apps Fetch Devices Requesting Extension': 'customers_apps-fetch-devices-requesting-extension.md'
+    - 'Apps Fetch Users Requesting Extension': 'customers_apps-fetch-users-requesting-extension.md'
     - 'Apps Web Get': 'customers_apps-web-get.md'
     - 'Reports Count Chrome Browsers Needing Attention': 'customers_reports-count-chrome-browsers-needing-attention.md'
+    - 'Reports Count Chrome Crash Events': 'customers_reports-count-chrome-crash-events.md'
     - 'Reports Count Chrome Devices Reaching Auto Expiration Date': 'customers_reports-count-chrome-devices-reaching-auto-expiration-date.md'
     - 'Reports Count Chrome Devices That Need Attention': 'customers_reports-count-chrome-devices-that-need-attention.md'
     - 'Reports Count Chrome Hardware Fleet Devices': 'customers_reports-count-chrome-hardware-fleet-devices.md'
@@ -35,5 +38,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

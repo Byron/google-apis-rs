@@ -2671,7 +2671,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the project resource in the form: `projects/{project_id}`"##),
+                     Some(r##"Required. The name of the project resource in the form: `projects/{project_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2771,7 +2771,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the project resource in the form: `projects/{project_id}`"##),
+                     Some(r##"Required. The name of the project resource in the form: `projects/{project_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2937,7 +2937,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
+                     Some(r##"Identifier. The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
                      Some(true),
                      Some(false)),
         
@@ -3081,7 +3081,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3109,7 +3109,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the project resource in the form: `projects/{project_id}`"##),
+                     Some(r##"Required. The name of the project resource in the form: `projects/{project_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -3231,7 +3231,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
+                     Some(r##"Identifier. The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
                      Some(true),
                      Some(false)),
         
@@ -3375,7 +3375,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
+                     Some(r##"Required. Transfer configuration name in the form: `projects/{project_id}/transferConfigs/{config_id}` or `projects/{project_id}/locations/{location_id}/transferConfigs/{config_id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3403,7 +3403,7 @@ async fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240227")
+           .version("5.0.5+20240616")
            .about("Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")
@@ -3467,6 +3467,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

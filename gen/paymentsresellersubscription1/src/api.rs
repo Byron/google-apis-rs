@@ -77,7 +77,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -126,7 +126,7 @@ impl<'a, S> PaymentsResellerSubscription<S> {
         PaymentsResellerSubscription {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://paymentsresellersubscription.googleapis.com/".to_string(),
             _root_url: "https://paymentsresellersubscription.googleapis.com/".to_string(),
         }
@@ -137,7 +137,7 @@ impl<'a, S> PaymentsResellerSubscription<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -169,6 +169,7 @@ impl<'a, S> PaymentsResellerSubscription<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Amount {
@@ -194,10 +195,11 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Amount {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions cancel partners](PartnerSubscriptionCancelCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest {
-    /// Optional. If true, Google will cancel the subscription immediately, and may or may not (based on the contract) issue a prorated refund for the remainder of the billing cycle. Otherwise, Google defers the cancelation at renewal_time, and will not issue a refund.
+    /// Optional. If true, Google will cancel the subscription immediately, and may or may not (based on the contract) issue a prorated refund for the remainder of the billing cycle. Otherwise, Google defers the cancelation at renewal_time, and will not issue a refund. - YouTube subscriptions must use this option currently. However, the user will still have access to the subscription until the end of the billing cycle.
     #[serde(rename="cancelImmediately")]
     
     pub cancel_immediately: Option<bool>,
@@ -218,6 +220,7 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1CancelSub
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions cancel partners](PartnerSubscriptionCancelCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionResponse {
@@ -233,6 +236,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1CancelS
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Duration {
@@ -247,7 +251,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Duration {
 impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Duration {}
 
 
-/// Partner request for entitling the previously provisioned subscription to an end user. The end user identity is inferred from the request OAuth context.
+/// LINT.IfChange Partner request for entitling the previously provisioned subscription to an end user. The end user identity is inferred from the request OAuth context.
 /// 
 /// # Activities
 /// 
@@ -255,6 +259,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Duration {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions entitle partners](PartnerSubscriptionEntitleCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest {
@@ -271,6 +276,7 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1EntitleSu
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequestLineItemEntitlementDetails {
@@ -294,6 +300,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscripti
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions entitle partners](PartnerSubscriptionEntitleCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionResponse {
@@ -313,6 +320,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1Entitle
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions extend partners](PartnerSubscriptionExtendCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest {
@@ -336,6 +344,7 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1ExtendSub
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions extend partners](PartnerSubscriptionExtendCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionResponse {
@@ -360,6 +369,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ExtendS
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Extension {
@@ -383,6 +393,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Extension {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [promotions find eligible partners](PartnerPromotionFindEligibleCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsRequest {
@@ -410,6 +421,7 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1FindEligi
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [promotions find eligible partners](PartnerPromotionFindEligibleCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1FindEligiblePromotionsResponse {
@@ -429,6 +441,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1FindEli
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1FiniteBillingCycleDetails {
@@ -446,6 +459,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1FiniteBillingCycl
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload {
@@ -476,6 +490,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1GoogleOnePayload 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [products list partners](PartnerProductListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ListProductsResponse {
@@ -499,6 +514,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ListPro
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [promotions list partners](PartnerPromotionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ListPromotionsResponse {
@@ -518,6 +534,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1ListPro
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Location {
@@ -538,6 +555,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Location {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Product {
@@ -580,6 +598,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Product {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ProductBundleDetailsBundleElement {
@@ -595,6 +614,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ProductBundleDeta
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ProductPayload {
@@ -615,6 +635,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ProductPayload {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ProductPriceConfig {
@@ -634,6 +655,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ProductPriceConfi
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Promotion {
@@ -680,6 +702,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1Promotion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetails {
@@ -696,6 +719,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroduc
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroductoryPricingDetailsIntroductoryPricingSpec {
@@ -725,6 +749,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1PromotionIntroduc
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod {
@@ -751,6 +776,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1ServicePeriod {}
 /// * [subscriptions create partners](PartnerSubscriptionCreateCall) (request|response)
 /// * [subscriptions get partners](PartnerSubscriptionGetCall) (response)
 /// * [subscriptions provision partners](PartnerSubscriptionProvisionCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1Subscription {
@@ -799,6 +825,10 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1Subscription {
     /// Optional. Deprecated: consider using the top-level `promotion_specs` as the input. Optional. Resource name that identifies one or more promotions that can be applied on the product. A typical promotion for a subscription is Free trial. The format will be 'partners/{partner_id}/promotions/{promotion_id}'.
     
     pub promotions: Option<Vec<String>>,
+    /// Optional. The timestamp when the user transaction was made with the Partner. Specify for the case of "bundle with choice", and it must be before the provision_time (when the user makes a selection).
+    #[serde(rename="purchaseTime")]
+    
+    pub purchase_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// Output only. The place where partners should redirect the end-user to after creation. This field might also be populated when creation failed. However, Partners should always prepare a default URL to redirect the user in case this field is empty.
     #[serde(rename="redirectUri")]
     
@@ -832,6 +862,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1Subscri
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCancellationDetails {
@@ -847,6 +878,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionCance
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {
@@ -872,7 +904,7 @@ pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItem {
     #[serde(rename="lineItemIndex")]
     
     pub line_item_index: Option<i32>,
-    /// Optional. The promotions applied on the line item. It can be: - a free trial promotion, which overrides the subscription-level free trial promotion. - an introductory pricing promotion. When used as input in Create or Provision API, specify its resource name only.
+    /// Optional. The promotions applied on the line item. It can be: - an introductory pricing promotion. - a free trial promotion. This feature is not enabled. If used, the request will be rejected. When used as input in Create or Provision API, specify its resource name only.
     #[serde(rename="lineItemPromotionSpecs")]
     
     pub line_item_promotion_specs: Option<Vec<GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec>>,
@@ -903,6 +935,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineI
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemBundleDetailsBundleElementDetails {
@@ -922,6 +955,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineI
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineItemOneTimeRecurrenceDetails {
@@ -938,6 +972,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionLineI
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromotionSpec {
@@ -965,6 +1000,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionPromo
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1SubscriptionUpgradeDowngradeDetails {
@@ -989,6 +1025,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1SubscriptionUpgra
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions undo cancel partners](PartnerSubscriptionUndoCancelCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest { _never_set: Option<bool> }
@@ -1004,6 +1041,7 @@ impl client::RequestValue for GoogleCloudPaymentsResellerSubscriptionV1UndoCance
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [subscriptions undo cancel partners](PartnerSubscriptionUndoCancelCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionResponse {
@@ -1019,6 +1057,7 @@ impl client::ResponseResult for GoogleCloudPaymentsResellerSubscriptionV1UndoCan
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudPaymentsResellerSubscriptionV1YoutubePayload {
@@ -1043,6 +1082,7 @@ impl client::Part for GoogleCloudPaymentsResellerSubscriptionV1YoutubePayload {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeLocalizedText {
@@ -1062,6 +1102,7 @@ impl client::Part for GoogleTypeLocalizedText {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductBundleDetails {
@@ -1082,6 +1123,7 @@ impl client::Part for ProductBundleDetails {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubscriptionLineItemBundleDetails {
@@ -1120,7 +1162,7 @@ impl client::Part for SubscriptionLineItemBundleDetails {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `products_list(...)`, `promotions_find_eligible(...)`, `promotions_list(...)`, `subscriptions_cancel(...)`, `subscriptions_create(...)`, `subscriptions_entitle(...)`, `subscriptions_extend(...)`, `subscriptions_get(...)`, `subscriptions_provision(...)` and `subscriptions_undo_cancel(...)`
 /// // to build up your call.
@@ -1139,7 +1181,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// To retrieve the products that can be resold by the partner. It should be autenticated with a service account.
+    /// To retrieve the products that can be resold by the partner. It should be autenticated with a service account. - This API doesn't apply to YouTube products currently.
     /// 
     /// # Arguments
     ///
@@ -1178,7 +1220,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// To retrieve the promotions, such as free trial, that can be used by the partner. It should be autenticated with a service account.
+    /// Retrieves the promotions, such as free trial, that can be used by the partner. - This API doesn't apply to YouTube promotions currently. It should be autenticated with a service account.
     /// 
     /// # Arguments
     ///
@@ -1312,7 +1354,7 @@ impl<'a, S> PartnerMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Used by partners to revoke the pending cancellation of a subscription, which is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already cancelled, the request will fail. It should be called directly by the partner using service accounts.
+    /// Revokes the pending cancellation of a subscription, which is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already cancelled, the request will fail. - **This API doesn't apply to YouTube subscriptions.** It should be called directly by the partner using service accounts.
     /// 
     /// # Arguments
     ///
@@ -1338,7 +1380,7 @@ impl<'a, S> PartnerMethods<'a, S> {
 // CallBuilders   ###
 // #################
 
-/// To retrieve the products that can be resold by the partner. It should be autenticated with a service account.
+/// To retrieve the products that can be resold by the partner. It should be autenticated with a service account. - This API doesn't apply to YouTube products currently.
 ///
 /// A builder for the *products.list* method supported by a *partner* resource.
 /// It is not used directly, but through a [`PartnerMethods`] instance.
@@ -1360,7 +1402,7 @@ impl<'a, S> PartnerMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1473,6 +1515,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1659,7 +1702,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1928,7 +1971,7 @@ where
 }
 
 
-/// To retrieve the promotions, such as free trial, that can be used by the partner. It should be autenticated with a service account.
+/// Retrieves the promotions, such as free trial, that can be used by the partner. - This API doesn't apply to YouTube promotions currently. It should be autenticated with a service account.
 ///
 /// A builder for the *promotions.list* method supported by a *partner* resource.
 /// It is not used directly, but through a [`PartnerMethods`] instance.
@@ -1950,7 +1993,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2063,6 +2106,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2249,7 +2293,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2541,7 +2585,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2845,7 +2889,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3137,7 +3181,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3428,7 +3472,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3526,6 +3570,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3691,7 +3736,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3972,7 +4017,7 @@ where
 }
 
 
-/// Used by partners to revoke the pending cancellation of a subscription, which is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already cancelled, the request will fail. It should be called directly by the partner using service accounts.
+/// Revokes the pending cancellation of a subscription, which is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already cancelled, the request will fail. - **This API doesn't apply to YouTube subscriptions.** It should be called directly by the partner using service accounts.
 ///
 /// A builder for the *subscriptions.undoCancel* method supported by a *partner* resource.
 /// It is not used directly, but through a [`PartnerMethods`] instance.
@@ -3995,7 +4040,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = PaymentsResellerSubscription::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !

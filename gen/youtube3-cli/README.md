@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20240303*. The CLI is at version *5.0.4*.
+This documentation was generated from the *YouTube* API at revision *20240626*. The CLI is at version *5.0.5*.
 
 ```bash
 youtube3 [options]
@@ -78,6 +78,7 @@ youtube3 [options]
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 list <live-chat-id> <part>... [-p <v>]... [-o <out>]
+                transition [-p <v>]... [-o <out>]
         live-chat-moderators
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]

@@ -12939,10 +12939,13 @@ where
                     "condition-config.access-tokens" => Some(("conditionConfig.accessTokens", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition-config.api-keys" => Some(("conditionConfig.apiKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition-config.api-products" => Some(("conditionConfig.apiProducts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "condition-config.asns" => Some(("conditionConfig.asns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition-config.bot-reasons" => Some(("conditionConfig.botReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition-config.developer-apps" => Some(("conditionConfig.developerApps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition-config.developers" => Some(("conditionConfig.developers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "condition-config.http-methods" => Some(("conditionConfig.httpMethods", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition-config.ip-address-ranges" => Some(("conditionConfig.ipAddressRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "condition-config.region-codes" => Some(("conditionConfig.regionCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "condition-config.user-agents" => Some(("conditionConfig.userAgents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deny.response-code" => Some(("deny.responseCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -12953,7 +12956,7 @@ where
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-tokens", "api-keys", "api-products", "bot-reasons", "condition-config", "create-time", "deny", "description", "developer-apps", "developers", "expire-time", "ip-address-ranges", "name", "response-code", "state", "ttl", "update-time", "user-agents"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-tokens", "api-keys", "api-products", "asns", "bot-reasons", "condition-config", "create-time", "deny", "description", "developer-apps", "developers", "expire-time", "http-methods", "ip-address-ranges", "name", "region-codes", "response-code", "state", "ttl", "update-time", "user-agents"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14585,13 +14588,14 @@ where
                     "s-sl-info.common-name.value" => Some(("sSLInfo.commonName.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "s-sl-info.common-name.wildcard-match" => Some(("sSLInfo.commonName.wildcardMatch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "s-sl-info.enabled" => Some(("sSLInfo.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "s-sl-info.enforce" => Some(("sSLInfo.enforce", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "s-sl-info.ignore-validation-errors" => Some(("sSLInfo.ignoreValidationErrors", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "s-sl-info.key-alias" => Some(("sSLInfo.keyAlias", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "s-sl-info.key-store" => Some(("sSLInfo.keyStore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "s-sl-info.protocols" => Some(("sSLInfo.protocols", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "s-sl-info.trust-store" => Some(("sSLInfo.trustStore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ciphers", "client-auth-enabled", "common-name", "description", "enabled", "host", "ignore-validation-errors", "is-enabled", "key-alias", "key-store", "name", "port", "protocol", "protocols", "s-sl-info", "trust-store", "value", "wildcard-match"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ciphers", "client-auth-enabled", "common-name", "description", "enabled", "enforce", "host", "ignore-validation-errors", "is-enabled", "key-alias", "key-store", "name", "port", "protocol", "protocols", "s-sl-info", "trust-store", "value", "wildcard-match"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14793,13 +14797,14 @@ where
                     "s-sl-info.common-name.value" => Some(("sSLInfo.commonName.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "s-sl-info.common-name.wildcard-match" => Some(("sSLInfo.commonName.wildcardMatch", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "s-sl-info.enabled" => Some(("sSLInfo.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "s-sl-info.enforce" => Some(("sSLInfo.enforce", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "s-sl-info.ignore-validation-errors" => Some(("sSLInfo.ignoreValidationErrors", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "s-sl-info.key-alias" => Some(("sSLInfo.keyAlias", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "s-sl-info.key-store" => Some(("sSLInfo.keyStore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "s-sl-info.protocols" => Some(("sSLInfo.protocols", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "s-sl-info.trust-store" => Some(("sSLInfo.trustStore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ciphers", "client-auth-enabled", "common-name", "description", "enabled", "host", "ignore-validation-errors", "is-enabled", "key-alias", "key-store", "name", "port", "protocol", "protocols", "s-sl-info", "trust-store", "value", "wildcard-match"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ciphers", "client-auth-enabled", "common-name", "description", "enabled", "enforce", "host", "ignore-validation-errors", "is-enabled", "key-alias", "key-store", "name", "port", "protocol", "protocols", "s-sl-info", "trust-store", "value", "wildcard-match"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -17363,6 +17368,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "access-logging-config.enabled" => Some(("accessLoggingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "access-logging-config.filter" => Some(("accessLoggingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "consumer-accept-list" => Some(("consumerAcceptList", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "created-at" => Some(("createdAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -17379,7 +17386,7 @@ where
                     "service-attachment" => Some(("serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["consumer-accept-list", "created-at", "description", "disk-encryption-key-name", "display-name", "host", "ip-range", "last-modified-at", "location", "name", "peering-cidr-range", "port", "runtime-version", "service-attachment", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-logging-config", "consumer-accept-list", "created-at", "description", "disk-encryption-key-name", "display-name", "enabled", "filter", "host", "ip-range", "last-modified-at", "location", "name", "peering-cidr-range", "port", "runtime-version", "service-attachment", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -17959,6 +17966,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "access-logging-config.enabled" => Some(("accessLoggingConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "access-logging-config.filter" => Some(("accessLoggingConfig.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "consumer-accept-list" => Some(("consumerAcceptList", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "created-at" => Some(("createdAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -17975,7 +17984,7 @@ where
                     "service-attachment" => Some(("serviceAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["consumer-accept-list", "created-at", "description", "disk-encryption-key-name", "display-name", "host", "ip-range", "last-modified-at", "location", "name", "peering-cidr-range", "port", "runtime-version", "service-attachment", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-logging-config", "consumer-accept-list", "created-at", "description", "disk-encryption-key-name", "display-name", "enabled", "filter", "host", "ip-range", "last-modified-at", "location", "name", "peering-cidr-range", "port", "runtime-version", "service-attachment", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -19178,6 +19187,94 @@ where
         }
         let mut request: api::GoogleCloudApigeeV1CustomReport = json::value::from_value(object).unwrap();
         let mut call = self.hub.organizations().reports_update(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_assessment_results_batch_compute(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile" => Some(("profile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["page-size", "page-token", "profile", "scope"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudApigeeV1BatchComputeSecurityAssessmentResultsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().security_assessment_results_batch_compute(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -22596,6 +22693,9 @@ where
                     ("reports-update", Some(opt)) => {
                         call_result = self._organizations_reports_update(opt, dry_run, &mut err).await;
                     },
+                    ("security-assessment-results-batch-compute", Some(opt)) => {
+                        call_result = self._organizations_security_assessment_results_batch_compute(opt, dry_run, &mut err).await;
+                    },
                     ("security-profiles-create", Some(opt)) => {
                         call_result = self._organizations_security_profiles_create(opt, dry_run, &mut err).await;
                     },
@@ -22813,7 +22913,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("organizations", "methods: 'analytics-datastores-create', 'analytics-datastores-delete', 'analytics-datastores-get', 'analytics-datastores-list', 'analytics-datastores-test', 'analytics-datastores-update', 'apiproducts-attributes', 'apiproducts-attributes-delete', 'apiproducts-attributes-get', 'apiproducts-attributes-list', 'apiproducts-attributes-update-api-product-attribute', 'apiproducts-create', 'apiproducts-delete', 'apiproducts-get', 'apiproducts-list', 'apiproducts-rateplans-create', 'apiproducts-rateplans-delete', 'apiproducts-rateplans-get', 'apiproducts-rateplans-list', 'apiproducts-rateplans-update', 'apiproducts-update', 'apis-create', 'apis-delete', 'apis-deployments-list', 'apis-get', 'apis-keyvaluemaps-create', 'apis-keyvaluemaps-delete', 'apis-keyvaluemaps-entries-create', 'apis-keyvaluemaps-entries-delete', 'apis-keyvaluemaps-entries-get', 'apis-keyvaluemaps-entries-list', 'apis-keyvaluemaps-entries-update', 'apis-list', 'apis-patch', 'apis-revisions-delete', 'apis-revisions-deployments-list', 'apis-revisions-get', 'apis-revisions-update-api-proxy-revision', 'appgroups-apps-create', 'appgroups-apps-delete', 'appgroups-apps-get', 'appgroups-apps-keys-apiproducts-delete', 'appgroups-apps-keys-apiproducts-update-app-group-app-key-api-product', 'appgroups-apps-keys-create', 'appgroups-apps-keys-delete', 'appgroups-apps-keys-get', 'appgroups-apps-keys-update-app-group-app-key', 'appgroups-apps-list', 'appgroups-apps-update', 'appgroups-create', 'appgroups-delete', 'appgroups-get', 'appgroups-list', 'appgroups-update', 'apps-get', 'apps-list', 'create', 'datacollectors-create', 'datacollectors-delete', 'datacollectors-get', 'datacollectors-list', 'datacollectors-patch', 'delete', 'deployments-list', 'developers-apps-attributes', 'developers-apps-attributes-delete', 'developers-apps-attributes-get', 'developers-apps-attributes-list', 'developers-apps-attributes-update-developer-app-attribute', 'developers-apps-create', 'developers-apps-delete', 'developers-apps-generate-key-pair-or-update-developer-app-status', 'developers-apps-get', 'developers-apps-keys-apiproducts-delete', 'developers-apps-keys-apiproducts-update-developer-app-key-api-product', 'developers-apps-keys-create', 'developers-apps-keys-create-create', 'developers-apps-keys-delete', 'developers-apps-keys-get', 'developers-apps-keys-replace-developer-app-key', 'developers-apps-keys-update-developer-app-key', 'developers-apps-list', 'developers-apps-update', 'developers-attributes', 'developers-attributes-delete', 'developers-attributes-get', 'developers-attributes-list', 'developers-attributes-update-developer-attribute', 'developers-balance-adjust', 'developers-balance-credit', 'developers-create', 'developers-delete', 'developers-get', 'developers-get-balance', 'developers-get-monetization-config', 'developers-list', 'developers-set-developer-status', 'developers-subscriptions-create', 'developers-subscriptions-expire', 'developers-subscriptions-get', 'developers-subscriptions-list', 'developers-update', 'developers-update-monetization-config', 'endpoint-attachments-create', 'endpoint-attachments-delete', 'endpoint-attachments-get', 'endpoint-attachments-list', 'envgroups-attachments-create', 'envgroups-attachments-delete', 'envgroups-attachments-get', 'envgroups-attachments-list', 'envgroups-create', 'envgroups-delete', 'envgroups-get', 'envgroups-get-deployed-ingress-config', 'envgroups-list', 'envgroups-patch', 'environments-addons-config-set-addon-enablement', 'environments-analytics-admin-get-schemav2', 'environments-analytics-exports-create', 'environments-analytics-exports-get', 'environments-analytics-exports-list', 'environments-apis-deployments-list', 'environments-apis-revisions-debugsessions-create', 'environments-apis-revisions-debugsessions-data-get', 'environments-apis-revisions-debugsessions-delete-data', 'environments-apis-revisions-debugsessions-get', 'environments-apis-revisions-debugsessions-list', 'environments-apis-revisions-deploy', 'environments-apis-revisions-deployments-generate-deploy-change-report', 'environments-apis-revisions-deployments-generate-undeploy-change-report', 'environments-apis-revisions-get-deployments', 'environments-apis-revisions-undeploy', 'environments-archive-deployments-create', 'environments-archive-deployments-delete', 'environments-archive-deployments-generate-download-url', 'environments-archive-deployments-generate-upload-url', 'environments-archive-deployments-get', 'environments-archive-deployments-list', 'environments-archive-deployments-patch', 'environments-caches-delete', 'environments-create', 'environments-delete', 'environments-deployments-list', 'environments-flowhooks-attach-shared-flow-to-flow-hook', 'environments-flowhooks-detach-shared-flow-from-flow-hook', 'environments-flowhooks-get', 'environments-get', 'environments-get-addons-config', 'environments-get-api-security-runtime-config', 'environments-get-debugmask', 'environments-get-deployed-config', 'environments-get-iam-policy', 'environments-get-security-actions-config', 'environments-get-trace-config', 'environments-keystores-aliases-create', 'environments-keystores-aliases-csr', 'environments-keystores-aliases-delete', 'environments-keystores-aliases-get', 'environments-keystores-aliases-get-certificate', 'environments-keystores-aliases-update', 'environments-keystores-create', 'environments-keystores-delete', 'environments-keystores-get', 'environments-keyvaluemaps-create', 'environments-keyvaluemaps-delete', 'environments-keyvaluemaps-entries-create', 'environments-keyvaluemaps-entries-delete', 'environments-keyvaluemaps-entries-get', 'environments-keyvaluemaps-entries-list', 'environments-keyvaluemaps-entries-update', 'environments-modify-environment', 'environments-optimized-stats-get', 'environments-queries-create', 'environments-queries-get', 'environments-queries-get-result', 'environments-queries-get-resulturl', 'environments-queries-list', 'environments-references-create', 'environments-references-delete', 'environments-references-get', 'environments-references-update', 'environments-resourcefiles-create', 'environments-resourcefiles-delete', 'environments-resourcefiles-get', 'environments-resourcefiles-list', 'environments-resourcefiles-list-environment-resources', 'environments-resourcefiles-update', 'environments-security-actions-create', 'environments-security-actions-disable', 'environments-security-actions-enable', 'environments-security-actions-get', 'environments-security-actions-list', 'environments-security-incidents-batch-update', 'environments-security-incidents-get', 'environments-security-incidents-list', 'environments-security-incidents-patch', 'environments-security-reports-create', 'environments-security-reports-get', 'environments-security-reports-get-result', 'environments-security-reports-get-result-view', 'environments-security-reports-list', 'environments-security-stats-query-tabular-stats', 'environments-security-stats-query-time-series-stats', 'environments-set-iam-policy', 'environments-sharedflows-deployments-list', 'environments-sharedflows-revisions-deploy', 'environments-sharedflows-revisions-get-deployments', 'environments-sharedflows-revisions-undeploy', 'environments-stats-get', 'environments-subscribe', 'environments-targetservers-create', 'environments-targetservers-delete', 'environments-targetservers-get', 'environments-targetservers-update', 'environments-test-iam-permissions', 'environments-trace-config-overrides-create', 'environments-trace-config-overrides-delete', 'environments-trace-config-overrides-get', 'environments-trace-config-overrides-list', 'environments-trace-config-overrides-patch', 'environments-unsubscribe', 'environments-update', 'environments-update-debugmask', 'environments-update-environment', 'environments-update-security-actions-config', 'environments-update-trace-config', 'get', 'get-deployed-ingress-config', 'get-project-mapping', 'get-runtime-config', 'get-security-settings', 'get-sync-authorization', 'host-queries-create', 'host-queries-get', 'host-queries-get-result', 'host-queries-get-result-view', 'host-queries-list', 'host-security-reports-create', 'host-security-reports-get', 'host-security-reports-get-result', 'host-security-reports-get-result-view', 'host-security-reports-list', 'host-stats-get', 'instances-attachments-create', 'instances-attachments-delete', 'instances-attachments-get', 'instances-attachments-list', 'instances-canaryevaluations-create', 'instances-canaryevaluations-get', 'instances-create', 'instances-delete', 'instances-get', 'instances-list', 'instances-nat-addresses-activate', 'instances-nat-addresses-create', 'instances-nat-addresses-delete', 'instances-nat-addresses-get', 'instances-nat-addresses-list', 'instances-patch', 'instances-report-status', 'keyvaluemaps-create', 'keyvaluemaps-delete', 'keyvaluemaps-entries-create', 'keyvaluemaps-entries-delete', 'keyvaluemaps-entries-get', 'keyvaluemaps-entries-list', 'keyvaluemaps-entries-update', 'list', 'operations-get', 'operations-list', 'optimized-host-stats-get', 'reports-create', 'reports-delete', 'reports-get', 'reports-list', 'reports-update', 'security-profiles-create', 'security-profiles-delete', 'security-profiles-environments-compute-environment-scores', 'security-profiles-environments-create', 'security-profiles-environments-delete', 'security-profiles-get', 'security-profiles-list', 'security-profiles-list-revisions', 'security-profiles-patch', 'set-addons', 'set-sync-authorization', 'sharedflows-create', 'sharedflows-delete', 'sharedflows-deployments-list', 'sharedflows-get', 'sharedflows-list', 'sharedflows-revisions-delete', 'sharedflows-revisions-deployments-list', 'sharedflows-revisions-get', 'sharedflows-revisions-update-shared-flow-revision', 'sites-apicategories-create', 'sites-apicategories-delete', 'sites-apicategories-get', 'sites-apicategories-list', 'sites-apicategories-patch', 'sites-apidocs-create', 'sites-apidocs-delete', 'sites-apidocs-get', 'sites-apidocs-get-documentation', 'sites-apidocs-list', 'sites-apidocs-update', 'sites-apidocs-update-documentation', 'update' and 'update-security-settings'", vec![
+        ("organizations", "methods: 'analytics-datastores-create', 'analytics-datastores-delete', 'analytics-datastores-get', 'analytics-datastores-list', 'analytics-datastores-test', 'analytics-datastores-update', 'apiproducts-attributes', 'apiproducts-attributes-delete', 'apiproducts-attributes-get', 'apiproducts-attributes-list', 'apiproducts-attributes-update-api-product-attribute', 'apiproducts-create', 'apiproducts-delete', 'apiproducts-get', 'apiproducts-list', 'apiproducts-rateplans-create', 'apiproducts-rateplans-delete', 'apiproducts-rateplans-get', 'apiproducts-rateplans-list', 'apiproducts-rateplans-update', 'apiproducts-update', 'apis-create', 'apis-delete', 'apis-deployments-list', 'apis-get', 'apis-keyvaluemaps-create', 'apis-keyvaluemaps-delete', 'apis-keyvaluemaps-entries-create', 'apis-keyvaluemaps-entries-delete', 'apis-keyvaluemaps-entries-get', 'apis-keyvaluemaps-entries-list', 'apis-keyvaluemaps-entries-update', 'apis-list', 'apis-patch', 'apis-revisions-delete', 'apis-revisions-deployments-list', 'apis-revisions-get', 'apis-revisions-update-api-proxy-revision', 'appgroups-apps-create', 'appgroups-apps-delete', 'appgroups-apps-get', 'appgroups-apps-keys-apiproducts-delete', 'appgroups-apps-keys-apiproducts-update-app-group-app-key-api-product', 'appgroups-apps-keys-create', 'appgroups-apps-keys-delete', 'appgroups-apps-keys-get', 'appgroups-apps-keys-update-app-group-app-key', 'appgroups-apps-list', 'appgroups-apps-update', 'appgroups-create', 'appgroups-delete', 'appgroups-get', 'appgroups-list', 'appgroups-update', 'apps-get', 'apps-list', 'create', 'datacollectors-create', 'datacollectors-delete', 'datacollectors-get', 'datacollectors-list', 'datacollectors-patch', 'delete', 'deployments-list', 'developers-apps-attributes', 'developers-apps-attributes-delete', 'developers-apps-attributes-get', 'developers-apps-attributes-list', 'developers-apps-attributes-update-developer-app-attribute', 'developers-apps-create', 'developers-apps-delete', 'developers-apps-generate-key-pair-or-update-developer-app-status', 'developers-apps-get', 'developers-apps-keys-apiproducts-delete', 'developers-apps-keys-apiproducts-update-developer-app-key-api-product', 'developers-apps-keys-create', 'developers-apps-keys-create-create', 'developers-apps-keys-delete', 'developers-apps-keys-get', 'developers-apps-keys-replace-developer-app-key', 'developers-apps-keys-update-developer-app-key', 'developers-apps-list', 'developers-apps-update', 'developers-attributes', 'developers-attributes-delete', 'developers-attributes-get', 'developers-attributes-list', 'developers-attributes-update-developer-attribute', 'developers-balance-adjust', 'developers-balance-credit', 'developers-create', 'developers-delete', 'developers-get', 'developers-get-balance', 'developers-get-monetization-config', 'developers-list', 'developers-set-developer-status', 'developers-subscriptions-create', 'developers-subscriptions-expire', 'developers-subscriptions-get', 'developers-subscriptions-list', 'developers-update', 'developers-update-monetization-config', 'endpoint-attachments-create', 'endpoint-attachments-delete', 'endpoint-attachments-get', 'endpoint-attachments-list', 'envgroups-attachments-create', 'envgroups-attachments-delete', 'envgroups-attachments-get', 'envgroups-attachments-list', 'envgroups-create', 'envgroups-delete', 'envgroups-get', 'envgroups-get-deployed-ingress-config', 'envgroups-list', 'envgroups-patch', 'environments-addons-config-set-addon-enablement', 'environments-analytics-admin-get-schemav2', 'environments-analytics-exports-create', 'environments-analytics-exports-get', 'environments-analytics-exports-list', 'environments-apis-deployments-list', 'environments-apis-revisions-debugsessions-create', 'environments-apis-revisions-debugsessions-data-get', 'environments-apis-revisions-debugsessions-delete-data', 'environments-apis-revisions-debugsessions-get', 'environments-apis-revisions-debugsessions-list', 'environments-apis-revisions-deploy', 'environments-apis-revisions-deployments-generate-deploy-change-report', 'environments-apis-revisions-deployments-generate-undeploy-change-report', 'environments-apis-revisions-get-deployments', 'environments-apis-revisions-undeploy', 'environments-archive-deployments-create', 'environments-archive-deployments-delete', 'environments-archive-deployments-generate-download-url', 'environments-archive-deployments-generate-upload-url', 'environments-archive-deployments-get', 'environments-archive-deployments-list', 'environments-archive-deployments-patch', 'environments-caches-delete', 'environments-create', 'environments-delete', 'environments-deployments-list', 'environments-flowhooks-attach-shared-flow-to-flow-hook', 'environments-flowhooks-detach-shared-flow-from-flow-hook', 'environments-flowhooks-get', 'environments-get', 'environments-get-addons-config', 'environments-get-api-security-runtime-config', 'environments-get-debugmask', 'environments-get-deployed-config', 'environments-get-iam-policy', 'environments-get-security-actions-config', 'environments-get-trace-config', 'environments-keystores-aliases-create', 'environments-keystores-aliases-csr', 'environments-keystores-aliases-delete', 'environments-keystores-aliases-get', 'environments-keystores-aliases-get-certificate', 'environments-keystores-aliases-update', 'environments-keystores-create', 'environments-keystores-delete', 'environments-keystores-get', 'environments-keyvaluemaps-create', 'environments-keyvaluemaps-delete', 'environments-keyvaluemaps-entries-create', 'environments-keyvaluemaps-entries-delete', 'environments-keyvaluemaps-entries-get', 'environments-keyvaluemaps-entries-list', 'environments-keyvaluemaps-entries-update', 'environments-modify-environment', 'environments-optimized-stats-get', 'environments-queries-create', 'environments-queries-get', 'environments-queries-get-result', 'environments-queries-get-resulturl', 'environments-queries-list', 'environments-references-create', 'environments-references-delete', 'environments-references-get', 'environments-references-update', 'environments-resourcefiles-create', 'environments-resourcefiles-delete', 'environments-resourcefiles-get', 'environments-resourcefiles-list', 'environments-resourcefiles-list-environment-resources', 'environments-resourcefiles-update', 'environments-security-actions-create', 'environments-security-actions-disable', 'environments-security-actions-enable', 'environments-security-actions-get', 'environments-security-actions-list', 'environments-security-incidents-batch-update', 'environments-security-incidents-get', 'environments-security-incidents-list', 'environments-security-incidents-patch', 'environments-security-reports-create', 'environments-security-reports-get', 'environments-security-reports-get-result', 'environments-security-reports-get-result-view', 'environments-security-reports-list', 'environments-security-stats-query-tabular-stats', 'environments-security-stats-query-time-series-stats', 'environments-set-iam-policy', 'environments-sharedflows-deployments-list', 'environments-sharedflows-revisions-deploy', 'environments-sharedflows-revisions-get-deployments', 'environments-sharedflows-revisions-undeploy', 'environments-stats-get', 'environments-subscribe', 'environments-targetservers-create', 'environments-targetservers-delete', 'environments-targetservers-get', 'environments-targetservers-update', 'environments-test-iam-permissions', 'environments-trace-config-overrides-create', 'environments-trace-config-overrides-delete', 'environments-trace-config-overrides-get', 'environments-trace-config-overrides-list', 'environments-trace-config-overrides-patch', 'environments-unsubscribe', 'environments-update', 'environments-update-debugmask', 'environments-update-environment', 'environments-update-security-actions-config', 'environments-update-trace-config', 'get', 'get-deployed-ingress-config', 'get-project-mapping', 'get-runtime-config', 'get-security-settings', 'get-sync-authorization', 'host-queries-create', 'host-queries-get', 'host-queries-get-result', 'host-queries-get-result-view', 'host-queries-list', 'host-security-reports-create', 'host-security-reports-get', 'host-security-reports-get-result', 'host-security-reports-get-result-view', 'host-security-reports-list', 'host-stats-get', 'instances-attachments-create', 'instances-attachments-delete', 'instances-attachments-get', 'instances-attachments-list', 'instances-canaryevaluations-create', 'instances-canaryevaluations-get', 'instances-create', 'instances-delete', 'instances-get', 'instances-list', 'instances-nat-addresses-activate', 'instances-nat-addresses-create', 'instances-nat-addresses-delete', 'instances-nat-addresses-get', 'instances-nat-addresses-list', 'instances-patch', 'instances-report-status', 'keyvaluemaps-create', 'keyvaluemaps-delete', 'keyvaluemaps-entries-create', 'keyvaluemaps-entries-delete', 'keyvaluemaps-entries-get', 'keyvaluemaps-entries-list', 'keyvaluemaps-entries-update', 'list', 'operations-get', 'operations-list', 'optimized-host-stats-get', 'reports-create', 'reports-delete', 'reports-get', 'reports-list', 'reports-update', 'security-assessment-results-batch-compute', 'security-profiles-create', 'security-profiles-delete', 'security-profiles-environments-compute-environment-scores', 'security-profiles-environments-create', 'security-profiles-environments-delete', 'security-profiles-get', 'security-profiles-list', 'security-profiles-list-revisions', 'security-profiles-patch', 'set-addons', 'set-sync-authorization', 'sharedflows-create', 'sharedflows-delete', 'sharedflows-deployments-list', 'sharedflows-get', 'sharedflows-list', 'sharedflows-revisions-delete', 'sharedflows-revisions-deployments-list', 'sharedflows-revisions-get', 'sharedflows-revisions-update-shared-flow-revision', 'sites-apicategories-create', 'sites-apicategories-delete', 'sites-apicategories-get', 'sites-apicategories-list', 'sites-apicategories-patch', 'sites-apidocs-create', 'sites-apidocs-delete', 'sites-apidocs-get', 'sites-apidocs-get-documentation', 'sites-apidocs-list', 'sites-apidocs-update', 'sites-apidocs-update-documentation', 'update' and 'update-security-settings'", vec![
             ("analytics-datastores-create",
                     Some(r##"Create a Datastore for an org"##),
                     "Details at http://byron.github.io/google-apis-rs/google_apigee1_cli/organizations_analytics-datastores-create",
@@ -29556,6 +29656,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("security-assessment-results-batch-compute",
+                    Some(r##"Compute RAV2 security scores for a set of resources."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_apigee1_cli/organizations_security-assessment-results-batch-compute",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the organization for which the score needs to be computed in the following format: `organizations/{org}/securityAssessmentResults`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("security-profiles-create",
                     Some(r##"CreateSecurityProfile create a new custom security profile."##),
                     "Details at http://byron.github.io/google-apis-rs/google_apigee1_cli/organizations_security-profiles-create",
@@ -30431,7 +30559,7 @@ async fn main() {
     
     let mut app = App::new("apigee1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240222")
+           .version("5.0.5+20240620")
            .about("Use the Apigee API to programmatically develop and manage APIs with a set of RESTful operations. Develop and secure API proxies, deploy and undeploy API proxy revisions, monitor APIs, configure environments, manage users, and more. Note: This product is available as a free trial for a time period of 60 days.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_apigee1_cli")
            .arg(Arg::with_name("url")
@@ -30495,6 +30623,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

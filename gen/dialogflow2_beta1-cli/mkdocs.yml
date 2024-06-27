@@ -1,4 +1,4 @@
-site_name: Dialogflow v5.0.4+20240227
+site_name: Dialogflow v5.0.5+20240614
 site_url: http://byron.github.io/google-apis-rs/google-dialogflow2_beta1-cli
 site_description: A complete library to interact with Dialogflow (protocol v2beta1)
 
@@ -107,10 +107,13 @@ nav:
     - 'Conversations Participants Suggestions List': 'projects_conversations-participants-suggestions-list.md'
     - 'Conversations Participants Suggestions Suggest Articles': 'projects_conversations-participants-suggestions-suggest-articles.md'
     - 'Conversations Participants Suggestions Suggest Faq Answers': 'projects_conversations-participants-suggestions-suggest-faq-answers.md'
+    - 'Conversations Participants Suggestions Suggest Knowledge Assist': 'projects_conversations-participants-suggestions-suggest-knowledge-assist.md'
     - 'Conversations Participants Suggestions Suggest Smart Replies': 'projects_conversations-participants-suggestions-suggest-smart-replies.md'
     - 'Conversations Suggestions Search Knowledge': 'projects_conversations-suggestions-search-knowledge.md'
     - 'Conversations Suggestions Suggest Conversation Summary': 'projects_conversations-suggestions-suggest-conversation-summary.md'
     - 'Delete Agent': 'projects_delete-agent.md'
+    - 'Generators Create': 'projects_generators-create.md'
+    - 'Generators List': 'projects_generators-list.md'
     - 'Get Agent': 'projects_get-agent.md'
     - 'Knowledge Bases Create': 'projects_knowledge-bases-create.md'
     - 'Knowledge Bases Delete': 'projects_knowledge-bases-delete.md'
@@ -208,10 +211,16 @@ nav:
     - 'Locations Conversations Participants Patch': 'projects_locations-conversations-participants-patch.md'
     - 'Locations Conversations Participants Suggestions Suggest Articles': 'projects_locations-conversations-participants-suggestions-suggest-articles.md'
     - 'Locations Conversations Participants Suggestions Suggest Faq Answers': 'projects_locations-conversations-participants-suggestions-suggest-faq-answers.md'
+    - 'Locations Conversations Participants Suggestions Suggest Knowledge Assist': 'projects_locations-conversations-participants-suggestions-suggest-knowledge-assist.md'
     - 'Locations Conversations Participants Suggestions Suggest Smart Replies': 'projects_locations-conversations-participants-suggestions-suggest-smart-replies.md'
     - 'Locations Conversations Suggestions Search Knowledge': 'projects_locations-conversations-suggestions-search-knowledge.md'
     - 'Locations Conversations Suggestions Suggest Conversation Summary': 'projects_locations-conversations-suggestions-suggest-conversation-summary.md'
     - 'Locations Delete Agent': 'projects_locations-delete-agent.md'
+    - 'Locations Generators Create': 'projects_locations-generators-create.md'
+    - 'Locations Generators Delete': 'projects_locations-generators-delete.md'
+    - 'Locations Generators Get': 'projects_locations-generators-get.md'
+    - 'Locations Generators List': 'projects_locations-generators-list.md'
+    - 'Locations Generators Patch': 'projects_locations-generators-patch.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations Get Agent': 'projects_locations-get-agent.md'
     - 'Locations Knowledge Bases Create': 'projects_locations-knowledge-bases-create.md'
@@ -231,6 +240,7 @@ nav:
     - 'Locations Operations Get': 'projects_locations-operations-get.md'
     - 'Locations Operations List': 'projects_locations-operations-list.md'
     - 'Locations Set Agent': 'projects_locations-set-agent.md'
+    - 'Locations Stateless Suggestion Generate': 'projects_locations-stateless-suggestion-generate.md'
     - 'Locations Suggestions Generate Stateless Summary': 'projects_locations-suggestions-generate-stateless-summary.md'
     - 'Locations Suggestions Search Knowledge': 'projects_locations-suggestions-search-knowledge.md'
     - 'Operations Cancel': 'projects_operations-cancel.md'
@@ -242,5 +252,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

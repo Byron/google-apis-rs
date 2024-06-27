@@ -239,7 +239,7 @@ async fn main() {
     
     let mut app = App::new("pagespeedonline5")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240229")
+           .version("5.0.5+20240624")
            .about("The PageSpeed Insights API lets you analyze the performance of your website with a simple API. It offers tailored suggestions for how you can optimize your site, and lets you easily integrate PageSpeed Insights analysis into your development tools and workflow. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pagespeedonline5_cli")
            .arg(Arg::with_name("url")
@@ -303,6 +303,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

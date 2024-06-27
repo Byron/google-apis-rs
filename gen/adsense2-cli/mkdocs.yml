@@ -1,4 +1,4 @@
-site_name: adsense v5.0.4+20240305
+site_name: adsense v5.0.5+20240626
 site_url: http://byron.github.io/google-apis-rs/google-adsense2-cli
 site_description: A complete library to interact with adsense (protocol v2)
 
@@ -33,6 +33,8 @@ nav:
     - 'List': 'accounts_list.md'
     - 'List Child Accounts': 'accounts_list-child-accounts.md'
     - 'Payments List': 'accounts_payments-list.md'
+    - 'Policy Issues Get': 'accounts_policy-issues-get.md'
+    - 'Policy Issues List': 'accounts_policy-issues-list.md'
     - 'Reports Generate': 'accounts_reports-generate.md'
     - 'Reports Generate Csv': 'accounts_reports-generate-csv.md'
     - 'Reports Get Saved': 'accounts_reports-get-saved.md'
@@ -44,5 +46,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

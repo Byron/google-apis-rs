@@ -2931,6 +2931,7 @@ where
                     "http-check.ping-config.pings-count" => Some(("httpCheck.pingConfig.pingsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.service-agent-authentication.type" => Some(("httpCheck.serviceAgentAuthentication.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2949,7 +2950,7 @@ where
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "cloud-function-v2", "cloud-run-revision", "content-type", "custom-content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "synthetic-monitor", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "cloud-function-v2", "cloud-run-revision", "content-type", "custom-content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "service-agent-authentication", "synthetic-monitor", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3211,6 +3212,7 @@ where
                     "http-check.ping-config.pings-count" => Some(("httpCheck.pingConfig.pingsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "http-check.port" => Some(("httpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "http-check.request-method" => Some(("httpCheck.requestMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.service-agent-authentication.type" => Some(("httpCheck.serviceAgentAuthentication.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.use-ssl" => Some(("httpCheck.useSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.validate-ssl" => Some(("httpCheck.validateSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "is-internal" => Some(("isInternal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3229,7 +3231,7 @@ where
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "cloud-function-v2", "cloud-run-revision", "content-type", "custom-content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "synthetic-monitor", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "cloud-function-v2", "cloud-run-revision", "content-type", "custom-content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "service-agent-authentication", "synthetic-monitor", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5274,7 +5276,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the Snooze. The format is: projects/[PROJECT_ID_OR_NUMBER]/snoozes/[SNOOZE_ID] The ID of the Snooze will be generated by the system."##),
+                     Some(r##"Required. Identifier. The name of the Snooze. The format is: projects/[PROJECT_ID_OR_NUMBER]/snoozes/[SNOOZE_ID] The ID of the Snooze will be generated by the system."##),
                      Some(true),
                      Some(false)),
         
@@ -5627,7 +5629,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Resource name for this Service. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] "##),
+                     Some(r##"Identifier. Resource name for this Service. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID] "##),
                      Some(true),
                      Some(false)),
         
@@ -5749,7 +5751,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Resource name for this ServiceLevelObjective. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME] "##),
+                     Some(r##"Identifier. Resource name for this ServiceLevelObjective. The format is: projects/[PROJECT_ID_OR_NUMBER]/services/[SERVICE_ID]/serviceLevelObjectives/[SLO_NAME] "##),
                      Some(true),
                      Some(false)),
         
@@ -5775,7 +5777,7 @@ async fn main() {
         
         ("uptime-check-ips", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns the list of IP addresses that checkers run from"##),
+                    Some(r##"Returns the list of IP addresses that checkers run from."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/uptime-check-ips_list",
                   vec![
                     (Some(r##"v"##),
@@ -5796,7 +5798,7 @@ async fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240225")
+           .version("5.0.5+20240623")
            .about("Manages your Cloud Monitoring data and configurations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")
@@ -5860,6 +5862,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

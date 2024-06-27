@@ -1,4 +1,4 @@
-site_name: YouTube v5.0.4+20240303
+site_name: YouTube v5.0.5+20240626
 site_url: http://byron.github.io/google-apis-rs/google-youtube3-cli
 site_description: A complete library to interact with YouTube (protocol v3)
 
@@ -58,6 +58,7 @@ nav:
     - 'Delete': 'live-chat-messages_delete.md'
     - 'Insert': 'live-chat-messages_insert.md'
     - 'List': 'live-chat-messages_list.md'
+    - 'Transition': 'live-chat-messages_transition.md'
 - 'Live Chat Moderators':
     - 'Delete': 'live-chat-moderators_delete.md'
     - 'Insert': 'live-chat-moderators_insert.md'
@@ -123,5 +124,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

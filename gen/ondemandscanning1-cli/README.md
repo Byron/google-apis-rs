@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *On-Demand Scanning* API at revision *20240226*. The CLI is at version *5.0.4*.
+This documentation was generated from the *On-Demand Scanning* API at revision *20240624*. The CLI is at version *5.0.5*.
 
 ```bash
 ondemandscanning1 [options]

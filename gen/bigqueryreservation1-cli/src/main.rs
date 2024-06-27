@@ -1054,10 +1054,13 @@ where
                     "ignore-idle-slots" => Some(("ignoreIdleSlots", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "multi-region-auxiliary" => Some(("multiRegionAuxiliary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "original-primary-location" => Some(("originalPrimaryLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-location" => Some(("primaryLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secondary-location" => Some(("secondaryLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscale", "concurrency", "creation-time", "current-slots", "edition", "ignore-idle-slots", "max-slots", "multi-region-auxiliary", "name", "slot-capacity", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscale", "concurrency", "creation-time", "current-slots", "edition", "ignore-idle-slots", "max-slots", "multi-region-auxiliary", "name", "original-primary-location", "primary-location", "secondary-location", "slot-capacity", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1124,6 +1127,90 @@ where
     async fn _projects_locations_reservations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_reservations_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_reservations_failover_reservation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::FailoverReservationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_reservations_failover_reservation(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1315,10 +1402,13 @@ where
                     "ignore-idle-slots" => Some(("ignoreIdleSlots", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "multi-region-auxiliary" => Some(("multiRegionAuxiliary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "original-primary-location" => Some(("originalPrimaryLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-location" => Some(("primaryLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "secondary-location" => Some(("secondaryLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "slot-capacity" => Some(("slotCapacity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscale", "concurrency", "creation-time", "current-slots", "edition", "ignore-idle-slots", "max-slots", "multi-region-auxiliary", "name", "slot-capacity", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["autoscale", "concurrency", "creation-time", "current-slots", "edition", "ignore-idle-slots", "max-slots", "multi-region-auxiliary", "name", "original-primary-location", "primary-location", "secondary-location", "slot-capacity", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1649,6 +1739,9 @@ where
                     ("locations-reservations-delete", Some(opt)) => {
                         call_result = self._projects_locations_reservations_delete(opt, dry_run, &mut err).await;
                     },
+                    ("locations-reservations-failover-reservation", Some(opt)) => {
+                        call_result = self._projects_locations_reservations_failover_reservation(opt, dry_run, &mut err).await;
+                    },
                     ("locations-reservations-get", Some(opt)) => {
                         call_result = self._projects_locations_reservations_get(opt, dry_run, &mut err).await;
                     },
@@ -1746,7 +1839,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-capacity-commitments-create', 'locations-capacity-commitments-delete', 'locations-capacity-commitments-get', 'locations-capacity-commitments-list', 'locations-capacity-commitments-merge', 'locations-capacity-commitments-patch', 'locations-capacity-commitments-split', 'locations-get-bi-reservation', 'locations-reservations-assignments-create', 'locations-reservations-assignments-delete', 'locations-reservations-assignments-list', 'locations-reservations-assignments-move', 'locations-reservations-assignments-patch', 'locations-reservations-create', 'locations-reservations-delete', 'locations-reservations-get', 'locations-reservations-list', 'locations-reservations-patch', 'locations-search-all-assignments', 'locations-search-assignments' and 'locations-update-bi-reservation'", vec![
+        ("projects", "methods: 'locations-capacity-commitments-create', 'locations-capacity-commitments-delete', 'locations-capacity-commitments-get', 'locations-capacity-commitments-list', 'locations-capacity-commitments-merge', 'locations-capacity-commitments-patch', 'locations-capacity-commitments-split', 'locations-get-bi-reservation', 'locations-reservations-assignments-create', 'locations-reservations-assignments-delete', 'locations-reservations-assignments-list', 'locations-reservations-assignments-move', 'locations-reservations-assignments-patch', 'locations-reservations-create', 'locations-reservations-delete', 'locations-reservations-failover-reservation', 'locations-reservations-get', 'locations-reservations-list', 'locations-reservations-patch', 'locations-search-all-assignments', 'locations-search-assignments' and 'locations-update-bi-reservation'", vec![
             ("locations-capacity-commitments-create",
                     Some(r##"Creates a new capacity commitment resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-capacity-commitments-create",
@@ -2125,6 +2218,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-reservations-failover-reservation",
+                    Some(r##"Failover a reservation to the secondary location. The operation should be done in the current secondary location, which will be promoted to the new primary location for the reservation. Attempting to failover a reservation in the current primary location will fail with the error code `google.rpc.Code.FAILED_PRECONDITION`."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-failover-reservation",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Resource name of the reservation to failover. E.g., `projects/myproject/locations/US/reservations/team1-prod`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-reservations-get",
                     Some(r##"Returns information about the reservation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli/projects_locations-reservations-get",
@@ -2275,7 +2396,7 @@ async fn main() {
     
     let mut app = App::new("bigqueryreservation1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240227")
+           .version("5.0.5+20240611")
            .about("A service to modify your BigQuery flat-rate reservations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigqueryreservation1_cli")
            .arg(Arg::with_name("url")
@@ -2339,6 +2460,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

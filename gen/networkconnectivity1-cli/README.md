@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *networkconnectivity* API at revision *20240221*. The CLI is at version *5.0.4*.
+This documentation was generated from the *networkconnectivity* API at revision *20240618*. The CLI is at version *5.0.5*.
 
 ```bash
 networkconnectivity1 [options]
@@ -39,6 +39,7 @@ networkconnectivity1 [options]
                 locations-global-hubs-groups-get <name> [-p <v>]... [-o <out>]
                 locations-global-hubs-groups-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-global-hubs-groups-list <parent> [-p <v>]... [-o <out>]
+                locations-global-hubs-groups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-hubs-groups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-hubs-groups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-global-hubs-list <parent> [-p <v>]... [-o <out>]
@@ -68,6 +69,10 @@ networkconnectivity1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-regional-endpoints-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-regional-endpoints-delete <name> [-p <v>]... [-o <out>]
+                locations-regional-endpoints-get <name> [-p <v>]... [-o <out>]
+                locations-regional-endpoints-list <parent> [-p <v>]... [-o <out>]
                 locations-service-classes-delete <name> [-p <v>]... [-o <out>]
                 locations-service-classes-get <name> [-p <v>]... [-o <out>]
                 locations-service-classes-get-iam-policy <resource> [-p <v>]... [-o <out>]

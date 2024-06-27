@@ -1,4 +1,4 @@
-site_name: Cloud Composer v5.0.4+20240227
+site_name: Cloud Composer v5.0.5+20240618
 site_url: http://byron.github.io/google-apis-rs/google-composer1-cli
 site_description: A complete library to interact with Cloud Composer (protocol v1)
 
@@ -10,6 +10,7 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Locations Environments Check Upgrade': 'projects_locations-environments-check-upgrade.md'
     - 'Locations Environments Create': 'projects_locations-environments-create.md'
     - 'Locations Environments Database Failover': 'projects_locations-environments-database-failover.md'
     - 'Locations Environments Delete': 'projects_locations-environments-delete.md'
@@ -40,5 +41,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

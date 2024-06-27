@@ -1462,6 +1462,117 @@ where
         }
     }
 
+    async fn _accounts_policy_issues_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().policy_issues_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_policy_issues_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().policy_issues_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _accounts_reports_generate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().reports_generate(opt.value_of("account").unwrap_or(""));
@@ -2122,6 +2233,12 @@ where
                     ("payments-list", Some(opt)) => {
                         call_result = self._accounts_payments_list(opt, dry_run, &mut err).await;
                     },
+                    ("policy-issues-get", Some(opt)) => {
+                        call_result = self._accounts_policy_issues_get(opt, dry_run, &mut err).await;
+                    },
+                    ("policy-issues-list", Some(opt)) => {
+                        call_result = self._accounts_policy_issues_list(opt, dry_run, &mut err).await;
+                    },
                     ("reports-generate", Some(opt)) => {
                         call_result = self._accounts_reports_generate(opt, dry_run, &mut err).await;
                     },
@@ -2225,9 +2342,9 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'adclients-adunits-create', 'adclients-adunits-get', 'adclients-adunits-get-adcode', 'adclients-adunits-list', 'adclients-adunits-list-linked-custom-channels', 'adclients-adunits-patch', 'adclients-customchannels-create', 'adclients-customchannels-delete', 'adclients-customchannels-get', 'adclients-customchannels-list', 'adclients-customchannels-list-linked-ad-units', 'adclients-customchannels-patch', 'adclients-get', 'adclients-get-adcode', 'adclients-list', 'adclients-urlchannels-get', 'adclients-urlchannels-list', 'alerts-list', 'get', 'get-ad-blocking-recovery-tag', 'list', 'list-child-accounts', 'payments-list', 'reports-generate', 'reports-generate-csv', 'reports-get-saved', 'reports-saved-generate', 'reports-saved-generate-csv', 'reports-saved-list', 'sites-get' and 'sites-list'", vec![
+        ("accounts", "methods: 'adclients-adunits-create', 'adclients-adunits-get', 'adclients-adunits-get-adcode', 'adclients-adunits-list', 'adclients-adunits-list-linked-custom-channels', 'adclients-adunits-patch', 'adclients-customchannels-create', 'adclients-customchannels-delete', 'adclients-customchannels-get', 'adclients-customchannels-list', 'adclients-customchannels-list-linked-ad-units', 'adclients-customchannels-patch', 'adclients-get', 'adclients-get-adcode', 'adclients-list', 'adclients-urlchannels-get', 'adclients-urlchannels-list', 'alerts-list', 'get', 'get-ad-blocking-recovery-tag', 'list', 'list-child-accounts', 'payments-list', 'policy-issues-get', 'policy-issues-list', 'reports-generate', 'reports-generate-csv', 'reports-get-saved', 'reports-saved-generate', 'reports-saved-generate-csv', 'reports-saved-list', 'sites-get' and 'sites-list'", vec![
             ("adclients-adunits-create",
-                    Some(r##"Creates an ad unit. This method can only be used by projects enabled for the [AdSense for Platforms](https://developers.google.com/adsense/platforms/) product. Note that ad units can only be created for ad clients with an "AFC" product code. For more info see the [AdClient resource](/adsense/management/reference/rest/v2/accounts.adclients). For now, this method can only be used to create `DISPLAY` ad units. See: https://support.google.com/adsense/answer/9183566"##),
+                    Some(r##"Creates an ad unit. This method can be called only by a restricted set of projects, which are usually owned by [AdSense for Platforms](https://developers.google.com/adsense/platforms/) publishers. Contact your account manager if you need to use this method. Note that ad units can only be created for ad clients with an "AFC" product code. For more info see the [AdClient resource](/adsense/management/reference/rest/v2/accounts.adclients). For now, this method can only be used to create `DISPLAY` ad units. See: https://support.google.com/adsense/answer/9183566"##),
                     "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_adclients-adunits-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2343,7 +2460,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("adclients-adunits-patch",
-                    Some(r##"Updates an ad unit. This method can only be used by projects enabled for the [AdSense for Platforms](https://developers.google.com/adsense/platforms/) product. For now, this method can only be used to update `DISPLAY` ad units. See: https://support.google.com/adsense/answer/9183566"##),
+                    Some(r##"Updates an ad unit. This method can be called only by a restricted set of projects, which are usually owned by [AdSense for Platforms](https://developers.google.com/adsense/platforms/) publishers. Contact your account manager if you need to use this method. For now, this method can only be used to update `DISPLAY` ad units. See: https://support.google.com/adsense/answer/9183566"##),
                     "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_adclients-adunits-patch",
                   vec![
                     (Some(r##"name"##),
@@ -2371,7 +2488,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("adclients-customchannels-create",
-                    Some(r##"Creates a custom channel. This method can only be used by projects enabled for the [AdSense for Platforms](https://developers.google.com/adsense/platforms/) product."##),
+                    Some(r##"Creates a custom channel. This method can be called only by a restricted set of projects, which are usually owned by [AdSense for Platforms](https://developers.google.com/adsense/platforms/) publishers. Contact your account manager if you need to use this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_adclients-customchannels-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2399,7 +2516,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("adclients-customchannels-delete",
-                    Some(r##"Deletes a custom channel. This method can only be used by projects enabled for the [AdSense for Platforms](https://developers.google.com/adsense/platforms/) product."##),
+                    Some(r##"Deletes a custom channel. This method can be called only by a restricted set of projects, which are usually owned by [AdSense for Platforms](https://developers.google.com/adsense/platforms/) publishers. Contact your account manager if you need to use this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_adclients-customchannels-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2487,7 +2604,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("adclients-customchannels-patch",
-                    Some(r##"Updates a custom channel. This method can only be used by projects enabled for the [AdSense for Platforms](https://developers.google.com/adsense/platforms/) product."##),
+                    Some(r##"Updates a custom channel. This method can be called only by a restricted set of projects, which are usually owned by [AdSense for Platforms](https://developers.google.com/adsense/platforms/) publishers. Contact your account manager if you need to use this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_adclients-customchannels-patch",
                   vec![
                     (Some(r##"name"##),
@@ -2750,6 +2867,50 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("policy-issues-get",
+                    Some(r##"Gets information about the selected policy issue."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_policy-issues-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the policy issue. Format: accounts/{account}/policyIssues/{policy_issue}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("policy-issues-list",
+                    Some(r##"Lists all the policy issues where the specified account is involved, both directly and through any AFP child accounts."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_policy-issues-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The account for which policy issues are being retrieved. Format: accounts/{account}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("reports-generate",
                     Some(r##"Generates an ad hoc report."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adsense2_cli/accounts_reports-generate",
@@ -2932,7 +3093,7 @@ async fn main() {
     
     let mut app = App::new("adsense2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240305")
+           .version("5.0.5+20240626")
            .about("The AdSense Management API allows publishers to access their inventory and run earnings and performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsense2_cli")
            .arg(Arg::with_name("url")
@@ -2996,6 +3157,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

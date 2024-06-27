@@ -1,4 +1,4 @@
-site_name: NetworkServices v5.0.4+20240224
+site_name: NetworkServices v5.0.5+20240620
 site_url: http://byron.github.io/google-apis-rs/google-networkservices1-cli
 site_description: A complete library to interact with NetworkServices (protocol v1)
 
@@ -97,5 +97,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

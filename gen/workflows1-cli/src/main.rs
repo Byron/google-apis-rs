@@ -353,9 +353,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "all-kms-keys" => Some(("allKmsKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "all-kms-keys-versions" => Some(("allKmsKeysVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "call-log-level" => Some(("callLogLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "crypto-key-name" => Some(("cryptoKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "crypto-key-version" => Some(("cryptoKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -369,7 +372,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-env-vars" => Some(("userEnvVars", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["call-log-level", "create-time", "crypto-key-name", "description", "details", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "state-error", "type", "update-time", "user-env-vars"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all-kms-keys", "all-kms-keys-versions", "call-log-level", "create-time", "crypto-key-name", "crypto-key-version", "description", "details", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "state-error", "type", "update-time", "user-env-vars"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -688,9 +691,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "all-kms-keys" => Some(("allKmsKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "all-kms-keys-versions" => Some(("allKmsKeysVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "call-log-level" => Some(("callLogLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "crypto-key-name" => Some(("cryptoKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "crypto-key-version" => Some(("cryptoKeyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -704,7 +710,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-env-vars" => Some(("userEnvVars", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["call-log-level", "create-time", "crypto-key-name", "description", "details", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "state-error", "type", "update-time", "user-env-vars"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all-kms-keys", "all-kms-keys-versions", "call-log-level", "create-time", "crypto-key-name", "crypto-key-version", "description", "details", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "state-error", "type", "update-time", "user-env-vars"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1148,7 +1154,7 @@ async fn main() {
     
     let mut app = App::new("workflows1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.4+20240207")
+           .version("5.0.5+20240612")
            .about("Manage workflow definitions. To execute workflows and manage executions, see the Workflows Executions API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_workflows1_cli")
            .arg(Arg::with_name("url")
@@ -1212,6 +1218,7 @@ async fn main() {
 
     let debug = matches.is_present("adebug");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();

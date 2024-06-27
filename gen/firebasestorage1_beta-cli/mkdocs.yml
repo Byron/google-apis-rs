@@ -1,4 +1,4 @@
-site_name: Firebasestorage v5.0.4+20240301
+site_name: Firebasestorage v5.0.5+20240621
 site_url: http://byron.github.io/google-apis-rs/google-firebasestorage1_beta-cli
 site_description: A complete library to interact with Firebasestorage (protocol v1beta)
 
@@ -17,5 +17,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 

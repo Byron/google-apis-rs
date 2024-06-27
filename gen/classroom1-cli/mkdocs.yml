@@ -1,4 +1,4 @@
-site_name: classroom v5.0.4+20240227
+site_name: classroom v5.0.5+20240617
 site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
 site_description: A complete library to interact with classroom (protocol v1)
 
@@ -13,15 +13,29 @@ nav:
     - 'Aliases Create': 'courses_aliases-create.md'
     - 'Aliases Delete': 'courses_aliases-delete.md'
     - 'Aliases List': 'courses_aliases-list.md'
+    - 'Announcements Add On Attachments Create': 'courses_announcements-add-on-attachments-create.md'
+    - 'Announcements Add On Attachments Delete': 'courses_announcements-add-on-attachments-delete.md'
+    - 'Announcements Add On Attachments Get': 'courses_announcements-add-on-attachments-get.md'
+    - 'Announcements Add On Attachments List': 'courses_announcements-add-on-attachments-list.md'
+    - 'Announcements Add On Attachments Patch': 'courses_announcements-add-on-attachments-patch.md'
     - 'Announcements Create': 'courses_announcements-create.md'
     - 'Announcements Delete': 'courses_announcements-delete.md'
     - 'Announcements Get': 'courses_announcements-get.md'
+    - 'Announcements Get Add On Context': 'courses_announcements-get-add-on-context.md'
     - 'Announcements List': 'courses_announcements-list.md'
     - 'Announcements Modify Assignees': 'courses_announcements-modify-assignees.md'
     - 'Announcements Patch': 'courses_announcements-patch.md'
+    - 'Course Work Add On Attachments Create': 'courses_course-work-add-on-attachments-create.md'
+    - 'Course Work Add On Attachments Delete': 'courses_course-work-add-on-attachments-delete.md'
+    - 'Course Work Add On Attachments Get': 'courses_course-work-add-on-attachments-get.md'
+    - 'Course Work Add On Attachments List': 'courses_course-work-add-on-attachments-list.md'
+    - 'Course Work Add On Attachments Patch': 'courses_course-work-add-on-attachments-patch.md'
+    - 'Course Work Add On Attachments Student Submissions Get': 'courses_course-work-add-on-attachments-student-submissions-get.md'
+    - 'Course Work Add On Attachments Student Submissions Patch': 'courses_course-work-add-on-attachments-student-submissions-patch.md'
     - 'Course Work Create': 'courses_course-work-create.md'
     - 'Course Work Delete': 'courses_course-work-delete.md'
     - 'Course Work Get': 'courses_course-work-get.md'
+    - 'Course Work Get Add On Context': 'courses_course-work-get-add-on-context.md'
     - 'Course Work List': 'courses_course-work-list.md'
     - 'Course Work Modify Assignees': 'courses_course-work-modify-assignees.md'
     - 'Course Work Patch': 'courses_course-work-patch.md'
@@ -32,9 +46,15 @@ nav:
     - 'Course Work Student Submissions Reclaim': 'courses_course-work-student-submissions-reclaim.md'
     - 'Course Work Student Submissions Return': 'courses_course-work-student-submissions-return.md'
     - 'Course Work Student Submissions Turn In': 'courses_course-work-student-submissions-turn-in.md'
+    - 'Course Work Materials Add On Attachments Create': 'courses_course-work-materials-add-on-attachments-create.md'
+    - 'Course Work Materials Add On Attachments Delete': 'courses_course-work-materials-add-on-attachments-delete.md'
+    - 'Course Work Materials Add On Attachments Get': 'courses_course-work-materials-add-on-attachments-get.md'
+    - 'Course Work Materials Add On Attachments List': 'courses_course-work-materials-add-on-attachments-list.md'
+    - 'Course Work Materials Add On Attachments Patch': 'courses_course-work-materials-add-on-attachments-patch.md'
     - 'Course Work Materials Create': 'courses_course-work-materials-create.md'
     - 'Course Work Materials Delete': 'courses_course-work-materials-delete.md'
     - 'Course Work Materials Get': 'courses_course-work-materials-get.md'
+    - 'Course Work Materials Get Add On Context': 'courses_course-work-materials-get-add-on-context.md'
     - 'Course Work Materials List': 'courses_course-work-materials-list.md'
     - 'Course Work Materials Patch': 'courses_course-work-materials-patch.md'
     - 'Create': 'courses_create.md'
@@ -42,6 +62,14 @@ nav:
     - 'Get': 'courses_get.md'
     - 'List': 'courses_list.md'
     - 'Patch': 'courses_patch.md'
+    - 'Posts Add On Attachments Create': 'courses_posts-add-on-attachments-create.md'
+    - 'Posts Add On Attachments Delete': 'courses_posts-add-on-attachments-delete.md'
+    - 'Posts Add On Attachments Get': 'courses_posts-add-on-attachments-get.md'
+    - 'Posts Add On Attachments List': 'courses_posts-add-on-attachments-list.md'
+    - 'Posts Add On Attachments Patch': 'courses_posts-add-on-attachments-patch.md'
+    - 'Posts Add On Attachments Student Submissions Get': 'courses_posts-add-on-attachments-student-submissions-get.md'
+    - 'Posts Add On Attachments Student Submissions Patch': 'courses_posts-add-on-attachments-student-submissions-patch.md'
+    - 'Posts Get Add On Context': 'courses_posts-get-add-on-context.md'
     - 'Students Create': 'courses_students-create.md'
     - 'Students Delete': 'courses_students-delete.md'
     - 'Students Get': 'courses_students-get.md'
@@ -77,5 +105,5 @@ nav:
 
 theme: readthedocs
 
-copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
 
