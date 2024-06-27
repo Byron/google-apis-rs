@@ -1,0 +1,39 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/generator/templates/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-spanner1"
+version = "5.0.5+20240618"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Spanner (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/spanner1"
+homepage = "https://cloud.google.com/spanner/"
+documentation = "https://docs.rs/google-spanner1/5.0.5+20240618"
+license = "MIT"
+keywords = ["spanner", "google", "protocol", "web", "api"]
+autobins = false
+edition = "2018"
+
+
+[dependencies]
+anyhow = "^ 1.0"
+hyper-rustls = "0.25.0"
+mime = "^ 0.3.0"
+serde = { version = "^ 1.0", features = ["derive"] }
+utoipa = { version = "^4.2", optional = true }
+serde_json = "^ 1.0"
+itertools = "0.13"
+google-apis-common = { path = "../../google-apis-common", version = "6.0.3" }
+hyper = "^ 0.14"
+http = "^0.2"
+tokio = "^1.0"
+tower-service = "^0.3.1"
+url = "= 1.7"
+
+
+
+[features]
+yup-oauth2 = ["google-apis-common/yup-oauth2"]
+default = ["yup-oauth2"]
+utoipa = ["dep:utoipa"]

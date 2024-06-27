@@ -5,6 +5,8 @@ api:
     - analyticsadmin
     # resursive type
     - bigquery
+    # resursive type
+    - bigtableadmin
     # redefinition of `Scope`
     - binaryauthorization
     # ampersand & in type name

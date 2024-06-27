@@ -254,7 +254,7 @@
             }
         }
     },
-    "revision": "20240331",
+    "revision": "20240624",
     "rootUrl": "https://cloudprofiler.googleapis.com/",
     "schemas": {
         "CreateProfileRequest": {
