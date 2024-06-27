@@ -313,7 +313,7 @@
             }
         }
     },
-    "revision": "20240415",
+    "revision": "20240621",
     "rootUrl": "https://slides.googleapis.com/",
     "schemas": {
         "AffineTransform": {
