@@ -19,6 +19,7 @@
     hub_type_name = hub_type(schemas, util.canonical_name())
     rb_params = rb_type_params_s(resource, c)
     ThisType = rb_type(resource) + rb_params
+    parent = resource
 %>\
 % if resource == METHODS_RESOURCE:
 /// A builder providing access to all free methods, which are not associated with a particular resource.
@@ -46,7 +47,7 @@ let rb = hub.${mangle_ident(resource)}();
 pub struct ${ThisType}
     where ${struct_type_bounds_s()} {
 
-    hub: &'a ${hub_type_name}${hub_type_params_s()},
+   pub(super) hub: &'a ${hub_type_name}${hub_type_params_s()},
 }
 
 impl${rb_params} ${METHODS_BUILDER_MARKER_TRAIT} for ${ThisType} {}
@@ -65,7 +66,7 @@ impl${rb_params} ${ThisType} {
 
     method_args = ''
     if required_props:
-        method_args = ', ' + ', '.join('%s: %s' % (mangle_ident(p.name), activity_input_type(schemas, p)) for p in required_props)
+        method_args = ', ' + ', '.join('%s: %s' % (mangle_ident(p.name), activity_input_type(schemas, p, parent=parent)) for p in required_props)
 
     mb_tparams = mb_type_params_s(m)
     # we would could have information about data requirements for each property in it's dict.

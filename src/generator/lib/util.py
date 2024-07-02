@@ -19,17 +19,16 @@ re_desc_parts = re.compile(
 
 re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 re_relative_links = re.compile(r"\]\s*\([^h]")
+# re_non_hyper_links = re.compile(r"(?<!<)(?:https?|ftp)://[\w/\-?=%.]+\.[\w/\-&?=%+#]+(?!>)")
+"""a regex that finds all links not surrounded by < and >"""
 
-HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
+HTTP_METHODS = {"OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"}
 
-
-RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
-                      'else', 'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop',
-                      'macro', 'match', 'mod', 'move', 'mut', 'offsetof', 'override', 'priv', 'pub', 'pure', 'ref',
-                      'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
-                      'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
-
-
+RESERVED_WORDS = {'abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do', 'else',
+                  'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop', 'macro', 'match',
+                  'mod', 'move', 'mut', 'offsetof', 'override', 'priv', 'pub', 'pure', 'ref', 'return', 'sizeof',
+                  'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof', 'unsafe', 'unsized', 'use',
+                  'virtual', 'where', 'while', 'yield'}
 
 TREF = '$ref'
 IO_RESPONSE = 'response'
@@ -97,9 +96,7 @@ data_unit_multipliers = {
     '%': 1,
 }
 
-
 inflection = inflect.engine()
-
 
 HUB_TYPE_PARAMETERS = ('S',)
 
@@ -122,17 +119,31 @@ def custom_sorted(p: List[Mapping[str, Any]]) -> List[Mapping[str, Any]]:
 
 # rust module doc comment filter
 def rust_module_doc_comment(s):
+    s = use_automatic_links_in_rust_doc_comment(s)
     return re_linestart.sub('//! ', s)
 
 
 # rust doc comment filter
 def rust_doc_comment(s):
+    s = use_automatic_links_in_rust_doc_comment(s)
     return re_linestart.sub('/// ', s)
+
+
+def use_automatic_links_in_rust_doc_comment(s: str) -> str:
+    """Surrounds all links in the text with <>."""
+
+    def replace_links(match):
+        link = match.group()
+        return f"<{link}>"
+
+    # return re_non_hyper_links.sub(replace_links, s)
+    return s
 
 
 # returns true if there is an indication for something that is interpreted as doc comment by rustdoc
 def has_markdown_codeblock_with_indentation(s):
     return re_spaces_after_newline.search(s) != None
+
 
 def preprocess(base_url, s):
     if base_url is None:
@@ -144,15 +155,17 @@ def preprocess(base_url, s):
         stdout=subprocess.PIPE,
         env={"URL_BASE": base_url or ""}
     )
-    
+
     res = p.communicate(s.encode('utf-8'))
     exitcode = p.wait(timeout=1)
     if exitcode != 0:
         raise ValueError(f"Child process exited with non-zero code {exitcode}")
     return res[0].decode('utf-8')
 
+
 def has_relative_links(s):
     return re_relative_links.search(s) is not None
+
 
 # runs the preprocessor in case there is evidence for code blocks using indentation
 def rust_doc_sanitize(base_url):
@@ -161,6 +174,7 @@ def rust_doc_sanitize(base_url):
             return preprocess(base_url, s)
         else:
             return s
+
     return fixer
 
 
@@ -314,6 +328,10 @@ def singular(s):
     if single_noun is False:
         return s
     else:
+        # special case for upload-status which is not properly singularized by inflection
+        if s.lower().endswith('status') and single_noun.lower().endswith('statu'):
+            return single_noun + 's'
+
         return single_noun
 
 
@@ -371,9 +389,16 @@ def nested_type_name(sn, pn):
 
 # Make properties which are reserved keywords usable
 def mangle_ident(n):
-    n = camel_to_under(n).replace('-', '.').replace('.', '_').replace('$', '')
+    n = camel_to_under(n)
+    return remove_invalid_chars_in_ident(n)
+
+
+def remove_invalid_chars_in_ident(n):
+    n = n.replace('-', '.').replace('.', '_').replace('$', '')
     if n in RESERVED_WORDS:
-        return n + '_'
+        n = n + '_'
+    if n[0] in '0123456789':
+        n = '_' + n
     return n
 
 
@@ -421,6 +446,7 @@ def to_rust_type_inner(
         allow_optionals=True,
         _is_recursive=False
 ) -> RustType:
+    from .enum_utils import is_property_enum, get_enum_type
     def nested_type(nt) -> RustType:
         if 'items' in nt:
             nt = nt['items']
@@ -448,8 +474,12 @@ def to_rust_type_inner(
             rt = Option(Box(rt))
         return wrap_type(rt)
     try:
-        # prefer format if present
-        rust_type = RUST_TYPE_MAP[t.get("format", t["type"])]
+        if is_property_enum(t):
+            rust_type = get_enum_type(schema_name, property_name)
+        else:
+            # prefer format if present
+            rust_type = RUST_TYPE_MAP[t.get("format", t["type"])]
+
         if rust_type == Vec(None):
             return wrap_type(Vec(nested_type(t)))
         if rust_type == HashMap(None, None):
@@ -478,10 +508,10 @@ def is_nested_type(s):
 
 # convert a rust-type to something that would be taken as input of a function
 # even though our storage type is different
-def activity_input_type(schemas, p):
+def activity_input_type(schemas, p, parent=None):
     if 'input_type' in p:
         return p.input_type
-    n = activity_rust_type(schemas, p, allow_optionals=False)
+    n = activity_rust_type(schemas, p, allow_optionals=False, parent=parent)
     if n == 'String':
         n = 'str'
     # pods are copied anyway
@@ -580,8 +610,8 @@ def activity_split(fqan: str) -> Tuple[str, str, str]:
 
 
 # Shorthand to get a type from parameters of activities
-def activity_rust_type(schemas, p, allow_optionals=True):
-    return to_rust_type(schemas, None, p.name, p, allow_optionals=allow_optionals)
+def activity_rust_type(schemas, p, allow_optionals=True, parent=None):
+    return to_rust_type(schemas, parent, p.name, p, allow_optionals=allow_optionals)
 
 
 # the inverse of activity-split, but needs to know the 'name' of the API
@@ -661,6 +691,25 @@ def schema_to_required_property(s, n):
 
 def is_required_property(p):
     return p.get('required', False) or p.get('priority', 0) > 0
+
+
+def has_default_value(p):
+    from .enum_utils import is_property_enum, get_enum_default
+    if is_property_enum(p):
+        return get_enum_default(p) is not None
+
+    return p.get('default', None) is not None
+
+
+def get_default_value(p):
+    if not has_default_value(p):
+        return None
+
+    from .enum_utils import is_property_enum, get_enum_default
+    if is_property_enum(p):
+        return get_enum_default(p)
+
+    return p.default
 
 
 def is_repeated_property(p):
@@ -753,15 +802,45 @@ def build_all_params(c, m):
 
 
 @dataclass
+class EnumVariant:
+    name: str
+    """ the rust name of the enum variant """
+    value: str
+    """ the value of the enum variant (which is used for the api) """
+    description: str | None
+    deprecated: bool
+    deprecation_message: str | None
+
+    def __str__(self):
+        if self.deprecated:
+            return f'({self.name}=>{self.value} (deprecated: {self.deprecation_message}) {self.description})'
+        return f'({self.name}=>{self.value} {self.description})'
+
+
+@dataclass
+class Enum:
+    ty: RustType
+    description: str | None
+    variants: list[EnumVariant]
+    default: EnumVariant | None
+    has_deprecated_variants: bool
+
+    def __str__(self):
+        return (f'{self.ty} {self.description} default: {self.default} has deprecated variants: '
+                f'{self.has_deprecated_variants} variants: [{", ".join(map(str, self.variants))}]')
+
+
+@dataclass
 class Context:
     sta_map: Dict[str, Any]
     fqan_map: Dict[str, Any]
     rta_map: Dict[str, Any]
     rtc_map: Dict[str, Any]
     schemas: Dict[str, Any]
+    enums: List[Enum]
 
 
-# return a newly build context from the given data
+# return a newly built context from the given data
 def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -> Context:
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
@@ -884,7 +963,7 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
 
     all_schemas = schemas and build_schema_map() or dict()
     if not resources:
-        return Context(dict(), dict(), dict(), dict(), all_schemas)
+        return Context(dict(), dict(), dict(), dict(), all_schemas, [])
 
     rta_map: Dict[str, Any] = {}
     rtc_map: Dict[str, Any] = {}
@@ -899,7 +978,12 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
     # end for each fqan
     sta_map.update(_sta_map)
     fqan_map.update(_fqan_map)
-    return Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas)
+    context = Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas, [])
+
+    from .enum_utils import find_enums_in_context
+    context.enums = find_enums_in_context(context)
+
+    return context
 
 
 def _is_special_version(v):
@@ -1159,12 +1243,26 @@ def method_name_to_variant(name):
 
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value
 # as string suitable to be passed as reference (or copy, where applicable)
-def rnd_arg_val_for_type(tn):
+def rnd_arg_val_for_type(tn: str, c: Context = None) -> str:
     segments = tn.split("::")
     for index in range(len(segments)):
         name = "::".join(segments[index:])
         if name in RUST_TYPE_RND_MAP:
             return str(RUST_TYPE_RND_MAP[name]())
+
+    if c:
+        if tn.startswith("&"):  # sometimes the types get passed as ref which doesn't make too much sense here
+            tn = tn[1:]
+
+        for enum in c.enums:
+            if tn == enum.ty:
+                variants = enum.variants
+                if len(variants) > 0:
+                    variant = variants[0].name
+                    return f"&{tn}::{variant}"
+
+                print('Enum has no variants. This is probably not right...', enum)
+
     return "&Default::default()"
 
 
