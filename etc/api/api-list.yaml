@@ -32,6 +32,9 @@ api:
     - v2
     adsensehost:
     - v4.1
+    aiplatform:
+    - v1
+    - v1beta1
     alertcenter:
     - v1beta1
     analytics:

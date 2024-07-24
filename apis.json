@@ -4,6 +4,36 @@
   "items": [
     {
       "kind": "discovery#directoryItem",
+      "id": "aiplatform:v1",
+      "name": "aiplatform",
+      "version": "v1",
+      "title": "Vertex AI API",
+      "description": "Train high-quality custom machine learning models with minimal machine learning expertise and effort.",
+      "discoveryRestUrl": "https://aiplatform.googleapis.com/$discovery/rest?version=v1",
+      "icons": {
+        "x16": "http://www.google.com/images/icons/product/search-16.gif",
+        "x32": "http://www.google.com/images/icons/product/search-32.gif"
+      },
+      "documentationLink": "https://cloud.google.com/vertex-ai/",
+      "preferred": true
+    },
+    {
+      "kind": "discovery#directoryItem",
+      "id": "aiplatform:v1beta1",
+      "name": "aiplatform",
+      "version": "v1",
+      "title": "Vertex AI API",
+      "description": "Train high-quality custom machine learning models with minimal machine learning expertise and effort.",
+      "discoveryRestUrl": "https://aiplatform.googleapis.com/$discovery/rest?version=v1beta1",
+      "icons": {
+        "x16": "http://www.google.com/images/icons/product/search-16.gif",
+        "x32": "http://www.google.com/images/icons/product/search-32.gif"
+      },
+      "documentationLink": "https://cloud.google.com/vertex-ai/",
+      "preferred": false
+    },
+    {
+      "kind": "discovery#directoryItem",
       "id": "walletobjects:v1",
       "name": "walletobjects",
       "version": "v1",
