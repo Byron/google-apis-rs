@@ -22,6 +22,18 @@ make:
       output_dir: src
     - source: api.rs
       output_dir: src
+    - source: api/utilities.rs
+      output_dir: src
+    - source: api/hub.rs
+      output_dir: src
+    - source: api/method_builders.rs
+      output_dir: src
+    - source: api/schemas.rs
+      output_dir: src
+    - source: api/call_builders.rs
+      output_dir: src
+    - source: api/enums.rs
+      output_dir: src
 cargo:
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs

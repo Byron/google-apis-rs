@@ -2,14 +2,15 @@
 <%!
     from generator.lib.util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN,
                       upload_action_fn, is_schema_with_optionals, schema_markers, indent_by, method_default_scope,
-                      ADD_SCOPE_FN, TREF, enclose_in)
+                      ADD_SCOPE_FN, TREF, enclose_in, has_default_value, get_default_value)
     from generator.lib.cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
-                     call_method_ident, POD_TYPES, opt_value, ident,
+                     call_method_ident, POD_TYPES, opt_value, ident, req_enum_value,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
                      application_secret_path, CONFIG_DIR_FLAG, req_value, MODE_ARG,
                      opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields, JSON_TYPE_TO_ENUM_MAP,
                      CTYPE_TO_ENUM_MAP)
+    from generator.lib.enum_utils import is_property_enum
     from generator.lib.types import JSON_TO_RUST_DEFAULT
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
@@ -35,6 +36,7 @@ use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, pars
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
+use std::convert::TryInto;
 use std::default::Default;
 use std::error::Error as StdError;
 use std::str::FromStr;
@@ -212,7 +214,12 @@ let ${prop_name}: ${prop_type} = arg_from_str(&${opt_value(p.name)}, err, "<${ma
             if p.get('repeated', False):
                 arg_name = opt_values(p.name) + '.map(|&v| v.to_string()).collect::<Vec<String>>()'
             else:
-                arg_name = opt_value(p.name)
+                if is_property_enum(p):
+                    default = get_default_value(p)
+                    arg_name = req_enum_value(p.name, default)
+                    borrow = '&'
+                else:
+                    arg_name = opt_value(p.name)
         call_args.append(borrow + arg_name)
     # end for each required prop
 %>\
@@ -227,10 +234,25 @@ for parg in ${opt_values(VALUE_ARG)} {
 % for p in optional_props:
 <%
     ptype = actual_json_type(p.name, p.get("format", p.type))
-    default_value = JSON_TO_RUST_DEFAULT[ptype]
-    value_unwrap = f"value.unwrap_or({default_value})"
+    no_default_enum = False
+    if is_property_enum(p):
+        default_value = 'Default::default()'
+        value_unwrap = f"&value.and_then(|v|v.try_into().ok()).unwrap_or({default_value})"
+        if not has_default_value(p):
+            no_default_enum = True
+    else:
+        default_value = JSON_TO_RUST_DEFAULT[ptype]
+        value_unwrap = f"value.unwrap_or({default_value})"
 %>\
         "${mangle_subcommand(p.name)}" => {
+        % if no_default_enum:
+            if let Some(value) = value.and_then(|v|v.try_into().ok()) {
+                call = call.${mangle_ident(setter_fn_name(p))}(&value);
+            } else {
+                /*value was empty or invalid but has no default. We are ignoring it for now,
+                it might throw an error when running the call*/
+            }
+        % else:
         % if p.name == 'alt':
             if ${value_unwrap} == "media" {
                 download_mode = true;
@@ -243,6 +265,7 @@ for parg in ${opt_values(VALUE_ARG)} {
 ${value_unwrap}\
         % endif # handle conversion
 );
+        % endif # enum without default or not
         },
 % endfor # each property
         _ => {
@@ -258,7 +281,7 @@ ${value_unwrap}\
                     }
                     % endif
                     found = true;
-                    call = call.${ADD_PARAM_FN}(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, ${value_unwrap});
+                    call = call.${ADD_PARAM_FN}(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, ${value_unwrap}.into());
                     break;
                 }
             }

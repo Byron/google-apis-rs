@@ -1,6 +1,6 @@
 <%!
     from generator.lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
-                      rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
+                      rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by, new_context,
                       activity_rust_type, mangle_ident, activity_input_type, get_word,
                       split_camelcase_s, property, is_pod_property, TREF, IO_REQUEST,
                       schema_to_required_property, rust_copy_value_s, is_required_property,
@@ -100,10 +100,10 @@ ${part_desc | rust_doc_sanitize(documentationLink), rust_doc_comment}
 at least one of the following scopes to make a valid call, possibly depending on *parts*:
 ///
 % for s in m.scopes:
-/// * *${s}*
+/// * *<${s}>*
 % endfor
 % else:
-the *${m.scopes[0]}* scope to make a valid call.
+the *<${m.scopes[0]}>* scope to make a valid call.
 % endif # len(scopes) > 1
 ///
 /// The default scope will be `${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`.
@@ -120,21 +120,21 @@ ${self.usage(resource, method, m, params, request_value, parts)}\
 pub struct ${ThisType}
     where ${struct_type_bounds_s()} {
 
-    hub: &'a ${hub_type_name}${hub_type_params_s()},
+   pub(super) hub: &'a ${hub_type_name}${hub_type_params_s()},
 ## PROPERTIES ###############
 % for p in params:
-    ${property(p.name)}:\
+   pub(super) ${property(p.name)}:\
     % if is_required_property(p):
- ${activity_rust_type(schemas, p, allow_optionals=False)},
+ ${activity_rust_type(schemas, p, allow_optionals=False, parent=resource)},
     % else:
- ${activity_rust_type(schemas, p)},
+ ${activity_rust_type(schemas, p, parent=resource)},
     % endif
 % endfor
 ## A generic map for additinal parameters. Sometimes you can set some that are documented online only
-    ${api.properties.params}: HashMap<String, String>,
+   pub(super) ${api.properties.params}: HashMap<String, String>,
     % if method_default_scope(m):
 ## We need the scopes sorted, to not unnecessarily query new tokens
-    ${api.properties.scopes}: BTreeSet<String>
+   pub(super) ${api.properties.scopes}: BTreeSet<String>
     % endif
 }
 
@@ -223,11 +223,11 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ###############################################################################################
 <%def name="_setter_fn(resource, method, m, p, part_prop, ThisType, c)">\
 <%
-    InType = activity_input_type(schemas, p)
+    InType = activity_input_type(schemas, p, parent=resource)
 
     if is_repeated_property(p):
         p.repeated = False
-        InType = activity_input_type(schemas, p)
+        InType = activity_input_type(schemas, p, parent=resource)
         p.repeated = True
 
     def show_part_info(m, p):
@@ -292,6 +292,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ###############################################################################################
 <%def name="usage(resource, method, m, params, request_value, parts=None, show_all=False, rust_doc=True, handle_result=False)">\
 <%
+    c = new_context(schemas, resources)
     hub_type_name = hub_type(schemas, util.canonical_name())
     required_props, optional_props, part_prop = organize_params(params, request_value)
     is_string_value = lambda v: v.endswith('"')
@@ -304,7 +305,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         sp.repeated = prev
         return res
     # rvfrt = random value for rust type
-    rvfrt = lambda spn, sp, sn=None: rnd_arg_val_for_type(trv(spn, sp, sn))
+    rvfrt = lambda spn, sp, sn: rnd_arg_val_for_type(trv(spn, sp, sn), c)
 
     rb_name = 'req'   # name of request binding
     required_args = request_value and [rb_name] or []
@@ -312,7 +313,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         # could also just skip the first element, but ... let's be safe
         if request_value and request_value.id == p.get(TREF):
             continue
-        v = rnd_arg_val_for_type(activity_input_type(schemas, p))
+        v = rnd_arg_val_for_type(activity_input_type(schemas, p, parent=resource), c)
         # we chose to replace random strings with their meaning, as indicated by the name !
         if is_string_value(v):
             v = '"%s"' % p.name
@@ -351,6 +352,7 @@ use ${util.library_name()}::api::${request_value_type};
 % if handle_result:
 use ${util.library_name()}::{Result, Error};
 % endif
+use ${util.library_name()}::api::enums::*;
 % if media_params:
 use std::fs;
 % endif
@@ -367,7 +369,7 @@ let mut ${rb_name} = ${request_value_type}::default();
 % endif
 <%
     rtn = trv(spn, sp, request_value.id)
-    assignment = rnd_arg_val_for_type(rtn)
+    assignment = rnd_arg_val_for_type(rtn, c)
     if is_string_value(assignment):
         assignment = assignment + '.to_string()'
     if assignment.endswith('default()'):
@@ -392,7 +394,7 @@ let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_
 % endif
 
 <%block  filter="indent_by(13)">\
-.${mangle_ident(setter_fn_name(p))}(${rvfrt(p.name, p)})\
+.${mangle_ident(setter_fn_name(p))}(${rvfrt(p.name, p, resource)})\
 </%block>\
 % endfor
 
@@ -579,7 +581,7 @@ match result {
         % endif ## not is_required_property(p)
         % endif is_repeated_property(p):
         % endif ## p.name == 'part' and request_value:
-        % if p.get('repeated', False):
+        % if is_repeated_property(p):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
                 params.push("${p.name}", ${to_string_impl("f")});
@@ -590,8 +592,10 @@ match result {
             params.push("${p.name}", ${to_string_impl("value")});
         }
         % else:
-        params.push("${p.name}", ${to_string_impl(pname)});
+        let param = ${to_string_impl(pname)};
+        params.push("${p.name}", &param);
         % endif
+
         % endfor
 
         params.extend(${paddfields}.iter());

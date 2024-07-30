@@ -3,6 +3,7 @@ import unittest
 from pprint import pprint
 
 from generator.lib.util import new_context
+from . import DictObject
 from .test_data.discovery_document import DISCOVERY_DOC
 
 
@@ -11,7 +12,7 @@ class ContextTest(unittest.TestCase):
         self.discovery_doc = json.loads(DISCOVERY_DOC)
 
     def test_sta_map(self):
-        expected = {
+        expected = DictObject({
             "AddEnrichmentToAlbumRequest": {
                 "photoslibrary.albums.addEnrichment": ["request"]
             },
@@ -59,16 +60,16 @@ class ContextTest(unittest.TestCase):
                 "photoslibrary.sharedAlbums.join": [],
                 "photoslibrary.sharedAlbums.list": [],
             },
-        }
+        })
 
-        schemas = self.discovery_doc["schemas"]
-        resources = self.discovery_doc["resources"]
+        schemas = DictObject(self.discovery_doc["schemas"])
+        resources = DictObject(self.discovery_doc["resources"])
 
         actual = new_context(schemas, resources).sta_map
         self.assertEqual(actual, expected)
 
     def test_fqan_map(self):
-        expected = {
+        expected = DictObject({
             "photoslibrary.mediaItems.batchCreate": {
                 "flatPath": "v1/mediaItems:batchCreate",
                 "path": "v1/mediaItems:batchCreate",
@@ -345,44 +346,42 @@ class ContextTest(unittest.TestCase):
                 "path": "v1/albums/{+albumId}:share",
                 "id": "photoslibrary.albums.share",
             },
-        }
+        })
 
-        schemas = self.discovery_doc["schemas"]
-        resources = self.discovery_doc["resources"]
+        schemas = DictObject(self.discovery_doc["schemas"])
+        resources = DictObject(self.discovery_doc["resources"])
 
         actual = new_context(schemas, resources).fqan_map
         self.assertEqual(actual, expected)
 
     def test_rta_map(self):
-        expected = {
+        expected = DictObject({
             "mediaItems": ["batchCreate", "search", "list", "get"],
             "sharedAlbums": ["get", "list", "join"],
             "albums": ["list", "get", "addEnrichment", "create", "share"],
-        }
+        })
 
-        schemas = self.discovery_doc["schemas"]
-        resources = self.discovery_doc["resources"]
+        schemas = DictObject(self.discovery_doc["schemas"])
+        resources = DictObject(self.discovery_doc["resources"])
 
         actual = new_context(schemas, resources).rta_map
         self.assertEqual(actual, expected)
 
     def test_rtc_map(self):
-        expected = {
+        expected = DictObject({
             "mediaItems": "photoslibrary",
             "sharedAlbums": "photoslibrary",
             "albums": "photoslibrary",
-        }
+        })
 
-        schemas = self.discovery_doc["schemas"]
-        resources = self.discovery_doc["resources"]
+        schemas = DictObject(self.discovery_doc["schemas"])
+        resources = DictObject(self.discovery_doc["resources"])
 
         actual = new_context(schemas, resources).rtc_map
-        with open("actual.json", "w") as aj:
-            json.dump(actual, aj, indent=4)
         self.assertEqual(actual, expected)
 
     def test_schemas(self):
-        expected = {
+        expected = DictObject({
             "EnrichmentItem": {
                 "description": "An enrichment item.",
                 "type": "object",
@@ -1360,10 +1359,10 @@ class ContextTest(unittest.TestCase):
                 "used_by": ["MediaMetadata"],
                 "parents": [],
             },
-        }
+        })
 
-        schemas = self.discovery_doc["schemas"]
-        resources = self.discovery_doc["resources"]
+        schemas = DictObject(self.discovery_doc["schemas"])
+        resources = DictObject(self.discovery_doc["resources"])
 
         actual = new_context(schemas, resources).schemas
         self.assertEqual(actual, expected)
