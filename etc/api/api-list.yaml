@@ -126,6 +126,8 @@ api:
     - v1
     cloudchannel:
     - v1
+    cloudcommerceprocurement:
+    - v1
     clouddebugger:
     - v2
     clouddeploy:
