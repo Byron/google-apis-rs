@@ -710,20 +710,18 @@ where
                     }
 
                     let (parts, body) = response.into_parts();
-                    let body = to_string(body).await.ok();
-                    let response = Response::from_parts(
-                        parts,
-                        body.clone()
-                            .map(hyper::body::Bytes::from)
-                            .map(Body::new)
-                            .unwrap_or_default(),
-                    );
+                    let success = parts.status.is_success();
+                    let bytes = to_bytes(body).await.ok();
+                    let error = if !success {
+                        bytes.as_ref().and_then(to_json)
+                    } else {
+                        None
+                    };
+                    let response =
+                        Response::from_parts(parts, bytes.map(Body::new).unwrap_or_default());
 
-                    if !response.status().is_success() {
-                        if let Retry::After(d) = self.delegate.http_failure(
-                            &response,
-                            body.as_ref().and_then(|value| json::from_str(value).ok()),
-                        ) {
+                    if !success {
+                        if let Retry::After(d) = self.delegate.http_failure(&response, error) {
                             sleep(d).await;
                             continue;
                         }
@@ -757,20 +755,17 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
     }
 }
 
-// Borrowing the body object as mutable and converts it to a string
-pub async fn get_body_as_string<T: hyper::body::Body>(body: T) -> String {
-    to_string(body).await.unwrap_or_default()
-}
-
-async fn to_bytes<T: hyper::body::Body>(
+#[doc(hidden)]
+pub async fn to_bytes<T: hyper::body::Body>(
     body: T,
 ) -> std::result::Result<hyper::body::Bytes, T::Error> {
     use http_body_util::BodyExt;
     Ok(body.collect().await?.to_bytes())
 }
 
-async fn to_string<T: hyper::body::Body>(body: T) -> std::result::Result<String, T::Error> {
-    Ok(String::from_utf8_lossy(&to_bytes(body).await?).to_string())
+#[doc(hidden)]
+pub fn to_json(bytes: &hyper::body::Bytes) -> Option<json::Value> {
+    json::from_str(&String::from_utf8_lossy(&bytes)).ok()
 }
 
 #[cfg(test)]
