@@ -24,15 +24,10 @@
 //!
 //! # Example
 //! ```rust
-//! use core::future::Future;
-//! use core::pin::Pin;
+//! use std::future::Future;
+//! use std::pin::Pin;
 //!
 //! use google_apis_common::{GetToken, oauth2};
-//!
-//! use http::Uri;
-//! use hyper::client::connect::Connection;
-//! use tokio::io::{AsyncRead, AsyncWrite};
-//! use tower_service::Service;
 //! use oauth2::authenticator::Authenticator;
 //!
 //! #[derive(Clone)]
@@ -41,12 +36,9 @@
 //!     retries: usize,
 //! }
 //!
-//! impl<S> GetToken for AuthenticatorWithRetry<S>
+//! impl<C> GetToken for AuthenticatorWithRetry<C>
 //! where
-//!     S: Service<Uri> + Clone + Send + Sync + 'static,
-//!     S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-//!     S::Future: Send + Unpin + 'static,
-//!     S::Error: Into<Box<dyn std::error::Error + Send + Sync>>,
+//!     C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
 //! {
 //!     fn get_token<'a>(
 //!         &'a self,
@@ -71,6 +63,7 @@
 //! [`oauth2`]: https://docs.rs/oauth2/latest/oauth2/
 //! [`AccessToken`]: https://docs.rs/oauth2/latest/oauth2/struct.AccessToken.html
 //! [`Authenticator`]: yup_oauth2::authenticator::Authenticator
+
 use std::future::Future;
 use std::pin::Pin;
 
@@ -127,20 +120,13 @@ impl GetToken for NoToken {
 
 #[cfg(feature = "yup-oauth2")]
 mod yup_oauth2_impl {
-    use super::{GetToken, GetTokenOutput};
-
-    use http::Uri;
-    use hyper::client::connect::Connection;
-    use tokio::io::{AsyncRead, AsyncWrite};
-    use tower_service::Service;
     use yup_oauth2::authenticator::Authenticator;
 
-    impl<S> GetToken for Authenticator<S>
+    use super::{GetToken, GetTokenOutput};
+
+    impl<C> GetToken for Authenticator<C>
     where
-        S: Service<Uri> + Clone + Send + Sync + 'static,
-        S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-        S::Future: Send + Unpin + 'static,
-        S::Error: Into<Box<dyn std::error::Error + Send + Sync>>,
+        C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
     {
         fn get_token<'a>(&'a self, scopes: &'a [&str]) -> GetTokenOutput<'a> {
             Box::pin(async move {

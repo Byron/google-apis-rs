@@ -174,8 +174,8 @@ pub mod standard_base64 {
                 Ok(decoded) => Ok(decoded),
                 Err(first_err) => match base64::prelude::BASE64_URL_SAFE.decode(s.as_ref()) {
                     Ok(decoded) => Ok(decoded),
-                    Err(_) => Err(serde::de::Error::custom(first_err))
-                }
+                    Err(_) => Err(serde::de::Error::custom(first_err)),
+                },
             }
         }
     }
@@ -212,8 +212,8 @@ pub mod urlsafe_base64 {
                 Ok(decoded) => Ok(decoded),
                 Err(first_err) => match base64::prelude::BASE64_STANDARD.decode(s.as_ref()) {
                     Ok(decoded) => Ok(decoded),
-                    Err(_) => Err(serde::de::Error::custom(first_err))
-                }
+                    Err(_) => Err(serde::de::Error::custom(first_err)),
+                },
             }
         }
     }
@@ -226,7 +226,6 @@ pub fn datetime_to_string(datetime: &chrono::DateTime<chrono::offset::Utc>) -> S
 #[cfg(test)]
 mod test {
     use super::{duration, standard_base64, urlsafe_base64};
-    use base64::Engine as _;
     use serde::{Deserialize, Serialize};
     use serde_with::{serde_as, DisplayFromStr};
 
