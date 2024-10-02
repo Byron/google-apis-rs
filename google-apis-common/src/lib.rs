@@ -26,8 +26,11 @@ pub use yup_oauth2 as oauth2;
 
 const LINE_ENDING: &str = "\r\n";
 
-type Body = http_body_util::Full<hyper::body::Bytes>;
-type Response = hyper::Response<Body>;
+/// A body.
+pub type Body = http_body_util::Full<hyper::body::Bytes>;
+
+/// A response.
+pub type Response = hyper::Response<Body>;
 
 pub enum Retry {
     /// Signal you don't want to retry
