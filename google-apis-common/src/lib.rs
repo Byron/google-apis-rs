@@ -788,7 +788,7 @@ where
 
 #[doc(hidden)]
 pub fn to_string(bytes: &hyper::body::Bytes) -> std::borrow::Cow<'_, str> {
-    String::from_utf8_lossy(&bytes)
+    String::from_utf8_lossy(bytes)
 }
 
 #[doc(hidden)]
