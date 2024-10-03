@@ -34,13 +34,13 @@ pub type Response = hyper::Response<Body>;
 /// A client.
 pub type Client<C> = hyper_util::client::legacy::Client<C, Body>;
 
-/// A connection.
-pub trait Connection:
+/// A connector.
+pub trait Connector:
     hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static
 {
 }
 
-impl<T> Connection for T where
+impl<T> Connector for T where
     T: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static
 {
 }
@@ -585,7 +585,7 @@ impl RangeResponseHeader {
 /// A utility type to perform a resumable upload from start to end.
 pub struct ResumableUploadHelper<'a, A: 'a, C>
 where
-    C: Connection,
+    C: Connector,
 {
     pub client: &'a Client<C>,
     pub delegate: &'a mut dyn Delegate,
@@ -601,7 +601,7 @@ where
 
 impl<'a, A, C> ResumableUploadHelper<'a, A, C>
 where
-    C: Connection,
+    C: Connector,
 {
     async fn query_transfer_status(
         &mut self,

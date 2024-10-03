@@ -142,7 +142,7 @@ impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType}
 where
-    C: client::Connection,
+    C: client::Connector,
 {
 % if api.get('no_upload_prefix') is not None and ThisType.startswith(api.no_upload_prefix):
 ${self._action_fn(c, resource, method, m, params, request_value, parts, doit_without_upload = True)}\
