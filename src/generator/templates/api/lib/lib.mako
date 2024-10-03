@@ -176,8 +176,8 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 ${util.crate_name()} = "*"
-serde = "^1.0"
-serde_json = "^1.0"
+serde = "1"
+serde_json = "1"
 ```
 
 ${'##'} A complete example
@@ -250,7 +250,7 @@ generated `openapi` spec would be invalid.
 ###############################################################################################
 <%def name="test_hub(hub_type, comments=True)">\
 use std::default::Default;
-use ${util.library_name()}::{${hub_type}, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+use ${util.library_name()}::{${hub_type}, oauth2, hyper, hyper_rustls, hyper_util, chrono, FieldMask};
 
 % if comments:
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
@@ -265,10 +265,22 @@ let secret: oauth2::ApplicationSecret = Default::default();
 // retrieve them from storage.
 % endif
 let auth = oauth2::InstalledFlowAuthenticator::builder(
-        secret,
-        oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-    ).build().await.unwrap();
-let mut hub = ${hub_type}::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);\
+    secret,
+    oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+).build().await.unwrap();
+
+let client = hyper_util::client::legacy::Client::builder(
+    hyper_util::rt::TokioExecutor::new()
+)
+.build(
+    hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
+        .unwrap()
+        .https_or_http()
+        .enable_http1()
+        .build()
+);
+let mut hub = ${hub_type}::new(client, auth);\
 </%def>
 
 ## You will still have to set the filter for your comment type - either nothing, or rust_doc_comment !

@@ -41,16 +41,19 @@ ${lib.docs(c)}
 </%block>
 
 // Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub use hyper;
-pub use hyper_rustls;
-pub extern crate google_apis_common as client;
-pub use client::chrono;
-pub mod api;
+pub extern crate hyper;
+pub extern crate hyper_rustls;
+pub extern crate hyper_util;
 
-// Re-export the hub type and some basic client structs
-pub use api::${hub_type};
+pub extern crate google_apis_common as client;
+
+pub use client::chrono;
 pub use client::{Result, Error, Delegate, FieldMask};
 
 // Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
 #[cfg(feature = "yup-oauth2")]
 pub use client::oauth2;
+
+pub mod api;
+// Re-export the hub type and some basic client structs
+pub use api::${hub_type};

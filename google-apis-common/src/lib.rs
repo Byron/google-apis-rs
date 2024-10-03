@@ -40,6 +40,11 @@ pub trait Connection:
 {
 }
 
+impl<T> Connection for T where
+    T: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static
+{
+}
+
 pub enum Retry {
     /// Signal you don't want to retry
     Abort,

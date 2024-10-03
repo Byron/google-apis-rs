@@ -27,8 +27,8 @@ cargo:
   is_executable: YES
   doc_base_url: http://byron.github.io/google-apis-rs
   dependencies:
-    - clap = "^2.0"
-    - http = "^0.2"
-    - hyper = { version = "0.14", features = ["full"] }
-    - tokio = { version = "^ 1.0", features = ["full"] }
-    - tower-service = "^0.3.1"
+    - clap = "2"
+    - http = "1"
+    - hyper = { version = "1", features = ["full"] }
+    - tokio = { version = "1", features = ["full"] }
+    - tower-service = "0.3"

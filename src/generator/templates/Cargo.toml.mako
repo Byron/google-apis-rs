@@ -26,18 +26,19 @@ path = "src/main.rs"
 % endif
 
 [dependencies]
-anyhow = "^ 1.0"
-hyper-rustls = "0.25.0"
+anyhow = "1"
+hyper-rustls = "0.27"
+hyper-util = "0.1"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
-mime = "^ 0.3.0"
-serde = { version = "^ 1.0", features = ["derive"] }
-utoipa = { version = "^4.2", optional = true }
-serde_json = "^ 1.0"
+mime = "0.3"
 itertools = "0.13"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+utoipa = { version = "4", optional = true }
 % if cargo.get('is_executable', False):
-google-clis-common = { path = "../../google-clis-common", version = "6.0" }
+google-clis-common = { path = "../../google-clis-common", version = "6" }
 % else:
-google-apis-common = { path = "../../google-apis-common", version = "6.0.3" }
+google-apis-common = { path = "../../google-apis-common", version = "6" }
 % endif
 % for dep in cargo.get('dependencies', list()):
 ${dep}
