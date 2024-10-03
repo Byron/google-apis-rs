@@ -718,7 +718,11 @@ where
                     let (parts, body) = response.into_parts();
                     let success = parts.status.is_success();
                     let bytes = to_bytes(body).await.unwrap_or_default();
-                    let error = if !success { to_json(&bytes) } else { None };
+                    let error = if !success {
+                        json::from_str(&to_string(&bytes)).ok()
+                    } else {
+                        None
+                    };
                     let response = to_response(parts, bytes);
 
                     if !success {
@@ -776,8 +780,8 @@ where
 }
 
 #[doc(hidden)]
-pub fn to_json(bytes: &hyper::body::Bytes) -> Option<json::Value> {
-    json::from_str(&String::from_utf8_lossy(&bytes)).ok()
+pub fn to_string(bytes: &hyper::body::Bytes) -> std::borrow::Cow<'_, str> {
+    String::from_utf8_lossy(&bytes)
 }
 
 #[doc(hidden)]
