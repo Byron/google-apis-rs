@@ -17,7 +17,7 @@ documentation = "${util.doc_base_url()}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
 autobins = false
-edition = "2018"
+edition = "2021"
 
 % if cargo.get('is_executable', False):
 [[bin]]
