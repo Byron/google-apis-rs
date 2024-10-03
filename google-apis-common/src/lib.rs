@@ -14,7 +14,6 @@ use hyper::Method;
 use hyper::StatusCode;
 use itertools::Itertools;
 use mime::Mime;
-use serde_json as json;
 use tokio::time::sleep;
 
 pub use auth::{GetToken, NoToken};
@@ -169,7 +168,7 @@ pub trait Delegate: Send {
     fn response_json_decode_error(
         &mut self,
         json_encoded_value: &str,
-        json_decode_error: &json::Error,
+        json_decode_error: &serde_json::Error,
     ) {
         let _ = json_encoded_value;
         let _ = json_decode_error;
@@ -256,7 +255,7 @@ pub enum Error {
 
     /// Shows that we failed to decode the server response.
     /// This can happen if the protocol changes in conjunction with strict json decoding.
-    JsonDecodeError(String, json::Error),
+    JsonDecodeError(String, serde_json::Error),
 
     /// Indicates an HTTP repsonse with a non-success status code
     Failure(Response),
@@ -719,7 +718,7 @@ where
                     let success = parts.status.is_success();
                     let bytes = to_bytes(body).await.unwrap_or_default();
                     let error = if !success {
-                        json::from_str(&to_string(&bytes)).ok()
+                        serde_json::from_str(&to_string(&bytes)).ok()
                     } else {
                         None
                     };
@@ -748,13 +747,13 @@ where
 }
 
 // TODO(ST): Allow sharing common code between program types
-pub fn remove_json_null_values(value: &mut json::value::Value) {
+pub fn remove_json_null_values(value: &mut serde_json::value::Value) {
     match value {
-        json::value::Value::Object(map) => {
+        serde_json::value::Value::Object(map) => {
             map.retain(|_, value| !value.is_null());
             map.values_mut().for_each(remove_json_null_values);
         }
-        json::value::Value::Array(arr) => {
+        serde_json::value::Value::Array(arr) => {
             arr.retain(|value| !value.is_null());
             arr.iter_mut().for_each(remove_json_null_values);
         }
@@ -793,14 +792,13 @@ where
 }
 
 #[cfg(test)]
-mod test_api {
-    use super::*;
+mod tests {
     use std::default::Default;
     use std::str::FromStr;
 
     use ::serde::{Deserialize, Serialize};
 
-    use serde_json as json;
+    use super::*;
 
     #[test]
     fn serde() {
@@ -813,24 +811,24 @@ mod test_api {
         }
 
         let f: Foo = Default::default();
-        json::to_string(&f).unwrap(); // should work
+        serde_json::to_string(&f).unwrap(); // should work
 
         let j = "{\"opt\":null,\"req\":0,\"vec\":[]}";
-        let _f: Foo = json::from_str(j).unwrap();
+        let _f: Foo = serde_json::from_str(j).unwrap();
 
         // This fails, unless 'vec' is optional
         // let j = "{\"opt\":null,\"req\":0}";
-        // let f: Foo = json::from_str(j).unwrap();
+        // let f: Foo = serde_json::from_str(j).unwrap();
 
         #[derive(Default, Serialize, Deserialize)]
         struct Bar {
             #[serde(rename = "snooSnoo")]
             snoo_snoo: String,
         }
-        json::to_string(&<Bar as Default>::default()).unwrap();
+        serde_json::to_string(&<Bar as Default>::default()).unwrap();
 
         let j = "{\"snooSnoo\":\"foo\"}";
-        let b: Bar = json::from_str(j).unwrap();
+        let b: Bar = serde_json::from_str(j).unwrap();
         assert_eq!(b.snoo_snoo, "foo");
 
         // We can't have unknown fields with structs.
@@ -840,7 +838,7 @@ mod test_api {
         //     snoo_snoo: Option<String>
         // }
         // let j = "{\"snooSnoo\":\"foo\",\"foo\":\"bar\"}";
-        // let b: BarOpt = json::from_str(&j).unwrap();
+        // let b: BarOpt = serde_json::from_str(&j).unwrap();
     }
 
     #[test]

@@ -224,10 +224,11 @@ pub fn datetime_to_string(datetime: &chrono::DateTime<chrono::offset::Utc>) -> S
 }
 
 #[cfg(test)]
-mod test {
-    use super::{duration, standard_base64, urlsafe_base64};
+mod tests {
     use serde::{Deserialize, Serialize};
     use serde_with::{serde_as, DisplayFromStr};
+
+    use super::{duration, standard_base64, urlsafe_base64};
 
     #[serde_as]
     #[derive(Serialize, Deserialize, Debug, PartialEq)]
