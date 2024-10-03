@@ -33,7 +33,10 @@ pub type Body = http_body_util::Full<hyper::body::Bytes>;
 pub type Response = hyper::Response<Body>;
 
 /// A client.
-pub trait Client: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static {}
+pub trait Client:
+    hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static
+{
+}
 
 pub enum Retry {
     /// Signal you don't want to retry
@@ -716,7 +719,7 @@ where
                     let success = parts.status.is_success();
                     let bytes = to_bytes(body).await.unwrap_or_default();
                     let error = if !success { to_json(&bytes) } else { None };
-                    let response = Response::from_parts(parts, to_body(bytes));
+                    let response = to_response(parts, bytes);
 
                     if !success {
                         if let Retry::After(d) =
@@ -756,12 +759,18 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
 }
 
 #[doc(hidden)]
-pub fn to_body<T: Into<hyper::body::Bytes>>(bytes: T) -> Body {
+pub fn to_body<T>(bytes: T) -> Body
+where
+    T: Into<hyper::body::Bytes>,
+{
     Body::new(bytes.into())
 }
 
 #[doc(hidden)]
-pub async fn to_bytes<T: hyper::body::Body>(body: T) -> Option<hyper::body::Bytes> {
+pub async fn to_bytes<T>(body: T) -> Option<hyper::body::Bytes>
+where
+    T: hyper::body::Body,
+{
     use http_body_util::BodyExt;
     body.collect().await.ok().map(|value| value.to_bytes())
 }
@@ -769,6 +778,14 @@ pub async fn to_bytes<T: hyper::body::Body>(body: T) -> Option<hyper::body::Byte
 #[doc(hidden)]
 pub fn to_json(bytes: &hyper::body::Bytes) -> Option<json::Value> {
     json::from_str(&String::from_utf8_lossy(&bytes)).ok()
+}
+
+#[doc(hidden)]
+pub fn to_response<T>(parts: http::response::Parts, body: T) -> Response
+where
+    T: Into<hyper::body::Bytes>,
+{
+    Response::from_parts(parts, to_body(body))
 }
 
 #[cfg(test)]
