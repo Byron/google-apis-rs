@@ -110,6 +110,7 @@ ${api_common}: ${gen_root_stamp}
 ${gen_root_stamp}: $(MAKO_RENDER) ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES)
 	@echo Generating ${api_target}
 	$(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} ${post_processor_arg} --data-files ${api_json_inputs}
+	cargo fmt --manifest-path ${gen_root}/Cargo.toml
 	@touch $@
 
 ${api_target}: ${api_common}
