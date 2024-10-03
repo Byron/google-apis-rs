@@ -96,11 +96,11 @@ ${_new_object(s, s.items.get('properties'), c, allow_optionals)}\
 % endif ## array item != 'object'
 % elif s.type == 'any':
 ## waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
-pub struct ${s_type}(pub json::Value);
+pub struct ${s_type}(pub serde_json::Value);
 
 impl Default for ${s_type} {
     fn default() -> ${s_type} {
-        ${s_type}(json::Value::Null)
+        ${s_type}(serde_json::Value::Null)
     }
 }
 % else:

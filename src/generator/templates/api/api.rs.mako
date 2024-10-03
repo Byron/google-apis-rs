@@ -20,12 +20,10 @@ use std::cell::RefCell;
 use std::default::Default;
 use std::collections::BTreeSet;
 use std::error::Error as StdError;
-use serde_json as json;
 use std::io;
 use std::fs;
 use std::mem;
 
-use hyper::client::connect;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 use tower_service;
@@ -55,7 +53,7 @@ ${lib.hub_usage_example(c)}\
 </%block>
 #[derive(Clone)]
 pub struct ${hub_type}${ht_params} {
-    pub client: hyper::Client<S, hyper::body::Body>,
+    pub client: client::Client<C>,
     pub auth: Box<dyn client::GetToken>,
     _user_agent: String,
     _base_url: String,
@@ -66,7 +64,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_para
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> ${hub_type}${ht_params} {
+    pub fn new<A: 'static + client::GetToken>(client: client::Client<C>, auth: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client,
             auth: Box::new(auth),

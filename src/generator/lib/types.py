@@ -30,7 +30,7 @@ RUST_TYPE_MAP = {
     'double': Base("f64"),
     'float': Base("f32"),
     'int32': Base("i32"),
-    'any': Base("json::Value"),
+    'any': Base("serde_json::Value"),
     'int64': Base("i64"),
     'uint64': Base("u64"),
     'array': Vec(None),

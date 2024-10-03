@@ -101,7 +101,7 @@ data_unit_multipliers = {
 inflection = inflect.engine()
 
 
-HUB_TYPE_PARAMETERS = ('S',)
+HUB_TYPE_PARAMETERS = ('C',)
 
 
 def items(p):
