@@ -104,7 +104,7 @@ class UtilsTest(unittest.TestCase):
         property_name = 'details'
         property_value = schemas[class_name]['properties'][property_name]
         rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=True)
-        self.assertEqual(rust_type, 'Option<Vec<HashMap<String, json::Value>>>')
+        self.assertEqual(rust_type, 'Option<Vec<HashMap<String, serde_json::Value>>>')
 
 
 def main():
