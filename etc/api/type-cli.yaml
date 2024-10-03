@@ -29,6 +29,6 @@ cargo:
   dependencies:
     - clap = "2"
     - http = "1"
+    - http-body-util = "0.1"
     - hyper = { version = "1", features = ["full"] }
     - tokio = { version = "1", features = ["full"] }
-    - tower-service = "0.3"

@@ -751,7 +751,7 @@ pub fn application_secret_from_directory(
 }
 
 #[cfg(test)]
-mod test_cli {
+mod tests {
     use super::*;
 
     use std::default::Default;
