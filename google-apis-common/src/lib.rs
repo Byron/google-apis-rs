@@ -177,7 +177,7 @@ pub trait Delegate: Send {
     ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
-    fn http_failure(&mut self, _: &Response, _err: Option<serde_json::Value>) -> Retry {
+    fn http_failure(&mut self, _: &Response, _err: Option<&serde_json::Value>) -> Retry {
         Retry::Abort
     }
 
@@ -676,8 +676,8 @@ where
             };
 
             let mut section_reader = self.reader.take(request_size);
-            let mut req_bytes = vec![];
-            section_reader.read_to_end(&mut req_bytes).unwrap();
+            let mut bytes = vec![];
+            section_reader.read_to_end(&mut bytes).unwrap();
             let range_header = ContentRange {
                 range: Some(Chunk {
                     first: start,
@@ -697,7 +697,7 @@ where
                         .header("Content-Range", range_header.header_value())
                         .header(CONTENT_TYPE, format!("{}", self.media_type))
                         .header(USER_AGENT, self.user_agent.to_string())
-                        .body(Body::new(hyper::body::Bytes::from(req_bytes)))
+                        .body(to_body(bytes))
                         .unwrap(),
                 )
                 .await
@@ -711,17 +711,14 @@ where
 
                     let (parts, body) = response.into_parts();
                     let success = parts.status.is_success();
-                    let bytes = to_bytes(body).await.ok();
-                    let error = if !success {
-                        bytes.as_ref().and_then(to_json)
-                    } else {
-                        None
-                    };
-                    let response =
-                        Response::from_parts(parts, bytes.map(Body::new).unwrap_or_default());
+                    let bytes = to_bytes(body).await.unwrap_or_default();
+                    let error = if !success { to_json(&bytes) } else { None };
+                    let response = Response::from_parts(parts, to_body(bytes));
 
                     if !success {
-                        if let Retry::After(d) = self.delegate.http_failure(&response, error) {
+                        if let Retry::After(d) =
+                            self.delegate.http_failure(&response, error.as_ref())
+                        {
                             sleep(d).await;
                             continue;
                         }
@@ -756,11 +753,14 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
 }
 
 #[doc(hidden)]
-pub async fn to_bytes<T: hyper::body::Body>(
-    body: T,
-) -> std::result::Result<hyper::body::Bytes, T::Error> {
+pub fn to_body<T: Into<hyper::body::Bytes>>(bytes: T) -> Body {
+    Body::new(bytes.into())
+}
+
+#[doc(hidden)]
+pub async fn to_bytes<T: hyper::body::Body>(body: T) -> Option<hyper::body::Bytes> {
     use http_body_util::BodyExt;
-    Ok(body.collect().await?.to_bytes())
+    body.collect().await.ok().map(|value| value.to_bytes())
 }
 
 #[doc(hidden)]
