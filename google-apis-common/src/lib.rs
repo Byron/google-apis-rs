@@ -32,6 +32,9 @@ pub type Body = http_body_util::Full<hyper::body::Bytes>;
 /// A response.
 pub type Response = hyper::Response<Body>;
 
+/// A client.
+pub trait Client: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static {}
+
 pub enum Retry {
     /// Signal you don't want to retry
     Abort,
@@ -572,7 +575,7 @@ impl RangeResponseHeader {
 /// A utility type to perform a resumable upload from start to end.
 pub struct ResumableUploadHelper<'a, A: 'a, C>
 where
-    C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
+    C: Client,
 {
     pub client: &'a hyper_util::client::legacy::Client<C, Body>,
     pub delegate: &'a mut dyn Delegate,
@@ -588,7 +591,7 @@ where
 
 impl<'a, A, C> ResumableUploadHelper<'a, A, C>
 where
-    C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
+    C: Client,
 {
     async fn query_transfer_status(
         &mut self,
