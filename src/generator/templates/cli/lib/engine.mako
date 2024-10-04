@@ -31,16 +31,31 @@
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
-use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
-
 use std::default::Default;
 use std::error::Error as StdError;
 use std::str::FromStr;
 
 use clap::ArgMatches;
 use http_body_util::BodyExt;
+
+use common::{
+  CLIError,
+  CallType,
+  ComplexType,
+  FieldCursor,
+  FieldError,
+  InvalidOptionsError,
+  JsonType,
+  JsonTypeInfo,
+  UploadProtocol,
+  arg_from_str,
+  calltype_from_str,
+  input_file_from_opts,
+  input_mime_from_opts,
+  parse_kv_arg,
+  remove_json_null_values,
+  writer_from_opts,
+};
 
 enum DoitError {
     IoError(String, io::Error),
@@ -57,7 +72,7 @@ struct Engine<'n, C> {
 
 impl<'n, C> Engine<'n, C>
 where
-    C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
+    C: apis_common::Connector,
 {
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
@@ -108,12 +123,12 @@ where
     // Please note that this call will fail if any part of the opt can't be handled
     async fn new(opt: ArgMatches<'n>, connector: C) -> Result<Engine<'n, C>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match client::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
+            let config_dir = match common::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match client::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}",
+            match common::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}",
                                                          "${api.credentials.replace('"', r'\"')}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -121,12 +136,12 @@ where
         };
 
         let executor = hyper_util::rt::TokioExecutor::new();
-        let client = hyper_util::client::legacy::Client::builder(executor).build(connector);
+        let client = hyper_util::client::legacy::Client::builder(executor.clone()).build(connector.clone());
 
         let auth = oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            client.clone(),
+            hyper_util::client::legacy::Client::builder(executor).build(connector),
         ).persist_tokens_to_disk(format!("{}/${util.program_name()}", config_dir)).build().await.unwrap();
 
 <% gpm = gen_global_parameter_names(parameters) %>\

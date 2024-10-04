@@ -19,12 +19,13 @@ extern crate clap;
 
 use std::env;
 use std::io::{self, Write};
+
 use clap::{App, SubCommand, Arg};
 
 use ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))}::{api, Error, oauth2, client::chrono, FieldMask};
 
-
-use google_clis_common as client;
+use google_apis_common as apis_common;
+use google_clis_common as common;
 
 ${engine.new(c)}\
 

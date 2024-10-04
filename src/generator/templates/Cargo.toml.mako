@@ -35,11 +35,12 @@ itertools = "0.13"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 utoipa = { version = "4", optional = true }
+
+google-apis-common = { path = "../../google-apis-common", version = "6" }
 % if cargo.get('is_executable', False):
 google-clis-common = { path = "../../google-clis-common", version = "6" }
-% else:
-google-apis-common = { path = "../../google-apis-common", version = "6" }
 % endif
+
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
