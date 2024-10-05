@@ -4,7 +4,7 @@
 //!
 //! By default, [`GetToken`] is implemented for:
 //! - [`Authenticator`] : An authenticator which supports a variety of authentication methods
-//! - [`String`] : Plain oauth2 token in String format
+//! - [`String`] : Plain OAuth2 token in String format
 //! - [`NoToken`] : No token, used for APIs which do not require a token
 //!
 //! # Usage
@@ -27,8 +27,8 @@
 //! use std::future::Future;
 //! use std::pin::Pin;
 //!
-//! use google_apis_common::{GetToken, oauth2};
-//! use oauth2::authenticator::Authenticator;
+//! use google_apis_common::GetToken;
+//! use yup_oauth2::authenticator::Authenticator;
 //!
 //! #[derive(Clone)]
 //! struct AuthenticatorWithRetry<S> {
