@@ -16,6 +16,8 @@
     default_user_agent = "google-api-rust-client/" + cargo.build_version
 %>\
 
+#![allow(clippy::ptr_arg)]
+
 use std::collections::{BTreeSet, HashMap};
 
 use tokio::time::sleep;
@@ -48,7 +50,7 @@ pub struct ${hub_type}${ht_params} {
     _root_url: String,
 }
 
-impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> common::Hub for ${hub_type}${ht_params} {}
+impl<${', '.join(HUB_TYPE_PARAMETERS)}> common::Hub for ${hub_type}${ht_params} {}
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
@@ -64,7 +66,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
     % for resource in sorted(c.rta_map.keys()):
     pub fn ${mangle_ident(resource)}(&'a self) -> ${rb_type(resource)}${rb_type_params_s(resource, c)} {
-        ${rb_type(resource)} { hub: &self }
+        ${rb_type(resource)} { hub: self }
     }
     % endfor
 

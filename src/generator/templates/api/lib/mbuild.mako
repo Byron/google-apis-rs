@@ -571,14 +571,14 @@ match result {
             ${pname} = Some(self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts());
         }
         % else:
-        if ${pname}.len() == 0 {
+        if ${pname}.is_empty() {
             ${pname} = self.${property(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
         }
         % endif ## not is_required_property(p)
         % endif is_repeated_property(p):
         % endif ## p.name == 'part' and request_value:
         % if p.get('repeated', False):
-        if ${pname}.len() > 0 {
+        if !${pname}.is_empty() {
             for f in ${pname}.iter() {
                 params.push("${p.name}", ${to_string_impl("f")});
             }
@@ -650,6 +650,7 @@ else {
 
         ## Handle URI Templates
         % if replacements:
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
             url = params.uri_replacement(url, param_name, find_this, ${"true" if URL_ENCODE in special_cases else "false"});
         }

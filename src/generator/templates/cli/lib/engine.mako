@@ -109,7 +109,7 @@ where
         }
 
         if dry_run {
-            if err.issues.len() > 0 {
+            if !err.issues.is_empty() {
                 err_opt = Some(err);
             }
             Err(err_opt)
@@ -144,7 +144,7 @@ where
 
 <% gpm = gen_global_parameter_names(parameters) %>\
         let engine = Engine {
-            opt: opt,
+            opt,
             hub: ${hub_type_name}::new(client, auth),
             gp: ${field_vec(gpm)},
             gpm: vec![

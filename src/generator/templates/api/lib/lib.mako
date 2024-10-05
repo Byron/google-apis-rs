@@ -249,7 +249,6 @@ generated `openapi` spec would be invalid.
 ###############################################################################################
 ###############################################################################################
 <%def name="test_hub(hub_type, comments=True)">\
-use std::default::Default;
 use ${util.library_name()}::{${hub_type}, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 
 % if comments:
@@ -372,6 +371,7 @@ impl AsRef<str> for Scope {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
 <%
