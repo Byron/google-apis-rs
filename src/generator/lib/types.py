@@ -89,7 +89,7 @@ JSON_TO_RUST_DEFAULT = {
     # guessing bytes is universally url-safe b64
     "byte": "b\"hello world\"",
     # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto
-    "google-fieldmask": "FieldMask::default()"
+    "google-fieldmask": "apis_common::FieldMask::default()"
 }
 
 
