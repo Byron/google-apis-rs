@@ -107,8 +107,8 @@ impl GetToken for String {
     }
 }
 
-/// In the event that the API endpoint does not require an oauth2 token, `NoToken` should be provided to the hub to avoid specifying an
-/// authenticator.
+/// In the event that the API endpoint does not require an OAuth2 token, `NoToken` should be
+/// provided to the hub to avoid specifying an authenticator.
 #[derive(Default, Clone)]
 pub struct NoToken;
 
@@ -119,23 +119,17 @@ impl GetToken for NoToken {
 }
 
 #[cfg(feature = "yup-oauth2")]
-mod yup_oauth2_impl {
-    use yup_oauth2::authenticator::Authenticator;
-
-    use super::{GetToken, GetTokenOutput};
-
-    impl<C> GetToken for Authenticator<C>
-    where
-        C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
-    {
-        fn get_token<'a>(&'a self, scopes: &'a [&str]) -> GetTokenOutput<'a> {
-            Box::pin(async move {
-                self.token(scopes)
-                    .await
-                    .map(|t| t.token().map(|t| t.to_owned()))
-                    .map_err(|e| e.into())
-            })
-        }
+impl<C> GetToken for yup_oauth2::authenticator::Authenticator<C>
+where
+    C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
+{
+    fn get_token<'a>(&'a self, scopes: &'a [&str]) -> GetTokenOutput<'a> {
+        Box::pin(async move {
+            self.token(scopes)
+                .await
+                .map(|t| t.token().map(|t| t.to_owned()))
+                .map_err(|e| e.into())
+        })
     }
 }
 

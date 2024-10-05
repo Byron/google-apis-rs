@@ -31,8 +31,6 @@
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
-use std::default::Default;
-use std::error::Error as StdError;
 use std::str::FromStr;
 
 use clap::ArgMatches;
@@ -58,7 +56,7 @@ use common::{
 };
 
 enum DoitError {
-    IoError(String, io::Error),
+    IoError(String, std::io::Error),
     ApiError(Error),
 }
 
@@ -99,14 +97,14 @@ where
                     % endfor # each method
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("${mangle_subcommand(resource)}".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                        writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
             },
 % endfor # each resource
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
-                writeln!(io::stderr(), "{}\n", ${SOPT}.usage()).ok();
+                writeln!(std::io::stderr(), "{}\n", ${SOPT}.usage()).ok();
             }
         }
 
@@ -138,9 +136,9 @@ where
         let executor = hyper_util::rt::TokioExecutor::new();
         let client = hyper_util::client::legacy::Client::builder(executor.clone()).build(connector.clone());
 
-        let auth = oauth2::InstalledFlowAuthenticator::with_client(
+        let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
-            oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
             hyper_util::client::legacy::Client::builder(executor).build(connector),
         ).persist_tokens_to_disk(format!("{}/${util.program_name()}", config_dir)).build().await.unwrap();
 

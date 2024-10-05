@@ -96,7 +96,7 @@ impl${rb_params} ${ThisType} {
     % endif
     pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {
         % if part_prop and request_value:
-        use client::ToParts;
+        use common::ToParts;
         % if is_repeated_property(part_prop):
             let parts = vec![${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts()];
         % else:

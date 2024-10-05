@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
-use ::percent_encoding::{percent_encode, AsciiSet, CONTROLS};
 use ::url::Url;
+use percent_encoding::{percent_encode, AsciiSet, CONTROLS};
 
 pub struct Params<'a> {
     params: Vec<(&'a str, Cow<'a, str>)>,

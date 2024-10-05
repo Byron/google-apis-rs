@@ -1,8 +1,9 @@
 pub mod duration {
-    use serde::{Deserialize, Deserializer};
-    use serde_with::{DeserializeAs, SerializeAs};
     use std::fmt::Formatter;
     use std::str::FromStr;
+
+    use serde::{Deserialize, Deserializer};
+    use serde_with::{DeserializeAs, SerializeAs};
 
     use chrono::Duration;
 
@@ -144,10 +145,11 @@ pub mod duration {
 }
 
 pub mod standard_base64 {
+    use std::borrow::Cow;
+
     use base64::Engine as _;
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
-    use std::borrow::Cow;
 
     pub struct Wrapper;
 
@@ -182,10 +184,11 @@ pub mod standard_base64 {
 }
 
 pub mod urlsafe_base64 {
+    use std::borrow::Cow;
+
     use base64::Engine as _;
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
-    use std::borrow::Cow;
 
     pub struct Wrapper;
 

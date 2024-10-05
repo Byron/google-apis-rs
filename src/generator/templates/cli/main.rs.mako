@@ -17,12 +17,11 @@
 #[macro_use]
 extern crate clap;
 
-use std::env;
-use std::io::{self, Write};
+use std::io::Write;
 
 use clap::{App, SubCommand, Arg};
 
-use ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))}::{api, Error, oauth2, client::chrono, FieldMask};
+use ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))}::{Error, api, yup_oauth2};
 
 use google_apis_common as apis_common;
 use google_clis_common as common;
@@ -46,20 +45,20 @@ async fn main() {
     match Engine::new(matches, connector).await {
         Err(err) => {
             exit_status = err.exit_code;
-            writeln!(io::stderr(), "{}", err).ok();
+            writeln!(std::io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
-                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
+                        writeln!(std::io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:#?}", err).ok();
+                            writeln!(std::io::stderr(), "{:#?}", err).ok();
                         } else {
-                            writeln!(io::stderr(), "{}", err).ok();
+                            writeln!(std::io::stderr(), "{}", err).ok();
                         }
                     }
                 }

@@ -16,11 +16,10 @@ def chrono_date(y=None, m=None, d=None):
     return f"chrono::NaiveDate::from_ymd({y}, {m}, {d})"
 
 
-CHRONO_PATH = "client::chrono"
-CHRONO_DATETIME = f"{CHRONO_PATH}::DateTime<{CHRONO_PATH}::offset::Utc>"
-CHRONO_DATE = f"{CHRONO_PATH}::NaiveDate"
-USE_FORMAT = 'use_format_field'
+CHRONO_DATE = "chrono::NaiveDate"
+CHRONO_DATETIME = "chrono::DateTime<chrono::offset::Utc>"
 CHRONO_UTC_NOW = "chrono::Utc::now()"
+USE_FORMAT = 'use_format_field'
 
 RUST_TYPE_MAP = {
     'boolean': Base("bool"),
@@ -45,11 +44,11 @@ RUST_TYPE_MAP = {
     # e.g. "2013-01-15"
     'date': Base(CHRONO_DATE),
     # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/duration.proto
-    'google-duration': Base(f"{CHRONO_PATH}::Duration"),
+    'google-duration': Base(f"chrono::Duration"),
     # guessing bytes is universally url-safe b64
     "byte": Vec(Base("u8")),
     # https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto
-    "google-fieldmask": Base("client::FieldMask")
+    "google-fieldmask": Base("common::FieldMask")
 }
 
 RUST_TYPE_RND_MAP = {
@@ -67,7 +66,7 @@ RUST_TYPE_RND_MAP = {
     # why a reference to Vec? Because it works. Should be slice, but who knows how typing works here.
     "&Vec<u8>": lambda: f"&vec![0, 1, 2, 3]",
     # TODO: styling this
-    f"{CHRONO_PATH}::Duration": lambda: f"chrono::Duration::seconds({randint(0, 9999999)})",
+    f"chrono::Duration": lambda: f"chrono::Duration::seconds({randint(0, 9999999)})",
     CHRONO_DATE: chrono_date,
     CHRONO_DATETIME: lambda: CHRONO_UTC_NOW,
     "FieldMask": lambda: "FieldMask::new::<&str>(&[])",

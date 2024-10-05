@@ -49,19 +49,19 @@ ADD_PARAM_MEDIA_EXAMPLE = "." + ADD_PARAM_FN + '("alt", "media")'
 SPACES_PER_TAB = 4
 
 NESTED_TYPE_SUFFIX = 'item'
-DELEGATE_TYPE = 'client::Delegate'
+DELEGATE_TYPE = 'common::Delegate'
 REQUEST_PRIORITY = 100
-REQUEST_MARKER_TRAIT = 'client::RequestValue'
-RESPONSE_MARKER_TRAIT = 'client::ResponseResult'
-RESOURCE_MARKER_TRAIT = 'client::Resource'
-CALL_BUILDER_MARKERT_TRAIT = 'client::CallBuilder'
-METHODS_BUILDER_MARKER_TRAIT = 'client::MethodsBuilder'
-PART_MARKER_TRAIT = 'client::Part'
-NESTED_MARKER_TRAIT = 'client::NestedType'
+REQUEST_MARKER_TRAIT = 'common::RequestValue'
+RESPONSE_MARKER_TRAIT = 'common::ResponseResult'
+RESOURCE_MARKER_TRAIT = 'common::Resource'
+CALL_BUILDER_MARKERT_TRAIT = 'common::CallBuilder'
+METHODS_BUILDER_MARKER_TRAIT = 'common::MethodsBuilder'
+PART_MARKER_TRAIT = 'common::Part'
+NESTED_MARKER_TRAIT = 'common::NestedType'
 REQUEST_VALUE_PROPERTY_NAME = 'request'
 DELEGATE_PROPERTY_NAME = 'delegate'
-TO_PARTS_MARKER = 'client::ToParts'
-UNUSED_TYPE_MARKER = 'client::UnusedType'
+TO_PARTS_MARKER = 'common::ToParts'
+UNUSED_TYPE_MARKER = 'common::UnusedType'
 
 PROTOCOL_TYPE_INFO = {
     'simple': {
@@ -1186,10 +1186,10 @@ def size_to_bytes(size):
 def string_impl(p):
     """Returns a function which will convert instances of p to a string"""
     return {
-        "google-duration": lambda x: f"::client::serde::duration::to_string(&{x})",
-        "byte": lambda x: f"::client::serde::standard_base64::to_string(&{x})",
-        "google-datetime": lambda x: f"::client::serde::datetime_to_string(&{x})",
-        "date-time": lambda x: f"::client::serde::datetime_to_string(&{x})",
+        "google-duration": lambda x: f"common::serde::duration::to_string(&{x})",
+        "byte": lambda x: f"common::serde::standard_base64::to_string(&{x})",
+        "google-datetime": lambda x: f"common::serde::datetime_to_string(&{x})",
+        "date-time": lambda x: f"common::serde::datetime_to_string(&{x})",
         "google-fieldmask": lambda x: f"{x}.to_string()",
         "string": lambda x: x
     }.get(p.get("format", p["type"]), lambda x: f"{x}.to_string()")

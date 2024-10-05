@@ -24,11 +24,5 @@ make:
       output_dir: src
 cargo:
   keywords: [cli]
-  is_executable: YES
+  is_executable: true
   doc_base_url: http://byron.github.io/google-apis-rs
-  dependencies:
-    - clap = "2"
-    - http = "1"
-    - http-body-util = "0.1"
-    - hyper = { version = "1", features = ["full"] }
-    - tokio = { version = "1", features = ["full"] }

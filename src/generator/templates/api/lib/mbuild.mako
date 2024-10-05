@@ -17,8 +17,8 @@
     SIMPLE = "simple"
     RESUMABLE = "resumable"
     PROTOCOL_TYPE_MAP = {
-        SIMPLE: "client::UploadProtocol::Simple",
-        RESUMABLE: "client::UploadProtocol::Resumable"
+        SIMPLE: "common::UploadProtocol::Simple",
+        RESUMABLE: "common::UploadProtocol::Resumable"
     }
 
     def get_parts(part_prop):
@@ -142,7 +142,7 @@ impl${mb_tparams} ${CALL_BUILDER_MARKERT_TRAIT} for ${ThisType} {}
 
 impl${mb_tparams} ${ThisType}
 where
-    C: client::Connector,
+    C: common::Connector,
 {
 % if api.get('no_upload_prefix') is not None and ThisType.startswith(api.no_upload_prefix):
 ${self._action_fn(c, resource, method, m, params, request_value, parts, doit_without_upload = True)}\
@@ -435,7 +435,7 @@ match result {
     where = ''
     qualifier = 'pub '
     add_args = ''
-    rtype = 'client::Result<client::Response>'
+    rtype = 'common::Result<common::Response>'
     response_schema = method_response(c, m)
 
     supports_download = m.get('supportsMediaDownload', False);
@@ -443,7 +443,7 @@ match result {
     if response_schema:
         if not supports_download:
             reserved_params = ['alt']
-        rtype = 'client::Result<(client::Response, %s)>' % (response_schema.id)
+        rtype = 'common::Result<(common::Response, %s)>' % (response_schema.id)
 
     mtype_param = 'RS'
 
@@ -453,8 +453,8 @@ match result {
     if media_params:
         type_params = '<%s>' % mtype_param
         qualifier = ''
-        where = '\n\t\twhere ' + mtype_param + ': client::ReadSeek'
-        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: client::UploadProtocol"
+        where = '\n\t\twhere ' + mtype_param + ': common::ReadSeek'
+        add_args = (', mut reader: %s, reader_mime_type: mime::Mime' % mtype_param) + ", protocol: common::UploadProtocol"
         for p in media_params:
             if p.protocol == SIMPLE:
                 simple_media_param = p
@@ -484,11 +484,11 @@ match result {
     MULTI_SLASH = 'multi-slash-prefix'
     URL_ENCODE = 'url-encode'
 
-    READER_SEEK = "let size = reader.seek(io::SeekFrom::End(0)).unwrap();\nreader.seek(io::SeekFrom::Start(0)).unwrap();\n"
+    READER_SEEK = "let size = reader.seek(std::io::SeekFrom::End(0)).unwrap();\nreader.seek(std::io::SeekFrom::Start(0)).unwrap();\n"
     if media_params:
         max_size = media_params[0].max_size
         if max_size > 0:
-            READER_SEEK += "if size > %i {\n\treturn Err(client::Error::UploadSizeLimitExceeded(size, %i))\n}" % (max_size, max_size)
+            READER_SEEK += "if size > %i {\n\treturn Err(common::Error::UploadSizeLimitExceeded(size, %i))\n}" % (max_size, max_size)
 
     special_cases = set()
     for possible_url in possible_urls:
@@ -523,14 +523,15 @@ match result {
     /// Perform the operation you have build so far.
     % endif
     ${action_fn} {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = ${delegate}.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "${m.id}",
+        use common::{ToParts, url::Params};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = ${delegate}.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo { id: "${m.id}",
                                http_method: ${method_name_to_variant(m.httpMethod)} });
 
         ## TODO: Should go into validation function?
@@ -538,7 +539,7 @@ match result {
         for &field in [${', '.join(enclose_in('"', reserved_params + [p.name for p in field_params]))}].iter() {
             if ${paddfields}.contains_key(field) {
                 ${delegate_finish}(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -637,7 +638,7 @@ else {
             Some(value) => params.push("key", value),
             None => {
                 ${delegate_finish}(false);
-                return Err(client::Error::MissingAPIKey)
+                return Err(common::Error::MissingAPIKey)
             }
         }
         % endif
@@ -666,13 +667,13 @@ else {
         let mut request_value_reader =
             {
                 let mut value = serde_json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                common::remove_json_null_values(&mut value);
+                let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
                 serde_json::to_writer(&mut dst, &value).unwrap();
                 dst
             };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+        let request_size = request_value_reader.seek(std::io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(std::io::SeekFrom::Start(0)).unwrap();
         % endif
 
         % if resumable_media_param:
@@ -688,28 +689,28 @@ else {
                         Ok(token) => token,
                         Err(e) => {
                             ${delegate_finish}(false);
-                            return Err(client::Error::MissingToken(e));
+                            return Err(common::Error::MissingToken(e));
                         }
                     }
                 }
             };
             % endif
             % if request_value:
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader.seek(std::io::SeekFrom::Start(0)).unwrap();
             % endif
             let mut req_result = {
 <%block filter="indent_by(resumable_media_param and 4 or 0)">\
             % if request_value and simple_media_param:
-                let mut mp_reader: client::MultiPartReader = Default::default();
+                let mut mp_reader: common::MultiPartReader = Default::default();
                 let (mut body_reader, content_type) = match protocol {
                     ${PROTOCOL_TYPE_MAP[simple_media_param.protocol]} => {
                         mp_reader.reserve_exact(2);
                         ${READER_SEEK | indent_all_but_first_by(5)}
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                  .add_part(&mut reader, size, reader_mime_type.clone());
-                        (&mut mp_reader as &mut (dyn io::Read + Send), client::MultiPartReader::mime_type())
+                        (&mut mp_reader as &mut (dyn std::io::Read + Send), common::MultiPartReader::mime_type())
                     },
-                    _ => (&mut request_value_reader as &mut (dyn io::Read + Send), json_mime_type.clone()),
+                    _ => (&mut request_value_reader as &mut (dyn std::io::Read + Send), json_mime_type.clone()),
                 };
             % endif
                 let client = &self.hub.client;
@@ -737,13 +738,13 @@ else {
                         let request = req_builder
                         .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
-                        .body(client::to_body(request_value_reader.get_ref().clone()))\
+                        .body(common::to_body(request_value_reader.get_ref().clone()))\
                     % else:
                         let mut body_reader_bytes = vec![];
                         body_reader.read_to_end(&mut body_reader_bytes).unwrap();
                         let request = req_builder
                             .header(CONTENT_TYPE, content_type.to_string())
-                            .body(client::to_body(body_reader_bytes))\
+                            .body(common::to_body(body_reader_bytes))\
                     % endif ## not simple_media_param
                 % else:
                     % if simple_media_param:
@@ -753,7 +754,7 @@ else {
                             reader.read_to_end(&mut bytes)?;
                             req_builder.header(CONTENT_TYPE, reader_mime_type.to_string())
                                      .header(CONTENT_LENGTH, size)
-                                     .body(client::to_body(bytes))
+                                     .body(common::to_body(bytes))
                         } else {
                             req_builder.body(Default::default())
                         }\
@@ -772,21 +773,21 @@ else {
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     ${delegate_finish}(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err))
                 }
                 Ok(res) => {
                     let (mut parts, body) = res.into_parts();
-                    let mut bytes = client::to_bytes(body).await.unwrap_or_default();
+                    let mut bytes = common::to_bytes(body).await.unwrap_or_default();
                     if !parts.status.is_success() {
-                        let error = serde_json::from_str(&client::to_string(&bytes));
-                        let response = client::to_response(parts, bytes);
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes);
 
-                        if let client::Retry::After(d) = dlg.http_failure(&response, error.as_ref().ok()) {
+                        if let common::Retry::After(d) = dlg.http_failure(&response, error.as_ref().ok()) {
                             sleep(d).await;
                             continue;
                         }
@@ -794,8 +795,8 @@ else {
                         ${delegate_finish}(false);
 
                         return Err(match error {
-                            Ok(value) => client::Error::BadRequest(value),
-                            _ => client::Error::Failure(response),
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
                         });
                     }
                     % if resumable_media_param:
@@ -807,14 +808,14 @@ else {
                                 dlg.store_upload_url(Some(url_str));
                             }
 
-                            client::ResumableUploadHelper {
+                            common::ResumableUploadHelper {
                                 client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
                                 auth: &${auth_call},
                                 user_agent: &self.hub._user_agent,
                                 // TODO: Check this assumption
-                                auth_header: format!("Bearer {}", token.ok_or_else(|| client::Error::MissingToken("resumable upload requires token".into()))?.as_str()),
+                                auth_header: format!("Bearer {}", token.ok_or_else(|| common::Error::MissingToken("resumable upload requires token".into()))?.as_str()),
                                 url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
@@ -824,24 +825,24 @@ else {
                         match upload_result {
                             None => {
                                 ${delegate_finish}(false);
-                                return Err(client::Error::Cancelled)
+                                return Err(common::Error::Cancelled)
                             }
                             Some(Err(err)) => {
                                 ## Do not ask the delgate again, as it was asked by the helper !
                                 ${delegate_finish}(false);
-                                return Err(client::Error::HttpError(err))
+                                return Err(common::Error::HttpError(err))
                             }
                             ## Now the result contains the actual resource, if any ... it will be
                             ## decoded next
                             Some(Ok(response)) => {
                                 let parts_body = response.into_parts();
                                 parts = parts_body.0;
-                                bytes = client::to_bytes(parts_body.1).await.unwrap_or_default();
+                                bytes = common::to_bytes(parts_body.1).await.unwrap_or_default();
                                 if !parts.status.is_success() {
                                     ## delegate was called in upload() already - don't tell him again
                                     dlg.store_upload_url(None);
                                     ${delegate_finish}(false);
-                                    return Err(client::Error::Failure(client::to_response(parts, bytes)));
+                                    return Err(common::Error::Failure(common::to_response(parts, bytes)));
                                 }
                             }
                         }
@@ -854,23 +855,23 @@ else {
 if enable_resource_parsing \
                     % endif
 {
-                        let encoded = client::to_string(&bytes);
+                        let encoded = common::to_string(&bytes);
                         match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (client::to_response(parts, bytes), decoded),
+                            Ok(decoded) => (common::to_response(parts, bytes), decoded),
                             Err(error) => {
                                 dlg.response_json_decode_error(&encoded, &error);
-                                return Err(client::Error::JsonDecodeError(encoded.to_string(), error));
+                                return Err(common::Error::JsonDecodeError(encoded.to_string(), error));
                             }
                         }
                     }\
                     % if supports_download:
 else {
-                    (client::to_response(parts, bytes), Default::default())
+                    (common::to_response(parts, bytes), Default::default())
 }\
                     % endif
 ;
                 % else:
-                    let response = client::to_response(parts, bytes);
+                    let response = common::to_response(parts, bytes);
                 % endif
 
                     ${delegate_finish}(true);
@@ -887,7 +888,7 @@ else {
     /// * *${split_camelcase_s(item_name)}*: ${isinstance(item, (list, tuple)) and put_and(enclose_in("'", item)) or str(item)}
     % endfor
     pub async fn ${upload_action_fn(api.terms.upload_action, p.type.suffix)}<${mtype_param}>(self, ${p.type.arg_name}: ${mtype_param}, mime_type: mime::Mime) -> ${rtype}
-                where ${mtype_param}: client::ReadSeek {
+                where ${mtype_param}: common::ReadSeek {
         self.${api.terms.action}(${p.type.arg_name}, mime_type, ${PROTOCOL_TYPE_MAP[p.protocol]}).await
     }
     % endfor

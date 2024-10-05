@@ -186,7 +186,7 @@ ${self.hub_usage_example(c, rust_doc, fr=fr)}\
 
 ${'##'} Handling Errors
 
-All errors produced by the system are provided either as ${link('Result', 'client::Result')} enumeration as return value of
+All errors produced by the system are provided either as ${link('Result', 'common::Result')} enumeration as return value of
 the ${api.terms.action}() methods, or handed as possibly intermediate results to either the 
 ${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', urls.authenticator_delegate)}.
 
@@ -194,9 +194,9 @@ When delegates handle errors or intermediate values, they may have a chance to i
 makes the system potentially resilient to all kinds of errors.
 
 ${'##'} Uploads and Downloads
-If a method supports downloads, the response body, which is part of the ${link('Result', 'client::Result')}, should be
+If a method supports downloads, the response body, which is part of the ${link('Result', 'common::Result')}, should be
 read by you to obtain the media.
-If such a method also supports a ${link('Response Result', 'client::ResponseResult')}, it will return that by default.
+If such a method also supports a ${link('Response Result', 'common::ResponseResult')}, it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `${ADD_PARAM_MEDIA_EXAMPLE}`.
 
@@ -250,13 +250,13 @@ generated `openapi` spec would be invalid.
 ###############################################################################################
 <%def name="test_hub(hub_type, comments=True)">\
 use std::default::Default;
-use ${util.library_name()}::{${hub_type}, oauth2, hyper, hyper_rustls, hyper_util, chrono, FieldMask};
+use ${util.library_name()}::{${hub_type}, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 
 % if comments:
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 // `client_secret`, among other things.
 % endif
-let secret: oauth2::ApplicationSecret = Default::default();
+let secret: yup_oauth2::ApplicationSecret = Default::default();
 % if comments:
 // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
 // unless you replace  `None` with the desired Flow.
@@ -264,9 +264,9 @@ let secret: oauth2::ApplicationSecret = Default::default();
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 % endif
-let auth = oauth2::InstalledFlowAuthenticator::builder(
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
     secret,
-    oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ).build().await.unwrap();
 
 let client = hyper_util::client::legacy::Client::builder(

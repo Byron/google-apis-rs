@@ -3,9 +3,10 @@ pub mod field_mask;
 pub mod serde;
 pub mod url;
 
-use std::error;
-use std::fmt::{self, Display};
-use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
+pub use auth::{GetToken, NoToken};
+pub use field_mask::FieldMask;
+
+use std::io::{Cursor, Read, Seek, SeekFrom, Write};
 use std::str::FromStr;
 use std::time::Duration;
 
@@ -15,13 +16,6 @@ use hyper::StatusCode;
 use itertools::Itertools;
 use mime::Mime;
 use tokio::time::sleep;
-
-pub use auth::{GetToken, NoToken};
-pub use chrono;
-pub use field_mask::FieldMask;
-pub use serde_with;
-#[cfg(feature = "yup-oauth2")]
-pub use yup_oauth2 as oauth2;
 
 const LINE_ENDING: &str = "\r\n";
 
@@ -272,8 +266,8 @@ pub enum Error {
     Io(std::io::Error),
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Error::Io(err) => err.fmt(f),
             Error::HttpError(err) => err.fmt(f),
@@ -308,8 +302,8 @@ impl Display for Error {
     }
 }
 
-impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             Error::HttpError(ref err) => err.source(),
             Error::JsonDecodeError(_, ref err) => err.source(),
@@ -400,7 +394,7 @@ impl<'a> MultiPartReader<'a> {
 }
 
 impl<'a> Read for MultiPartReader<'a> {
-    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         match (
             self.raw_parts.len(),
             self.current_part.is_none(),
@@ -490,20 +484,20 @@ impl<'a> Read for MultiPartReader<'a> {
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct XUploadContentType(pub Mime);
 
-impl ::std::ops::Deref for XUploadContentType {
+impl std::ops::Deref for XUploadContentType {
     type Target = Mime;
     fn deref(&self) -> &Mime {
         &self.0
     }
 }
-impl ::std::ops::DerefMut for XUploadContentType {
+impl std::ops::DerefMut for XUploadContentType {
     fn deref_mut(&mut self) -> &mut Mime {
         &mut self.0
     }
 }
-impl Display for XUploadContentType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&**self, f)
+impl std::fmt::Display for XUploadContentType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        std::fmt::Display::fmt(&**self, f)
     }
 }
 
@@ -513,8 +507,8 @@ pub struct Chunk {
     pub last: u64,
 }
 
-impl fmt::Display for Chunk {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for Chunk {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         (write!(fmt, "{}-{}", self.first, self.last)).ok();
         Ok(())
     }

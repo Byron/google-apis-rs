@@ -65,7 +65,7 @@ ${struct} { _never_set: Option<bool> }
     # We always need Serialization support, as others might want to serialize the response, even though we will 
     # only deserialize it.
     # And since we don't know what others want to do, we implement Deserialize as well by default ... 
-    traits = ['Clone', 'Debug', 'Serialize', 'Deserialize']
+    traits = ['Clone', 'Debug', 'serde::Serialize', 'serde::Deserialize']
 
     # default only works for structs, and 'variant' will be an enum
     if 'variant' not in s:
@@ -84,7 +84,7 @@ ${struct} { _never_set: Option<bool> }
 ${doc(s, c)}\
 </%block>
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
+#[serde_with::serde_as]
 #[derive(${', '.join(traits)})]
 % if s.type == 'object':
 ${_new_object(s, s.get('properties'), c, allow_optionals)}\

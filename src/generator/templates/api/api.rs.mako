@@ -15,28 +15,16 @@
 
     default_user_agent = "google-api-rust-client/" + cargo.build_version
 %>\
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use std::io;
-use std::fs;
-use std::mem;
 
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
 // ############
 
 ${lib.scope_enum()}
-
 
 // ########
 // HUB ###
@@ -53,18 +41,18 @@ ${lib.hub_usage_example(c)}\
 </%block>
 #[derive(Clone)]
 pub struct ${hub_type}${ht_params} {
-    pub client: client::Client<C>,
-    pub auth: Box<dyn client::GetToken>,
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> client::Hub for ${hub_type}${ht_params} {}
+impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> common::Hub for ${hub_type}${ht_params} {}
 
 impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
 
-    pub fn new<A: 'static + client::GetToken>(client: client::Client<C>, auth: A) -> ${hub_type}${ht_params} {
+    pub fn new<A: 'static + common::GetToken>(client: common::Client<C>, auth: A) -> ${hub_type}${ht_params} {
         ${hub_type} {
             client,
             auth: Box::new(auth),
@@ -85,7 +73,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -93,7 +81,7 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -101,10 +89,9 @@ impl<'a, ${', '.join(HUB_TYPE_PARAMETERS)}> ${hub_type}${ht_params} {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 % if c.schemas:
 // ############
@@ -123,10 +110,7 @@ ${schema.new(s, c)}
 
 % for resource in c.rta_map:
 ${rbuild.new(resource, c)}
-
-
 % endfor
-
 
 // ###################
 // CallBuilders   ###
@@ -135,6 +119,5 @@ ${rbuild.new(resource, c)}
 % for resource, methods in c.rta_map.items():
 % for method in methods:
 ${mbuild.new(resource, method, c)}
-
 % endfor ## method in methods
 % endfor ## resource, methods
