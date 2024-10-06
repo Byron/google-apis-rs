@@ -7,32 +7,58 @@ on:
     branches: [main]
 
 jobs:
-  clippy:
-    name: Run Clippy
+  meta-check:
+    name: Check the generative code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: Swatinem/rust-cache@v2
-      - run: cargo clippy -- -D warnings
+      - run: make meta-check
 
-  build-and-test:
-    name: Build and test
+  check:
+    name: Check the generated code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: Swatinem/rust-cache@v2
       - run: |
-          source ~/.profile
-          cargo test
-          make test-gen
-          make gen-all-cli cargo-api ARGS=test
-          make cargo-api ARGS='check --all-features'
+          make gen-all-api
+          make cargo-api ARGS=check
           make cargo-api ARGS='check --no-default-features'
-          make cargo-api ARGS=doc
+
+          make gen-all-cli
           make cargo-cli ARGS=check
+        env:
+          CI: true
+
+  meta-test:
+    name: Test the generative code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make meta-test
+
+  test:
+    name: Test the generated code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          make gen-all-api
+          make cargo-api ARGS=test
+        env:
+          CI: true
+
+  document:
+    name: Document the generated code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          make gen-all-api
+          make cargo-api ARGS=doc
           make docs-all
         env:
-          # The environment variable is set to test only on a few selected APIs,
-          # speeding up the integration process. See etc/api/api-list-ci.yaml.
           CI: true
           RUSTDOCFLAGS: -A warnings

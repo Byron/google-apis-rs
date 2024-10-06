@@ -2,12 +2,12 @@
     from generator.lib.util import (activity_split, put_and, md_italic, split_camelcase_s, canonical_type_name, hub_type,
                       rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment, markdown_rust_block,
                       unindent_first_by, mangle_ident, mb_type, singular, scope_url_to_variant,
-                      PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, CALL_BUILDER_MARKERT_TRAIT, 
+                      PART_MARKER_TRAIT, RESOURCE_MARKER_TRAIT, CALL_BUILDER_MARKERT_TRAIT,
                       find_fattest_resource, build_all_params, pass_through, parts_from_params,
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
                       upload_action_fn, METHODS_BUILDER_MARKER_TRAIT, DELEGATE_TYPE,
-                      to_extern_crate_name, rust_doc_sanitize)  
+                      to_extern_crate_name, rust_doc_sanitize)
 
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
@@ -15,7 +15,7 @@
 <%namespace name="util" file="../../../lib/util.mako"/>\
 <%namespace name="mbuild" file="mbuild.mako"/>\
 
-## If rust-doc is True, examples will be made to work for rust doc tests. Otherwise they are set 
+## If rust-doc is True, examples will be made to work for rust doc tests. Otherwise they are set
 ## for github markdown.
 ###############################################################################################
 ###############################################################################################
@@ -69,9 +69,9 @@ The original source code is [on github](${util.github_source_root_url()}).
 # Features
 
 % if len(c.rta_map) > 0 + (METHODS_RESOURCE in c.rta_map):
-Handle the following *Resources* with ease from the central ${link('hub', hub_url)} ... 
+Handle the following *Resources* with ease from the central ${link('hub', hub_url)} ...
 % elif METHODS_RESOURCE in c.rta_map:
-Use the following functionality with ease from the central ${link('hub', hub_url)} ... 
+Use the following functionality with ease from the central ${link('hub', hub_url)} ...
 % else:
 It seems there is nothing you can do here ... .
 % endif
@@ -109,7 +109,7 @@ Other activities are ...
 ${method_type} supported by ...
 
 % for m in methods:
-<% 
+<%
     _, resource, method = activity_split(m.id)
     name_parts = [pretty_name(method)]
     if resource != METHODS_RESOURCE:
@@ -162,8 +162,8 @@ let r = hub.${mangle_ident(resource)}().${mangle_ident(activity)}(...).${api.ter
 ```
 % endif
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `${api.terms.action}()` method performs the actual communication with the server and returns the respective result.
 
@@ -187,10 +187,10 @@ ${self.hub_usage_example(c, rust_doc, fr=fr)}\
 ${'##'} Handling Errors
 
 All errors produced by the system are provided either as ${link('Result', 'common::Result')} enumeration as return value of
-the ${api.terms.action}() methods, or handed as possibly intermediate results to either the 
+the ${api.terms.action}() methods, or handed as possibly intermediate results to either the
 ${link('Hub Delegate', delegate_url)}, or the ${link('Authenticator Delegate', urls.authenticator_delegate)}.
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ${'##'} Uploads and Downloads
@@ -200,25 +200,25 @@ If such a method also supports a ${link('Response Result', 'common::ResponseResu
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `${ADD_PARAM_MEDIA_EXAMPLE}`.
 
-Methods supporting uploads can do so using up to ${len(PROTOCOL_TYPE_INFO)} different protocols: 
-${put_and(md_italic(PROTOCOL_TYPE_INFO.keys()))}. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to ${len(PROTOCOL_TYPE_INFO)} different protocols:
+${put_and(md_italic(PROTOCOL_TYPE_INFO.keys()))}. The distinctiveness of each is represented by customized
 `${api.terms.action}(...)` methods, which are then named ${put_and(enclose_in('`', ("%s(...)" % upload_action_fn(api.terms.upload_action, v['suffix']) for v in PROTOCOL_TYPE_INFO.values())))} respectively.
 
 ${'##'} Customization and Callbacks
 
-You may alter the way an `${api.terms.action}()` method is called by providing a ${link('delegate', delegate_url)} to the 
-${link('Method Builder', call_builder_url)} before making the final `${api.terms.action}()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `${api.terms.action}()` method is called by providing a ${link('delegate', delegate_url)} to the
+${link('Method Builder', call_builder_url)} before making the final `${api.terms.action}()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
 The ${link('delegate trait', delegate_url)} is default-implemented, allowing you to customize it with minimal effort.
 
 ${'##'} Optional Parts in Server-Requests
 
-All structures provided by this library are made to be ${link('encodable', request_trait_url)} and 
-${link('decodable', response_trait_url)} via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be ${link('encodable', request_trait_url)} and
+${link('decodable', response_trait_url)} via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered ${link('Parts', part_trait_url)} which are identifiable by name, which will be sent to 
+Most optionals are are considered ${link('Parts', part_trait_url)} which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ${'##'} Builder Arguments
@@ -252,14 +252,14 @@ generated `openapi` spec would be invalid.
 use ${util.library_name()}::{${hub_type}, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 
 % if comments:
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
 % endif
 let secret: yup_oauth2::ApplicationSecret = Default::default();
 % if comments:
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 % endif
@@ -286,7 +286,7 @@ let mut hub = ${hub_type}::new(client, auth);\
 ###############################################################################################
 ###############################################################################################
 <%def name="hub_usage_example(c, rust_doc=True, fr=None)">\
-<% 
+<%
     test_filter = rust_test_fn_invisible
     main_filter = rust_doc_test_norun
     if not rust_doc:
@@ -331,7 +331,7 @@ ${self.test_hub(hub_type(c.schemas, util.canonical_name()))}
 ###############################################################################################
 <%def name="license()">\
 # License
-The **${util.library_name()}** library was generated by ${put_and(copyright.authors)}, and is placed 
+The **${util.library_name()}** library was generated by ${put_and(copyright.authors)}, and is placed
 under the *${copyright.license_abbrev}* license.
 You can read the full text at the repository's [license file][repo-license].
 

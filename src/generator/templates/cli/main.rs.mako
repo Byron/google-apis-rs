@@ -1,7 +1,7 @@
 <%namespace name="argparse" file="lib/argparse.mako"/>\
 <%namespace name="engine" file="lib/engine.mako"/>\
 <%namespace name="util" file="../../lib/util.mako"/>\
-<%  
+<%
     from generator.lib.util import (new_context, rust_comment, to_extern_crate_name, library_to_crate_name, library_name,
                       indent_all_but_first_by)
     from generator.lib.cli import OUT_ARG, DEBUG_FLAG, opt_value

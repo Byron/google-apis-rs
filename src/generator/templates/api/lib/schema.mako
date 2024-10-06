@@ -20,7 +20,7 @@ ${struct} {
     <%
         rust_ty = to_rust_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)
         serde_ty, use_custom_serde = to_serde_type(schemas, s.id, pn, p, allow_optionals=allow_optionals)
-    %>
+    %>\
     % if use_custom_serde:
     #[serde_as(as = "${serde_ty}")]
     % endif
@@ -30,7 +30,7 @@ ${struct} {
 % elif 'additionalProperties' in s:
 ${struct}(pub ${to_rust_type(schemas, s.id, NESTED_TYPE_SUFFIX, s, allow_optionals=allow_optionals)});
 % elif 'variant' in s:
-<% 
+<%
     et = s.id
     variant_type = lambda p: canonical_type_name(p.type_value)
 %>\
@@ -60,20 +60,20 @@ ${struct} { _never_set: Option<bool> }
 ###################################################################################################################
 ###################################################################################################################
 <%def name="new(s, c)">\
-<% 
+<%
     markers = schema_markers(s, c, transitive=True)
-    # We always need Serialization support, as others might want to serialize the response, even though we will 
+    # We always need Serialization support, as others might want to serialize the response, even though we will
     # only deserialize it.
-    # And since we don't know what others want to do, we implement Deserialize as well by default ... 
+    # And since we don't know what others want to do, we implement Deserialize as well by default ...
     traits = ['Clone', 'Debug', 'serde::Serialize', 'serde::Deserialize']
 
     # default only works for structs, and 'variant' will be an enum
     if 'variant' not in s:
         traits.insert(0, 'Default')
-    
+
     nt_markers = schema_markers(s, c, transitive=False)
     allow_optionals = is_schema_with_optionals(nt_markers)
-    
+
     # waiting for Default: https://github.com/rust-lang/rustc-serialize/issues/71
     if s.type == 'any':
         traits.remove('Default')
@@ -146,7 +146,7 @@ ${s.get('description', 'There is no detailed description.')}
 
 # Activities
 
-This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+This type is used in activities, which are methods you may call on this type or where this type is involved in.
 The list links the activity name, along with information about where it is used (one of ${put_and(enclose_in('*', IO_TYPES))}).
 
 % for a, iot in c.sta_map[s.id].items():
@@ -167,7 +167,7 @@ This type is not used in any activity, and only used as *part* of another schema
 % endif
 % if s.type != 'object':
 
-## for some reason, it's not shown in rustdoc ... 
+## for some reason, it's not shown in rustdoc ...
 The contained type is `${to_rust_type(schemas, s.id, s.id, s)}`.
 %endif
 </%def>

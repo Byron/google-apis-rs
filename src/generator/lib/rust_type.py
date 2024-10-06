@@ -1,5 +1,5 @@
-from typing import Optional, List, Tuple
 from copy import deepcopy
+from typing import List, Optional, Tuple
 
 
 class RustType:
@@ -68,6 +68,7 @@ class RustType:
         if self.members:
             return hash((self.name, *[(i, v) for i, v in enumerate(self.members)]))
         return hash((self.name, None))
+
 
 class Option(RustType):
     def __init__(self, member):

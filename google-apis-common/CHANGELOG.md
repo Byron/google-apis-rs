@@ -218,10 +218,10 @@ A maintenance release with updated yup-oauth2 dependency
  - <csr-id-a6574486ba7cae72951f9d8c2c555b38d7279306/> remove old time dependency from API.
    Chrono currently depends on an old version of time with a reported
    vulnerability: https://rustsec.org/advisories/RUSTSEC-2020-0159
-   
+
    While it does not use any vulnerable code, the dependency may show
    up in code vulnerability scans, etc.
-   
+
    This removes the "oldtime" feature from chrono, to remove that.
    Also removes the "std" feature because it doesn't seem to be in use
    in this code.
@@ -614,13 +614,13 @@ you need.
  - <csr-id-f947a4552fad3d1c27b13cc3636922f6d170a9b2/> upgrade patch level
    It seems crates.io has inconsistent version information,
    making a few CLIs pull outdated crates.
-   
+
    [skip CI]
  - <csr-id-1dd5eadac1cd9a8aea817067f6ef3c968feab794/> all api+cli
    However, it appears some APIs changed without updating their respective
    version number. Thus newer CLIs pull outdated APIs?
    Something is wrong.
-   
+
    [skip CI]
  - <csr-id-fc4ff6fe8b31b2a6c49ab1de4f4e74e0675d3a81/> Update examples
  - <csr-id-9cff80836244ec600dafac1994943ed562107af0/> update all apis
@@ -630,7 +630,7 @@ you need.
  - <csr-id-d0eb8f3d9a8aa5cfdf9527a7989cc457f9d69612/> more crates published
  - <csr-id-87c15a7406bb84d71255942a7d47cdf34fcecfc6/> intermediate publish
    cargo cannot connect to github anymore for some reason
-   
+
    [skip ci]
  - <csr-id-d18714e9b2a76cebbe8c6004cddb95e77b9e04be/> regen all apis/clis for v1.0.4
  - <csr-id-6cad082b7632393cf1415c48023a4733534482cb/> v1.0.4 - serde upgrade
@@ -647,7 +647,7 @@ you need.
    dermesser/yup-oauth2#51. As long as the API crates depend on openssl 0.7
    via hyper 0.9, any client using the APIs won't build :( For example,
    examples/drive_example/ in dermesser/yup-oauth2.
-   
+
    Please regenerate and publish afterwards, if possible.
  - <csr-id-7a4d59d19768377a7e14cc90b66674293bd1a0a8/> published all v1.0.2
    For the sole purpose of getting the documentation onto
@@ -691,7 +691,7 @@ you need.
    It appears someone in the dependency chain is pulling in a
    failing aster. Ideally, we review this or try to make a PR
    to fix this in our upstream dependencies.
-   
+
    For now though, I want this badge green.
  - <csr-id-73f0e83086ba168f354a3395911409b4f2b91856/> use serde_derive
  - <csr-id-bc582e57612821e71ec056d4f213db3a4ff2bb83/> use yup-oauth2 1.0
@@ -726,26 +726,26 @@ you need.
    Use latest serde to make nightly builds work.
  - <csr-id-df2dc4784aaa988c7c1e2bc2598b538fa33e8aec/> one more down
    Even though docs work on this one, compilation does not.
-   
+
    [skip ci]
  - <csr-id-527ffa35c23186a1253365448469030aae313b0c/> v0.3.6
    With simpler authentication flow.
  - <csr-id-2a2e7bfc9a6ae870acc2901527fb69c41895fb08/> rustc version no longer needed
    It now just works, and hopefully will keep doing so for a while.
-   
+
    [skip ci]
  - <csr-id-38c3d9a34dcdb947324b02876a5d2f3ef4e614e2/> update to latest version
    [skip ci]
  - <csr-id-2b37fc4d353f8a6f139eef70cc5254140675facc/> update with latest troublemakers
    Those don't compile, usually for trivial reason, which means
    they come up with duplicate types, or have name-clashes.
-   
+
    If there is the need, this can be fixed.
  - <csr-id-b9f237eec04ca2547cc8c53deb149e88aea1d2cb/> latest version to crates.io
    Also update the latest source-code, which is just a cleanup.
  - <csr-id-e7721ce53bafc70ea4de3d14920739649c06c492/> remove workaround marker
    ... and some left-over comments.
-   
+
    The workaround code is actually more readable than the previous version,
    so it may as well stay.
  - <csr-id-ae276438ae7dbc4cb141c8f216834435976e80f0/> update code to latest version
@@ -776,7 +776,7 @@ you need.
  - <csr-id-8d7a49891f8e6db1c528ce4b212029612c077472/> update to latest version + nightly support
    Nightly is now supported, in theory, to allow not to use serde_codegen,
    which currently has trouble to build thanks to an assertion error.
-   
+
    Nightly on the other hand suffers from being build with incorrect
    feature-flags, which makes quasi_macros fail to build ... .
  - <csr-id-ca5dca7af93f7feef1b81237a9c7c1d5b07e1577/> pin `url` crate
@@ -819,7 +819,7 @@ you need.
  - <csr-id-8295bf3c2dc310aeae293dc7287e2efe8d651abd/> no wildcards in dependencies
    Also version specifications in dependencies were chosen to provide
    maximum flexibility for users of the libraries.
-   
+
    CLIs on the other hand specify last known-to-work major and minor versions
    to prevent breakage
  - <csr-id-e3f4fcadad5310ad79d91a1ce449e1ee9f3d0c74/> support for latest hyper
@@ -842,7 +842,7 @@ you need.
  - <csr-id-6393bbf7f69f63e1291dc5b2cbd71a79bfdac2cc/> latest version of v0.3.1 code
    * also fixed OSX deployment utility to deal with target folder
      as primary location for build-artifacts
-   
+
    [skip ci]
  - <csr-id-337f167e6c9cfd464231bbbac9ea4503f9c77e00/> CLI v0.3.1
  - <csr-id-7d58d66025ea58088950a0914bfb910a35a16748/> update json and regen all code
@@ -850,14 +850,14 @@ you need.
    Thanks to the latest cargo 0.3.0, it's possible to keep everything
    in the stanard doc output directory, which essentially collects
    everything for us.
-   
+
    This creatly reduces the space required to hold all documentation, and
    is in fact quite beatiful.
  - <csr-id-31f22b1535feaa031586bdb6d16e2a306fd62a38/> one target dir for all projects
    Starting from cargo 0.3.0, one can override the target-directory
    to be an absolute path, forcing all output to be dumped into
    one and the same target dir.
-   
+
    That way, all dependencies are shared among the projects, saving
    4 to 7 minutes per project in debug and release mode respectively.
  - <csr-id-d0fb7a5ccc5729303b5aca2419ac06abf12e0133/> cli code update
@@ -870,7 +870,7 @@ you need.
  - <csr-id-d6ddff240d1fefac28549efad78648d98e4ed9a4/> api+cli increment
    CLI was incremented to 0.3.0, just to signal usage of the latest clap-rs
    as well as the update of the used API implememtation.
-   
+
    In that moment we also got rid of the json-tools dependency - it
    required unstable features, and I was not willing to enforce making
    it stable just yet.
@@ -886,7 +886,7 @@ you need.
  - <csr-id-5e5f0dcc662160a378387a91a0719407dde503c9/> fix tar-handling
    Previously it would fail as '*' was in fact not substituted by the
    subshell. Now I just take the brutal route, using find.
-   
+
    [skip ci]
  - <csr-id-296debda85e0afb22261b61ab671325f539e01ff/> typo + fixed yaml references
    [skip ci]
@@ -897,20 +897,20 @@ you need.
  - <csr-id-ad6dd7758e08e72cf3df3cee87df41286e9d5f0a/> move all scripts into src/bash
    That way, they are more official than hidden scripts dumped in the
    project root.
-   
+
    [skip ci]
  - <csr-id-1d44d794eba6d7c371c10205e6f1d8b416748035/> script to deploy for download
    A fully untested utility script allows to unpack a tar file previously
    created from `*-depoly.sh` scripts to a suitable location to be
    compatible with the downloads links we generate in the documentation
    index.
-   
+
    Related to #107
    [skip ci]
  - <csr-id-3e70a896742dd682a55394be6936811eaad27111/> publish APIs @v0.1.7
    * keep track of publish through version files
    * updated clog configuration and changelog (automatic)
-   
+
    [skip ci]
  - <csr-id-9e6c9537a527528debd0c68a5fe4494291facdbd/> latest version of all code
  - <csr-id-8375dd0508c6e09761f79f8b47379cc240a0c7c4/> remove special clap configuration
@@ -918,7 +918,7 @@ you need.
  - <csr-id-294da41a308e4f4125db876c5b24084ae8cfcb5f/> special clap configuration
    Turn off default features to disable overly red first version
    of otherwise very promising ascii-coloring support.
-   
+
    It's good to see that thanks to yaml, that flexibility is easily
    achieved without altering any generator code.
  - <csr-id-362781e6014a2b050f69f5487b33aba8434c14a0/> added dev diary episode 2 link
@@ -928,12 +928,12 @@ you need.
    A new feature supported in clog v0.5.0
  - <csr-id-fb80b056ac6cc8eee1972eec979a7f810861f8b8/> added changelog
    Powered by [clog](http://goo.gl/QUpyeL)
-   
+
    [skip ci]
  - <csr-id-d8acd607aea2e4bed548695e46fe541cb72ee904/> disabled rust linter,but configured it
    It's usually too slow to run it, but besides that it's very practical
    to have !
-   
+
    [skip ci]
  - <csr-id-cc1bfd19c8aecb4a62bf68f3bf7db650eb8fc29d/> to reflect recent changes
    And to be sure we don't forget to publish new crates when the new CLI
@@ -957,7 +957,7 @@ you need.
  - <csr-id-9377220c59cf9a8a29720b0528b9263e9e947580/> api-list is now in separte file
    This file is completely generated, and allows us to easily bring in
    new versions after each json update.
-   
+
    To make that work, we simple merge all data handed to mako-render,
    inside of it. That way, we can put 'api/list' data in any yaml.
  - <csr-id-7b81646f43c1c4de5165c5b3e9e7ea5c836eb664/> update-json and all APIs
@@ -1026,7 +1026,7 @@ you need.
  - <csr-id-383595c44e9b2aafbece20eb60a3ff36c1f88d81/> added Download information
    That way, it's easy to obtain the respective precompiled binary, as
    well as seeing the source-code.
-   
+
    Overall, it makes promoting the tools easier as the CLI docs can be
    linked directly.
  - <csr-id-6bca4b75d9b1abbe882f5c1bb7ab27232046f89d/> detailed deployment instructions
@@ -1036,7 +1036,7 @@ you need.
    That way, whenever the extended help of a method (e.g. apis get-rest)
    is queried, you can easily jump to the online docs to get details about
    required data-structures or parameters for instance.
-   
+
    [skip ci]
  - <csr-id-bd27046cc8cd5ccf515355a5d810dace168a7db3/> update STRUCT_FLAG and UPLOAD flags
    * adjust documentation to resemble actual upload flag semantics. It was
@@ -1220,7 +1220,7 @@ you need.
    We save about 30% of CLI code just because we offload the work of
    settings structures into serde, building a generic `json::Value` to
    contain all the data, and then let serde do the deserialization for us.
-   
+
    All we need for that is some information we let the generator provide
    and translate it into the runtime.
  - <csr-id-a2dd71451deaf49e2bc4bb8de68a4e4cc87ec8a9/> basis for simplified value setting
@@ -1228,7 +1228,7 @@ you need.
    and utility functions. Now we setup the foundation to allow setting
    a generic `json::value::Value` instead, which can later be deserialized
    into the target structure.
-   
+
    Related to #111
  - <csr-id-52027c6db59c2952f61ee03204fd947277d0cc62/> added download links (osx,ubuntu)
    All assets are configured via shared.yaml and are located elsewhere in
@@ -1295,7 +1295,7 @@ you need.
      elaborate.
 * everything related to docopts functionality is now in the docopts
      module.
-   
+
      Related to #45
 * crate version: code gen version
 * +<revision> (build-metadata): exact version of API schema
@@ -1556,7 +1556,7 @@ you need.
    google_firestore1_beta1's `CommitRequest` contains an array of `Write` objects which can ultimately
    contain `Value` members that need to have nulls removed to avoid sending multiple types of values
    which generates a 400 response
-   
+
    fixes calls to google_firestore1_beta1's `hub.projects().databases_documents_commit()`
  - <csr-id-d042fcf1a7e50666e1a5090680d4d1ff6081d695/> iteration over dicts with 'values' key
    Sheets api has a 'values' key in resources.spreadsheets.resources which
@@ -1578,7 +1578,7 @@ you need.
  - <csr-id-ef070eef59b2eb3e54b77b5fe600e6f6c900c8dd/> Added an assert to detect when docs need updating
  - <csr-id-de6528be98503c07d04fbf42f740b6da91902672/> Finished adjustments to index.html template (fixes #166)
    Summary of changes:
-   
+
    - Converted from using span + br tags for formatting to using tables
 * `SubCommand::new(...)` was renamed to `SubCommand::with_name(...)`
      which actually is now consistent with everything else
@@ -1714,7 +1714,7 @@ you need.
    aimed at reducing dependency on the DictObject class. The rough idea is
    to annotate everything as Dict, add some tests to codify the existing
    behavior, and then start defining dataclasses for the dischovery schema.
-   
+
    We also remove some unused logic & params.
  - <csr-id-819e1ccce5c503329bf6ed5dd9078553a48997c5/> :iter not needed
  - <csr-id-d202f9792ba0aea107213ad33ce5e7da06145ef1/> blacklist versions that do not exist
@@ -1722,7 +1722,7 @@ you need.
    mkdocs depends on tornado that fails to compile on Python before 2.7.9.
    When running in Travis not using the Python language a very old version
    of Python is used.
-   
+
    This commit adds pyenv and uses it to ensure Travis Python is viable and
    stable.
  - <csr-id-aaac92bad68634923c554f4f2e8bc28769a47e84/> update toc
@@ -1730,7 +1730,7 @@ you need.
  - <csr-id-c4e363d94ce1715f3ecfe6fd6ee56b93c670bfb2/> remove obsolete notes about linux
    We use cargo now as installation method, no need
    to provide binaries anymore.
-   
+
    [skip ci]
  - <csr-id-0337435cd44105749cb219cc75d61da6895d5d8a/> upgrade to v0.9
    This provides proc macros, greatly simplifying the build
@@ -1739,7 +1739,7 @@ you need.
    The only openssl dependency left would be coming from yup-oauth2!
  - <csr-id-cc30a2e20b697ca318bd3b54e5b94f6935eaadd2/> don't use relative links
    Instead we link to the absolute location.
-   
+
    tech debt: we now use http://byron.github.io/google-apis-rs
    multiple times and thus duplicate that information.
  - <csr-id-6279fd8f5df3ca9c9013635c36041e89df902428/> improve UX
@@ -1749,18 +1749,18 @@ you need.
    We now consider the blacklist, which is probably what the previous
    implementation achieved as it checked for existence of files on disk.
    We do the same, but more directly.
-   
+
    A complete installation script is provided for those who don't yet
    have rustup installed.
  - <csr-id-fad9d3b0ca3f588f65faf6ec46caf51a7ca1c239/> link to doc.rs for APIs
    We also link more specifically to crates.io.
-   
+
    Some debt was taken on as the build_version is special and
    duplicated right now.
  - <csr-id-fdc0141fbcabf68ed5d715314d483469e7a7ef14/> button to copy install-script
  - <csr-id-d6accb8f6194bac7f982ee93409821436dd8beed/> remove all download links
    Instead refer to cargo install for installation.
-   
+
    [skip ci]
  - <csr-id-fc34337ee4ba708f63e3d2f164660edd5ffe5614/> use docs.rs for library documentation
    We will still need to host the CLI docs though.
@@ -1787,7 +1787,7 @@ you need.
  - <csr-id-69b12104a9f9579773553825f63c321e7d1a6899/> DL title contains os-name
    That way, it's clearer, besides the icons themselves, which OS you are
    downloading for.
-   
+
    Related to #106
    [skip ci]
  - <csr-id-e86e55cae788506a2280816009b8620bad091477/> improved display of BadRequest
@@ -1799,11 +1799,11 @@ you need.
  - <csr-id-5894c8163afa9f9d9bed592e7e41912c77cf993d/> remove null in pretty-printed json
    Without all that clutter, it's so much more enjoyable to read the
    output.
-   
+
    The implementation is based on a suggestion of @erickt, which is
    converts into a json::Value (able to represent any json structure),
    on which the filtering is applied.
-   
+
    If we should ever implement pretty-printing in json-tools, we might
    still consider using these capabilities instead, as we would avoid
    building potentially large datastructures, all we would need is
@@ -1813,7 +1813,7 @@ you need.
    Previously reserialization of token streams with removed null values
    was performed on a byte-per-byte basis, which was quite inefficient
    to say the least.
-   
+
    Now it uses `io::copy` to copy in chunks of 65kb, which makes out
    our throughput and should deliver about 150MB/s at least.
 
@@ -1835,7 +1835,7 @@ you need.
  - <csr-id-f83dff672bc5a739f1a4b76333e25d40523fbe2c/> bring in all required field data
    Previously we only knew the type as string, now we have enums and
    additional type information, like whether or not it's a POD.
-   
+
    However, borrow-checker doesn't like the current code, will need more
    work.
  - <csr-id-5c284e1c418d93bca7da4a29c4f8feaf5800c1ce/> non-redundant data access
@@ -1853,18 +1853,18 @@ you need.
    Instead of using multiple lines to add vectors up involving iterators,
    I just add slices together. This should produce less, and possibly
    faster machine code, with less ascii code.
-   
+
    Downloads tested with drive2, and are verified to be working !
  - <csr-id-f1fe6bac018c2268d10233ec1635f0273f1192dc/> move global params to runtime
    Global params were repeated per method, even though they were global,
    per API. Now they are kept in vectors and used at runtime, accordingly.
    We save a little bit of code, have simple matches, and less repition.
-   
+
    It's unclear if this reduces the size of the binary though ... or the
    compile times, as the extra loop is an extra loop after all ;).
-   
+
    Still need to test the download mode using drive1
-   
+
    Related to #97
    [skip ci]
  - <csr-id-bbab1f2e38f4445179e7385a9507098d6ff15cbf/> use raw strings for argparser
@@ -1888,7 +1888,7 @@ you need.
  - <csr-id-a2550d11811de9f9ee51652975363d0f24b8d032/> into own def
    Was rather easy, and shows that plenty of complexity arose from the
    usage example.
-   
+
    Implementing the action will probably be quite something ... .
    Can't wait to have an auto-generated sample program !
  - <csr-id-331ecf87a76189b10672770377d36877dbd7f53a/> methods useful for mbuild as too
@@ -1935,4 +1935,3 @@ you need.
     - Prepare google-apis-common for release ([`716c4c2`](https://github.com/Byron/google-apis-rs/commit/716c4c263a278c334feacf57c3eabbed09251a9e))
     - Rename `google-api-client` to `google-apis-common` ([`8d7309b`](https://github.com/Byron/google-apis-rs/commit/8d7309b78c3bc909b794d447115328cfb0f41649))
 </details>
-

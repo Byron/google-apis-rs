@@ -26,4 +26,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; ${copyright.years}, ${put_and(["`%s`" % a for a in copyright.authors])}
-

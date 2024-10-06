@@ -208,14 +208,11 @@ let arg_data = [
              ${rust_optional(desc)},
              ${rust_optional(required)},
              ${rust_optional(multi)}),
-            % if not loop.last:
-
-            % endif
             % endfor
           ]),
     % endfor # each method
     ]),
-</%block>
+</%block>\
 % endfor # end for each resource
 ];
 

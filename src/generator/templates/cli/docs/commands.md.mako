@@ -5,7 +5,7 @@
     from generator.lib.cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
                      mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG, UPLOAD_FLAG, docopt_mode,
                      FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG, to_cli_schema, cli_schema_to_yaml, SchemaEntry,
-                     STRUCT_FLAG, field_to_value, CTYPE_ARRAY, CTYPE_MAP, to_docopt_arg, FILE_FLAG, MIME_FLAG, 
+                     STRUCT_FLAG, field_to_value, CTYPE_ARRAY, CTYPE_MAP, to_docopt_arg, FILE_FLAG, MIME_FLAG,
                      DEFAULT_MIME)
 
     from copy import deepcopy
@@ -102,7 +102,7 @@ This method supports the upload of data, which *requires* all of the following f
 * **-${FILE_FLAG} ${escape_html(FILE_ARG)}**
     - Path to file to upload. It must be seekable.
 
-The following flag *may* be set: 
+The following flag *may* be set:
 
 * **-${MIME_FLAG} ${escape_html(MIME_ARG)}**
     - the mime type, like '${DEFAULT_MIME}', which is the default
@@ -139,13 +139,13 @@ The method's return value is a byte stream of the downloadable resource.
 % if oprops:
 # Optional Method Properties
 
-You may set the following properties to further configure the call. Please note that `-${PARAM_FLAG}` is followed by one 
+You may set the following properties to further configure the call. Please note that `-${PARAM_FLAG}` is followed by one
 or more key-value-pairs, and is called like this `-${PARAM_FLAG} k1=v1 k2=v2` even though the listing below repeats the
 `-${PARAM_FLAG}` for completeness.
 
 % for p in custom_sorted(oprops):
 ${self._md_property(p)}
-% endfor 
+% endfor
 % endif # optional method properties
 % if parameters is not UNDEFINED:
 # Optional General Properties
@@ -153,12 +153,12 @@ ${self._md_property(p)}
 The following properties can configure any call, and are not specific to this method.
 
 % for pn in sorted(parameters.keys()):
-<% 
+<%
     p = deepcopy(parameters[pn])
     p.name = pn
 %>\
 ${self._md_property(p)}
-% endfor 
+% endfor
 % endif # general parameters
 ${SPLIT_END}
 % endfor # each method
@@ -194,7 +194,7 @@ ${SPLIT_END}
         return  prefix + field
 %>\
 % for fni, fn in enumerate(sorted(schema.fields.keys())):
-<% 
+<%
     f = schema.fields[fn]
     if fni > 0:
         first_flag = ''
@@ -216,7 +216,7 @@ ${self._list_schem_args(f, cursor_tokens, first_flag)}
     assert not cursor_tokens or cursor_tokens[-1] == FIELD_SEP
     if not cursor_tokens:
         cursor_tokens.append(FIELD_SEP)
-    cursor_tokens.append(FIELD_SEP) 
+    cursor_tokens.append(FIELD_SEP)
 %>\
 % endif
 % endfor

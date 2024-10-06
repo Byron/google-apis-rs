@@ -1,14 +1,14 @@
-.DS_Store
-/.vscode/
-/.idea/
-.timestamp
-gen/doc
-*.go    
-**/target/
-gen/**/docs/
-**/build_html/
-.*.deps
 **/Cargo.lock
+**/build_html/
+**/target/
+*.go
+.*.deps
+.DS_Store
+.timestamp
+/.idea/
+/.vscode/
+gen/**/docs/
+gen/doc
 
 # Python: Makefile lead dirs
 .pyenv-*
@@ -18,43 +18,43 @@ gen/**/docs/
 *.sublime-workspace
 
 # Python: Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
 *$py.class
+*.py[cod]
+__pycache__/
 
 # Python: Distribution / packaging
+*.egg
+*.egg-info/
 .Python
+.eggs/
+.installed.cfg
+MANIFEST
 build/
 develop-eggs/
 dist/
 downloads/
 eggs/
-.eggs/
 parts/
 sdist/
 var/
 wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
 # Python: Installer logs
-pip-log.txt
 pip-delete-this-directory.txt
+pip-log.txt
 
 # Python: Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
+*.cover
+.cache
 .coverage
 .coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
 .hypothesis/
+.nox/
 .pytest_cache/
+.tox/
+coverage.xml
+htmlcov/
+nosetests.xml
 
 # Python: pyenv
 .python-version

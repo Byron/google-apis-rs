@@ -87,4 +87,3 @@ The first release to allow CLIs to share code in a backwards compatible fashion.
     - Run only tests that are actually used/implemented ([`a1e6496`](https://github.com/Byron/google-apis-rs/commit/a1e6496ccdeaa8a0d799c53ed3b95fca5b7fc7c9))
     - Add google-clis-common crate ([`322ea69`](https://github.com/Byron/google-apis-rs/commit/322ea698c365f1a713bc54d5aae9ffb92d9e646b))
 </details>
-
