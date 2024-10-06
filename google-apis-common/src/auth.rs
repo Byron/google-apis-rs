@@ -4,7 +4,7 @@
 //!
 //! By default, [`GetToken`] is implemented for:
 //! - [`Authenticator`] : An authenticator which supports a variety of authentication methods
-//! - [`String`] : Plain oauth2 token in String format
+//! - [`String`] : Plain OAuth2 token in String format
 //! - [`NoToken`] : No token, used for APIs which do not require a token
 //!
 //! # Usage
@@ -24,16 +24,11 @@
 //!
 //! # Example
 //! ```rust
-//! use core::future::Future;
-//! use core::pin::Pin;
+//! use std::future::Future;
+//! use std::pin::Pin;
 //!
-//! use google_apis_common::{GetToken, oauth2};
-//!
-//! use http::Uri;
-//! use hyper::client::connect::Connection;
-//! use tokio::io::{AsyncRead, AsyncWrite};
-//! use tower_service::Service;
-//! use oauth2::authenticator::Authenticator;
+//! use google_apis_common::GetToken;
+//! use yup_oauth2::authenticator::Authenticator;
 //!
 //! #[derive(Clone)]
 //! struct AuthenticatorWithRetry<S> {
@@ -41,12 +36,9 @@
 //!     retries: usize,
 //! }
 //!
-//! impl<S> GetToken for AuthenticatorWithRetry<S>
+//! impl<C> GetToken for AuthenticatorWithRetry<C>
 //! where
-//!     S: Service<Uri> + Clone + Send + Sync + 'static,
-//!     S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-//!     S::Future: Send + Unpin + 'static,
-//!     S::Error: Into<Box<dyn std::error::Error + Send + Sync>>,
+//!     C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
 //! {
 //!     fn get_token<'a>(
 //!         &'a self,
@@ -71,6 +63,7 @@
 //! [`oauth2`]: https://docs.rs/oauth2/latest/oauth2/
 //! [`AccessToken`]: https://docs.rs/oauth2/latest/oauth2/struct.AccessToken.html
 //! [`Authenticator`]: yup_oauth2::authenticator::Authenticator
+
 use std::future::Future;
 use std::pin::Pin;
 
@@ -114,8 +107,8 @@ impl GetToken for String {
     }
 }
 
-/// In the event that the API endpoint does not require an oauth2 token, `NoToken` should be provided to the hub to avoid specifying an
-/// authenticator.
+/// In the event that the API endpoint does not require an OAuth2 token, `NoToken` should be
+/// provided to the hub to avoid specifying an authenticator.
 #[derive(Default, Clone)]
 pub struct NoToken;
 
@@ -126,30 +119,17 @@ impl GetToken for NoToken {
 }
 
 #[cfg(feature = "yup-oauth2")]
-mod yup_oauth2_impl {
-    use super::{GetToken, GetTokenOutput};
-
-    use http::Uri;
-    use hyper::client::connect::Connection;
-    use tokio::io::{AsyncRead, AsyncWrite};
-    use tower_service::Service;
-    use yup_oauth2::authenticator::Authenticator;
-
-    impl<S> GetToken for Authenticator<S>
-    where
-        S: Service<Uri> + Clone + Send + Sync + 'static,
-        S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-        S::Future: Send + Unpin + 'static,
-        S::Error: Into<Box<dyn std::error::Error + Send + Sync>>,
-    {
-        fn get_token<'a>(&'a self, scopes: &'a [&str]) -> GetTokenOutput<'a> {
-            Box::pin(async move {
-                self.token(scopes)
-                    .await
-                    .map(|t| t.token().map(|t| t.to_owned()))
-                    .map_err(|e| e.into())
-            })
-        }
+impl<C> GetToken for yup_oauth2::authenticator::Authenticator<C>
+where
+    C: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static,
+{
+    fn get_token<'a>(&'a self, scopes: &'a [&str]) -> GetTokenOutput<'a> {
+        Box::pin(async move {
+            self.token(scopes)
+                .await
+                .map(|t| t.token().map(|t| t.to_owned()))
+                .map_err(|e| e.into())
+        })
     }
 }
 

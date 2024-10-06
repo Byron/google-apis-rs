@@ -31,40 +31,46 @@
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
-use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
-
-use std::default::Default;
-use std::error::Error as StdError;
 use std::str::FromStr;
 
-use serde_json as json;
 use clap::ArgMatches;
-use http::Uri;
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
-use tower_service;
+use http_body_util::BodyExt;
+
+use common::{
+  CLIError,
+  CallType,
+  ComplexType,
+  FieldCursor,
+  FieldError,
+  InvalidOptionsError,
+  JsonType,
+  JsonTypeInfo,
+  UploadProtocol,
+  arg_from_str,
+  calltype_from_str,
+  input_file_from_opts,
+  input_mime_from_opts,
+  parse_kv_arg,
+  remove_json_null_values,
+  writer_from_opts,
+};
 
 enum DoitError {
-    IoError(String, io::Error),
+    IoError(String, std::io::Error),
     ApiError(Error),
 }
 
-struct Engine<'n, S> {
+struct Engine<'n, C> {
     opt: ArgMatches<'n>,
-    hub: ${hub_type_name}<S>,
+    hub: ${hub_type_name}<C>,
     gp: ${"Vec<&'static str>"},
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n, S> Engine<'n, S>
+impl<'n, C> Engine<'n, C>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: apis_common::Connector,
 {
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
@@ -91,19 +97,19 @@ where
                     % endfor # each method
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("${mangle_subcommand(resource)}".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                        writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
             },
 % endfor # each resource
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
-                writeln!(io::stderr(), "{}\n", ${SOPT}.usage()).ok();
+                writeln!(std::io::stderr(), "{}\n", ${SOPT}.usage()).ok();
             }
         }
 
         if dry_run {
-            if err.issues.len() > 0 {
+            if !err.issues.is_empty() {
                 err_opt = Some(err);
             }
             Err(err_opt)
@@ -113,31 +119,32 @@ where
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    async fn new(opt: ArgMatches<'n>, connector: S) -> Result<Engine<'n, S>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>, connector: C) -> Result<Engine<'n, C>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match client::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
+            let config_dir = match common::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match client::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}",
+            match common::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}",
                                                          "${api.credentials.replace('"', r'\"')}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let client = hyper::Client::builder().build(connector);
+        let executor = hyper_util::rt::TokioExecutor::new();
+        let client = hyper_util::client::legacy::Client::builder(executor.clone()).build(connector.clone());
 
-        let auth = oauth2::InstalledFlowAuthenticator::with_client(
+        let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
-            oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            client.clone(),
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+            hyper_util::client::legacy::Client::builder(executor).build(connector),
         ).persist_tokens_to_disk(format!("{}/${util.program_name()}", config_dir)).build().await.unwrap();
 
 <% gpm = gen_global_parameter_names(parameters) %>\
         let engine = Engine {
-            opt: opt,
+            opt,
             hub: ${hub_type_name}::new(client, auth),
             gp: ${field_vec(gpm)},
             gpm: vec![
@@ -323,9 +330,9 @@ if dry_run {
             if !download_mode {
             % endif
             % if mc.response_schema:
-            let mut value = json::value::to_value(&output_schema).expect("serde to work");
+            let mut value = serde_json::value::to_value(&output_schema).expect("serde to work");
             remove_json_null_values(&mut value);
-            json::to_writer_pretty(&mut ostream, &value).unwrap();
+            serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
             ostream.flush().unwrap();
             % endif
             % if track_download_flag:
@@ -333,7 +340,11 @@ if dry_run {
             % endif
             % if supports_media_download:
             ## Download is the only option - nothing else matters
-            let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
+            let bytes = response
+                .into_body()
+                .collect().await
+                .map(|value| value.to_bytes().to_vec())
+                .expect("a string as API currently is inefficient");
             ostream.write_all(&bytes).expect("write to be complete");
             ostream.flush().expect("io to never fail which should really be fixed one day");
             % endif
@@ -375,7 +386,7 @@ if dry_run {
     flatten_schema_fields(request_cli_schema, schema_fields, fields)
 %>\
 let mut field_cursor = FieldCursor::default();
-let mut object = json::value::Value::Object(Default::default());
+let mut object = serde_json::value::Value::Object(Default::default());
 
 for kvarg in ${opt_values(KEY_VALUE_ARG)} {
     let last_errc = err.issues.len();
@@ -416,5 +427,5 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
         FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
     }
 }
-let mut ${request_prop_name}: api::${request_prop_type} = json::value::from_value(object).unwrap();
+let mut ${request_prop_name}: api::${request_prop_type} = serde_json::value::from_value(object).unwrap();
 </%def>

@@ -2,9 +2,9 @@
     from generator.lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, singular, hub_type, mangle_ident, mb_type, property,
                       to_fqan, indent_all_but_first_by, is_repeated_property, is_required_property,
-                      activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 
+                      activity_input_type, TREF, IO_REQUEST, schema_to_required_property,
                       rust_copy_value_s, organize_params, REQUEST_VALUE_PROPERTY_NAME,
-                      build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params, 
+                      build_all_params, rb_type_params_s, hub_type_params_s, mb_type_params_s, mb_additional_type_params,
                       struct_type_bounds_s, METHODS_RESOURCE, SPACES_PER_TAB, prefix_all_but_first_with,
                       METHODS_BUILDER_MARKER_TRAIT, remove_empty_lines, method_default_scope, rust_doc_sanitize)
 %>\
@@ -15,7 +15,7 @@
 ###############################################################################################
 ###############################################################################################
 <%def name="new(resource, c)">\
-<% 
+<%
     hub_type_name = hub_type(schemas, util.canonical_name())
     rb_params = rb_type_params_s(resource, c)
     ThisType = rb_type(resource) + rb_params
@@ -76,14 +76,14 @@ impl${rb_params} ${ThisType} {
     if mb_additional_type_params(m):
         type_params = '<%s>' % ', '.join(mb_additional_type_params(m))
 %>\
-    
+
     % if 'description' in m:
     /// Create a builder to help you perform the following task:
     ///
     ${m.description | rust_doc_sanitize(documentationLink), rust_doc_comment, indent_all_but_first_by(1)}
     % endif
     % if required_props:
-    /// 
+    ///
     /// # Arguments
     ///
     % for p in required_props:
@@ -96,7 +96,7 @@ impl${rb_params} ${ThisType} {
     % endif
     pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {
         % if part_prop and request_value:
-        use client::ToParts;
+        use common::ToParts;
         % if is_repeated_property(part_prop):
             let parts = vec![${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts()];
         % else:

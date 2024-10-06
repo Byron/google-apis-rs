@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  meta-check:
+    name: Check the generative code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make meta-check
+
+  check:
+    name: Check the generated code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          make gen-all-api
+          make cargo-api ARGS=check
+          make cargo-api ARGS='check --no-default-features'
+
+          make gen-all-cli
+          make cargo-cli ARGS=check
+        env:
+          CI: true
+
+  meta-test:
+    name: Test the generative code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make meta-test
+
+  test:
+    name: Test the generated code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          make gen-all-api
+          make cargo-api ARGS=test
+        env:
+          CI: true
+
+  document:
+    name: Document the generated code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          make gen-all-api
+          make cargo-api ARGS=doc
+          make docs-all
+        env:
+          CI: true
+          RUSTDOCFLAGS: -A warnings

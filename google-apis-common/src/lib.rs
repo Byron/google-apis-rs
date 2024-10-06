@@ -3,36 +3,41 @@ pub mod field_mask;
 pub mod serde;
 pub mod url;
 
-use std::error;
-use std::error::Error as StdError;
-use std::fmt::{self, Display};
-use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
+pub use auth::{GetToken, NoToken};
+pub use field_mask::FieldMask;
+
+use std::io::{Cursor, Read, Seek, SeekFrom, Write};
 use std::str::FromStr;
 use std::time::Duration;
-
-use itertools::Itertools;
-
-use hyper::http::Uri;
 
 use hyper::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
 use hyper::Method;
 use hyper::StatusCode;
-
+use itertools::Itertools;
 use mime::Mime;
-
-use serde_json as json;
-
-use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 
-pub use auth::{GetToken, NoToken};
-pub use chrono;
-pub use field_mask::FieldMask;
-pub use serde_with;
-#[cfg(feature = "yup-oauth2")]
-pub use yup_oauth2 as oauth2;
-
 const LINE_ENDING: &str = "\r\n";
+
+/// A body.
+pub type Body = http_body_util::Full<hyper::body::Bytes>;
+
+/// A response.
+pub type Response = hyper::Response<Body>;
+
+/// A client.
+pub type Client<C> = hyper_util::client::legacy::Client<C, Body>;
+
+/// A connector.
+pub trait Connector:
+    hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static
+{
+}
+
+impl<T> Connector for T where
+    T: hyper_util::client::legacy::connect::Connect + Clone + Send + Sync + 'static
+{
+}
 
 pub enum Retry {
     /// Signal you don't want to retry
@@ -103,13 +108,14 @@ pub trait Delegate: Send {
     /// between various API calls.
     fn begin(&mut self, _info: MethodInfo) {}
 
-    /// Called whenever there is an [HttpError](hyper::Error), usually if there are network problems.
+    /// Called whenever there is an [HttpError](hyper_util::client::legacy::Error), usually if
+    /// there are network problems.
     ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
     ///
     /// Return retry information.
-    fn http_error(&mut self, _err: &hyper::Error) -> Retry {
+    fn http_error(&mut self, _err: &hyper_util::client::legacy::Error) -> Retry {
         Retry::Abort
     }
 
@@ -127,8 +133,8 @@ pub trait Delegate: Send {
     /// first place
     fn token(
         &mut self,
-        e: Box<dyn StdError + Send + Sync>,
-    ) -> std::result::Result<Option<String>, Box<dyn StdError + Send + Sync>> {
+        e: Box<dyn std::error::Error + Send + Sync>,
+    ) -> std::result::Result<Option<String>, Box<dyn std::error::Error + Send + Sync>> {
         Err(e)
     }
 
@@ -164,7 +170,7 @@ pub trait Delegate: Send {
     fn response_json_decode_error(
         &mut self,
         json_encoded_value: &str,
-        json_decode_error: &json::Error,
+        json_decode_error: &serde_json::Error,
     ) {
         let _ = json_encoded_value;
         let _ = json_decode_error;
@@ -178,11 +184,7 @@ pub trait Delegate: Send {
     ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
-    fn http_failure(
-        &mut self,
-        _: &hyper::Response<hyper::body::Body>,
-        _err: Option<serde_json::Value>,
-    ) -> Retry {
+    fn http_failure(&mut self, _: &Response, _err: Option<&serde_json::Value>) -> Retry {
         Retry::Abort
     }
 
@@ -230,7 +232,7 @@ impl Delegate for DefaultDelegate {}
 #[derive(Debug)]
 pub enum Error {
     /// The http connection failed
-    HttpError(hyper::Error),
+    HttpError(hyper_util::client::legacy::Error),
 
     /// An attempt was made to upload a resource with size stored in field `.0`
     /// even though the maximum upload size is what is stored in field `.1`.
@@ -245,7 +247,7 @@ pub enum Error {
     MissingAPIKey,
 
     /// We required a Token, but didn't get one from the Authenticator
-    MissingToken(Box<dyn StdError + Send + Sync>),
+    MissingToken(Box<dyn std::error::Error + Send + Sync>),
 
     /// The delgate instructed to cancel the operation
     Cancelled,
@@ -255,17 +257,17 @@ pub enum Error {
 
     /// Shows that we failed to decode the server response.
     /// This can happen if the protocol changes in conjunction with strict json decoding.
-    JsonDecodeError(String, json::Error),
+    JsonDecodeError(String, serde_json::Error),
 
     /// Indicates an HTTP repsonse with a non-success status code
-    Failure(hyper::Response<hyper::body::Body>),
+    Failure(Response),
 
     /// An IO error occurred while reading a stream into memory
     Io(std::io::Error),
 }
 
-impl Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             Error::Io(err) => err.fmt(f),
             Error::HttpError(err) => err.fmt(f),
@@ -300,8 +302,8 @@ impl Display for Error {
     }
 }
 
-impl error::Error for Error {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+impl std::error::Error for Error {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match *self {
             Error::HttpError(ref err) => err.source(),
             Error::JsonDecodeError(_, ref err) => err.source(),
@@ -392,7 +394,7 @@ impl<'a> MultiPartReader<'a> {
 }
 
 impl<'a> Read for MultiPartReader<'a> {
-    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         match (
             self.raw_parts.len(),
             self.current_part.is_none(),
@@ -482,20 +484,20 @@ impl<'a> Read for MultiPartReader<'a> {
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct XUploadContentType(pub Mime);
 
-impl ::std::ops::Deref for XUploadContentType {
+impl std::ops::Deref for XUploadContentType {
     type Target = Mime;
     fn deref(&self) -> &Mime {
         &self.0
     }
 }
-impl ::std::ops::DerefMut for XUploadContentType {
+impl std::ops::DerefMut for XUploadContentType {
     fn deref_mut(&mut self) -> &mut Mime {
         &mut self.0
     }
 }
-impl Display for XUploadContentType {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&**self, f)
+impl std::fmt::Display for XUploadContentType {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        std::fmt::Display::fmt(&**self, f)
     }
 }
 
@@ -505,8 +507,8 @@ pub struct Chunk {
     pub last: u64,
 }
 
-impl fmt::Display for Chunk {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+impl std::fmt::Display for Chunk {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         (write!(fmt, "{}-{}", self.first, self.last)).ok();
         Ok(())
     }
@@ -575,15 +577,11 @@ impl RangeResponseHeader {
 }
 
 /// A utility type to perform a resumable upload from start to end.
-pub struct ResumableUploadHelper<'a, A: 'a, S>
+pub struct ResumableUploadHelper<'a, A: 'a, C>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response:
-        hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: Connector,
 {
-    pub client: &'a hyper::client::Client<S, hyper::body::Body>,
+    pub client: &'a Client<C>,
     pub delegate: &'a mut dyn Delegate,
     pub start_at: Option<u64>,
     pub auth: &'a A,
@@ -594,17 +592,15 @@ where
     pub media_type: Mime,
     pub content_length: u64,
 }
-impl<'a, A, S> ResumableUploadHelper<'a, A, S>
+
+impl<'a, A, C> ResumableUploadHelper<'a, A, C>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response:
-        hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: Connector,
 {
     async fn query_transfer_status(
         &mut self,
-    ) -> std::result::Result<u64, hyper::Result<hyper::Response<hyper::body::Body>>> {
+    ) -> std::result::Result<u64, std::result::Result<Response, hyper_util::client::legacy::Error>>
+    {
         loop {
             match self
                 .client
@@ -622,7 +618,7 @@ where
                             .header_value(),
                         )
                         .header(AUTHORIZATION, self.auth_header.clone())
-                        .body(hyper::body::Body::empty())
+                        .body(Default::default())
                         .unwrap(),
                 )
                 .await
@@ -635,11 +631,14 @@ where
                             RangeResponseHeader::from_bytes(hh.as_bytes())
                         }
                         None | Some(_) => {
-                            if let Retry::After(d) = self.delegate.http_failure(&r, None) {
+                            let (parts, body) = r.into_parts();
+                            let body = Body::new(to_bytes(body).await.unwrap_or_default());
+                            let response = Response::from_parts(parts, body);
+                            if let Retry::After(d) = self.delegate.http_failure(&response, None) {
                                 sleep(d).await;
                                 continue;
                             }
-                            return Err(Ok(r));
+                            return Err(Ok(response));
                         }
                     };
                     return Ok(h.0.last);
@@ -658,7 +657,9 @@ where
     /// returns None if operation was cancelled by delegate, or the HttpResult.
     /// It can be that we return the result just because we didn't understand the status code -
     /// caller should check for status himself before assuming it's OK to use
-    pub async fn upload(&mut self) -> Option<hyper::Result<hyper::Response<hyper::body::Body>>> {
+    pub async fn upload(
+        &mut self,
+    ) -> Option<std::result::Result<Response, hyper_util::client::legacy::Error>> {
         let mut start = match self.start_at {
             Some(s) => s,
             None => match self.query_transfer_status().await {
@@ -682,8 +683,8 @@ where
             };
 
             let mut section_reader = self.reader.take(request_size);
-            let mut req_bytes = vec![];
-            section_reader.read_to_end(&mut req_bytes).unwrap();
+            let mut bytes = vec![];
+            section_reader.read_to_end(&mut bytes).unwrap();
             let range_header = ContentRange {
                 range: Some(Chunk {
                     first: start,
@@ -694,7 +695,7 @@ where
             if self.delegate.cancel_chunk_upload(&range_header) {
                 return None;
             }
-            let res = self
+            match self
                 .client
                 .request(
                     hyper::Request::builder()
@@ -703,37 +704,37 @@ where
                         .header("Content-Range", range_header.header_value())
                         .header(CONTENT_TYPE, format!("{}", self.media_type))
                         .header(USER_AGENT, self.user_agent.to_string())
-                        .body(hyper::body::Body::from(req_bytes))
+                        .body(to_body(bytes))
                         .unwrap(),
                 )
-                .await;
-            match res {
-                Ok(res) => {
+                .await
+            {
+                Ok(response) => {
                     start += request_size;
 
-                    if res.status() == StatusCode::PERMANENT_REDIRECT {
+                    if response.status() == StatusCode::PERMANENT_REDIRECT {
                         continue;
                     }
 
-                    let (res_parts, res_body) = res.into_parts();
-                    let res_body = match hyper::body::to_bytes(res_body).await {
-                        Ok(res_body) => res_body.into_iter().collect(),
-                        Err(err) => return Some(Err(err)),
+                    let (parts, body) = response.into_parts();
+                    let success = parts.status.is_success();
+                    let bytes = to_bytes(body).await.unwrap_or_default();
+                    let error = if !success {
+                        serde_json::from_str(&to_string(&bytes)).ok()
+                    } else {
+                        None
                     };
-                    let res_body_string: String = String::from_utf8(res_body).unwrap();
-                    let reconstructed_result =
-                        hyper::Response::from_parts(res_parts, res_body_string.clone().into());
+                    let response = to_response(parts, bytes);
 
-                    if !reconstructed_result.status().is_success() {
-                        if let Retry::After(d) = self.delegate.http_failure(
-                            &reconstructed_result,
-                            json::from_str(&res_body_string).ok(),
-                        ) {
+                    if !success {
+                        if let Retry::After(d) =
+                            self.delegate.http_failure(&response, error.as_ref())
+                        {
                             sleep(d).await;
                             continue;
                         }
                     }
-                    return Some(Ok(reconstructed_result));
+                    return Some(Ok(response));
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
@@ -748,13 +749,13 @@ where
 }
 
 // TODO(ST): Allow sharing common code between program types
-pub fn remove_json_null_values(value: &mut json::value::Value) {
+pub fn remove_json_null_values(value: &mut serde_json::value::Value) {
     match value {
-        json::value::Value::Object(map) => {
+        serde_json::value::Value::Object(map) => {
             map.retain(|_, value| !value.is_null());
             map.values_mut().for_each(remove_json_null_values);
         }
-        json::value::Value::Array(arr) => {
+        serde_json::value::Value::Array(arr) => {
             arr.retain(|value| !value.is_null());
             arr.iter_mut().for_each(remove_json_null_values);
         }
@@ -762,22 +763,44 @@ pub fn remove_json_null_values(value: &mut json::value::Value) {
     }
 }
 
-// Borrowing the body object as mutable and converts it to a string
-pub async fn get_body_as_string(res_body: &mut hyper::Body) -> String {
-    let res_body_buf = hyper::body::to_bytes(res_body).await.unwrap();
-    let res_body_string = String::from_utf8_lossy(&res_body_buf);
-    res_body_string.to_string()
+#[doc(hidden)]
+pub fn to_body<T>(bytes: T) -> Body
+where
+    T: Into<hyper::body::Bytes>,
+{
+    Body::new(bytes.into())
+}
+
+#[doc(hidden)]
+pub async fn to_bytes<T>(body: T) -> Option<hyper::body::Bytes>
+where
+    T: hyper::body::Body,
+{
+    use http_body_util::BodyExt;
+    body.collect().await.ok().map(|value| value.to_bytes())
+}
+
+#[doc(hidden)]
+pub fn to_string(bytes: &hyper::body::Bytes) -> std::borrow::Cow<'_, str> {
+    String::from_utf8_lossy(bytes)
+}
+
+#[doc(hidden)]
+pub fn to_response<T>(parts: http::response::Parts, body: T) -> Response
+where
+    T: Into<hyper::body::Bytes>,
+{
+    Response::from_parts(parts, to_body(body))
 }
 
 #[cfg(test)]
-mod test_api {
-    use super::*;
+mod tests {
     use std::default::Default;
     use std::str::FromStr;
 
     use ::serde::{Deserialize, Serialize};
 
-    use serde_json as json;
+    use super::*;
 
     #[test]
     fn serde() {
@@ -790,24 +813,24 @@ mod test_api {
         }
 
         let f: Foo = Default::default();
-        json::to_string(&f).unwrap(); // should work
+        serde_json::to_string(&f).unwrap(); // should work
 
         let j = "{\"opt\":null,\"req\":0,\"vec\":[]}";
-        let _f: Foo = json::from_str(j).unwrap();
+        let _f: Foo = serde_json::from_str(j).unwrap();
 
         // This fails, unless 'vec' is optional
         // let j = "{\"opt\":null,\"req\":0}";
-        // let f: Foo = json::from_str(j).unwrap();
+        // let f: Foo = serde_json::from_str(j).unwrap();
 
         #[derive(Default, Serialize, Deserialize)]
         struct Bar {
             #[serde(rename = "snooSnoo")]
             snoo_snoo: String,
         }
-        json::to_string(&<Bar as Default>::default()).unwrap();
+        serde_json::to_string(&<Bar as Default>::default()).unwrap();
 
         let j = "{\"snooSnoo\":\"foo\"}";
-        let b: Bar = json::from_str(j).unwrap();
+        let b: Bar = serde_json::from_str(j).unwrap();
         assert_eq!(b.snoo_snoo, "foo");
 
         // We can't have unknown fields with structs.
@@ -817,7 +840,7 @@ mod test_api {
         //     snoo_snoo: Option<String>
         // }
         // let j = "{\"snooSnoo\":\"foo\",\"foo\":\"bar\"}";
-        // let b: BarOpt = json::from_str(&j).unwrap();
+        // let b: BarOpt = serde_json::from_str(&j).unwrap();
     }
 
     #[test]

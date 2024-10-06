@@ -1,8 +1,8 @@
+use clap::arg_enum;
 use mime::Mime;
-use yup_oauth2::{ApplicationSecret, ConsoleApplicationSecret};
 use serde_json as json;
 use serde_json::value::Value;
-use clap::arg_enum;
+use yup_oauth2::{ApplicationSecret, ConsoleApplicationSecret};
 
 use std::env;
 use std::fmt;
@@ -750,9 +750,8 @@ pub fn application_secret_from_directory(
     unreachable!();
 }
 
-
 #[cfg(test)]
-mod test_cli {
+mod tests {
     use super::*;
 
     use std::default::Default;

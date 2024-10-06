@@ -2,7 +2,7 @@
 name = "preproc"
 version = "0.1.0"
 authors = ["Sebastian Thiel <sthiel@thoughtworks.com>"]
-edition = "2018"
+edition = "2021"
 publish = false
 
 [[bin]]
@@ -10,8 +10,6 @@ name = "preproc"
 path = "src/main.rs"
 doctest = false
 test = false
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 pulldown-cmark-to-cmark = "10.0.0"

@@ -27,8 +27,8 @@ DO NOT EDIT !
 -->
 <html lang="en">
 <head>
-  <link rel="stylesheet" 
-    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+  <link rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
     integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
     crossorigin="anonymous">
   <script type="text/javascript">
@@ -37,12 +37,12 @@ function onClick(button) {
   selectElementContents(button)
   if (document.execCommand('copy') && !alertShown) {
     msg = "Installation script copied to clipboard.\n"
-    
+
     msg += "\nIt contains no new-lines and will \n"
     msg += "not execute automatically after\n"
     msg += "pasting it into a shell so you can\n"
     msg += "review it beforehand.\n"
-    
+
     msg += "\nThis message will not be shown again."
     alert(msg)
     alertShown = true
@@ -90,7 +90,7 @@ function onCopy(e) {
       % endif
     % for version in api.list[name]:
       <tr>
-        <% 
+        <%
             type_names = ["api", "cli"]
             assert set(type_names) == set(tc.keys()), "The type cache has changed, make sure to update the documentation accordingly"
 
@@ -103,7 +103,7 @@ function onCopy(e) {
             api_data = tc["api"]
             revision = metadata.get('revision', None)
 
-            api_link = api_index(DOC_ROOT, name, version, api_data['make'], 
+            api_link = api_index(DOC_ROOT, name, version, api_data['make'],
                 api_data['cargo'], revision)
 
             crates_link = crates_io_url(name, version)
@@ -111,14 +111,14 @@ function onCopy(e) {
             crates_link += crate_version(api_data.cargo.build_version, revision)
 
             cli_data = tc["cli"]
-            cli_link = api_index(DOC_ROOT, name, version, cli_data['make'], 
+            cli_link = api_index(DOC_ROOT, name, version, cli_data['make'],
                                  cli_data['cargo'], revision)
         %>\
-        <td>${name} (${version})</td> 
+        <td>${name} (${version})</td>
           <td>
             <a href="${api_link}" title="API docs for the ${name} ${version}">API</a>
             <a href="${crates_link}">
-              <img src="${url_info.asset_urls.crates_img}" 
+              <img src="${url_info.asset_urls.crates_img}"
                 title="This API on crates.io" height="16" width="16"/>
             </a>
           </td>
@@ -128,8 +128,8 @@ function onCopy(e) {
             </a>
           </td>
           <td>
-            <button class="mono" onclick="onClick(this)" 
-              oncopy="onCopy(event)" 
+            <button class="mono" onclick="onClick(this)"
+              oncopy="onCopy(event)"
               title="Copy complete installation script to clipboard">
               cargo install ${library_to_crate_name(library_name(name, version))}-cli
             </button>

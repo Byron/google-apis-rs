@@ -10,7 +10,7 @@ PYTHON_BIN := $(VENV_DIR)/bin/python
 PYTHON := . $(VENV_DIR)/bin/activate; python
 PYTEST := $(PYTHON) -m pytest
 
-MAKO_RENDER := etc/bin/mako-render
+MAKO_RENDER := etc/bin/mako-render.py
 API_VERSION_GEN := etc/bin/api_version_to_yaml.py
 SORT_JSON_FILE := etc/bin/sort_json_file.py
 TPL := $(PYTHON) $(MAKO_RENDER)
@@ -61,14 +61,14 @@ help:
 	$(info help           -   print this help)
 
 $(PREPROC): $(PREPROC_DIR)/src/main.rs
-	cd "$(PREPROC_DIR)" && cargo build --release 
+	cd "$(PREPROC_DIR)" && cargo build --release
 
 $(VENV_BIN):
-	python3 -m pip install --user virtualenv==$(VENV_VERSION)
+	python -m pip install --user virtualenv==$(VENV_VERSION)
 	touch $@
 
 $(PYTHON_BIN): $(VENV_BIN) requirements.txt
-	python3 -m venv $(VENV_DIR)
+	python -m venv $(VENV_DIR)
 	$@ -m pip install -r requirements.txt
 
 $(MAKO_RENDER): $(PYTHON_BIN) $(wildcard $(GEN_LIB_SRC)/*)
@@ -93,10 +93,21 @@ license: LICENSE.md
 
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
-test-gen: $(PYTHON_BIN)
-	export PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; $(PYTEST) src
+meta-test: meta-test-python meta-test-rust
 
-test: test-gen
+meta-test-python: $(PYTHON_BIN)
+	PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 $(PYTEST) src
+
+meta-test-rust:
+	cargo test
+
+meta-check: meta-check-python meta-check-rust
+
+meta-check-python: $(PYTHON_BIN)
+	$(VENV_DIR)/bin/pre-commit run --all-files --show-diff-on-failure
+
+meta-check-rust:
+	cargo clippy -- -D warnings
 
 typecheck: $(PYTHON_BIN)
 	$(PYTHON) -m pyright $(GEN_LIB_SRC)

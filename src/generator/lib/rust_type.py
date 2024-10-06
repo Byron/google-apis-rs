@@ -1,5 +1,5 @@
-from typing import Optional, List, Tuple
 from copy import deepcopy
+from typing import List, Optional, Tuple
 
 
 class RustType:
@@ -37,17 +37,17 @@ class RustType:
 
         if "base64url" in description or "URL-safe Base64" in description:
             from_to = {
-                Vec(Base("u8")): Base("::client::serde::urlsafe_base64::Wrapper"),
-                Base("client::chrono::Duration"): Base("::client::serde::duration::Wrapper"),
-                Base("i64"): Base("::client::serde_with::DisplayFromStr"),
-                Base("u64"): Base("::client::serde_with::DisplayFromStr"),
+                Vec(Base("u8")): Base("common::serde::urlsafe_base64::Wrapper"),
+                Base("chrono::Duration"): Base("common::serde::duration::Wrapper"),
+                Base("i64"): Base("serde_with::DisplayFromStr"),
+                Base("u64"): Base("serde_with::DisplayFromStr"),
             }
         else:
             from_to = {
-                Vec(Base("u8")): Base("::client::serde::standard_base64::Wrapper"),
-                Base("client::chrono::Duration"): Base("::client::serde::duration::Wrapper"),
-                Base("i64"): Base("::client::serde_with::DisplayFromStr"),
-                Base("u64"): Base("::client::serde_with::DisplayFromStr"),
+                Vec(Base("u8")): Base("common::serde::standard_base64::Wrapper"),
+                Base("chrono::Duration"): Base("common::serde::duration::Wrapper"),
+                Base("i64"): Base("serde_with::DisplayFromStr"),
+                Base("u64"): Base("serde_with::DisplayFromStr"),
             }
 
         changed = copied.serde_replace_inner_ty(from_to)
@@ -68,6 +68,7 @@ class RustType:
         if self.members:
             return hash((self.name, *[(i, v) for i, v in enumerate(self.members)]))
         return hash((self.name, None))
+
 
 class Option(RustType):
     def __init__(self, member):

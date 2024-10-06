@@ -3,6 +3,7 @@ import unittest
 from pprint import pprint
 
 from generator.lib.util import new_context
+
 from .test_data.discovery_document import DISCOVERY_DOC
 
 

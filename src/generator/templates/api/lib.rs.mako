@@ -13,10 +13,11 @@
 ${lib.docs(c)}
 </%block>
 
-// Unused attributes happen thanks to defined, but unused structures
-// We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
-// unused imports in fully featured APIs. Same with unused_mut ... .
+// Unused attributes happen thanks to defined, but unused structures We don't
+// warn about this, as depending on the API, some data structures or facilities
+// are never used. Instead of pre-determining this, we just disable the lint.
+// It's manually tuned to not have any unused imports in fully featured APIs.
+// Same with unused_mut.
 #![allow(unused_imports, unused_mut, dead_code)]
 
 <%namespace name="lib" file="lib/lib.mako"/>\
@@ -40,17 +41,14 @@ ${lib.docs(c)}
 <%util:gen_info source="${self.uri}" />\
 </%block>
 
-// Re-export the hyper and hyper_rustls crate, they are required to build the hub
-pub use hyper;
-pub use hyper_rustls;
-pub extern crate google_apis_common as client;
-pub use client::chrono;
-pub mod api;
-
-// Re-export the hub type and some basic client structs
-pub use api::${hub_type};
-pub use client::{Result, Error, Delegate, FieldMask};
-
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate hyper;
+pub extern crate hyper_rustls;
+pub extern crate hyper_util;
 #[cfg(feature = "yup-oauth2")]
-pub use client::oauth2;
+pub extern crate yup_oauth2;
+
+pub extern crate google_apis_common as common;
+pub use common::{Delegate, Error, FieldMask, Result};
+
+pub mod api;
+pub use api::${hub_type};

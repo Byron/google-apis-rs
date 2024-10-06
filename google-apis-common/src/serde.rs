@@ -1,8 +1,9 @@
 pub mod duration {
-    use serde::{Deserialize, Deserializer};
-    use serde_with::{DeserializeAs, SerializeAs};
     use std::fmt::Formatter;
     use std::str::FromStr;
+
+    use serde::{Deserialize, Deserializer};
+    use serde_with::{DeserializeAs, SerializeAs};
 
     use chrono::Duration;
 
@@ -144,10 +145,11 @@ pub mod duration {
 }
 
 pub mod standard_base64 {
+    use std::borrow::Cow;
+
     use base64::Engine as _;
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
-    use std::borrow::Cow;
 
     pub struct Wrapper;
 
@@ -174,18 +176,19 @@ pub mod standard_base64 {
                 Ok(decoded) => Ok(decoded),
                 Err(first_err) => match base64::prelude::BASE64_URL_SAFE.decode(s.as_ref()) {
                     Ok(decoded) => Ok(decoded),
-                    Err(_) => Err(serde::de::Error::custom(first_err))
-                }
+                    Err(_) => Err(serde::de::Error::custom(first_err)),
+                },
             }
         }
     }
 }
 
 pub mod urlsafe_base64 {
+    use std::borrow::Cow;
+
     use base64::Engine as _;
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
-    use std::borrow::Cow;
 
     pub struct Wrapper;
 
@@ -212,8 +215,8 @@ pub mod urlsafe_base64 {
                 Ok(decoded) => Ok(decoded),
                 Err(first_err) => match base64::prelude::BASE64_STANDARD.decode(s.as_ref()) {
                     Ok(decoded) => Ok(decoded),
-                    Err(_) => Err(serde::de::Error::custom(first_err))
-                }
+                    Err(_) => Err(serde::de::Error::custom(first_err)),
+                },
             }
         }
     }
@@ -224,11 +227,11 @@ pub fn datetime_to_string(datetime: &chrono::DateTime<chrono::offset::Utc>) -> S
 }
 
 #[cfg(test)]
-mod test {
-    use super::{duration, standard_base64, urlsafe_base64};
-    use base64::Engine as _;
+mod tests {
     use serde::{Deserialize, Serialize};
     use serde_with::{serde_as, DisplayFromStr};
+
+    use super::{duration, standard_base64, urlsafe_base64};
 
     #[serde_as]
     #[derive(Serialize, Deserialize, Debug, PartialEq)]

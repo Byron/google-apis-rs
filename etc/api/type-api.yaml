@@ -25,9 +25,3 @@ make:
 cargo:
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs
-  dependencies:
-    - hyper = "^ 0.14"
-    - http = "^0.2"
-    - tokio = "^1.0"
-    - tower-service = "^0.3.1"
-    - url = "= 1.7"

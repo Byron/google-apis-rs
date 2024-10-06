@@ -1,10 +1,11 @@
+ghp-import
+inflect
 mako
-pyyaml
 mkdocs==1.3.1
+pre-commit
+pyright
 pytest
 pytest-cov
-ghp-import
-pyright
+pyyaml
 types-PyYAML
-inflect
 urllib3
