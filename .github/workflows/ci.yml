@@ -7,15 +7,22 @@ on:
     branches: [main]
 
 jobs:
-  meta-check:
-    name: Check the generative code
+  common-check:
+    name: Check the common code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: make meta-check
+      - run: make common-check
 
-  check:
-    name: Check the generated code
+  common-test:
+    name: Test the common code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: make common-test
+
+  api-check:
+    name: Check the generated APIs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,21 +31,11 @@ jobs:
           make gen-all-api
           make cargo-api ARGS=check
           make cargo-api ARGS='check --no-default-features'
-
-          make gen-all-cli
-          make cargo-cli ARGS=check
         env:
           CI: true
 
-  meta-test:
-    name: Test the generative code
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: make meta-test
-
-  test:
-    name: Test the generated code
+  api-test:
+    name: Test the generated APIs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,8 +46,8 @@ jobs:
         env:
           CI: true
 
-  document:
-    name: Document the generated code
+  api-document:
+    name: Document the generated APIs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,3 +59,17 @@ jobs:
         env:
           CI: true
           RUSTDOCFLAGS: -A warnings
+
+  cli-check:
+    name: Check the generated CLIs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: Swatinem/rust-cache@v2
+      - run: |
+          make gen-all-api
+          make gen-all-cli
+          make cargo-cli ARGS=check
+          make cargo-cli ARGS='check --no-default-features'
+        env:
+          CI: true
