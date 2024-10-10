@@ -739,13 +739,13 @@ else {
                         let request = req_builder
                         .header(CONTENT_TYPE, json_mime_type.to_string())
                         .header(CONTENT_LENGTH, request_size as u64)
-                        .body(common::to_body(request_value_reader.get_ref().clone()))\
+                        .body(common::to_body(request_value_reader.get_ref().clone().into()))\
                     % else:
                         let mut body_reader_bytes = vec![];
                         body_reader.read_to_end(&mut body_reader_bytes).unwrap();
                         let request = req_builder
                             .header(CONTENT_TYPE, content_type.to_string())
-                            .body(common::to_body(body_reader_bytes))\
+                            .body(common::to_body(body_reader_bytes.into()))\
                     % endif ## not simple_media_param
                 % else:
                     % if simple_media_param:
@@ -755,14 +755,14 @@ else {
                             reader.read_to_end(&mut bytes)?;
                             req_builder.header(CONTENT_TYPE, reader_mime_type.to_string())
                                      .header(CONTENT_LENGTH, size)
-                                     .body(common::to_body(bytes))
+                                     .body(common::to_body(bytes.into()))
                         } else {
-                            req_builder.body(Default::default())
+                            req_builder.body(common::to_body::<String>(None))
                         }\
                     % else:
                         let request = req_builder
                         .header(CONTENT_LENGTH, 0_u64)
-                        .body(Default::default())\
+                        .body(common::to_body::<String>(None))\
                     % endif
                 % endif
 ;
@@ -783,10 +783,11 @@ else {
                 }
                 Ok(res) => {
                     let (mut parts, body) = res.into_parts();
-                    let mut bytes = common::to_bytes(body).await.unwrap_or_default();
+                    let mut body = common::Body::new(body);
                     if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
                         let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes);
+                        let response = common::to_response(parts, bytes.into());
 
                         if let common::Retry::After(d) = dlg.http_failure(&response, error.as_ref().ok()) {
                             sleep(d).await;
@@ -836,14 +837,12 @@ else {
                             ## Now the result contains the actual resource, if any ... it will be
                             ## decoded next
                             Some(Ok(response)) => {
-                                let parts_body = response.into_parts();
-                                parts = parts_body.0;
-                                bytes = common::to_bytes(parts_body.1).await.unwrap_or_default();
+                                (parts, body) = response.into_parts();
                                 if !parts.status.is_success() {
                                     ## delegate was called in upload() already - don't tell him again
                                     dlg.store_upload_url(None);
                                     ${delegate_finish}(false);
-                                    return Err(common::Error::Failure(common::to_response(parts, bytes)));
+                                    return Err(common::Error::Failure(common::Response::from_parts(parts, body)));
                                 }
                             }
                         }
@@ -856,9 +855,10 @@ else {
 if enable_resource_parsing \
                     % endif
 {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
                         let encoded = common::to_string(&bytes);
                         match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes), decoded),
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
                             Err(error) => {
                                 dlg.response_json_decode_error(&encoded, &error);
                                 return Err(common::Error::JsonDecodeError(encoded.to_string(), error));
@@ -867,12 +867,12 @@ if enable_resource_parsing \
                     }\
                     % if supports_download:
 else {
-                    (common::to_response(parts, bytes), Default::default())
+                    (common::Response::from_parts(parts, body), Default::default())
 }\
                     % endif
 ;
                 % else:
-                    let response = common::to_response(parts, bytes);
+                    let response = common::Response::from_parts(parts, body);
                 % endif
 
                     ${delegate_finish}(true);
