@@ -32,7 +32,7 @@ clap = "2"
 http-body-util = "0.1"
 % endif
 hyper = "1"
-hyper-rustls = "0.27"
+hyper-rustls = { version = "0.27", default-features = false }
 hyper-util = "0.1"
 mime = "0.3"
 serde = { version = "1", features = ["derive"] }

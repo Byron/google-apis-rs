@@ -20,7 +20,7 @@ use tokio::time::sleep;
 const LINE_ENDING: &str = "\r\n";
 
 /// A body.
-pub type Body = http_body_util::Full<hyper::body::Bytes>;
+pub type Body = http_body_util::combinators::BoxBody<hyper::body::Bytes, hyper::Error>;
 
 /// A response.
 pub type Response = hyper::Response<Body>;
@@ -618,7 +618,7 @@ where
                             .header_value(),
                         )
                         .header(AUTHORIZATION, self.auth_header.clone())
-                        .body(Default::default())
+                        .body(to_body::<String>(None))
                         .unwrap(),
                 )
                 .await
@@ -632,7 +632,7 @@ where
                         }
                         None | Some(_) => {
                             let (parts, body) = r.into_parts();
-                            let body = Body::new(to_bytes(body).await.unwrap_or_default());
+                            let body = to_body(to_bytes(body).await);
                             let response = Response::from_parts(parts, body);
                             if let Retry::After(d) = self.delegate.http_failure(&response, None) {
                                 sleep(d).await;
@@ -704,7 +704,7 @@ where
                         .header("Content-Range", range_header.header_value())
                         .header(CONTENT_TYPE, format!("{}", self.media_type))
                         .header(USER_AGENT, self.user_agent.to_string())
-                        .body(to_body(bytes))
+                        .body(to_body(bytes.into()))
                         .unwrap(),
                 )
                 .await
@@ -724,7 +724,7 @@ where
                     } else {
                         None
                     };
-                    let response = to_response(parts, bytes);
+                    let response = to_response(parts, bytes.into());
 
                     if !success {
                         if let Retry::After(d) =
@@ -764,11 +764,18 @@ pub fn remove_json_null_values(value: &mut serde_json::value::Value) {
 }
 
 #[doc(hidden)]
-pub fn to_body<T>(bytes: T) -> Body
+pub fn to_body<T>(bytes: Option<T>) -> Body
 where
     T: Into<hyper::body::Bytes>,
 {
-    Body::new(bytes.into())
+    use http_body_util::BodyExt;
+
+    fn falliable(_: std::convert::Infallible) -> hyper::Error {
+        unreachable!()
+    }
+
+    let bytes = bytes.map(Into::into).unwrap_or_default();
+    Body::new(http_body_util::Full::from(bytes).map_err(falliable))
 }
 
 #[doc(hidden)]
@@ -786,7 +793,7 @@ pub fn to_string(bytes: &hyper::body::Bytes) -> std::borrow::Cow<'_, str> {
 }
 
 #[doc(hidden)]
-pub fn to_response<T>(parts: http::response::Parts, body: T) -> Response
+pub fn to_response<T>(parts: http::response::Parts, body: Option<T>) -> Response
 where
     T: Into<hyper::body::Bytes>,
 {

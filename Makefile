@@ -93,20 +93,20 @@ license: LICENSE.md
 
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
-meta-test: meta-test-python meta-test-rust
+common-test: common-test-python common-test-rust
 
-meta-test-python: $(PYTHON_BIN)
+common-test-python: $(PYTHON_BIN)
 	PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 $(PYTEST) src
 
-meta-test-rust:
+common-test-rust:
 	cargo test
 
-meta-check: meta-check-python meta-check-rust
+common-check: common-check-python common-check-rust
 
-meta-check-python: $(PYTHON_BIN)
+common-check-python: $(PYTHON_BIN)
 	$(VENV_DIR)/bin/pre-commit run --all-files --show-diff-on-failure
 
-meta-check-rust:
+common-check-rust:
 	cargo clippy -- -D warnings
 
 typecheck: $(PYTHON_BIN)

@@ -19,7 +19,7 @@ chrono = { version = "0.4", default-features = false, features = ["clock", "serd
 http = "1"
 http-body-util = "0.1"
 hyper = { version = "1", features = ["client", "http2"] }
-hyper-util = "0.1"
+hyper-util = { version = "0.1", features = ["client-legacy", "http2"] }
 itertools = "0.13"
 mime = "0.3"
 percent-encoding = "2"
