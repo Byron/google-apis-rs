@@ -4,7 +4,8 @@ repos:
     rev: v4.6.0
     hooks:
       - id: check-yaml
-      - id: trailing-whitespace
+      # This seems to fail on CHANGELOG.md, which is generated and shouldn't be checked.
+      # - id: trailing-whitespace
   - repo: https://github.com/psf/black
     rev: 24.8.0
     hooks:
