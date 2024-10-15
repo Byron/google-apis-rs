@@ -444,6 +444,8 @@ api:
     - v1
     photoslibrary:
     - v1
+    places:
+    - v1
     playablelocations:
     - v3
     playcustomapp:
