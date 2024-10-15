@@ -5,16 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 6.0.4 (2024-05-29)
+## Unreleased
 
-Various fixes - please see the commit-details.
+Breaking as a lot of dependencies were updated, and there maybe minor API changes as well.
 
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 8 commits contributed to the release over the course of 36 calendar days.
- - 78 days passed between releases.
+ - 26 commits contributed to the release.
+ - 139 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -25,6 +25,54 @@ Various fixes - please see the commit-details.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Set next major version for google-(apis|clis)-common, and the crates ([`cdacfdf`](https://github.com/Byron/google-apis-rs/commit/cdacfdf7a7b17b58dbcf5fc271a005715d6f0aa4))
+    - Merge pull request #527 from IvanUkhov/body ([`fcd59df`](https://github.com/Byron/google-apis-rs/commit/fcd59df97c85c958481a2fdb205780196c81a310))
+    - Revisit the features of hyper-util ([`dca7fb6`](https://github.com/Byron/google-apis-rs/commit/dca7fb659dc6152fd3d06cd7cbd7fe3fdd71e1c9))
+    - Avoid processing incoming bodies unnecessarily ([`5e728f7`](https://github.com/Byron/google-apis-rs/commit/5e728f7ed8a477f28d59e2c8bf25044f9f37c423))
+    - Merge pull request #524 from IvanUkhov/yup-oauth2 ([`450748c`](https://github.com/Byron/google-apis-rs/commit/450748cf02173188a5731156f7694239899901e5))
+    - Sort out new lines and trailing whitespace ([`8e80440`](https://github.com/Byron/google-apis-rs/commit/8e80440fef232c7cda0e95524878e0c75c59e3f4))
+    - Adjust a docstring ([`13ae02e`](https://github.com/Byron/google-apis-rs/commit/13ae02edda02901e455e5d3e3491f04ac7ce7d00))
+    - Sort out the dependencies ([`f62b45e`](https://github.com/Byron/google-apis-rs/commit/f62b45e6ad923adc74b443317718eb246925b697))
+    - Address the lints ([`4bbf1ee`](https://github.com/Byron/google-apis-rs/commit/4bbf1ee673a189b2a5440b3aadd097b9e7d09abd))
+    - Rename Connection to Connector ([`c67b9d3`](https://github.com/Byron/google-apis-rs/commit/c67b9d3ce55c33e6018d193c84270c5493c78151))
+    - Make the API documentation compile ([`a72a918`](https://github.com/Byron/google-apis-rs/commit/a72a918a82208dab98360faccd0ee91a3d37343a))
+    - Introduce Client and Connection ([`6d3710f`](https://github.com/Byron/google-apis-rs/commit/6d3710fd116291280d52a86a29a42d8932820810))
+    - Remove the json alias ([`70bfc8f`](https://github.com/Byron/google-apis-rs/commit/70bfc8f4e3e73ecf815b4de762c975b8589a9956))
+    - Remove to_json and add to_string ([`8978b94`](https://github.com/Byron/google-apis-rs/commit/8978b94120932f8e4792c4c0dc05e97d6c00800c))
+    - Introduce to_response ([`5a494f3`](https://github.com/Byron/google-apis-rs/commit/5a494f351d78b79a91d39a25f6d10a1237f9f86b))
+    - Introduce Client ([`82a00cc`](https://github.com/Byron/google-apis-rs/commit/82a00cce69f6c6d73b0af287f24e36076164f973))
+    - Introduce to_body ([`8835901`](https://github.com/Byron/google-apis-rs/commit/8835901a4d2bdc7358d7deccb073f4cd856e9918))
+    - Remove get_body_as_string ([`a654f2c`](https://github.com/Byron/google-apis-rs/commit/a654f2cb8506958caf14964ef77eacaad7b0a2c3))
+    - Export Body and Response ([`98c432c`](https://github.com/Byron/google-apis-rs/commit/98c432ce3ba907ddeee95ce2fb1d9d413c156162))
+    - Update google-apis-common ([`926ad7b`](https://github.com/Byron/google-apis-rs/commit/926ad7bb2a3dd908321ad40da97331cb45363c89))
+    - Merge pull request #506 from dantreiman/tolerant_base64_decoders ([`7b70b66`](https://github.com/Byron/google-apis-rs/commit/7b70b66c634ff7c798cda36fc68f5b99ae5a703a))
+    - Merge pull request #508 from M4SS-Code/itertools-0.13 ([`46107ff`](https://github.com/Byron/google-apis-rs/commit/46107ff49371fa97ba4fedd0bf09498f23a98337))
+    - Test to ensure standard decoder accepts urlsafe, and vice-versa ([`b5bc9d6`](https://github.com/Byron/google-apis-rs/commit/b5bc9d694185d10ae365f886545506954bdef198))
+    - Bump itertools to 0.13 ([`20893b5`](https://github.com/Byron/google-apis-rs/commit/20893b5644708f3d538f9bb4fbdeb019e706d048))
+    - Fix copy-paste mistakes. ([`74b4a08`](https://github.com/Byron/google-apis-rs/commit/74b4a08e7cc464efa3cf72c9e67533d397d54086))
+    - Base64 decoding accepts standard or url-safe. ([`d659486`](https://github.com/Byron/google-apis-rs/commit/d6594866aaf30b609cb2e61175d003c90cf012a5))
+</details>
+
+## 6.0.4 (2024-05-29)
+
+Various fixes - please see the commit-details.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 9 commits contributed to the release over the course of 36 calendar days.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Release google-apis-common v6.0.4 ([`279a0a5`](https://github.com/Byron/google-apis-rs/commit/279a0a5e9a42367ac37d66503c948a96baa0dfc7))
     - Prepare changelog of `google-apis-common` ([`1c42538`](https://github.com/Byron/google-apis-rs/commit/1c42538333d6fd0cec554c977d9894080829c808))
     - Merge pull request #493 from serprex/base64v22 ([`ce47a46`](https://github.com/Byron/google-apis-rs/commit/ce47a46ca4e80dfbb2ead94037169bc5257c306e))
     - 6.0.4 ([`4b23b5a`](https://github.com/Byron/google-apis-rs/commit/4b23b5a0c6b267f0fc1213b2c401bd156abfdb1e))
@@ -77,7 +125,7 @@ Fix deprecation warnings in latest version of the `chrono` crate.
 
 <csr-read-only-do-not-edit/>
 
- - 11 commits contributed to the release over the course of 65 calendar days.
+ - 11 commits contributed to the release.
  - 65 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -110,8 +158,7 @@ Added another encoding/decoding wrapper for base64.
 
 <csr-read-only-do-not-edit/>
 
- - 4 commits contributed to the release over the course of 100 calendar days.
- - 135 days passed between releases.
+ - 4 commits contributed to the release.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -192,8 +239,7 @@ A maintenance release with updated yup-oauth2 dependency
 
 <csr-read-only-do-not-edit/>
 
- - 5 commits contributed to the release over the course of 55 calendar days.
- - 136 days passed between releases.
+ - 5 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -218,10 +264,10 @@ A maintenance release with updated yup-oauth2 dependency
  - <csr-id-a6574486ba7cae72951f9d8c2c555b38d7279306/> remove old time dependency from API.
    Chrono currently depends on an old version of time with a reported
    vulnerability: https://rustsec.org/advisories/RUSTSEC-2020-0159
-
+   
    While it does not use any vulnerable code, the dependency may show
    up in code vulnerability scans, etc.
-
+   
    This removes the "oldtime" feature from chrono, to remove that.
    Also removes the "std" feature because it doesn't seem to be in use
    in this code.
@@ -231,7 +277,6 @@ A maintenance release with updated yup-oauth2 dependency
 <csr-read-only-do-not-edit/>
 
  - 5 commits contributed to the release over the course of 3 calendar days.
- - 44 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -259,7 +304,7 @@ A maintenance release with updated yup-oauth2 dependency
 
 <csr-read-only-do-not-edit/>
 
- - 20 commits contributed to the release over the course of 2 calendar days.
+ - 20 commits contributed to the release.
  - 10 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -304,7 +349,7 @@ A maintenance release with updated yup-oauth2 dependency
 
 <csr-read-only-do-not-edit/>
 
- - 18 commits contributed to the release over the course of 2 calendar days.
+ - 18 commits contributed to the release.
  - 8 days passed between releases.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -344,7 +389,7 @@ A maintenance release with updated yup-oauth2 dependency
 
 <csr-read-only-do-not-edit/>
 
- - 13 commits contributed to the release over the course of 3 calendar days.
+ - 13 commits contributed to the release.
  - 6 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -1026,7 +1071,7 @@ you need.
  - <csr-id-383595c44e9b2aafbece20eb60a3ff36c1f88d81/> added Download information
    That way, it's easy to obtain the respective precompiled binary, as
    well as seeing the source-code.
-
+   
    Overall, it makes promoting the tools easier as the CLI docs can be
    linked directly.
  - <csr-id-6bca4b75d9b1abbe882f5c1bb7ab27232046f89d/> detailed deployment instructions
@@ -1036,7 +1081,7 @@ you need.
    That way, whenever the extended help of a method (e.g. apis get-rest)
    is queried, you can easily jump to the online docs to get details about
    required data-structures or parameters for instance.
-
+   
    [skip ci]
  - <csr-id-bd27046cc8cd5ccf515355a5d810dace168a7db3/> update STRUCT_FLAG and UPLOAD flags
    * adjust documentation to resemble actual upload flag semantics. It was
@@ -1220,7 +1265,7 @@ you need.
    We save about 30% of CLI code just because we offload the work of
    settings structures into serde, building a generic `json::Value` to
    contain all the data, and then let serde do the deserialization for us.
-
+   
    All we need for that is some information we let the generator provide
    and translate it into the runtime.
  - <csr-id-a2dd71451deaf49e2bc4bb8de68a4e4cc87ec8a9/> basis for simplified value setting
@@ -1228,7 +1273,7 @@ you need.
    and utility functions. Now we setup the foundation to allow setting
    a generic `json::value::Value` instead, which can later be deserialized
    into the target structure.
-
+   
    Related to #111
  - <csr-id-52027c6db59c2952f61ee03204fd947277d0cc62/> added download links (osx,ubuntu)
    All assets are configured via shared.yaml and are located elsewhere in
@@ -1556,7 +1601,7 @@ you need.
    google_firestore1_beta1's `CommitRequest` contains an array of `Write` objects which can ultimately
    contain `Value` members that need to have nulls removed to avoid sending multiple types of values
    which generates a 400 response
-
+   
    fixes calls to google_firestore1_beta1's `hub.projects().databases_documents_commit()`
  - <csr-id-d042fcf1a7e50666e1a5090680d4d1ff6081d695/> iteration over dicts with 'values' key
    Sheets api has a 'values' key in resources.spreadsheets.resources which
@@ -1578,7 +1623,7 @@ you need.
  - <csr-id-ef070eef59b2eb3e54b77b5fe600e6f6c900c8dd/> Added an assert to detect when docs need updating
  - <csr-id-de6528be98503c07d04fbf42f740b6da91902672/> Finished adjustments to index.html template (fixes #166)
    Summary of changes:
-
+   
    - Converted from using span + br tags for formatting to using tables
 * `SubCommand::new(...)` was renamed to `SubCommand::with_name(...)`
      which actually is now consistent with everything else
@@ -1935,3 +1980,4 @@ you need.
     - Prepare google-apis-common for release ([`716c4c2`](https://github.com/Byron/google-apis-rs/commit/716c4c263a278c334feacf57c3eabbed09251a9e))
     - Rename `google-api-client` to `google-apis-common` ([`8d7309b`](https://github.com/Byron/google-apis-rs/commit/8d7309b78c3bc909b794d447115328cfb0f41649))
 </details>
+
