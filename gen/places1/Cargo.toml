@@ -1,0 +1,40 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/generator/templates/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-places1"
+version = "5.0.5+20241013"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Maps Places (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/places1"
+homepage = "https://mapsplatform.google.com/maps-products/#places-section"
+documentation = "https://docs.rs/google-places1/5.0.5+20241013"
+license = "MIT"
+keywords = ["places", "google", "protocol", "web", "api"]
+autobins = false
+edition = "2021"
+
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+hyper = "1"
+hyper-rustls = { version = "0.27", default-features = false }
+hyper-util = "0.1"
+mime = "0.3"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_with = "3"
+tokio = "1"
+url = "2"
+utoipa = { version = "4", optional = true }
+yup-oauth2 = { version = "11", optional = true }
+
+google-apis-common = { path = "../../google-apis-common", version = "6" }
+
+
+
+[features]
+default = ["yup-oauth2"]
+utoipa = ["dep:utoipa"]
+yup-oauth2 = ["dep:yup-oauth2", "google-apis-common/yup-oauth2"]
