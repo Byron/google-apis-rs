@@ -4,12 +4,12 @@
 [package]
 
 name = "google-places1"
-version = "5.0.5+20241013"
+version = "6.0.0+20241013"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Maps Places (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/places1"
 homepage = "https://mapsplatform.google.com/maps-products/#places-section"
-documentation = "https://docs.rs/google-places1/5.0.5+20241013"
+documentation = "https://docs.rs/google-places1/6.0.0+20241013"
 license = "MIT"
 keywords = ["places", "google", "protocol", "web", "api"]
 autobins = false
@@ -30,7 +30,7 @@ url = "2"
 utoipa = { version = "4", optional = true }
 yup-oauth2 = { version = "11", optional = true }
 
-google-apis-common = { path = "../../google-apis-common", version = "6" }
+google-apis-common = { path = "../../google-apis-common", version = "7" }
 
 
 

@@ -1,4 +1,4 @@
-site_name: Drive Activity v5.0.5+20240623
+site_name: Drive Activity v6.0.0+20240623
 site_url: http://byron.github.io/google-apis-rs/google-driveactivity2-cli
 site_description: A complete library to interact with Drive Activity (protocol v2)
 
@@ -15,4 +15,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

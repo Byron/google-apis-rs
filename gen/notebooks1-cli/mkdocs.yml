@@ -1,4 +1,4 @@
-site_name: AI Platform Notebooks v5.0.5+20240613
+site_name: AI Platform Notebooks v6.0.0+20240613
 site_url: http://byron.github.io/google-apis-rs/google-notebooks1-cli
 site_description: A complete library to interact with AI Platform Notebooks (protocol v1)
 
@@ -76,4 +76,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

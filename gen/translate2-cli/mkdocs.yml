@@ -1,4 +1,4 @@
-site_name: Translate v5.0.5+20170525
+site_name: Translate v6.0.0+20170525
 site_url: http://byron.github.io/google-apis-rs/google-translate2-cli
 site_description: A complete library to interact with Translate (protocol v2)
 
@@ -21,4 +21,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

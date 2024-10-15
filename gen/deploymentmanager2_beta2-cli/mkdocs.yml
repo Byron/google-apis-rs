@@ -1,4 +1,4 @@
-site_name: Deployment Manager v5.0.5+20160201
+site_name: Deployment Manager v6.0.0+20160201
 site_url: http://byron.github.io/google-apis-rs/google-deploymentmanager2_beta2-cli
 site_description: A complete library to interact with Deployment Manager (protocol v2beta2)
 
@@ -31,4 +31,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

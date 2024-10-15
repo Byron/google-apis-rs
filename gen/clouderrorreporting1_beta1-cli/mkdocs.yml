@@ -1,4 +1,4 @@
-site_name: Clouderrorreporting v5.0.5+20240621
+site_name: Clouderrorreporting v6.0.0+20240621
 site_url: http://byron.github.io/google-apis-rs/google-clouderrorreporting1_beta1-cli
 site_description: A complete library to interact with Clouderrorreporting (protocol v1beta1)
 
@@ -20,4 +20,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

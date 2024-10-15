@@ -1,4 +1,4 @@
-site_name: Cloud Composer v5.0.5+20240618
+site_name: Cloud Composer v6.0.0+20240618
 site_url: http://byron.github.io/google-apis-rs/google-composer1-cli
 site_description: A complete library to interact with Cloud Composer (protocol v1)
 
@@ -42,4 +42,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

@@ -1,4 +1,4 @@
-site_name: Cloud Commerce Partner Procurement Service v5.0.5+20240804
+site_name: Cloud Commerce Partner Procurement Service v6.0.0+20240804
 site_url: http://byron.github.io/google-apis-rs/google-cloudcommerceprocurement1-cli
 site_description: A complete library to interact with Cloud Commerce Partner Procurement Service (protocol v1)
 
@@ -27,4 +27,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

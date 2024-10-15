@@ -1,4 +1,4 @@
-site_name: Recaptcha Enterprise v5.0.5+20240623
+site_name: Recaptcha Enterprise v6.0.0+20240623
 site_url: http://byron.github.io/google-apis-rs/google-recaptchaenterprise1-cli
 site_description: A complete library to interact with Recaptcha Enterprise (protocol v1)
 
@@ -33,4 +33,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

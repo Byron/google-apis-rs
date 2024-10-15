@@ -1,4 +1,4 @@
-site_name: spectrum v5.0.5+20170306
+site_name: spectrum v6.0.0+20170306
 site_url: http://byron.github.io/google-apis-rs/google-spectrum1_explorer-cli
 site_description: A complete library to interact with spectrum (protocol v1explorer)
 
@@ -20,4 +20,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

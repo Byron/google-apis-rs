@@ -1,4 +1,4 @@
-site_name: Logging v5.0.5+20240531
+site_name: Logging v6.0.0+20240531
 site_url: http://byron.github.io/google-apis-rs/google-logging2-cli
 site_description: A complete library to interact with Logging (protocol v2)
 
@@ -255,4 +255,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

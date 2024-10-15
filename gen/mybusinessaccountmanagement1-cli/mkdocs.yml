@@ -1,4 +1,4 @@
-site_name: My Business Account Management v5.0.5+20240625
+site_name: My Business Account Management v6.0.0+20240625
 site_url: http://byron.github.io/google-apis-rs/google-mybusinessaccountmanagement1-cli
 site_description: A complete library to interact with My Business Account Management (protocol v1)
 
@@ -31,4 +31,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

@@ -1,4 +1,4 @@
-site_name: taskqueue v5.0.5+20160428
+site_name: taskqueue v6.0.0+20160428
 site_url: http://byron.github.io/google-apis-rs/google-taskqueue1_beta2-cli
 site_description: A complete library to interact with taskqueue (protocol v1beta2)
 
@@ -23,4 +23,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

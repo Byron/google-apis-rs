@@ -1,4 +1,4 @@
-site_name: Play Movies v5.0.5+20170919
+site_name: Play Movies v6.0.0+20170919
 site_url: http://byron.github.io/google-apis-rs/google-playmoviespartner1-cli
 site_description: A complete library to interact with Play Movies (protocol v1)
 
@@ -20,4 +20,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-
