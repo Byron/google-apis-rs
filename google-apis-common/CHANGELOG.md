@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 7.0.0 (2024-10-15)
 
 Breaking as a lot of dependencies were updated, and there maybe minor API changes as well.
 
@@ -13,7 +13,7 @@ Breaking as a lot of dependencies were updated, and there maybe minor API change
 
 <csr-read-only-do-not-edit/>
 
- - 26 commits contributed to the release.
+ - 27 commits contributed to the release.
  - 139 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ Breaking as a lot of dependencies were updated, and there maybe minor API change
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Update changelogs ([`9648129`](https://github.com/Byron/google-apis-rs/commit/9648129be46b2a0f96b599a7a21ae98ba1639938))
     - Set next major version for google-(apis|clis)-common, and the crates ([`cdacfdf`](https://github.com/Byron/google-apis-rs/commit/cdacfdf7a7b17b58dbcf5fc271a005715d6f0aa4))
     - Merge pull request #527 from IvanUkhov/body ([`fcd59df`](https://github.com/Byron/google-apis-rs/commit/fcd59df97c85c958481a2fdb205780196c81a310))
     - Revisit the features of hyper-util ([`dca7fb6`](https://github.com/Byron/google-apis-rs/commit/dca7fb659dc6152fd3d06cd7cbd7fe3fdd71e1c9))

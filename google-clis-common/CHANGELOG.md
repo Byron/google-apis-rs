@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 7.0.0 (2024-10-15)
 
 A maintenance release with various updated dependencies.
 
@@ -13,7 +13,7 @@ A maintenance release with various updated dependencies.
 
 <csr-read-only-do-not-edit/>
 
- - 13 commits contributed to the release.
+ - 14 commits contributed to the release.
  - 419 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ A maintenance release with various updated dependencies.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Update changelogs ([`9648129`](https://github.com/Byron/google-apis-rs/commit/9648129be46b2a0f96b599a7a21ae98ba1639938))
     - Set next major version for google-(apis|clis)-common, and the crates ([`cdacfdf`](https://github.com/Byron/google-apis-rs/commit/cdacfdf7a7b17b58dbcf5fc271a005715d6f0aa4))
     - Merge pull request #524 from IvanUkhov/yup-oauth2 ([`450748c`](https://github.com/Byron/google-apis-rs/commit/450748cf02173188a5731156f7694239899901e5))
     - Sort out new lines and trailing whitespace ([`8e80440`](https://github.com/Byron/google-apis-rs/commit/8e80440fef232c7cda0e95524878e0c75c59e3f4))
