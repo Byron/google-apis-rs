@@ -1,20 +1,8 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -37,13 +25,12 @@ impl AsRef<str> for Scope {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
         Scope::CloudPlatform
     }
 }
-
-
 
 // ########
 // HUB ###
@@ -61,22 +48,33 @@ impl Default for Scope {
 /// extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// use cloudprivatecatalog1_beta1::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -85,7 +83,7 @@ impl Default for Scope {
 ///              .page_token("amet.")
 ///              .page_size(-20)
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -106,44 +104,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudPrivateCatalog<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct CloudPrivateCatalog<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for CloudPrivateCatalog<S> {}
+impl<C> common::Hub for CloudPrivateCatalog<C> {}
 
-impl<'a, S> CloudPrivateCatalog<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> CloudPrivateCatalog<S> {
+impl<'a, C> CloudPrivateCatalog<C> {
+    pub fn new<A: 'static + common::GetToken>(
+        client: common::Client<C>,
+        auth: A,
+    ) -> CloudPrivateCatalog<C> {
         CloudPrivateCatalog {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://cloudprivatecatalog.googleapis.com/".to_string(),
             _root_url: "https://cloudprivatecatalog.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a, S> {
-        FolderMethods { hub: &self }
+    pub fn folders(&'a self) -> FolderMethods<'a, C> {
+        FolderMethods { hub: self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
-        OrganizationMethods { hub: &self }
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, C> {
+        OrganizationMethods { hub: self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
-        ProjectMethods { hub: &self }
+    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+        ProjectMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -151,7 +151,7 @@ impl<'a, S> CloudPrivateCatalog<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -159,73 +159,64 @@ impl<'a, S> CloudPrivateCatalog<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// The readonly representation of a catalog computed with a given resource
 /// context.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudPrivatecatalogV1beta1Catalog {
     /// Output only. The time when the catalog was created.
-    #[serde(rename="createTime")]
-    
-    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Output only. The description of the catalog.
-    
     pub description: Option<String>,
     /// Output only. The descriptive name of the catalog as it appears in UIs.
-    #[serde(rename="displayName")]
-    
+    #[serde(rename = "displayName")]
     pub display_name: Option<String>,
     /// Output only. The resource name of the target catalog, in the format of
     /// `catalogs/{catalog_id}'.
-    
     pub name: Option<String>,
     /// Output only. The time when the catalog was last updated.
-    #[serde(rename="updateTime")]
-    
-    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
-impl client::Part for GoogleCloudPrivatecatalogV1beta1Catalog {}
-
+impl common::Part for GoogleCloudPrivatecatalogV1beta1Catalog {}
 
 /// The readonly representation of a product computed with a given resource
 /// context.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudPrivatecatalogV1beta1Product {
     /// Output only. The type of the product asset. It can be one of the
     /// following values:
-    /// 
+    ///
     /// * `google.deploymentmanager.Template`
     /// * `google.cloudprivatecatalog.ListingOnly`
-    #[serde(rename="assetType")]
-    
+    #[serde(rename = "assetType")]
     pub asset_type: Option<String>,
     /// Output only. The time when the product was created.
-    #[serde(rename="createTime")]
-    
-    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Output only. The display metadata to describe the product.
     /// The JSON schema of the metadata differs by Product.asset_type.
     /// When the type is `google.deploymentmanager.Template`, the schema is as
     /// follows:
-    /// 
+    ///
     /// ````
     /// "$schema": http://json-schema.org/draft-04/schema#
     /// type: object
@@ -271,12 +262,12 @@ pub struct GoogleCloudPrivatecatalogV1beta1Product {
     /// - name
     /// - description
     /// additionalProperties: false
-    /// 
+    ///
     /// ````
-    /// 
+    ///
     /// When the asset type is `google.cloudprivatecatalog.ListingOnly`, the schema
     /// is as follows:
-    /// 
+    ///
     /// ````
     /// "$schema": http://json-schema.org/draft-04/schema#
     /// type: object
@@ -328,149 +319,128 @@ pub struct GoogleCloudPrivatecatalogV1beta1Product {
     /// - signup_url
     /// additionalProperties: false
     /// ````
-    #[serde(rename="displayMetadata")]
-    
-    pub display_metadata: Option<HashMap<String, json::Value>>,
+    #[serde(rename = "displayMetadata")]
+    pub display_metadata: Option<HashMap<String, serde_json::Value>>,
     /// Output only. The icon URI of the product.
-    #[serde(rename="iconUri")]
-    
+    #[serde(rename = "iconUri")]
     pub icon_uri: Option<String>,
     /// Output only. The resource name of the target product, in the format of
     /// `products/a-z*[a-z0-9]'.
-    /// 
+    ///
     /// A unique identifier for the product under a catalog.
-    
     pub name: Option<String>,
     /// Output only. The time when the product was last updated.
-    #[serde(rename="updateTime")]
-    
-    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
-impl client::Part for GoogleCloudPrivatecatalogV1beta1Product {}
-
+impl common::Part for GoogleCloudPrivatecatalogV1beta1Product {}
 
 /// Response message for PrivateCatalog.SearchCatalogs.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [catalogs search folders](FolderCatalogSearchCall) (response)
 /// * [catalogs search organizations](OrganizationCatalogSearchCall) (response)
 /// * [catalogs search projects](ProjectCatalogSearchCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse {
     /// The `Catalog`s computed from the resource context.
-    
     pub catalogs: Option<Vec<GoogleCloudPrivatecatalogV1beta1Catalog>>,
     /// A pagination token returned from a previous call to SearchCatalogs that
     /// indicates from where listing should continue.
     /// This field is optional.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
 }
 
-impl client::ResponseResult for GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse {}
-
+impl common::ResponseResult for GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse {}
 
 /// Response message for PrivateCatalog.SearchProducts.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [products search folders](FolderProductSearchCall) (response)
 /// * [products search organizations](OrganizationProductSearchCall) (response)
 /// * [products search projects](ProjectProductSearchCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudPrivatecatalogV1beta1SearchProductsResponse {
     /// A pagination token returned from a previous call to SearchProducts that
     /// indicates from where listing should continue.
     /// This field is optional.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
     /// The `Product` resources computed from the resource context.
-    
     pub products: Option<Vec<GoogleCloudPrivatecatalogV1beta1Product>>,
 }
 
-impl client::ResponseResult for GoogleCloudPrivatecatalogV1beta1SearchProductsResponse {}
-
+impl common::ResponseResult for GoogleCloudPrivatecatalogV1beta1SearchProductsResponse {}
 
 /// Response message for PrivateCatalog.SearchVersions.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [versions search folders](FolderVersionSearchCall) (response)
 /// * [versions search organizations](OrganizationVersionSearchCall) (response)
 /// * [versions search projects](ProjectVersionSearchCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse {
     /// A pagination token returned from a previous call to SearchVersions that
     /// indicates from where the listing should continue.
     /// This field is optional.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
     /// The `Version` resources computed from the resource context.
-    
     pub versions: Option<Vec<GoogleCloudPrivatecatalogV1beta1Version>>,
 }
 
-impl client::ResponseResult for GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse {}
-
+impl common::ResponseResult for GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse {}
 
 /// The consumer representation of a version which is a child resource under a
 /// `Product` with asset data.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudPrivatecatalogV1beta1Version {
     /// Output only. The asset which has been validated and is ready to be
     /// provisioned. See
     /// google.cloud.privatecatalogproducer.v1beta.Version.asset for details.
-    
-    pub asset: Option<HashMap<String, json::Value>>,
+    pub asset: Option<HashMap<String, serde_json::Value>>,
     /// Output only. The time when the version was created.
-    #[serde(rename="createTime")]
-    
-    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Output only. The user-supplied description of the version. Maximum of 256
     /// characters.
-    
     pub description: Option<String>,
     /// Output only. The resource name of the version, in the format
     /// `catalogs/{catalog_id}/products/{product_id}/versions/a-z*[a-z0-9]'.
-    /// 
+    ///
     /// A unique identifier for the version under a product.
-    
     pub name: Option<String>,
     /// Output only. The time when the version was last updated.
-    #[serde(rename="updateTime")]
-    
-    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
-impl client::Part for GoogleCloudPrivatecatalogV1beta1Version {}
-
-
+impl common::Part for GoogleCloudPrivatecatalogV1beta1Version {}
 
 // ###################
 // MethodBuilders ###
@@ -487,45 +457,56 @@ impl client::Part for GoogleCloudPrivatecatalogV1beta1Version {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `catalogs_search(...)`, `products_search(...)` and `versions_search(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct FolderMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for FolderMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for FolderMethods<'a, C> {}
 
-impl<'a, S> FolderMethods<'a, S> {
-    
+impl<'a, C> FolderMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Search Catalog resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. It can be in following formats:
     ///                * `projects/{project_id}`
     ///                * `folders/{folder_id}`
     ///                * `organizations/{organization_id}`
-    pub fn catalogs_search(&self, resource: &str) -> FolderCatalogSearchCall<'a, S> {
+    pub fn catalogs_search(&self, resource: &str) -> FolderCatalogSearchCall<'a, C> {
         FolderCatalogSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -537,17 +518,17 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Search Product resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn products_search(&self, resource: &str) -> FolderProductSearchCall<'a, S> {
+    pub fn products_search(&self, resource: &str) -> FolderProductSearchCall<'a, C> {
         FolderProductSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -559,17 +540,17 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Search Version resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn versions_search(&self, resource: &str) -> FolderVersionSearchCall<'a, S> {
+    pub fn versions_search(&self, resource: &str) -> FolderVersionSearchCall<'a, C> {
         FolderVersionSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -583,8 +564,6 @@ impl<'a, S> FolderMethods<'a, S> {
     }
 }
 
-
-
 /// A builder providing access to all methods supported on *organization* resources.
 /// It is not used directly, but through the [`CloudPrivateCatalog`] hub.
 ///
@@ -596,45 +575,56 @@ impl<'a, S> FolderMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `catalogs_search(...)`, `products_search(...)` and `versions_search(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct OrganizationMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for OrganizationMethods<'a, C> {}
 
-impl<'a, S> OrganizationMethods<'a, S> {
-    
+impl<'a, C> OrganizationMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Search Catalog resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. It can be in following formats:
     ///                * `projects/{project_id}`
     ///                * `folders/{folder_id}`
     ///                * `organizations/{organization_id}`
-    pub fn catalogs_search(&self, resource: &str) -> OrganizationCatalogSearchCall<'a, S> {
+    pub fn catalogs_search(&self, resource: &str) -> OrganizationCatalogSearchCall<'a, C> {
         OrganizationCatalogSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -646,17 +636,17 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Search Product resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn products_search(&self, resource: &str) -> OrganizationProductSearchCall<'a, S> {
+    pub fn products_search(&self, resource: &str) -> OrganizationProductSearchCall<'a, C> {
         OrganizationProductSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -668,17 +658,17 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Search Version resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn versions_search(&self, resource: &str) -> OrganizationVersionSearchCall<'a, S> {
+    pub fn versions_search(&self, resource: &str) -> OrganizationVersionSearchCall<'a, C> {
         OrganizationVersionSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -692,8 +682,6 @@ impl<'a, S> OrganizationMethods<'a, S> {
     }
 }
 
-
-
 /// A builder providing access to all methods supported on *project* resources.
 /// It is not used directly, but through the [`CloudPrivateCatalog`] hub.
 ///
@@ -705,45 +693,56 @@ impl<'a, S> OrganizationMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `catalogs_search(...)`, `products_search(...)` and `versions_search(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct ProjectMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for ProjectMethods<'a, C> {}
 
-impl<'a, S> ProjectMethods<'a, S> {
-    
+impl<'a, C> ProjectMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Search Catalog resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. It can be in following formats:
     ///                * `projects/{project_id}`
     ///                * `folders/{folder_id}`
     ///                * `organizations/{organization_id}`
-    pub fn catalogs_search(&self, resource: &str) -> ProjectCatalogSearchCall<'a, S> {
+    pub fn catalogs_search(&self, resource: &str) -> ProjectCatalogSearchCall<'a, C> {
         ProjectCatalogSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -755,17 +754,17 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Search Product resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn products_search(&self, resource: &str) -> ProjectProductSearchCall<'a, S> {
+    pub fn products_search(&self, resource: &str) -> ProjectProductSearchCall<'a, C> {
         ProjectProductSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -777,17 +776,17 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Search Version resources that consumers have access to, within the
     /// scope of the consumer cloud resource hierarchy context.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn versions_search(&self, resource: &str) -> ProjectVersionSearchCall<'a, S> {
+    pub fn versions_search(&self, resource: &str) -> ProjectVersionSearchCall<'a, C> {
         ProjectVersionSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -800,10 +799,6 @@ impl<'a, S> ProjectMethods<'a, S> {
         }
     }
 }
-
-
-
-
 
 // ###################
 // CallBuilders   ###
@@ -824,15 +819,26 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -843,46 +849,50 @@ impl<'a, S> ProjectMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderCatalogSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct FolderCatalogSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderCatalogSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderCatalogSearchCall<'a, C> {}
 
-impl<'a, S> FolderCatalogSearchCall<'a, S>
+impl<'a, C> FolderCatalogSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.folders.catalogs.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.folders.catalogs.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -903,9 +913,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/catalogs:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -916,20 +928,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -943,67 +956,68 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Required. The name of the resource context. It can be in following formats:
-    /// 
+    ///
     /// * `projects/{project_id}`
     /// * `folders/{folder_id}`
     /// * `organizations/{organization_id}`
@@ -1012,16 +1026,16 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the catalogs. The supported queries are:
-    /// 
+    ///
     /// * Get a single catalog: `name=catalogs/{catalog_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1030,26 +1044,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderCatalogSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> FolderCatalogSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderCatalogSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderCatalogSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1074,9 +1091,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderCatalogSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderCatalogSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1091,17 +1111,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderCatalogSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderCatalogSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderCatalogSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderCatalogSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1110,12 +1134,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderCatalogSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderCatalogSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Product resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -1132,15 +1155,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1151,46 +1185,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderProductSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct FolderProductSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderProductSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderProductSearchCall<'a, C> {}
 
-impl<'a, S> FolderProductSearchCall<'a, S>
+impl<'a, C> FolderProductSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchProductsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchProductsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.folders.products.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.folders.products.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1211,9 +1249,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/products:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -1224,20 +1264,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1251,64 +1292,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource context. See
     /// SearchCatalogsRequest.resource for details.
@@ -1317,12 +1359,12 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderProductSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> FolderProductSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the products.
-    /// 
+    ///
     /// The supported queries are:
     /// * List products of all catalogs: empty
     /// * List products under a catalog: `parent=catalogs/{catalog_id}`
@@ -1330,7 +1372,7 @@ where
     /// `name=catalogs/{catalog_id}/products/{product_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> FolderProductSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> FolderProductSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1339,26 +1381,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderProductSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> FolderProductSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderProductSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> FolderProductSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderProductSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderProductSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1383,9 +1428,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderProductSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderProductSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1400,17 +1448,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderProductSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderProductSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderProductSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderProductSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1419,12 +1471,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderProductSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderProductSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Version resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -1441,15 +1492,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1460,46 +1522,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderVersionSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct FolderVersionSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderVersionSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderVersionSearchCall<'a, C> {}
 
-impl<'a, S> FolderVersionSearchCall<'a, S>
+impl<'a, C> FolderVersionSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.folders.versions.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.folders.versions.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1520,9 +1586,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/versions:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -1533,20 +1601,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1560,64 +1629,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource context. See
     /// SearchCatalogsRequest.resource for details.
@@ -1626,12 +1696,12 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderVersionSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> FolderVersionSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the versions. Required.
-    /// 
+    ///
     /// The supported queries are:
     /// * List versions under a product:
     /// `parent=catalogs/{catalog_id}/products/{product_id}`
@@ -1639,7 +1709,7 @@ where
     /// `name=catalogs/{catalog_id}/products/{product_id}/versions/{version_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> FolderVersionSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> FolderVersionSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1648,26 +1718,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderVersionSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> FolderVersionSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderVersionSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> FolderVersionSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderVersionSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderVersionSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1692,9 +1765,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderVersionSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderVersionSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1709,17 +1785,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderVersionSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderVersionSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderVersionSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderVersionSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1728,12 +1808,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderVersionSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderVersionSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Catalog resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -1750,15 +1829,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1769,46 +1859,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationCatalogSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct OrganizationCatalogSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationCatalogSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationCatalogSearchCall<'a, C> {}
 
-impl<'a, S> OrganizationCatalogSearchCall<'a, S>
+impl<'a, C> OrganizationCatalogSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.organizations.catalogs.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.organizations.catalogs.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1829,9 +1923,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/catalogs:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -1842,20 +1938,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1869,67 +1966,68 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Required. The name of the resource context. It can be in following formats:
-    /// 
+    ///
     /// * `projects/{project_id}`
     /// * `folders/{folder_id}`
     /// * `organizations/{organization_id}`
@@ -1938,16 +2036,16 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the catalogs. The supported queries are:
-    /// 
+    ///
     /// * Get a single catalog: `name=catalogs/{catalog_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1956,26 +2054,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationCatalogSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationCatalogSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationCatalogSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationCatalogSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2000,9 +2101,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationCatalogSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationCatalogSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2017,17 +2121,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationCatalogSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationCatalogSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationCatalogSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationCatalogSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2036,12 +2144,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationCatalogSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationCatalogSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Product resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -2058,15 +2165,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2077,46 +2195,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationProductSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct OrganizationProductSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationProductSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationProductSearchCall<'a, C> {}
 
-impl<'a, S> OrganizationProductSearchCall<'a, S>
+impl<'a, C> OrganizationProductSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchProductsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchProductsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.organizations.products.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.organizations.products.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2137,9 +2259,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/products:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2150,20 +2274,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2177,64 +2302,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource context. See
     /// SearchCatalogsRequest.resource for details.
@@ -2243,12 +2369,12 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the products.
-    /// 
+    ///
     /// The supported queries are:
     /// * List products of all catalogs: empty
     /// * List products under a catalog: `parent=catalogs/{catalog_id}`
@@ -2256,7 +2382,7 @@ where
     /// `name=catalogs/{catalog_id}/products/{product_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -2265,26 +2391,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationProductSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationProductSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationProductSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationProductSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2309,9 +2438,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationProductSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationProductSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2326,17 +2458,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationProductSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationProductSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationProductSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationProductSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2345,12 +2481,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationProductSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationProductSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Version resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -2367,15 +2502,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2386,46 +2532,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationVersionSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct OrganizationVersionSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationVersionSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationVersionSearchCall<'a, C> {}
 
-impl<'a, S> OrganizationVersionSearchCall<'a, S>
+impl<'a, C> OrganizationVersionSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.organizations.versions.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.organizations.versions.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2446,9 +2596,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/versions:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2459,20 +2611,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2486,64 +2639,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource context. See
     /// SearchCatalogsRequest.resource for details.
@@ -2552,12 +2706,12 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the versions. Required.
-    /// 
+    ///
     /// The supported queries are:
     /// * List versions under a product:
     /// `parent=catalogs/{catalog_id}/products/{product_id}`
@@ -2565,7 +2719,7 @@ where
     /// `name=catalogs/{catalog_id}/products/{product_id}/versions/{version_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -2574,26 +2728,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationVersionSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationVersionSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationVersionSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationVersionSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2618,9 +2775,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationVersionSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationVersionSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2635,17 +2795,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationVersionSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationVersionSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationVersionSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationVersionSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2654,12 +2818,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationVersionSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationVersionSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Catalog resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -2676,15 +2839,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2695,46 +2869,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectCatalogSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct ProjectCatalogSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectCatalogSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectCatalogSearchCall<'a, C> {}
 
-impl<'a, S> ProjectCatalogSearchCall<'a, S>
+impl<'a, C> ProjectCatalogSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchCatalogsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.projects.catalogs.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.projects.catalogs.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2755,9 +2933,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/catalogs:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2768,20 +2948,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2795,67 +2976,68 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Required. The name of the resource context. It can be in following formats:
-    /// 
+    ///
     /// * `projects/{project_id}`
     /// * `folders/{folder_id}`
     /// * `organizations/{organization_id}`
@@ -2864,16 +3046,16 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the catalogs. The supported queries are:
-    /// 
+    ///
     /// * Get a single catalog: `name=catalogs/{catalog_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -2882,26 +3064,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectCatalogSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectCatalogSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectCatalogSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectCatalogSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2926,9 +3111,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectCatalogSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectCatalogSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2943,17 +3131,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectCatalogSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectCatalogSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectCatalogSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectCatalogSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2962,12 +3154,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectCatalogSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectCatalogSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Product resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -2984,15 +3175,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3003,46 +3205,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProductSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct ProjectProductSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectProductSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectProductSearchCall<'a, C> {}
 
-impl<'a, S> ProjectProductSearchCall<'a, S>
+impl<'a, C> ProjectProductSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchProductsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchProductsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.projects.products.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.projects.products.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3063,9 +3269,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/products:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3076,20 +3284,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3103,64 +3312,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource context. See
     /// SearchCatalogsRequest.resource for details.
@@ -3169,12 +3379,12 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectProductSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> ProjectProductSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the products.
-    /// 
+    ///
     /// The supported queries are:
     /// * List products of all catalogs: empty
     /// * List products under a catalog: `parent=catalogs/{catalog_id}`
@@ -3182,7 +3392,7 @@ where
     /// `name=catalogs/{catalog_id}/products/{product_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectProductSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> ProjectProductSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -3191,26 +3401,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectProductSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectProductSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectProductSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectProductSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProductSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectProductSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3235,9 +3448,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProductSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProductSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3252,17 +3468,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectProductSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectProductSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectProductSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectProductSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3271,12 +3491,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectProductSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectProductSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Search Version resources that consumers have access to, within the
 /// scope of the consumer cloud resource hierarchy context.
@@ -3293,15 +3512,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_cloudprivatecatalog1_beta1 as cloudprivatecatalog1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudPrivateCatalog::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use cloudprivatecatalog1_beta1::{CloudPrivateCatalog, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudPrivateCatalog::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3312,46 +3542,50 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectVersionSearchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudPrivateCatalog<S>,
+pub struct ProjectVersionSearchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudPrivateCatalog<C>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectVersionSearchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectVersionSearchCall<'a, C> {}
 
-impl<'a, S> ProjectVersionSearchCall<'a, S>
+impl<'a, C> ProjectVersionSearchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudPrivatecatalogV1beta1SearchVersionsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudprivatecatalog.projects.versions.search",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "cloudprivatecatalog.projects.versions.search",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "resource", "query", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3372,9 +3606,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+resource}/versions:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3385,20 +3621,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3412,64 +3649,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource context. See
     /// SearchCatalogsRequest.resource for details.
@@ -3478,12 +3716,12 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The query to filter the versions. Required.
-    /// 
+    ///
     /// The supported queries are:
     /// * List versions under a product:
     /// `parent=catalogs/{catalog_id}/products/{product_id}`
@@ -3491,7 +3729,7 @@ where
     /// `name=catalogs/{catalog_id}/products/{product_id}/versions/{version_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, S> {
+    pub fn query(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, C> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -3500,26 +3738,29 @@ where
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectVersionSearchCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectVersionSearchCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectVersionSearchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectVersionSearchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3544,9 +3785,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectVersionSearchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectVersionSearchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3561,17 +3805,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectVersionSearchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectVersionSearchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectVersionSearchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectVersionSearchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3580,10 +3828,8 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectVersionSearchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectVersionSearchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
-

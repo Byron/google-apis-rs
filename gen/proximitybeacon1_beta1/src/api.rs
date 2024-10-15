@@ -1,20 +1,8 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -32,18 +20,19 @@ pub enum Scope {
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::UserlocationBeaconRegistry => "https://www.googleapis.com/auth/userlocation.beacon.registry",
+            Scope::UserlocationBeaconRegistry => {
+                "https://www.googleapis.com/auth/userlocation.beacon.registry"
+            }
         }
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
         Scope::UserlocationBeaconRegistry
     }
 }
-
-
 
 // ########
 // HUB ###
@@ -61,22 +50,33 @@ impl Default for Scope {
 /// extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// use proximitybeacon1_beta1::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -86,7 +86,7 @@ impl Default for Scope {
 ///              .page_size(-62)
 ///              .alert_filter("Lorem")
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -107,47 +107,49 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Proximitybeacon<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct Proximitybeacon<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for Proximitybeacon<S> {}
+impl<C> common::Hub for Proximitybeacon<C> {}
 
-impl<'a, S> Proximitybeacon<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Proximitybeacon<S> {
+impl<'a, C> Proximitybeacon<C> {
+    pub fn new<A: 'static + common::GetToken>(
+        client: common::Client<C>,
+        auth: A,
+    ) -> Proximitybeacon<C> {
         Proximitybeacon {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://proximitybeacon.googleapis.com/".to_string(),
             _root_url: "https://proximitybeacon.googleapis.com/".to_string(),
         }
     }
 
-    pub fn beaconinfo(&'a self) -> BeaconinfoMethods<'a, S> {
-        BeaconinfoMethods { hub: &self }
+    pub fn beaconinfo(&'a self) -> BeaconinfoMethods<'a, C> {
+        BeaconinfoMethods { hub: self }
     }
-    pub fn beacons(&'a self) -> BeaconMethods<'a, S> {
-        BeaconMethods { hub: &self }
+    pub fn beacons(&'a self) -> BeaconMethods<'a, C> {
+        BeaconMethods { hub: self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, S> {
-        MethodMethods { hub: &self }
+    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+        MethodMethods { hub: self }
     }
-    pub fn namespaces(&'a self) -> NamespaceMethods<'a, S> {
-        NamespaceMethods { hub: &self }
+    pub fn namespaces(&'a self) -> NamespaceMethods<'a, C> {
+        NamespaceMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -155,7 +157,7 @@ impl<'a, S> Proximitybeacon<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -163,21 +165,20 @@ impl<'a, S> Proximitybeacon<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// Defines a unique identifier of a beacon as broadcast by the device.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AdvertisedId {
     /// The actual beacon identifier, as broadcast by the beacon hardware. Must be
     /// [base64](http://tools.ietf.org/html/rfc4648#section-4) encoded in HTTP
@@ -185,69 +186,62 @@ pub struct AdvertisedId {
     /// encoding should be of the binary byte-stream and not any textual (such as
     /// hex) representation thereof.
     /// Required.
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub id: Option<Vec<u8>>,
     /// Specifies the identifier type.
     /// Required.
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::Part for AdvertisedId {}
-
+impl common::Part for AdvertisedId {}
 
 /// A subset of attachment information served via the
 /// `beaconinfo.getforobserved` method, used when your users encounter your
 /// beacons.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AttachmentInfo {
     /// An opaque data container for client-provided data.
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// The distance away from the beacon at which this attachment should be
     /// delivered to a mobile app.
-    /// 
+    ///
     /// Setting this to a value greater than zero indicates that the app should
     /// behave as if the beacon is "seen" when the mobile device is less than this
     /// distance away from the beacon.
-    /// 
+    ///
     /// Different attachments on the same beacon can have different max distances.
-    /// 
+    ///
     /// Note that even though this value is expressed with fractional meter
     /// precision, real-world behavior is likley to be much less precise than one
     /// meter, due to the nature of current Bluetooth radio technology.
-    /// 
+    ///
     /// Optional. When not set or zero, the attachment should be delivered at the
     /// beacon's outer limit of detection.
-    #[serde(rename="maxDistanceMeters")]
-    
+    #[serde(rename = "maxDistanceMeters")]
     pub max_distance_meters: Option<f64>,
     /// Specifies what kind of attachment this is. Tells a client how to
     /// interpret the `data` field. Format is <var>namespace/type</var>, for
     /// example <code>scrupulous-wombat-12345/welcome-message</code>
-    #[serde(rename="namespacedType")]
-    
+    #[serde(rename = "namespacedType")]
     pub namespaced_type: Option<String>,
 }
 
-impl client::Part for AttachmentInfo {}
-
+impl common::Part for AttachmentInfo {}
 
 /// Details of a beacon device.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [attachments batch delete beacons](BeaconAttachmentBatchDeleteCall) (none)
 /// * [attachments create beacons](BeaconAttachmentCreateCall) (none)
 /// * [attachments delete beacons](BeaconAttachmentDeleteCall) (none)
@@ -262,73 +256,64 @@ impl client::Part for AttachmentInfo {}
 /// * [register beacons](BeaconRegisterCall) (request|response)
 /// * [update beacons](BeaconUpdateCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Beacon {
     /// The identifier of a beacon as advertised by it. This field must be
     /// populated when registering. It may be empty when updating a beacon
     /// record because it is ignored in updates.
-    /// 
+    ///
     /// When registering a beacon that broadcasts Eddystone-EID, this field
     /// should contain a "stable" Eddystone-UID that identifies the beacon and
     /// links it to its attachments. The stable Eddystone-UID is only used for
     /// administering the beacon.
-    #[serde(rename="advertisedId")]
-    
+    #[serde(rename = "advertisedId")]
     pub advertised_id: Option<AdvertisedId>,
     /// Resource name of this beacon. A beacon name has the format
     /// "beacons/N!beaconId" where the beaconId is the base16 ID broadcast by
     /// the beacon and N is a code for the beacon's type. Possible values are
     /// `3` for Eddystone, `1` for iBeacon, or `5` for AltBeacon.
-    /// 
+    ///
     /// This field must be left empty when registering. After reading a beacon,
     /// clients can use the name for future operations.
-    #[serde(rename="beaconName")]
-    
+    #[serde(rename = "beaconName")]
     pub beacon_name: Option<String>,
     /// Free text used to identify and describe the beacon. Maximum length 140
     /// characters.
     /// Optional.
-    
     pub description: Option<String>,
     /// Write-only registration parameters for beacons using Eddystone-EID
     /// (remotely resolved ephemeral ID) format. This information will not be
     /// populated in API responses. When submitting this data, the `advertised_id`
     /// field must contain an ID of type Eddystone-UID. Any other ID type will
     /// result in an error.
-    #[serde(rename="ephemeralIdRegistration")]
-    
+    #[serde(rename = "ephemeralIdRegistration")]
     pub ephemeral_id_registration: Option<EphemeralIdRegistration>,
     /// Expected location stability. This is set when the beacon is registered or
     /// updated, not automatically detected in any way.
     /// Optional.
-    #[serde(rename="expectedStability")]
-    
+    #[serde(rename = "expectedStability")]
     pub expected_stability: Option<String>,
     /// The indoor level information for this beacon, if known. As returned by the
     /// Google Maps API.
     /// Optional.
-    #[serde(rename="indoorLevel")]
-    
+    #[serde(rename = "indoorLevel")]
     pub indoor_level: Option<IndoorLevel>,
     /// The location of the beacon, expressed as a latitude and longitude pair.
     /// This location is given when the beacon is registered or updated. It does
     /// not necessarily indicate the actual current location of the beacon.
     /// Optional.
-    #[serde(rename="latLng")]
-    
+    #[serde(rename = "latLng")]
     pub lat_lng: Option<LatLng>,
     /// The [Google Places API](https://developers.google.com/places/place-id) Place ID of the place where
     /// the beacon is deployed. This is given when the beacon is registered or
     /// updated, not automatically detected in any way.
     /// Optional.
-    #[serde(rename="placeId")]
-    
+    #[serde(rename = "placeId")]
     pub place_id: Option<String>,
     /// Properties of the beacon device, for example battery type or firmware
     /// version.
     /// Optional.
-    
     pub properties: Option<HashMap<String, String>>,
     /// Some beacons may require a user to provide an authorization key before
     /// changing any of its configuration (e.g. broadcast frames, transmit power).
@@ -338,228 +323,206 @@ pub struct Beacon {
     /// user is authorized to write the beacon's confidential data in the service,
     /// the service considers them authorized to configure the beacon. Note
     /// that this key grants nothing on the service, only on the beacon itself.
-    #[serde(rename="provisioningKey")]
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde(rename = "provisioningKey")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub provisioning_key: Option<Vec<u8>>,
     /// Current status of the beacon.
     /// Required.
-    
     pub status: Option<String>,
 }
 
-impl client::RequestValue for Beacon {}
-impl client::Resource for Beacon {}
-impl client::ResponseResult for Beacon {}
-
+impl common::RequestValue for Beacon {}
+impl common::Resource for Beacon {}
+impl common::ResponseResult for Beacon {}
 
 /// Project-specific data associated with a beacon.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [attachments create beacons](BeaconAttachmentCreateCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BeaconAttachment {
     /// Resource name of this attachment. Attachment names have the format:
     /// <code>beacons/<var>beacon_id</var>/attachments/<var>attachment_id</var></code>.
     /// Leave this empty on creation.
-    #[serde(rename="attachmentName")]
-    
+    #[serde(rename = "attachmentName")]
     pub attachment_name: Option<String>,
     /// The UTC time when this attachment was created, in milliseconds since the
     /// UNIX epoch.
-    #[serde(rename="creationTimeMs")]
-    
-    pub creation_time_ms: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "creationTimeMs")]
+    pub creation_time_ms: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// An opaque data container for client-provided data. Must be
     /// [base64](http://tools.ietf.org/html/rfc4648#section-4) encoded in HTTP
     /// requests, and will be so encoded (with padding) in responses.
     /// Required.
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// The distance away from the beacon at which this attachment should be
     /// delivered to a mobile app.
-    /// 
+    ///
     /// Setting this to a value greater than zero indicates that the app should
     /// behave as if the beacon is "seen" when the mobile device is less than this
     /// distance away from the beacon.
-    /// 
+    ///
     /// Different attachments on the same beacon can have different max distances.
-    /// 
+    ///
     /// Note that even though this value is expressed with fractional meter
     /// precision, real-world behavior is likley to be much less precise than one
     /// meter, due to the nature of current Bluetooth radio technology.
-    /// 
+    ///
     /// Optional. When not set or zero, the attachment should be delivered at the
     /// beacon's outer limit of detection.
-    /// 
+    ///
     /// Negative values are invalid and return an error.
-    #[serde(rename="maxDistanceMeters")]
-    
+    #[serde(rename = "maxDistanceMeters")]
     pub max_distance_meters: Option<f64>,
     /// Specifies what kind of attachment this is. Tells a client how to
     /// interpret the `data` field. Format is <var>namespace/type</var>. Namespace
     /// provides type separation between clients. Type describes the type of
     /// `data`, for use by the client when parsing the `data` field.
     /// Required.
-    #[serde(rename="namespacedType")]
-    
+    #[serde(rename = "namespacedType")]
     pub namespaced_type: Option<String>,
 }
 
-impl client::RequestValue for BeaconAttachment {}
-impl client::ResponseResult for BeaconAttachment {}
-
+impl common::RequestValue for BeaconAttachment {}
+impl common::ResponseResult for BeaconAttachment {}
 
 /// A subset of beacon information served via the `beaconinfo.getforobserved`
 /// method, which you call when users of your app encounter your beacons.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BeaconInfo {
     /// The ID advertised by the beacon.
-    #[serde(rename="advertisedId")]
-    
+    #[serde(rename = "advertisedId")]
     pub advertised_id: Option<AdvertisedId>,
     /// Attachments matching the type(s) requested.
     /// May be empty if no attachment types were requested.
-    
     pub attachments: Option<Vec<AttachmentInfo>>,
     /// The name under which the beacon is registered.
-    #[serde(rename="beaconName")]
-    
+    #[serde(rename = "beaconName")]
     pub beacon_name: Option<String>,
 }
 
-impl client::Part for BeaconInfo {}
-
+impl common::Part for BeaconInfo {}
 
 /// Represents a whole or partial calendar date, e.g. a birthday. The time of day
 /// and time zone are either specified elsewhere or are not significant. The date
 /// is relative to the Proleptic Gregorian Calendar. This can represent:
-/// 
+///
 /// * A full date, with non-zero year, month and day values
 /// * A month and day value, with a zero year, e.g. an anniversary
 /// * A year on its own, with zero month and day values
 /// * A year and month value, with a zero day, e.g. a credit card expiration date
-/// 
+///
 /// Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Date {
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year by itself or a year and month where the day is not
     /// significant.
-    
     pub day: Option<i32>,
     /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
     /// month and day.
-    
     pub month: Option<i32>,
     /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
     /// a year.
-    
     pub year: Option<i32>,
 }
 
-impl client::Part for Date {}
-
+impl common::Part for Date {}
 
 /// Response for a request to delete attachments.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [attachments batch delete beacons](BeaconAttachmentBatchDeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DeleteAttachmentsResponse {
     /// The number of attachments that were deleted.
-    #[serde(rename="numDeleted")]
-    
+    #[serde(rename = "numDeleted")]
     pub num_deleted: Option<i32>,
 }
 
-impl client::ResponseResult for DeleteAttachmentsResponse {}
-
+impl common::ResponseResult for DeleteAttachmentsResponse {}
 
 /// Diagnostics for a single beacon.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Diagnostics {
     /// An unordered list of Alerts that the beacon has.
-    
     pub alerts: Option<Vec<String>>,
     /// Resource name of the beacon. For Eddystone-EID beacons, this may
     /// be the beacon's current EID, or the beacon's "stable" Eddystone-UID.
-    #[serde(rename="beaconName")]
-    
+    #[serde(rename = "beaconName")]
     pub beacon_name: Option<String>,
     /// The date when the battery is expected to be low. If the value is missing
     /// then there is no estimate for when the battery will be low.
     /// This value is only an estimate, not an exact date.
-    #[serde(rename="estimatedLowBatteryDate")]
-    
+    #[serde(rename = "estimatedLowBatteryDate")]
     pub estimated_low_battery_date: Option<Date>,
 }
 
-impl client::Part for Diagnostics {}
-
+impl common::Part for Diagnostics {}
 
 /// A generic empty message that you can re-use to avoid defining duplicated
 /// empty messages in your APIs. A typical example is to use it as the request
 /// or the response type of an API method. For instance:
-/// 
+///
 /// ````text
 /// service Foo {
 ///   rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
 /// }
 /// ````
-/// 
+///
 /// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [attachments delete beacons](BeaconAttachmentDeleteCall) (response)
 /// * [activate beacons](BeaconActivateCall) (response)
 /// * [deactivate beacons](BeaconDeactivateCall) (response)
 /// * [decommission beacons](BeaconDecommissionCall) (response)
 /// * [delete beacons](BeaconDeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Empty {
+    _never_set: Option<bool>,
+}
 
-impl client::ResponseResult for Empty {}
-
+impl common::ResponseResult for Empty {}
 
 /// Write-only registration parameters for beacons using Eddystone-EID format.
 /// Two ways of securely registering an Eddystone-EID beacon with the service
 /// are supported:
-/// 
+///
 /// 1. Perform an ECDH key exchange via this API, including a previous call
 ///    to `GET /v1beta1/eidparams`. In this case the fields
 ///    `beacon_ecdh_public_key` and `service_ecdh_public_key` should be
@@ -575,48 +538,44 @@ impl client::ResponseResult for Empty {}
 ///    depends on how securely the parties involved (in particular the
 ///    bluetooth client) handle the identity key, and obviously on how
 ///    securely the identity key was generated.
-/// 
+///
 /// See [the Eddystone
 /// specification](https://github.com/google/eddystone/tree/master/eddystone-eid)
 /// at GitHub.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct EphemeralIdRegistration {
     /// The beacon's public key used for the Elliptic curve Diffie-Hellman
     /// key exchange. When this field is populated, `service_ecdh_public_key`
     /// must also be populated, and `beacon_identity_key` must not be.
-    #[serde(rename="beaconEcdhPublicKey")]
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde(rename = "beaconEcdhPublicKey")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub beacon_ecdh_public_key: Option<Vec<u8>>,
     /// The private key of the beacon. If this field is populated,
     /// `beacon_ecdh_public_key` and `service_ecdh_public_key` must not be
     /// populated.
-    #[serde(rename="beaconIdentityKey")]
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde(rename = "beaconIdentityKey")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub beacon_identity_key: Option<Vec<u8>>,
     /// The initial clock value of the beacon. The beacon's clock must have
     /// begun counting at this value immediately prior to transmitting this
     /// value to the resolving service. Significant delay in transmitting this
     /// value to the service risks registration or resolution failures. If a
     /// value is not provided, the default is zero.
-    #[serde(rename="initialClockValue")]
-    
-    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    #[serde(rename = "initialClockValue")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub initial_clock_value: Option<u64>,
     /// An initial ephemeral ID calculated using the clock value submitted as
     /// `initial_clock_value`, and the secret key generated by the
     /// Diffie-Hellman key exchange using `service_ecdh_public_key` and
     /// `service_ecdh_public_key`. This initial EID value will be used by the
     /// service to confirm that the key exchange process was successful.
-    #[serde(rename="initialEid")]
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde(rename = "initialEid")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub initial_eid: Option<Vec<u8>>,
     /// Indicates the nominal period between each rotation of the beacon's
     /// ephemeral ID. "Nominal" because the beacon should randomize the
@@ -625,20 +584,17 @@ pub struct EphemeralIdRegistration {
     /// for details. This value corresponds to a power-of-two scaler on the
     /// beacon's clock: when the scaler value is K, the beacon will begin
     /// broadcasting a new ephemeral ID on average every 2^K seconds.
-    #[serde(rename="rotationPeriodExponent")]
-    
+    #[serde(rename = "rotationPeriodExponent")]
     pub rotation_period_exponent: Option<u32>,
     /// The service's public key used for the Elliptic curve Diffie-Hellman
     /// key exchange. When this field is populated, `beacon_ecdh_public_key`
     /// must also be populated, and `beacon_identity_key` must not be.
-    #[serde(rename="serviceEcdhPublicKey")]
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde(rename = "serviceEcdhPublicKey")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub service_ecdh_public_key: Option<Vec<u8>>,
 }
 
-impl client::Part for EphemeralIdRegistration {}
-
+impl common::Part for EphemeralIdRegistration {}
 
 /// Information a client needs to provision and register beacons that
 /// broadcast Eddystone-EID format beacon IDs, using Elliptic curve
@@ -646,52 +602,48 @@ impl client::Part for EphemeralIdRegistration {}
 /// [the Eddystone
 /// specification](https://github.com/google/eddystone/tree/master/eddystone-eid)
 /// at GitHub.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get eidparams](MethodGetEidparamCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct EphemeralIdRegistrationParams {
     /// Indicates the maximum rotation period supported by the service.
     /// See
     /// EddystoneEidRegistration.rotation_period_exponent
-    #[serde(rename="maxRotationPeriodExponent")]
-    
+    #[serde(rename = "maxRotationPeriodExponent")]
     pub max_rotation_period_exponent: Option<u32>,
     /// Indicates the minimum rotation period supported by the service.
     /// See
     /// EddystoneEidRegistration.rotation_period_exponent
-    #[serde(rename="minRotationPeriodExponent")]
-    
+    #[serde(rename = "minRotationPeriodExponent")]
     pub min_rotation_period_exponent: Option<u32>,
     /// The beacon service's public key for use by a beacon to derive its
     /// Identity Key using Elliptic Curve Diffie-Hellman key exchange.
-    #[serde(rename="serviceEcdhPublicKey")]
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde(rename = "serviceEcdhPublicKey")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub service_ecdh_public_key: Option<Vec<u8>>,
 }
 
-impl client::ResponseResult for EphemeralIdRegistrationParams {}
-
+impl common::ResponseResult for EphemeralIdRegistrationParams {}
 
 /// Request for beacon and attachment information about beacons that
 /// a mobile client has encountered “in the wild”.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [getforobserved beaconinfo](BeaconinfoGetforobservedCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GetInfoForObservedBeaconsRequest {
     /// Specifies what kind of attachments to include in the response.
     /// When given, the response will include only attachments of the given types.
@@ -699,240 +651,211 @@ pub struct GetInfoForObservedBeaconsRequest {
     /// <var>namespace/type</var>. Accepts `*` to specify all types in
     /// all namespaces owned by the client.
     /// Optional.
-    #[serde(rename="namespacedTypes")]
-    
+    #[serde(rename = "namespacedTypes")]
     pub namespaced_types: Option<Vec<String>>,
     /// The beacons that the client has encountered.
     /// At least one must be given.
-    
     pub observations: Option<Vec<Observation>>,
 }
 
-impl client::RequestValue for GetInfoForObservedBeaconsRequest {}
-
+impl common::RequestValue for GetInfoForObservedBeaconsRequest {}
 
 /// Information about the requested beacons, optionally including attachment
 /// data.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [getforobserved beaconinfo](BeaconinfoGetforobservedCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GetInfoForObservedBeaconsResponse {
     /// Public information about beacons.
     /// May be empty if the request matched no beacons.
-    
     pub beacons: Option<Vec<BeaconInfo>>,
 }
 
-impl client::ResponseResult for GetInfoForObservedBeaconsResponse {}
-
+impl common::ResponseResult for GetInfoForObservedBeaconsResponse {}
 
 /// Indoor level, a human-readable string as returned by Google Maps APIs,
 /// useful to indicate which floor of a building a beacon is located on.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct IndoorLevel {
     /// The name of this level.
-    
     pub name: Option<String>,
 }
 
-impl client::Part for IndoorLevel {}
-
+impl common::Part for IndoorLevel {}
 
 /// An object representing a latitude/longitude pair. This is expressed as a pair
 /// of doubles representing degrees latitude and degrees longitude. Unless
 /// specified otherwise, this must conform to the
 /// <a href="http://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf">WGS84
 /// standard</a>. Values must be within normalized ranges.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct LatLng {
     /// The latitude in degrees. It must be in the range [-90.0, +90.0].
-    
     pub latitude: Option<f64>,
     /// The longitude in degrees. It must be in the range [-180.0, +180.0].
-    
     pub longitude: Option<f64>,
 }
 
-impl client::Part for LatLng {}
-
+impl common::Part for LatLng {}
 
 /// Response to `ListBeaconAttachments` that contains the requested attachments.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [attachments list beacons](BeaconAttachmentListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListBeaconAttachmentsResponse {
     /// The attachments that corresponded to the request params.
-    
     pub attachments: Option<Vec<BeaconAttachment>>,
 }
 
-impl client::ResponseResult for ListBeaconAttachmentsResponse {}
-
+impl common::ResponseResult for ListBeaconAttachmentsResponse {}
 
 /// Response that contains list beacon results and pagination help.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list beacons](BeaconListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListBeaconsResponse {
     /// The beacons that matched the search criteria.
-    
     pub beacons: Option<Vec<Beacon>>,
     /// An opaque pagination token that the client may provide in their next
     /// request to retrieve the next page of results.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
     /// Estimate of the total number of beacons matched by the query. Higher
     /// values may be less accurate.
-    #[serde(rename="totalCount")]
-    
-    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    #[serde(rename = "totalCount")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub total_count: Option<i64>,
 }
 
-impl client::ResponseResult for ListBeaconsResponse {}
-
+impl common::ResponseResult for ListBeaconsResponse {}
 
 /// Response that contains the requested diagnostics.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [diagnostics list beacons](BeaconDiagnosticListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListDiagnosticsResponse {
     /// The diagnostics matching the given request.
-    
     pub diagnostics: Option<Vec<Diagnostics>>,
     /// Token that can be used for pagination. Returned only if the
     /// request matches more beacons than can be returned in this response.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
 }
 
-impl client::ResponseResult for ListDiagnosticsResponse {}
-
+impl common::ResponseResult for ListDiagnosticsResponse {}
 
 /// Response to ListNamespacesRequest that contains all the project’s namespaces.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list namespaces](NamespaceListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListNamespacesResponse {
     /// The attachments that corresponded to the request params.
-    
     pub namespaces: Option<Vec<Namespace>>,
 }
 
-impl client::ResponseResult for ListNamespacesResponse {}
-
+impl common::ResponseResult for ListNamespacesResponse {}
 
 /// An attachment namespace defines read and write access for all the attachments
 /// created under it. Each namespace is globally unique, and owned by one
 /// project which is the only project that can create attachments under it.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list namespaces](NamespaceListCall) (none)
 /// * [update namespaces](NamespaceUpdateCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Namespace {
     /// Resource name of this namespace. Namespaces names have the format:
     /// <code>namespaces/<var>namespace</var></code>.
-    #[serde(rename="namespaceName")]
-    
+    #[serde(rename = "namespaceName")]
     pub namespace_name: Option<String>,
     /// Specifies what clients may receive attachments under this namespace
     /// via `beaconinfo.getforobserved`.
-    #[serde(rename="servingVisibility")]
-    
+    #[serde(rename = "servingVisibility")]
     pub serving_visibility: Option<String>,
 }
 
-impl client::RequestValue for Namespace {}
-impl client::Resource for Namespace {}
-impl client::ResponseResult for Namespace {}
-
+impl common::RequestValue for Namespace {}
+impl common::Resource for Namespace {}
+impl common::ResponseResult for Namespace {}
 
 /// Represents one beacon observed once.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Observation {
     /// The ID advertised by the beacon the client has encountered.
-    /// 
+    ///
     /// If the submitted `advertised_id` type is Eddystone-EID, then the client
     /// must be authorized to resolve the given beacon. Otherwise no data will be
     /// returned for that beacon.
     /// Required.
-    #[serde(rename="advertisedId")]
-    
+    #[serde(rename = "advertisedId")]
     pub advertised_id: Option<AdvertisedId>,
     /// The array of telemetry bytes received from the beacon. The server is
     /// responsible for parsing it. This field may frequently be empty, as
     /// with a beacon that transmits telemetry only occasionally.
-    
-    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    #[serde_as(as = "Option<common::serde::standard_base64::Wrapper>")]
     pub telemetry: Option<Vec<u8>>,
     /// Time when the beacon was observed.
-    #[serde(rename="timestampMs")]
-    
-    pub timestamp_ms: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "timestampMs")]
+    pub timestamp_ms: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
-impl client::Part for Observation {}
-
-
+impl common::Part for Observation {}
 
 // ###################
 // MethodBuilders ###
@@ -949,33 +872,44 @@ impl client::Part for Observation {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Proximitybeacon::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `getforobserved(...)`
 /// // to build up your call.
 /// let rb = hub.beaconinfo();
 /// # }
 /// ```
-pub struct BeaconinfoMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconinfoMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for BeaconinfoMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for BeaconinfoMethods<'a, C> {}
 
-impl<'a, S> BeaconinfoMethods<'a, S> {
-    
+impl<'a, C> BeaconinfoMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Given one or more beacon observations, returns any beacon information
@@ -983,11 +917,14 @@ impl<'a, S> BeaconinfoMethods<'a, S> {
     /// [API
     /// key](https://developers.google.com/beacons/proximity/get-started#request_a_browser_api_key)
     /// for the application.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn getforobserved(&self, request: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a, S> {
+    pub fn getforobserved(
+        &self,
+        request: GetInfoForObservedBeaconsRequest,
+    ) -> BeaconinfoGetforobservedCall<'a, C> {
         BeaconinfoGetforobservedCall {
             hub: self.hub,
             _request: request,
@@ -996,8 +933,6 @@ impl<'a, S> BeaconinfoMethods<'a, S> {
         }
     }
 }
-
-
 
 /// A builder providing access to all methods supported on *beacon* resources.
 /// It is not used directly, but through the [`Proximitybeacon`] hub.
@@ -1010,48 +945,59 @@ impl<'a, S> BeaconinfoMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Proximitybeacon::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `activate(...)`, `attachments_batch_delete(...)`, `attachments_create(...)`, `attachments_delete(...)`, `attachments_list(...)`, `deactivate(...)`, `decommission(...)`, `delete(...)`, `diagnostics_list(...)`, `get(...)`, `list(...)`, `register(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.beacons();
 /// # }
 /// ```
-pub struct BeaconMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for BeaconMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for BeaconMethods<'a, C> {}
 
-impl<'a, S> BeaconMethods<'a, S> {
-    
+impl<'a, C> BeaconMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes multiple attachments on a given beacon. This operation is
     /// permanent and cannot be undone.
-    /// 
+    ///
     /// You can optionally specify `namespacedType` to choose which attachments
     /// should be deleted. If you do not specify `namespacedType`,  all your
     /// attachments on the given beacon will be deleted. You also may explicitly
     /// specify `*/*` to delete all.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - The beacon whose attachments should be deleted. A beacon name has the
@@ -1061,7 +1007,10 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_batch_delete(&self, beacon_name: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
+    pub fn attachments_batch_delete(
+        &self,
+        beacon_name: &str,
+    ) -> BeaconAttachmentBatchDeleteCall<'a, C> {
         BeaconAttachmentBatchDeleteCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1072,7 +1021,7 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Associates the given data with the specified beacon. Attachment data must
@@ -1085,14 +1034,14 @@ impl<'a, S> BeaconMethods<'a, S> {
     /// The namespace must be one of the values returned by the `namespaces`
     /// endpoint, while the type can be a string of any characters except for the
     /// forward slash (`/`) up to 100 characters in length.
-    /// 
+    ///
     /// Attachment data can be up to 1024 bytes long.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -1103,7 +1052,11 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_create(&self, request: BeaconAttachment, beacon_name: &str) -> BeaconAttachmentCreateCall<'a, S> {
+    pub fn attachments_create(
+        &self,
+        request: BeaconAttachment,
+        beacon_name: &str,
+    ) -> BeaconAttachmentCreateCall<'a, C> {
         BeaconAttachmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1114,7 +1067,7 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes the specified attachment for the given beacon. Each attachment has
@@ -1122,12 +1075,12 @@ impl<'a, S> BeaconMethods<'a, S> {
     /// fetch the attachment data via this API. You specify this with the delete
     /// request to control which attachment is removed. This operation cannot be
     /// undone.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `attachmentName` - The attachment name (`attachmentName`) of
@@ -1136,7 +1089,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                      Eddystone-EID beacons, the beacon ID portion (`3!893737abc9`) may be the
     ///                      beacon's current EID, or its "stable" Eddystone-UID.
     ///                      Required.
-    pub fn attachments_delete(&self, attachment_name: &str) -> BeaconAttachmentDeleteCall<'a, S> {
+    pub fn attachments_delete(&self, attachment_name: &str) -> BeaconAttachmentDeleteCall<'a, C> {
         BeaconAttachmentDeleteCall {
             hub: self.hub,
             _attachment_name: attachment_name.to_string(),
@@ -1146,22 +1099,22 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the attachments for the specified beacon that match the specified
     /// namespaced-type pattern.
-    /// 
+    ///
     /// To control which namespaced types are returned, you add the
     /// `namespacedType` query parameter to the request. You must either use
     /// `*/*`, to return all attachments, or the namespace must be one of
     /// the ones returned from the  `namespaces` endpoint.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - Beacon whose attachments should be fetched. A beacon name has the
@@ -1171,7 +1124,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_list(&self, beacon_name: &str) -> BeaconAttachmentListCall<'a, S> {
+    pub fn attachments_list(&self, beacon_name: &str) -> BeaconAttachmentListCall<'a, C> {
         BeaconAttachmentListCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1182,22 +1135,22 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// List the diagnostics for a single beacon. You can also list diagnostics for
     /// all the beacons owned by your Google Developers Console project by using
     /// the beacon name `beacons/-`.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - Beacon that the diagnostics are for.
-    pub fn diagnostics_list(&self, beacon_name: &str) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn diagnostics_list(&self, beacon_name: &str) -> BeaconDiagnosticListCall<'a, C> {
         BeaconDiagnosticListCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1210,19 +1163,19 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Activates a beacon. A beacon that is active will return information
     /// and attachment data when queried via `beaconinfo.getforobserved`.
     /// Calling this method on an already active beacon will do nothing (but
     /// will return a successful response code).
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - Beacon that should be activated. A beacon name has the format
@@ -1232,7 +1185,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn activate(&self, beacon_name: &str) -> BeaconActivateCall<'a, S> {
+    pub fn activate(&self, beacon_name: &str) -> BeaconActivateCall<'a, C> {
         BeaconActivateCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1242,19 +1195,19 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deactivates a beacon. Once deactivated, the API will not return
     /// information nor attachment data for the beacon when queried via
     /// `beaconinfo.getforobserved`. Calling this method on an already inactive
     /// beacon will do nothing (but will return a successful response code).
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - Beacon that should be deactivated. A beacon name has the format
@@ -1264,7 +1217,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn deactivate(&self, beacon_name: &str) -> BeaconDeactivateCall<'a, S> {
+    pub fn deactivate(&self, beacon_name: &str) -> BeaconDeactivateCall<'a, C> {
         BeaconDeactivateCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1274,19 +1227,19 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Decommissions the specified beacon in the service. This beacon will no
     /// longer be returned from `beaconinfo.getforobserved`. This operation is
     /// permanent -- you will not be able to re-register a beacon with this ID
     /// again.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - Beacon that should be decommissioned. A beacon name has the format
@@ -1296,7 +1249,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID of the beacon's "stable" UID.
     ///                  Required.
-    pub fn decommission(&self, beacon_name: &str) -> BeaconDecommissionCall<'a, S> {
+    pub fn decommission(&self, beacon_name: &str) -> BeaconDecommissionCall<'a, C> {
         BeaconDecommissionCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1306,18 +1259,18 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes the specified beacon including all diagnostics data for the beacon
     /// as well as any attachments on the beacon (including those belonging to
     /// other projects). This operation cannot be undone.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - Beacon that should be deleted. A beacon name has the format
@@ -1327,7 +1280,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn delete(&self, beacon_name: &str) -> BeaconDeleteCall<'a, S> {
+    pub fn delete(&self, beacon_name: &str) -> BeaconDeleteCall<'a, C> {
         BeaconDeleteCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1337,22 +1290,22 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Returns detailed information about the specified beacon.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    /// 
+    ///
     /// Requests may supply an Eddystone-EID beacon name in the form:
     /// `beacons/4!beaconId` where the `beaconId` is the base16 ephemeral ID
     /// broadcast by the beacon. The returned `Beacon` object will contain the
     /// beacon's stable Eddystone-UID. Clients not authorized to resolve the
     /// beacon's ephemeral Eddystone-EID broadcast will receive an error.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `beaconName` - Resource name of this beacon. A beacon name has the format
@@ -1362,7 +1315,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn get(&self, beacon_name: &str) -> BeaconGetCall<'a, S> {
+    pub fn get(&self, beacon_name: &str) -> BeaconGetCall<'a, C> {
         BeaconGetCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1372,18 +1325,18 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Searches the beacon registry for beacons that match the given search
     /// criteria. Only those beacons that the client has permission to list
     /// will be returned.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    pub fn list(&self) -> BeaconListCall<'a, S> {
+    pub fn list(&self) -> BeaconListCall<'a, C> {
         BeaconListCall {
             hub: self.hub,
             _q: Default::default(),
@@ -1395,21 +1348,21 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Registers a previously unregistered beacon given its `advertisedId`.
     /// These IDs are unique within the system. An ID can be registered only once.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn register(&self, request: Beacon) -> BeaconRegisterCall<'a, S> {
+    pub fn register(&self, request: Beacon) -> BeaconRegisterCall<'a, C> {
         BeaconRegisterCall {
             hub: self.hub,
             _request: request,
@@ -1419,14 +1372,14 @@ impl<'a, S> BeaconMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates the information about the specified beacon. **Any field that you do
     /// not populate in the submitted beacon will be permanently erased**, so you
     /// should follow the "read, modify, write" pattern to avoid inadvertently
     /// destroying data.
-    /// 
+    ///
     /// Changes to the beacon status via this method will be  silently ignored.
     /// To update beacon status, use the separate methods on this API for
     /// activation, deactivation, and decommissioning.
@@ -1434,7 +1387,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **Is owner** or **Can edit** permissions in the Google
     /// Developers Console project.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -1444,7 +1397,7 @@ impl<'a, S> BeaconMethods<'a, S> {
     ///                  `3` for Eddystone, `1` for iBeacon, or `5` for AltBeacon.
     ///                  This field must be left empty when registering. After reading a beacon,
     ///                  clients can use the name for future operations.
-    pub fn update(&self, request: Beacon, beacon_name: &str) -> BeaconUpdateCall<'a, S> {
+    pub fn update(&self, request: Beacon, beacon_name: &str) -> BeaconUpdateCall<'a, C> {
         BeaconUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1457,8 +1410,6 @@ impl<'a, S> BeaconMethods<'a, S> {
     }
 }
 
-
-
 /// A builder providing access to all methods supported on *namespace* resources.
 /// It is not used directly, but through the [`Proximitybeacon`] hub.
 ///
@@ -1470,44 +1421,55 @@ impl<'a, S> BeaconMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Proximitybeacon::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.namespaces();
 /// # }
 /// ```
-pub struct NamespaceMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct NamespaceMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for NamespaceMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for NamespaceMethods<'a, C> {}
 
-impl<'a, S> NamespaceMethods<'a, S> {
-    
+impl<'a, C> NamespaceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all attachment namespaces owned by your Google Developers Console
     /// project. Attachment data associated with a beacon must include a
     /// namespaced type, and the namespace must be owned by your project.
-    /// 
+    ///
     /// Authenticate using an [OAuth access
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    pub fn list(&self) -> NamespaceListCall<'a, S> {
+    pub fn list(&self) -> NamespaceListCall<'a, C> {
         NamespaceListCall {
             hub: self.hub,
             _project_id: Default::default(),
@@ -1516,18 +1478,18 @@ impl<'a, S> NamespaceMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates the information about the specified namespace. Only the namespace
     /// visibility can be updated.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `namespaceName` - Resource name of this namespace. Namespaces names have the format:
     ///                     <code>namespaces/<var>namespace</var></code>.
-    pub fn update(&self, request: Namespace, namespace_name: &str) -> NamespaceUpdateCall<'a, S> {
+    pub fn update(&self, request: Namespace, namespace_name: &str) -> NamespaceUpdateCall<'a, C> {
         NamespaceUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1540,8 +1502,6 @@ impl<'a, S> NamespaceMethods<'a, S> {
     }
 }
 
-
-
 /// A builder providing access to all free methods, which are not associated with a particular resource.
 /// It is not used directly, but through the [`Proximitybeacon`] hub.
 ///
@@ -1553,33 +1513,44 @@ impl<'a, S> NamespaceMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Proximitybeacon::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_eidparams(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct MethodMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for MethodMethods<'a, C> {}
 
-impl<'a, S> MethodMethods<'a, S> {
-    
+impl<'a, C> MethodMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the Proximity Beacon API's current public key and associated
@@ -1589,7 +1560,7 @@ impl<'a, S> MethodMethods<'a, S> {
     /// to provision and register multiple beacons. However, clients should be
     /// prepared to refresh this key when they encounter an error registering an
     /// Eddystone-EID beacon.
-    pub fn get_eidparams(&self) -> MethodGetEidparamCall<'a, S> {
+    pub fn get_eidparams(&self) -> MethodGetEidparamCall<'a, C> {
         MethodGetEidparamCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1598,10 +1569,6 @@ impl<'a, S> MethodMethods<'a, S> {
         }
     }
 }
-
-
-
-
 
 // ###################
 // CallBuilders   ###
@@ -1626,20 +1593,31 @@ impl<'a, S> MethodMethods<'a, S> {
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// use proximitybeacon1_beta1::api::GetInfoForObservedBeaconsRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GetInfoForObservedBeaconsRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1647,42 +1625,43 @@ impl<'a, S> MethodMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconinfoGetforobservedCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconinfoGetforobservedCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _request: GetInfoForObservedBeaconsRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconinfoGetforobservedCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconinfoGetforobservedCall<'a, C> {}
 
-impl<'a, S> BeaconinfoGetforobservedCall<'a, S>
+impl<'a, C> BeaconinfoGetforobservedCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GetInfoForObservedBeaconsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GetInfoForObservedBeaconsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beaconinfo.getforobserved",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beaconinfo.getforobserved",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1692,33 +1671,36 @@ where
 
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/beaconinfo:getforobserved";
-        
+
         match dlg.api_key() {
             Some(value) => params.push("key", value),
             None => {
                 dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
+                return Err(common::Error::MissingAPIKey);
             }
         }
-
 
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1727,85 +1709,93 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GetInfoForObservedBeaconsRequest,
+    ) -> BeaconinfoGetforobservedCall<'a, C> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconinfoGetforobservedCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconinfoGetforobservedCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1830,23 +1820,24 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconinfoGetforobservedCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconinfoGetforobservedCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
-
 }
-
 
 /// Deletes multiple attachments on a given beacon. This operation is
 /// permanent and cannot be undone.
-/// 
+///
 /// You can optionally specify `namespacedType` to choose which attachments
 /// should be deleted. If you do not specify `namespacedType`,  all your
 /// attachments on the given beacon will be deleted. You also may explicitly
 /// specify `*/*` to delete all.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -1864,15 +1855,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1882,45 +1884,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentBatchDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconAttachmentBatchDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
     _namespaced_type: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconAttachmentBatchDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconAttachmentBatchDeleteCall<'a, C> {}
 
-impl<'a, S> BeaconAttachmentBatchDeleteCall<'a, S>
+impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DeleteAttachmentsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, DeleteAttachmentsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.attachments.batchDelete",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.attachments.batchDelete",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "beaconName", "projectId", "namespacedType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1938,9 +1939,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/attachments:batchDelete";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -1951,20 +1954,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1978,64 +1982,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// The beacon whose attachments should be deleted. A beacon name has the
     /// format "beacons/N!beaconId" where the beaconId is the base16 ID broadcast
@@ -2049,7 +2054,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -2061,7 +2066,7 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2071,19 +2076,22 @@ where
     /// Optional.
     ///
     /// Sets the *namespaced type* query property to the given value.
-    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, S> {
+    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, C> {
         self._namespaced_type = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentBatchDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconAttachmentBatchDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2108,9 +2116,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentBatchDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentBatchDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2125,17 +2136,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentBatchDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentBatchDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentBatchDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentBatchDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2144,12 +2159,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconAttachmentBatchDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconAttachmentBatchDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Associates the given data with the specified beacon. Attachment data must
 /// contain two parts:
@@ -2161,9 +2175,9 @@ where
 /// The namespace must be one of the values returned by the `namespaces`
 /// endpoint, while the type can be a string of any characters except for the
 /// forward slash (`/`) up to 100 characters in length.
-/// 
+///
 /// Attachment data can be up to 1024 bytes long.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -2182,20 +2196,31 @@ where
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// use proximitybeacon1_beta1::api::BeaconAttachment;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = BeaconAttachment::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2204,45 +2229,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentCreateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconAttachmentCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _request: BeaconAttachment,
     _beacon_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconAttachmentCreateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconAttachmentCreateCall<'a, C> {}
 
-impl<'a, S> BeaconAttachmentCreateCall<'a, S>
+impl<'a, C> BeaconAttachmentCreateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BeaconAttachment)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, BeaconAttachment)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.attachments.create",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.attachments.create",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "beaconName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2257,9 +2281,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/attachments";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2271,32 +2297,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -2309,72 +2342,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BeaconAttachment) -> BeaconAttachmentCreateCall<'a, S> {
+    pub fn request(mut self, new_value: BeaconAttachment) -> BeaconAttachmentCreateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -2390,7 +2426,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -2400,19 +2436,22 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentCreateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconAttachmentCreateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2437,9 +2476,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentCreateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2454,17 +2496,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentCreateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentCreateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2473,19 +2519,18 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconAttachmentCreateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconAttachmentCreateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Deletes the specified attachment for the given beacon. Each attachment has
 /// a unique attachment name (`attachmentName`) which is returned when you
 /// fetch the attachment data via this API. You specify this with the delete
 /// request to control which attachment is removed. This operation cannot be
 /// undone.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -2503,15 +2548,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2520,44 +2576,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconAttachmentDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _attachment_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconAttachmentDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconAttachmentDeleteCall<'a, C> {}
 
-impl<'a, S> BeaconAttachmentDeleteCall<'a, S>
+impl<'a, C> BeaconAttachmentDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.attachments.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.attachments.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["alt", "attachmentName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2572,9 +2627,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+attachmentName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+attachmentName}", "attachmentName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2585,20 +2642,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2612,64 +2670,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// The attachment name (`attachmentName`) of
     /// the attachment to remove. For example:
@@ -2682,7 +2741,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn attachment_name(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, S> {
+    pub fn attachment_name(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, C> {
         self._attachment_name = new_value.to_string();
         self
     }
@@ -2691,19 +2750,22 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconAttachmentDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2728,9 +2790,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2745,17 +2810,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2764,21 +2833,20 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconAttachmentDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconAttachmentDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Returns the attachments for the specified beacon that match the specified
 /// namespaced-type pattern.
-/// 
+///
 /// To control which namespaced types are returned, you add the
 /// `namespacedType` query parameter to the request. You must either use
 /// `*/*`, to return all attachments, or the namespace must be one of
 /// the ones returned from the  `namespaces` endpoint.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
@@ -2796,15 +2864,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2814,45 +2893,46 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconAttachmentListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
     _namespaced_type: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconAttachmentListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconAttachmentListCall<'a, C> {}
 
-impl<'a, S> BeaconAttachmentListCall<'a, S>
+impl<'a, C> BeaconAttachmentListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListBeaconAttachmentsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, ListBeaconAttachmentsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.attachments.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.attachments.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "beaconName", "projectId", "namespacedType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2870,9 +2950,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/attachments";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2883,20 +2965,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2910,64 +2993,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Beacon whose attachments should be fetched. A beacon name has the
     /// format "beacons/N!beaconId" where the beaconId is the base16 ID broadcast
@@ -2981,7 +3065,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -2993,7 +3077,7 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3002,19 +3086,22 @@ where
     /// "all types in all namespaces".
     ///
     /// Sets the *namespaced type* query property to the given value.
-    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, S> {
+    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, C> {
         self._namespaced_type = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentListCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconAttachmentListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3039,9 +3126,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3056,17 +3146,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconAttachmentListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconAttachmentListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3075,17 +3169,16 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconAttachmentListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconAttachmentListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// List the diagnostics for a single beacon. You can also list diagnostics for
 /// all the beacons owned by your Google Developers Console project by using
 /// the beacon name `beacons/-`.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
@@ -3103,15 +3196,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3123,47 +3227,55 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDiagnosticListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconDiagnosticListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _alert_filter: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconDiagnosticListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconDiagnosticListCall<'a, C> {}
 
-impl<'a, S> BeaconDiagnosticListCall<'a, S>
+impl<'a, C> BeaconDiagnosticListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListDiagnosticsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListDiagnosticsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.diagnostics.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
 
-        for &field in ["alt", "beaconName", "projectId", "pageToken", "pageSize", "alertFilter"].iter() {
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.diagnostics.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "beaconName",
+            "projectId",
+            "pageToken",
+            "pageSize",
+            "alertFilter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3187,9 +3299,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}/diagnostics";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3200,20 +3314,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3227,64 +3342,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Beacon that the diagnostics are for.
     ///
@@ -3292,7 +3408,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3301,7 +3417,7 @@ where
     /// diagnostic records. Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3309,7 +3425,7 @@ where
     /// response to a previous request. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3317,7 +3433,7 @@ where
     /// 10. Maximum 1000. Optional.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> BeaconDiagnosticListCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
@@ -3325,19 +3441,22 @@ where
     /// beacons that have low batteries use `alert_filter=LOW_BATTERY`.
     ///
     /// Sets the *alert filter* query property to the given value.
-    pub fn alert_filter(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn alert_filter(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
         self._alert_filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconDiagnosticListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3362,9 +3481,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDiagnosticListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDiagnosticListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3379,17 +3501,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconDiagnosticListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconDiagnosticListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDiagnosticListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDiagnosticListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3398,18 +3524,17 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconDiagnosticListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconDiagnosticListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Activates a beacon. A beacon that is active will return information
 /// and attachment data when queried via `beaconinfo.getforobserved`.
 /// Calling this method on an already active beacon will do nothing (but
 /// will return a successful response code).
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -3427,15 +3552,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3444,44 +3580,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconActivateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconActivateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconActivateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconActivateCall<'a, C> {}
 
-impl<'a, S> BeaconActivateCall<'a, S>
+impl<'a, C> BeaconActivateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.activate",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.activate",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "beaconName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3496,9 +3631,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}:activate";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3509,20 +3646,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3536,64 +3674,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Beacon that should be activated. A beacon name has the format
     /// "beacons/N!beaconId" where the beaconId is the base16 ID broadcast by
@@ -3607,7 +3746,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconActivateCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconActivateCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3617,19 +3756,22 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconActivateCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconActivateCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconActivateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconActivateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3654,9 +3796,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconActivateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconActivateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3671,17 +3816,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconActivateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconActivateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconActivateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconActivateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3690,18 +3839,17 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconActivateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconActivateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Deactivates a beacon. Once deactivated, the API will not return
 /// information nor attachment data for the beacon when queried via
 /// `beaconinfo.getforobserved`. Calling this method on an already inactive
 /// beacon will do nothing (but will return a successful response code).
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -3719,15 +3867,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3736,44 +3895,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDeactivateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconDeactivateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconDeactivateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconDeactivateCall<'a, C> {}
 
-impl<'a, S> BeaconDeactivateCall<'a, S>
+impl<'a, C> BeaconDeactivateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.deactivate",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.deactivate",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "beaconName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3788,9 +3946,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}:deactivate";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3801,20 +3961,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3828,64 +3989,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Beacon that should be deactivated. A beacon name has the format
     /// "beacons/N!beaconId" where the beaconId is the base16 ID broadcast by
@@ -3899,7 +4061,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeactivateCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeactivateCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3909,19 +4071,22 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDeactivateCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDeactivateCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeactivateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconDeactivateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3946,9 +4111,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeactivateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeactivateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3963,17 +4131,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconDeactivateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconDeactivateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDeactivateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDeactivateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3982,18 +4154,17 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconDeactivateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconDeactivateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Decommissions the specified beacon in the service. This beacon will no
 /// longer be returned from `beaconinfo.getforobserved`. This operation is
 /// permanent -- you will not be able to re-register a beacon with this ID
 /// again.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -4011,15 +4182,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4028,44 +4210,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDecommissionCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconDecommissionCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconDecommissionCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconDecommissionCall<'a, C> {}
 
-impl<'a, S> BeaconDecommissionCall<'a, S>
+impl<'a, C> BeaconDecommissionCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.decommission",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.decommission",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "beaconName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4080,9 +4261,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}:decommission";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -4093,20 +4276,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -4120,64 +4304,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Beacon that should be decommissioned. A beacon name has the format
     /// "beacons/N!beaconId" where the beaconId is the base16 ID broadcast by
@@ -4191,7 +4376,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDecommissionCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDecommissionCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4201,19 +4386,22 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDecommissionCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDecommissionCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDecommissionCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconDecommissionCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -4238,9 +4426,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDecommissionCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDecommissionCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4255,17 +4446,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconDecommissionCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconDecommissionCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDecommissionCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDecommissionCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -4274,17 +4469,16 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconDecommissionCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconDecommissionCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Deletes the specified beacon including all diagnostics data for the beacon
 /// as well as any attachments on the beacon (including those belonging to
 /// other projects). This operation cannot be undone.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -4302,15 +4496,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4319,44 +4524,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconDeleteCall<'a, C> {}
 
-impl<'a, S> BeaconDeleteCall<'a, S>
+impl<'a, C> BeaconDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["alt", "beaconName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4371,9 +4575,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -4384,20 +4590,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -4411,64 +4618,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Beacon that should be deleted. A beacon name has the format
     /// "beacons/N!beaconId" where the beaconId is the base16 ID broadcast by
@@ -4482,7 +4690,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeleteCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeleteCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4491,19 +4699,19 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDeleteCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDeleteCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeleteCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> BeaconDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -4528,9 +4736,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4545,17 +4756,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -4564,20 +4779,19 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Returns detailed information about the specified beacon.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
 /// the Google Developers Console project.
-/// 
+///
 /// Requests may supply an Eddystone-EID beacon name in the form:
 /// `beacons/4!beaconId` where the `beaconId` is the base16 ephemeral ID
 /// broadcast by the beacon. The returned `Beacon` object will contain the
@@ -4596,15 +4810,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4613,44 +4838,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _beacon_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconGetCall<'a, C> {}
 
-impl<'a, S> BeaconGetCall<'a, S>
+impl<'a, C> BeaconGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Beacon)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Beacon)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "beaconName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4665,9 +4889,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -4678,20 +4904,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -4705,64 +4932,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Resource name of this beacon. A beacon name has the format
     /// "beacons/N!beaconId" where the beaconId is the base16 ID broadcast by
@@ -4776,7 +5004,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconGetCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconGetCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4786,19 +5014,19 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconGetCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconGetCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> BeaconGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -4823,9 +5051,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4840,17 +5071,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -4859,17 +5094,16 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Searches the beacon registry for beacons that match the given search
 /// criteria. Only those beacons that the client has permission to list
 /// will be returned.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
@@ -4887,15 +5121,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4907,46 +5152,45 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _q: Option<String>,
     _project_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconListCall<'a, C> {}
 
-impl<'a, S> BeaconListCall<'a, S>
+impl<'a, C> BeaconListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListBeaconsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListBeaconsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "q", "projectId", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4969,26 +5213,27 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/beacons";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -5002,67 +5247,68 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Filter query string that supports the following field filters:
-    /// 
+    ///
     /// * **description:`"<string>"`**
     ///   For example: **description:“Room 3”**
     ///   Returns beacons whose description matches tokens in the string “Room 3”
@@ -5117,20 +5363,20 @@ where
     ///   For example: **indoor\_level:“1”**
     ///   Returns beacons which are located on the given indoor level. Accepts
     ///   multiple filters that will be combined with OR logic.
-    /// 
+    ///
     /// Multiple filters on the same field are combined with OR logic (except
     /// registration_time which is combined with AND logic).
     /// Multiple filters on different fields are combined with AND logic.
     /// Filters should be separated by spaces.
-    /// 
+    ///
     /// As with any HTTP query string parameter, the whole filter expression must
     /// be URL-encoded.
-    /// 
+    ///
     /// Example REST request:
     /// `GET /v1beta1/beacons?q=status:active%20lat:51.123%20lng:-1.095%20radius:1000`
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> BeaconListCall<'a, S> {
+    pub fn q(mut self, new_value: &str) -> BeaconListCall<'a, C> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -5139,14 +5385,14 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconListCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconListCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// A pagination token obtained from a previous request to list beacons.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BeaconListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> BeaconListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5154,19 +5400,19 @@ where
     /// server-defined upper limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BeaconListCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> BeaconListCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> BeaconListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -5191,9 +5437,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5208,17 +5457,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -5227,16 +5480,15 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Registers a previously unregistered beacon given its `advertisedId`.
 /// These IDs are unique within the system. An ID can be registered only once.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **Is owner** or **Can edit** permissions in the Google
@@ -5255,20 +5507,31 @@ where
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// use proximitybeacon1_beta1::api::Beacon;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Beacon::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5277,44 +5540,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconRegisterCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconRegisterCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _request: Beacon,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconRegisterCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconRegisterCall<'a, C> {}
 
-impl<'a, S> BeaconRegisterCall<'a, S>
+impl<'a, C> BeaconRegisterCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Beacon)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Beacon)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.register",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.register",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -5328,39 +5590,46 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/beacons:register";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -5373,72 +5642,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Beacon) -> BeaconRegisterCall<'a, S> {
+    pub fn request(mut self, new_value: Beacon) -> BeaconRegisterCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -5448,19 +5720,22 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconRegisterCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconRegisterCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconRegisterCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> BeaconRegisterCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -5485,9 +5760,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconRegisterCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconRegisterCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5502,17 +5780,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconRegisterCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconRegisterCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconRegisterCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconRegisterCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -5521,18 +5803,17 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconRegisterCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconRegisterCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Updates the information about the specified beacon. **Any field that you do
 /// not populate in the submitted beacon will be permanently erased**, so you
 /// should follow the "read, modify, write" pattern to avoid inadvertently
 /// destroying data.
-/// 
+///
 /// Changes to the beacon status via this method will be  silently ignored.
 /// To update beacon status, use the separate methods on this API for
 /// activation, deactivation, and decommissioning.
@@ -5554,20 +5835,31 @@ where
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// use proximitybeacon1_beta1::api::Beacon;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Beacon::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5576,45 +5868,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconUpdateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct BeaconUpdateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _request: Beacon,
     _beacon_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for BeaconUpdateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for BeaconUpdateCall<'a, C> {}
 
-impl<'a, S> BeaconUpdateCall<'a, S>
+impl<'a, C> BeaconUpdateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Beacon)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Beacon)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.beacons.update",
-                               http_method: hyper::Method::PUT });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.beacons.update",
+            http_method: hyper::Method::PUT,
+        });
 
         for &field in ["alt", "beaconName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -5629,9 +5920,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+beaconName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+beaconName}", "beaconName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -5643,32 +5936,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -5681,72 +5981,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Beacon) -> BeaconUpdateCall<'a, S> {
+    pub fn request(mut self, new_value: Beacon) -> BeaconUpdateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -5754,7 +6057,7 @@ where
     /// "beacons/N!beaconId" where the beaconId is the base16 ID broadcast by
     /// the beacon and N is a code for the beacon's type. Possible values are
     /// `3` for Eddystone, `1` for iBeacon, or `5` for AltBeacon.
-    /// 
+    ///
     /// This field must be left empty when registering. After reading a beacon,
     /// clients can use the name for future operations.
     ///
@@ -5762,7 +6065,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconUpdateCall<'a, S> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconUpdateCall<'a, C> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -5772,19 +6075,19 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconUpdateCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconUpdateCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconUpdateCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> BeaconUpdateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -5809,9 +6112,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconUpdateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconUpdateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5826,17 +6132,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> BeaconUpdateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> BeaconUpdateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconUpdateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> BeaconUpdateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -5845,17 +6155,16 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> BeaconUpdateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> BeaconUpdateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
 /// Lists all attachment namespaces owned by your Google Developers Console
 /// project. Attachment data associated with a beacon must include a
 /// namespaced type, and the namespace must be owned by your project.
-/// 
+///
 /// Authenticate using an [OAuth access
 /// token](https://developers.google.com/identity/protocols/OAuth2) from a
 /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
@@ -5873,15 +6182,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5890,43 +6210,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct NamespaceListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for NamespaceListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for NamespaceListCall<'a, C> {}
 
-impl<'a, S> NamespaceListCall<'a, S>
+impl<'a, C> NamespaceListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListNamespacesResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListNamespacesResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.namespaces.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.namespaces.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -5940,26 +6259,27 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/namespaces";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -5973,82 +6293,83 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// The project id to list namespaces under.
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> NamespaceListCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> NamespaceListCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> NamespaceListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -6073,9 +6394,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6090,17 +6414,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> NamespaceListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> NamespaceListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> NamespaceListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> NamespaceListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -6109,12 +6437,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> NamespaceListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> NamespaceListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Updates the information about the specified namespace. Only the namespace
 /// visibility can be updated.
@@ -6132,20 +6459,31 @@ where
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// use proximitybeacon1_beta1::api::Namespace;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Namespace::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6154,45 +6492,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceUpdateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
+pub struct NamespaceUpdateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
     _request: Namespace,
     _namespace_name: String,
     _project_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for NamespaceUpdateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for NamespaceUpdateCall<'a, C> {}
 
-impl<'a, S> NamespaceUpdateCall<'a, S>
+impl<'a, C> NamespaceUpdateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Namespace)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Namespace)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.namespaces.update",
-                               http_method: hyper::Method::PUT });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.namespaces.update",
+            http_method: hyper::Method::PUT,
+        });
 
         for &field in ["alt", "namespaceName", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -6207,9 +6544,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/{+namespaceName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+namespaceName}", "namespaceName")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -6221,32 +6560,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -6259,72 +6605,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Namespace) -> NamespaceUpdateCall<'a, S> {
+    pub fn request(mut self, new_value: Namespace) -> NamespaceUpdateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -6335,7 +6684,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn namespace_name(mut self, new_value: &str) -> NamespaceUpdateCall<'a, S> {
+    pub fn namespace_name(mut self, new_value: &str) -> NamespaceUpdateCall<'a, C> {
         self._namespace_name = new_value.to_string();
         self
     }
@@ -6345,19 +6694,22 @@ where
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> NamespaceUpdateCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> NamespaceUpdateCall<'a, C> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceUpdateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> NamespaceUpdateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -6382,9 +6734,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceUpdateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceUpdateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6399,17 +6754,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> NamespaceUpdateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> NamespaceUpdateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> NamespaceUpdateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> NamespaceUpdateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -6418,12 +6777,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> NamespaceUpdateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> NamespaceUpdateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Gets the Proximity Beacon API's current public key and associated
 /// parameters used to initiate the Diffie-Hellman key exchange required to
@@ -6445,15 +6803,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_proximitybeacon1_beta1 as proximitybeacon1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use proximitybeacon1_beta1::{Proximitybeacon, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Proximitybeacon::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use proximitybeacon1_beta1::{Proximitybeacon, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Proximitybeacon::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6461,42 +6830,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetEidparamCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Proximitybeacon<S>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+pub struct MethodGetEidparamCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Proximitybeacon<C>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for MethodGetEidparamCall<'a, S> {}
+impl<'a, C> common::CallBuilder for MethodGetEidparamCall<'a, C> {}
 
-impl<'a, S> MethodGetEidparamCall<'a, S>
+impl<'a, C> MethodGetEidparamCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, EphemeralIdRegistrationParams)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, EphemeralIdRegistrationParams)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "proximitybeacon.getEidparams",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "proximitybeacon.getEidparams",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -6507,26 +6877,27 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/eidparams";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
+            self._scopes
+                .insert(Scope::UserlocationBeaconRegistry.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -6540,74 +6911,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEidparamCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> MethodGetEidparamCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -6632,9 +7007,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEidparamCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEidparamCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6649,17 +7027,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> MethodGetEidparamCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> MethodGetEidparamCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> MethodGetEidparamCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MethodGetEidparamCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -6668,10 +7050,8 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> MethodGetEidparamCall<'a, S> {
+    pub fn clear_scopes(mut self) -> MethodGetEidparamCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
-

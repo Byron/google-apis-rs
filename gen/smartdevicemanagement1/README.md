@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-smartdevicemanagement1` library allows access to all features of the *Google Smart Device Management* service.
 
-This documentation was generated from *Smart Device Management* crate version *5.0.5+20240616*, where *20240616* is the exact revision of the *smartdevicemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
+This documentation was generated from *Smart Device Management* crate version *6.0.0+20240616*, where *20240616* is the exact revision of the *smartdevicemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
 
 Everything else about the *Smart Device Management* *v1* API can be found at the
 [official documentation site](https://developers.google.com/nest/device-access).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/SmartDeviceManagement) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/SmartDeviceManagement) ...
 
 * enterprises
- * [*devices execute command*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/api::EnterpriseDeviceExecuteCommandCall), [*devices get*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/api::EnterpriseDeviceGetCall), [*devices list*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/api::EnterpriseDeviceListCall), [*structures get*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/api::EnterpriseStructureGetCall), [*structures list*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/api::EnterpriseStructureListCall), [*structures rooms get*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/api::EnterpriseStructureRoomGetCall) and [*structures rooms list*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/api::EnterpriseStructureRoomListCall)
+ * [*devices execute command*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/api::EnterpriseDeviceExecuteCommandCall), [*devices get*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/api::EnterpriseDeviceGetCall), [*devices list*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/api::EnterpriseDeviceListCall), [*structures get*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/api::EnterpriseStructureGetCall), [*structures list*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/api::EnterpriseStructureListCall), [*structures rooms get*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/api::EnterpriseStructureRoomGetCall) and [*structures rooms list*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/api::EnterpriseStructureRoomListCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/SmartDeviceManagement)**
+* **[Hub](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/SmartDeviceManagement)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::CallBuilder)
+* **[Resources](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Part)**
+    * **[Parts](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -50,8 +50,8 @@ Or specifically ...
 let r = hub.enterprises().devices_get(...).doit().await
 ```
 
-The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 The `doit()` method performs the actual communication with the server and returns the respective result.
 
@@ -64,8 +64,8 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 google-smartdevicemanagement1 = "*"
-serde = "^1.0"
-serde_json = "^1.0"
+serde = "1"
+serde_json = "1"
 ```
 
 ## A complete example
@@ -75,22 +75,33 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate google_smartdevicemanagement1 as smartdevicemanagement1;
 use smartdevicemanagement1::{Result, Error};
-use std::default::Default;
-use smartdevicemanagement1::{SmartDeviceManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+use smartdevicemanagement1::{SmartDeviceManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 
-// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// Get an ApplicationSecret instance by some means. It contains the `client_id` and
 // `client_secret`, among other things.
-let secret: oauth2::ApplicationSecret = Default::default();
-// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+let secret: yup_oauth2::ApplicationSecret = Default::default();
+// Instantiate the authenticator. It will choose a suitable authentication flow for you,
 // unless you replace  `None` with the desired Flow.
-// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = oauth2::InstalledFlowAuthenticator::builder(
-        secret,
-        oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-    ).build().await.unwrap();
-let mut hub = SmartDeviceManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+    secret,
+    yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+).build().await.unwrap();
+
+let client = hyper_util::client::legacy::Client::builder(
+    hyper_util::rt::TokioExecutor::new()
+)
+.build(
+    hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
+        .unwrap()
+        .https_or_http()
+        .enable_http1()
+        .build()
+);
+let mut hub = SmartDeviceManagement::new(client, auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
@@ -118,49 +129,49 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Result) enumeration as return value of
-the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+All errors produced by the system are provided either as [Result](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Result) enumeration as return value of
+the doit() methods, or handed as possibly intermediate results to either the
+[Hub Delegate](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
-When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
-Methods supporting uploads can do so using up to 2 different protocols: 
-*simple* and *resumable*. The distinctiveness of each is represented by customized 
+Methods supporting uploads can do so using up to 2 different protocols:
+*simple* and *resumable*. The distinctiveness of each is represented by customized
 `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::CallBuilder) before making the final `doit()` call. 
-Respective methods will be called to provide progress information, as well as determine whether the system should 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Delegate) to the
+[Method Builder](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::CallBuilder) before making the final `doit()` call.
+Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::RequestValue) and 
-[decodable](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::RequestValue) and
+[decodable](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-smartdevicemanagement1/5.0.5+20240616/google_smartdevicemanagement1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-smartdevicemanagement1/6.0.0+20240616/google_smartdevicemanagement1/common::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
@@ -176,7 +187,7 @@ generated `openapi` spec would be invalid.
 
 
 # License
-The **smartdevicemanagement1** library was generated by Sebastian Thiel, and is placed 
+The **smartdevicemanagement1** library was generated by Sebastian Thiel, and is placed
 under the *MIT* license.
 You can read the full text at the repository's [license file][repo-license].
 
