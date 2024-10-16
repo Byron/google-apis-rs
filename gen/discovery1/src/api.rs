@@ -1,27 +1,12 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
 // ############
-
-
-
 
 // ########
 // HUB ###
@@ -39,28 +24,39 @@ use crate::{client, client::GetToken, client::serde_with};
 /// extern crate google_discovery1 as discovery1;
 /// use discovery1::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use discovery1::{Discovery, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use discovery1::{Discovery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Discovery::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apis().get_rest("api", "version")
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -81,38 +77,37 @@ use crate::{client, client::GetToken, client::serde_with};
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Discovery<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct Discovery<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for Discovery<S> {}
+impl<C> common::Hub for Discovery<C> {}
 
-impl<'a, S> Discovery<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Discovery<S> {
+impl<'a, C> Discovery<C> {
+    pub fn new<A: 'static + common::GetToken>(client: common::Client<C>, auth: A) -> Discovery<C> {
         Discovery {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://www.googleapis.com/discovery/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn apis(&'a self) -> ApiMethods<'a, S> {
-        ApiMethods { hub: &self }
+    pub fn apis(&'a self) -> ApiMethods<'a, C> {
+        ApiMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -120,7 +115,7 @@ impl<'a, S> Discovery<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -128,701 +123,561 @@ impl<'a, S> Discovery<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list apis](ApiListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DirectoryList {
     /// Indicate the version of the Discovery API used to generate this doc.
-    #[serde(rename="discoveryVersion")]
-    
+    #[serde(rename = "discoveryVersion")]
     pub discovery_version: Option<String>,
     /// The individual directory entries. One entry per api/version pair.
-    
     pub items: Option<Vec<DirectoryListItems>>,
     /// The kind for this response.
-    
     pub kind: Option<String>,
 }
 
-impl client::ResponseResult for DirectoryList {}
-
+impl common::ResponseResult for DirectoryList {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct JsonSchema {
     /// A reference to another schema. The value of this property is the "id" of another schema.
-    #[serde(rename="$ref")]
-    
+    #[serde(rename = "$ref")]
     pub ref_: Option<String>,
     /// If this is a schema for an object, this property is the schema for any additional properties with dynamic keys on this object.
-    #[serde(rename="additionalProperties")]
-    
+    #[serde(rename = "additionalProperties")]
     pub additional_properties: Option<Option<Box<JsonSchema>>>,
     /// Additional information about this property.
-    
     pub annotations: Option<JsonSchemaAnnotations>,
     /// The default value of this property (if one exists).
-    
     pub default: Option<String>,
     /// Whether the parameter is deprecated.
-    
     pub deprecated: Option<bool>,
     /// A description of this object.
-    
     pub description: Option<String>,
     /// Values this parameter may take (if it is an enum).
-    #[serde(rename="enum")]
-    
+    #[serde(rename = "enum")]
     pub enum_: Option<Vec<String>>,
     /// The deprecation status for the enums. Each position maps to the corresponding value in the "enum" array.
-    #[serde(rename="enumDeprecated")]
-    
+    #[serde(rename = "enumDeprecated")]
     pub enum_deprecated: Option<Vec<bool>>,
     /// The descriptions for the enums. Each position maps to the corresponding value in the "enum" array.
-    #[serde(rename="enumDescriptions")]
-    
+    #[serde(rename = "enumDescriptions")]
     pub enum_descriptions: Option<Vec<String>>,
     /// An additional regular expression or key that helps constrain the value. For more details see: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.23
-    
     pub format: Option<String>,
     /// Unique identifier for this schema.
-    
     pub id: Option<String>,
     /// If this is a schema for an array, this property is the schema for each element in the array.
-    
     pub items: Option<Option<Box<JsonSchema>>>,
     /// Whether this parameter goes in the query or the path for REST requests.
-    
     pub location: Option<String>,
     /// The maximum value of this parameter.
-    
     pub maximum: Option<String>,
     /// The minimum value of this parameter.
-    
     pub minimum: Option<String>,
     /// The regular expression this parameter must conform to. Uses Java 6 regex format: http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html
-    
     pub pattern: Option<String>,
     /// If this is a schema for an object, list the schema for each property of this object.
-    
     pub properties: Option<HashMap<String, JsonSchema>>,
     /// The value is read-only, generated by the service. The value cannot be modified by the client. If the value is included in a POST, PUT, or PATCH request, it is ignored by the service.
-    #[serde(rename="readOnly")]
-    
+    #[serde(rename = "readOnly")]
     pub read_only: Option<bool>,
     /// Whether this parameter may appear multiple times.
-    
     pub repeated: Option<bool>,
     /// Whether the parameter is required.
-    
     pub required: Option<bool>,
     /// The value type for this schema. A list of values can be found here: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
     /// In a variant data type, the value of one property is used to determine how to interpret the entire entity. Its value must exist in a map of descriminant values to schema names.
-    
     pub variant: Option<JsonSchemaVariant>,
 }
 
-impl client::Part for JsonSchema {}
-
+impl common::Part for JsonSchema {}
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get rest apis](ApiGetRestCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestDescription {
     /// Authentication information.
-    
     pub auth: Option<RestDescriptionAuth>,
     /// [DEPRECATED] The base path for REST requests.
-    #[serde(rename="basePath")]
-    
+    #[serde(rename = "basePath")]
     pub base_path: Option<String>,
     /// [DEPRECATED] The base URL for REST requests.
-    #[serde(rename="baseUrl")]
-    
+    #[serde(rename = "baseUrl")]
     pub base_url: Option<String>,
     /// The path for REST batch requests.
-    #[serde(rename="batchPath")]
-    
+    #[serde(rename = "batchPath")]
     pub batch_path: Option<String>,
     /// Indicates how the API name should be capitalized and split into various parts. Useful for generating pretty class names.
-    #[serde(rename="canonicalName")]
-    
+    #[serde(rename = "canonicalName")]
     pub canonical_name: Option<String>,
     /// The description of this API.
-    
     pub description: Option<String>,
     /// Indicate the version of the Discovery API used to generate this doc.
-    #[serde(rename="discoveryVersion")]
-    
+    #[serde(rename = "discoveryVersion")]
     pub discovery_version: Option<String>,
     /// A link to human readable documentation for the API.
-    #[serde(rename="documentationLink")]
-    
+    #[serde(rename = "documentationLink")]
     pub documentation_link: Option<String>,
     /// A list of location-based endpoint objects for this API. Each object contains the endpoint URL, location, description and deprecation status.
-    
     pub endpoints: Option<Vec<RestDescriptionEndpoints>>,
     /// The ETag for this response.
-    
     pub etag: Option<String>,
     /// Enable exponential backoff for suitable methods in the generated clients.
-    #[serde(rename="exponentialBackoffDefault")]
-    
+    #[serde(rename = "exponentialBackoffDefault")]
     pub exponential_backoff_default: Option<bool>,
     /// A list of supported features for this API.
-    
     pub features: Option<Vec<String>>,
     /// Links to 16x16 and 32x32 icons representing the API.
-    
     pub icons: Option<RestDescriptionIcons>,
     /// The ID of this API.
-    
     pub id: Option<String>,
     /// The kind for this response.
-    
     pub kind: Option<String>,
     /// Labels for the status of this API, such as labs or deprecated.
-    
     pub labels: Option<Vec<String>>,
     /// API-level methods for this API.
-    
     pub methods: Option<HashMap<String, RestMethod>>,
     /// The name of this API.
-    
     pub name: Option<String>,
     /// The domain of the owner of this API. Together with the ownerName and a packagePath values, this can be used to generate a library for this API which would have a unique fully qualified name.
-    #[serde(rename="ownerDomain")]
-    
+    #[serde(rename = "ownerDomain")]
     pub owner_domain: Option<String>,
     /// The name of the owner of this API. See ownerDomain.
-    #[serde(rename="ownerName")]
-    
+    #[serde(rename = "ownerName")]
     pub owner_name: Option<String>,
     /// The package of the owner of this API. See ownerDomain.
-    #[serde(rename="packagePath")]
-    
+    #[serde(rename = "packagePath")]
     pub package_path: Option<String>,
     /// Common parameters that apply across all apis.
-    
     pub parameters: Option<HashMap<String, JsonSchema>>,
     /// The protocol described by this document.
-    
     pub protocol: Option<String>,
     /// The resources in this API.
-    
     pub resources: Option<HashMap<String, RestResource>>,
     /// The version of this API.
-    
     pub revision: Option<String>,
     /// The root URL under which all API services live.
-    #[serde(rename="rootUrl")]
-    
+    #[serde(rename = "rootUrl")]
     pub root_url: Option<String>,
     /// The schemas for this API.
-    
     pub schemas: Option<HashMap<String, JsonSchema>>,
     /// The base path for all REST requests.
-    #[serde(rename="servicePath")]
-    
+    #[serde(rename = "servicePath")]
     pub service_path: Option<String>,
     /// The title of this API.
-    
     pub title: Option<String>,
     /// The version of this API.
-    
     pub version: Option<String>,
     /// no description provided
-    
     pub version_module: Option<bool>,
 }
 
-impl client::ResponseResult for RestDescription {}
-
+impl common::ResponseResult for RestDescription {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestMethod {
     /// The API Version of this method, as passed in via the `X-Goog-Api-Version` header or `$apiVersion` query parameter.
-    #[serde(rename="apiVersion")]
-    
+    #[serde(rename = "apiVersion")]
     pub api_version: Option<String>,
     /// Whether this method is deprecated.
-    
     pub deprecated: Option<bool>,
     /// Description of this method.
-    
     pub description: Option<String>,
     /// Whether this method requires an ETag to be specified. The ETag is sent as an HTTP If-Match or If-None-Match header.
-    #[serde(rename="etagRequired")]
-    
+    #[serde(rename = "etagRequired")]
     pub etag_required: Option<bool>,
     /// The URI path of this REST method in (RFC 6570) format without level 2 features ({+var}). Supplementary to the path property.
-    #[serde(rename="flatPath")]
-    
+    #[serde(rename = "flatPath")]
     pub flat_path: Option<String>,
     /// HTTP method used by this method.
-    #[serde(rename="httpMethod")]
-    
+    #[serde(rename = "httpMethod")]
     pub http_method: Option<String>,
     /// A unique ID for this method. This property can be used to match methods between different versions of Discovery.
-    
     pub id: Option<String>,
     /// Media upload parameters.
-    #[serde(rename="mediaUpload")]
-    
+    #[serde(rename = "mediaUpload")]
     pub media_upload: Option<RestMethodMediaUpload>,
     /// Ordered list of required parameters, serves as a hint to clients on how to structure their method signatures. The array is ordered such that the "most-significant" parameter appears first.
-    #[serde(rename="parameterOrder")]
-    
+    #[serde(rename = "parameterOrder")]
     pub parameter_order: Option<Vec<String>>,
     /// Details for all parameters in this method.
-    
     pub parameters: Option<HashMap<String, JsonSchema>>,
     /// The URI path of this REST method. Should be used in conjunction with the basePath property at the api-level.
-    
     pub path: Option<String>,
     /// The schema for the request.
-    
     pub request: Option<RestMethodRequest>,
     /// The schema for the response.
-    
     pub response: Option<RestMethodResponse>,
     /// OAuth 2.0 scopes applicable to this method.
-    
     pub scopes: Option<Vec<String>>,
     /// Whether this method supports media downloads.
-    #[serde(rename="supportsMediaDownload")]
-    
+    #[serde(rename = "supportsMediaDownload")]
     pub supports_media_download: Option<bool>,
     /// Whether this method supports media uploads.
-    #[serde(rename="supportsMediaUpload")]
-    
+    #[serde(rename = "supportsMediaUpload")]
     pub supports_media_upload: Option<bool>,
     /// Whether this method supports subscriptions.
-    #[serde(rename="supportsSubscription")]
-    
+    #[serde(rename = "supportsSubscription")]
     pub supports_subscription: Option<bool>,
     /// Indicates that downloads from this method should use the download service URL (i.e. "/download"). Only applies if the method supports media download.
-    #[serde(rename="useMediaDownloadService")]
-    
+    #[serde(rename = "useMediaDownloadService")]
     pub use_media_download_service: Option<bool>,
 }
 
-impl client::Part for RestMethod {}
-
+impl common::Part for RestMethod {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestResource {
     /// Whether this resource is deprecated.
-    
     pub deprecated: Option<bool>,
     /// Methods on this resource.
-    
     pub methods: Option<HashMap<String, RestMethod>>,
     /// Sub-resources on this resource.
-    
     pub resources: Option<HashMap<String, RestResource>>,
 }
 
-impl client::Part for RestResource {}
-
+impl common::Part for RestResource {}
 
 /// The individual directory entries. One entry per api/version pair.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DirectoryListItems {
     /// The description of this API.
-    
     pub description: Option<String>,
     /// A link to the discovery document.
-    #[serde(rename="discoveryLink")]
-    
+    #[serde(rename = "discoveryLink")]
     pub discovery_link: Option<String>,
     /// The URL for the discovery REST document.
-    #[serde(rename="discoveryRestUrl")]
-    
+    #[serde(rename = "discoveryRestUrl")]
     pub discovery_rest_url: Option<String>,
     /// A link to human readable documentation for the API.
-    #[serde(rename="documentationLink")]
-    
+    #[serde(rename = "documentationLink")]
     pub documentation_link: Option<String>,
     /// Links to 16x16 and 32x32 icons representing the API.
-    
     pub icons: Option<DirectoryListItemsIcons>,
     /// The id of this API.
-    
     pub id: Option<String>,
     /// The kind for this response.
-    
     pub kind: Option<String>,
     /// Labels for the status of this API, such as labs or deprecated.
-    
     pub labels: Option<Vec<String>>,
     /// The name of the API.
-    
     pub name: Option<String>,
     /// True if this version is the preferred version to use.
-    
     pub preferred: Option<bool>,
     /// The title of this API.
-    
     pub title: Option<String>,
     /// The version of the API.
-    
     pub version: Option<String>,
 }
 
-impl client::NestedType for DirectoryListItems {}
-impl client::Part for DirectoryListItems {}
-
+impl common::NestedType for DirectoryListItems {}
+impl common::Part for DirectoryListItems {}
 
 /// Links to 16x16 and 32x32 icons representing the API.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DirectoryListItemsIcons {
     /// The URL of the 16x16 icon.
-    
     pub x16: Option<String>,
     /// The URL of the 32x32 icon.
-    
     pub x32: Option<String>,
 }
 
-impl client::NestedType for DirectoryListItemsIcons {}
-impl client::Part for DirectoryListItemsIcons {}
-
+impl common::NestedType for DirectoryListItemsIcons {}
+impl common::Part for DirectoryListItemsIcons {}
 
 /// Additional information about this property.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct JsonSchemaAnnotations {
     /// A list of methods for which this property is required on requests.
-    
     pub required: Option<Vec<String>>,
 }
 
-impl client::NestedType for JsonSchemaAnnotations {}
-impl client::Part for JsonSchemaAnnotations {}
-
+impl common::NestedType for JsonSchemaAnnotations {}
+impl common::Part for JsonSchemaAnnotations {}
 
 /// In a variant data type, the value of one property is used to determine how to interpret the entire entity. Its value must exist in a map of descriminant values to schema names.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct JsonSchemaVariant {
     /// The name of the type discriminant property.
-    
     pub discriminant: Option<String>,
     /// The map of discriminant value to schema to use for parsing..
-    
     pub map: Option<Vec<JsonSchemaVariantMap>>,
 }
 
-impl client::NestedType for JsonSchemaVariant {}
-impl client::Part for JsonSchemaVariant {}
-
+impl common::NestedType for JsonSchemaVariant {}
+impl common::Part for JsonSchemaVariant {}
 
 /// The map of discriminant value to schema to use for parsing..
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct JsonSchemaVariantMap {
     /// no description provided
-    #[serde(rename="$ref")]
-    
+    #[serde(rename = "$ref")]
     pub ref_: Option<String>,
     /// no description provided
-    
     pub type_value: Option<String>,
 }
 
-impl client::NestedType for JsonSchemaVariantMap {}
-impl client::Part for JsonSchemaVariantMap {}
-
+impl common::NestedType for JsonSchemaVariantMap {}
+impl common::Part for JsonSchemaVariantMap {}
 
 /// Authentication information.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestDescriptionAuth {
     /// OAuth 2.0 authentication information.
-    
     pub oauth2: Option<RestDescriptionAuthOauth2>,
 }
 
-impl client::NestedType for RestDescriptionAuth {}
-impl client::Part for RestDescriptionAuth {}
-
+impl common::NestedType for RestDescriptionAuth {}
+impl common::Part for RestDescriptionAuth {}
 
 /// OAuth 2.0 authentication information.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestDescriptionAuthOauth2 {
     /// Available OAuth 2.0 scopes.
-    
     pub scopes: Option<HashMap<String, RestDescriptionAuthOauth2Scopes>>,
 }
 
-impl client::NestedType for RestDescriptionAuthOauth2 {}
-impl client::Part for RestDescriptionAuthOauth2 {}
-
+impl common::NestedType for RestDescriptionAuthOauth2 {}
+impl common::Part for RestDescriptionAuthOauth2 {}
 
 /// The scope value.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestDescriptionAuthOauth2Scopes {
     /// Description of scope.
-    
     pub description: Option<String>,
 }
 
-impl client::NestedType for RestDescriptionAuthOauth2Scopes {}
-impl client::Part for RestDescriptionAuthOauth2Scopes {}
-
+impl common::NestedType for RestDescriptionAuthOauth2Scopes {}
+impl common::Part for RestDescriptionAuthOauth2Scopes {}
 
 /// A single endpoint object
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestDescriptionEndpoints {
     /// Whether this endpoint is deprecated
-    
     pub deprecated: Option<bool>,
     /// A string describing the host designated by the URL
-    
     pub description: Option<String>,
     /// The URL of the endpoint target host
-    #[serde(rename="endpointUrl")]
-    
+    #[serde(rename = "endpointUrl")]
     pub endpoint_url: Option<String>,
     /// The location of the endpoint
-    
     pub location: Option<String>,
 }
 
-impl client::NestedType for RestDescriptionEndpoints {}
-impl client::Part for RestDescriptionEndpoints {}
-
+impl common::NestedType for RestDescriptionEndpoints {}
+impl common::Part for RestDescriptionEndpoints {}
 
 /// Links to 16x16 and 32x32 icons representing the API.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestDescriptionIcons {
     /// The URL of the 16x16 icon.
-    
     pub x16: Option<String>,
     /// The URL of the 32x32 icon.
-    
     pub x32: Option<String>,
 }
 
-impl client::NestedType for RestDescriptionIcons {}
-impl client::Part for RestDescriptionIcons {}
-
+impl common::NestedType for RestDescriptionIcons {}
+impl common::Part for RestDescriptionIcons {}
 
 /// Media upload parameters.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestMethodMediaUpload {
     /// MIME Media Ranges for acceptable media uploads to this method.
-    
     pub accept: Option<Vec<String>>,
     /// Maximum size of a media upload, such as "1MB", "2GB" or "3TB".
-    #[serde(rename="maxSize")]
-    
+    #[serde(rename = "maxSize")]
     pub max_size: Option<String>,
     /// Supported upload protocols.
-    
     pub protocols: Option<RestMethodMediaUploadProtocols>,
 }
 
-impl client::NestedType for RestMethodMediaUpload {}
-impl client::Part for RestMethodMediaUpload {}
-
+impl common::NestedType for RestMethodMediaUpload {}
+impl common::Part for RestMethodMediaUpload {}
 
 /// Supported upload protocols.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestMethodMediaUploadProtocols {
     /// Supports the Resumable Media Upload protocol.
-    
     pub resumable: Option<RestMethodMediaUploadProtocolsResumable>,
     /// Supports uploading as a single HTTP request.
-    
     pub simple: Option<RestMethodMediaUploadProtocolsSimple>,
 }
 
-impl client::NestedType for RestMethodMediaUploadProtocols {}
-impl client::Part for RestMethodMediaUploadProtocols {}
-
+impl common::NestedType for RestMethodMediaUploadProtocols {}
+impl common::Part for RestMethodMediaUploadProtocols {}
 
 /// Supports the Resumable Media Upload protocol.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestMethodMediaUploadProtocolsResumable {
     /// True if this endpoint supports uploading multipart media.
-    
     pub multipart: Option<bool>,
     /// The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level.
-    
     pub path: Option<String>,
 }
 
-impl client::NestedType for RestMethodMediaUploadProtocolsResumable {}
-impl client::Part for RestMethodMediaUploadProtocolsResumable {}
-
+impl common::NestedType for RestMethodMediaUploadProtocolsResumable {}
+impl common::Part for RestMethodMediaUploadProtocolsResumable {}
 
 /// Supports uploading as a single HTTP request.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestMethodMediaUploadProtocolsSimple {
     /// True if this endpoint supports upload multipart media.
-    
     pub multipart: Option<bool>,
     /// The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level.
-    
     pub path: Option<String>,
 }
 
-impl client::NestedType for RestMethodMediaUploadProtocolsSimple {}
-impl client::Part for RestMethodMediaUploadProtocolsSimple {}
-
+impl common::NestedType for RestMethodMediaUploadProtocolsSimple {}
+impl common::Part for RestMethodMediaUploadProtocolsSimple {}
 
 /// The schema for the request.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestMethodRequest {
     /// Schema ID for the request schema.
-    #[serde(rename="$ref")]
-    
+    #[serde(rename = "$ref")]
     pub ref_: Option<String>,
     /// parameter name.
-    #[serde(rename="parameterName")]
-    
+    #[serde(rename = "parameterName")]
     pub parameter_name: Option<String>,
 }
 
-impl client::NestedType for RestMethodRequest {}
-impl client::Part for RestMethodRequest {}
-
+impl common::NestedType for RestMethodRequest {}
+impl common::Part for RestMethodRequest {}
 
 /// The schema for the response.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RestMethodResponse {
     /// Schema ID for the response schema.
-    #[serde(rename="$ref")]
-    
+    #[serde(rename = "$ref")]
     pub ref_: Option<String>,
 }
 
-impl client::NestedType for RestMethodResponse {}
-impl client::Part for RestMethodResponse {}
-
-
+impl common::NestedType for RestMethodResponse {}
+impl common::Part for RestMethodResponse {}
 
 // ###################
 // MethodBuilders ###
@@ -839,42 +694,53 @@ impl client::Part for RestMethodResponse {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_discovery1 as discovery1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use discovery1::{Discovery, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use discovery1::{Discovery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Discovery::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_rest(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.apis();
 /// # }
 /// ```
-pub struct ApiMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Discovery<S>,
+pub struct ApiMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Discovery<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for ApiMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for ApiMethods<'a, C> {}
 
-impl<'a, S> ApiMethods<'a, S> {
-    
+impl<'a, C> ApiMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieve the description of a particular version of an api.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `api` - The name of the API.
     /// * `version` - The version of the API.
-    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a, S> {
+    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a, C> {
         ApiGetRestCall {
             hub: self.hub,
             _api: api.to_string(),
@@ -883,11 +749,11 @@ impl<'a, S> ApiMethods<'a, S> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieve the list of APIs supported at this endpoint.
-    pub fn list(&self) -> ApiListCall<'a, S> {
+    pub fn list(&self) -> ApiListCall<'a, C> {
         ApiListCall {
             hub: self.hub,
             _preferred: Default::default(),
@@ -897,10 +763,6 @@ impl<'a, S> ApiMethods<'a, S> {
         }
     }
 }
-
-
-
-
 
 // ###################
 // CallBuilders   ###
@@ -920,15 +782,26 @@ impl<'a, S> ApiMethods<'a, S> {
 /// # extern crate hyper_rustls;
 /// # extern crate google_discovery1 as discovery1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use discovery1::{Discovery, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use discovery1::{Discovery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Discovery::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -936,43 +809,42 @@ impl<'a, S> ApiMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApiGetRestCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Discovery<S>,
+pub struct ApiGetRestCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Discovery<C>,
     _api: String,
     _version: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, S> client::CallBuilder for ApiGetRestCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ApiGetRestCall<'a, C> {}
 
-impl<'a, S> ApiGetRestCall<'a, S>
+impl<'a, C> ApiGetRestCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, RestDescription)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, RestDescription)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "discovery.apis.getRest",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "discovery.apis.getRest",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "api", "version"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -985,6 +857,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "apis/{api}/{version}/rest";
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{api}", "api"), ("{version}", "version")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -995,8 +868,6 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1006,65 +877,65 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
-
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// The name of the API.
     ///
@@ -1072,7 +943,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a, S> {
+    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a, C> {
         self._api = new_value.to_string();
         self
     }
@@ -1082,19 +953,19 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a, S> {
+    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a, C> {
         self._version = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiGetRestCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> ApiGetRestCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1115,14 +986,15 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
-
 }
-
 
 /// Retrieve the list of APIs supported at this endpoint.
 ///
@@ -1138,15 +1010,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_discovery1 as discovery1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use discovery1::{Discovery, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Discovery::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use discovery1::{Discovery, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Discovery::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1156,43 +1039,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApiListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Discovery<S>,
+pub struct ApiListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Discovery<C>,
     _preferred: Option<bool>,
     _name: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, S> client::CallBuilder for ApiListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ApiListCall<'a, C> {}
 
-impl<'a, S> ApiListCall<'a, S>
+impl<'a, C> ApiListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DirectoryList)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, DirectoryList)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "discovery.apis.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "discovery.apis.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "preferred", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1209,10 +1091,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "apis";
 
-
         let url = params.parse_with_url(&url);
-
-
 
         loop {
             let mut req_result = {
@@ -1223,89 +1102,89 @@ where
                     .uri(url.as_str())
                     .header(USER_AGENT, self.hub._user_agent.clone());
 
-
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Return only the preferred version of an API.
     ///
     /// Sets the *preferred* query property to the given value.
-    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a, S> {
+    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a, C> {
         self._preferred = Some(new_value);
         self
     }
     /// Only include APIs with the given name.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ApiListCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> ApiListCall<'a, C> {
         self._name = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> ApiListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1326,12 +1205,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
-
 }
-
-

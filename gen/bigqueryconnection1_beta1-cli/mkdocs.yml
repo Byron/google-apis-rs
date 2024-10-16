@@ -1,4 +1,4 @@
-site_name: BigQuery Connection Service v5.0.5+20240616
+site_name: BigQuery Connection Service v6.0.0+20240616
 site_url: http://byron.github.io/google-apis-rs/google-bigqueryconnection1_beta1-cli
 site_description: A complete library to interact with BigQuery Connection Service (protocol v1beta1)
 
@@ -23,4 +23,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

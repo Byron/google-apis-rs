@@ -6,54 +6,55 @@
 #[macro_use]
 extern crate clap;
 
-use std::env;
-use std::io::{self, Write};
-use clap::{App, SubCommand, Arg};
+use std::io::Write;
 
-use google_firebaseappcheck1_beta::{api, Error, oauth2, client::chrono, FieldMask};
+use clap::{App, Arg, SubCommand};
 
+use google_firebaseappcheck1_beta::{api, yup_oauth2, Error};
 
-use google_clis_common as client;
+use google_apis_common as apis_common;
+use google_clis_common as common;
 
-use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
-
-use std::default::Default;
-use std::error::Error as StdError;
 use std::str::FromStr;
 
-use serde_json as json;
 use clap::ArgMatches;
-use http::Uri;
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
-use tower_service;
+use http_body_util::BodyExt;
+
+use common::{
+    arg_from_str, calltype_from_str, input_file_from_opts, input_mime_from_opts, parse_kv_arg,
+    remove_json_null_values, writer_from_opts, CLIError, CallType, ComplexType, FieldCursor,
+    FieldError, InvalidOptionsError, JsonType, JsonTypeInfo, UploadProtocol,
+};
 
 enum DoitError {
-    IoError(String, io::Error),
+    IoError(String, std::io::Error),
     ApiError(Error),
 }
 
-struct Engine<'n, S> {
+struct Engine<'n, C> {
     opt: ArgMatches<'n>,
-    hub: api::Firebaseappcheck<S>,
+    hub: api::Firebaseappcheck<C>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
-
-impl<'n, S> Engine<'n, S>
+impl<'n, C> Engine<'n, C>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: apis_common::Connector,
 {
-    async fn _jwks_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
+    async fn _jwks_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut call = self.hub.jwks().get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -61,15 +62,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -79,22 +85,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -102,13 +120,21 @@ where
         }
     }
 
-    async fn _oauth_clients_exchange_app_attest_assertion(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _oauth_clients_exchange_app_attest_assertion(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -122,26 +148,72 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "artifact" => Some(("artifact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "assertion" => Some(("assertion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "challenge" => Some(("challenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact", "assertion", "challenge", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "artifact" => Some((
+                    "artifact",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assertion" => Some((
+                    "assertion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "challenge" => Some((
+                    "challenge",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["artifact", "assertion", "challenge", "limited-use"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.oauth_clients().exchange_app_attest_assertion(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .oauth_clients()
+            .exchange_app_attest_assertion(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -149,15 +221,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -167,22 +244,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -190,13 +279,21 @@ where
         }
     }
 
-    async fn _oauth_clients_exchange_app_attest_attestation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _oauth_clients_exchange_app_attest_attestation(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -210,26 +307,77 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "attestation-statement" => Some(("attestationStatement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "challenge" => Some(("challenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "key-id" => Some(("keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attestation-statement", "challenge", "key-id", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "attestation-statement" => Some((
+                    "attestationStatement",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "challenge" => Some((
+                    "challenge",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "key-id" => Some((
+                    "keyId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "attestation-statement",
+                            "challenge",
+                            "key-id",
+                            "limited-use",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.oauth_clients().exchange_app_attest_attestation(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .oauth_clients()
+            .exchange_app_attest_attestation(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -237,15 +385,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -255,22 +408,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -278,13 +443,21 @@ where
         }
     }
 
-    async fn _oauth_clients_exchange_debug_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _oauth_clients_exchange_debug_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -298,24 +471,56 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "debug-token" => Some(("debugToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["debug-token", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "debug-token" => Some((
+                    "debugToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["debug-token", "limited-use"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.oauth_clients().exchange_debug_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .oauth_clients()
+            .exchange_debug_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -323,15 +528,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -341,22 +551,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -364,13 +586,21 @@ where
         }
     }
 
-    async fn _oauth_clients_generate_app_attest_challenge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _oauth_clients_generate_app_attest_challenge(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -384,22 +614,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.oauth_clients().generate_app_attest_challenge(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .oauth_clients()
+            .generate_app_attest_challenge(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -407,15 +656,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -425,22 +679,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -448,30 +714,47 @@ where
         }
     }
 
-    async fn _projects_apps_app_attest_config_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_app_attest_config_batch_get(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_app_attest_config_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_app_attest_config_batch_get(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["names"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["names"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -481,22 +764,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -504,10 +799,22 @@ where
         }
     }
 
-    async fn _projects_apps_app_attest_config_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_app_attest_config_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_app_attest_config_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_app_attest_config_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -515,15 +822,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -533,22 +845,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -556,13 +880,21 @@ where
         }
     }
 
-    async fn _projects_apps_app_attest_config_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_app_attest_config_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -576,44 +908,84 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token-ttl" => Some(("tokenTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "token-ttl"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token-ttl" => Some((
+                    "tokenTtl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "token-ttl"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaAppAttestConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_app_attest_config_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaAppAttestConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_app_attest_config_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -623,22 +995,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -646,13 +1030,21 @@ where
         }
     }
 
-    async fn _projects_apps_debug_tokens_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_debug_tokens_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -666,26 +1058,72 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "token", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token" => Some((
+                    "token",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["display-name", "name", "token", "update-time"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaDebugToken = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_debug_tokens_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaDebugToken =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_debug_tokens_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -693,15 +1131,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -711,22 +1154,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -734,10 +1189,22 @@ where
         }
     }
 
-    async fn _projects_apps_debug_tokens_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_debug_tokens_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_debug_tokens_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_debug_tokens_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -745,15 +1212,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -763,22 +1235,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -786,10 +1270,22 @@ where
         }
     }
 
-    async fn _projects_apps_debug_tokens_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_debug_tokens_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_debug_tokens_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_debug_tokens_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -797,15 +1293,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -815,22 +1316,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -838,33 +1351,54 @@ where
         }
     }
 
-    async fn _projects_apps_debug_tokens_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_debug_tokens_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_debug_tokens_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_debug_tokens_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -874,22 +1408,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -897,13 +1443,21 @@ where
         }
     }
 
-    async fn _projects_apps_debug_tokens_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_debug_tokens_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -917,46 +1471,101 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token" => Some(("token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "token", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token" => Some((
+                    "token",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["display-name", "name", "token", "update-time"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaDebugToken = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_debug_tokens_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaDebugToken =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_debug_tokens_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -966,22 +1575,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -989,30 +1610,47 @@ where
         }
     }
 
-    async fn _projects_apps_device_check_config_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_device_check_config_batch_get(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_device_check_config_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_device_check_config_batch_get(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["names"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["names"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1022,22 +1660,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1045,10 +1695,22 @@ where
         }
     }
 
-    async fn _projects_apps_device_check_config_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_device_check_config_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_device_check_config_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_device_check_config_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1056,15 +1718,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1074,22 +1741,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1097,13 +1776,21 @@ where
         }
     }
 
-    async fn _projects_apps_device_check_config_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_device_check_config_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1117,47 +1804,114 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "key-id" => Some(("keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "private-key" => Some(("privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "private-key-set" => Some(("privateKeySet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "token-ttl" => Some(("tokenTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["key-id", "name", "private-key", "private-key-set", "token-ttl"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "key-id" => Some((
+                    "keyId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "private-key" => Some((
+                    "privateKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "private-key-set" => Some((
+                    "privateKeySet",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token-ttl" => Some((
+                    "tokenTtl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "key-id",
+                            "name",
+                            "private-key",
+                            "private-key-set",
+                            "token-ttl",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaDeviceCheckConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_device_check_config_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaDeviceCheckConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_device_check_config_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1167,22 +1921,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1190,13 +1956,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_app_attest_assertion(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_app_attest_assertion(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1210,26 +1984,72 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "artifact" => Some(("artifact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "assertion" => Some(("assertion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "challenge" => Some(("challenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact", "assertion", "challenge", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "artifact" => Some((
+                    "artifact",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "assertion" => Some((
+                    "assertion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "challenge" => Some((
+                    "challenge",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["artifact", "assertion", "challenge", "limited-use"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_app_attest_assertion(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAssertionRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_app_attest_assertion(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1237,15 +2057,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1255,22 +2080,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1278,13 +2115,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_app_attest_attestation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_app_attest_attestation(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1298,26 +2143,77 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "attestation-statement" => Some(("attestationStatement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "challenge" => Some(("challenge", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "key-id" => Some(("keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attestation-statement", "challenge", "key-id", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "attestation-statement" => Some((
+                    "attestationStatement",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "challenge" => Some((
+                    "challenge",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "key-id" => Some((
+                    "keyId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "attestation-statement",
+                            "challenge",
+                            "key-id",
+                            "limited-use",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_app_attest_attestation(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeAppAttestAttestationRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_app_attest_attestation(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1325,15 +2221,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1343,22 +2244,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1366,13 +2279,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_custom_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_custom_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1386,24 +2307,56 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "custom-token" => Some(("customToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-token", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "custom-token" => Some((
+                    "customToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["custom-token", "limited-use"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_custom_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeCustomTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_custom_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1411,15 +2364,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1429,22 +2387,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1452,13 +2422,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_debug_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_debug_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1472,24 +2450,56 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "debug-token" => Some(("debugToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["debug-token", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "debug-token" => Some((
+                    "debugToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["debug-token", "limited-use"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_debug_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeDebugTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_debug_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1497,15 +2507,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1515,22 +2530,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1538,13 +2565,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_device_check_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_device_check_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1558,24 +2593,56 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "device-token" => Some(("deviceToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["device-token", "limited-use"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "device-token" => Some((
+                    "deviceToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["device-token", "limited-use"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_device_check_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeDeviceCheckTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_device_check_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1583,15 +2650,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1601,22 +2673,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1624,13 +2708,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_play_integrity_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_play_integrity_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1644,24 +2736,58 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "play-integrity-token" => Some(("playIntegrityToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["limited-use", "play-integrity-token"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "play-integrity-token" => Some((
+                    "playIntegrityToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["limited-use", "play-integrity-token"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangePlayIntegrityTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_play_integrity_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangePlayIntegrityTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_play_integrity_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1669,15 +2795,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1687,22 +2818,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1710,13 +2853,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_recaptcha_enterprise_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_recaptcha_enterprise_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1730,24 +2881,58 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "recaptcha-enterprise-token" => Some(("recaptchaEnterpriseToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["limited-use", "recaptcha-enterprise-token"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "recaptcha-enterprise-token" => Some((
+                    "recaptchaEnterpriseToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["limited-use", "recaptcha-enterprise-token"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_recaptcha_enterprise_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeRecaptchaEnterpriseTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_recaptcha_enterprise_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1755,15 +2940,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1773,22 +2963,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1796,13 +2998,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_recaptcha_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_recaptcha_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1816,23 +3026,48 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "recaptcha-token" => Some(("recaptchaToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["recaptcha-token"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "recaptcha-token" => Some((
+                    "recaptchaToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["recaptcha-token"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_recaptcha_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeRecaptchaTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_recaptcha_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1840,15 +3075,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1858,22 +3098,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1881,13 +3133,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_recaptcha_v3_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_recaptcha_v3_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1901,24 +3161,56 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "limited-use" => Some(("limitedUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "recaptcha-v3-token" => Some(("recaptchaV3Token", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["limited-use", "recaptcha-v3-token"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "limited-use" => Some((
+                    "limitedUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "recaptcha-v3-token" => Some((
+                    "recaptchaV3Token",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["limited-use", "recaptcha-v3-token"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeRecaptchaV3TokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_recaptcha_v3_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeRecaptchaV3TokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_recaptcha_v3_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1926,15 +3218,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1944,22 +3241,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1967,13 +3276,21 @@ where
         }
     }
 
-    async fn _projects_apps_exchange_safety_net_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_exchange_safety_net_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1987,23 +3304,48 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "safety-net-token" => Some(("safetyNetToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["safety-net-token"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "safety-net-token" => Some((
+                    "safetyNetToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["safety-net-token"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_exchange_safety_net_token(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaExchangeSafetyNetTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_exchange_safety_net_token(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2011,15 +3353,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2029,22 +3376,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2052,13 +3411,21 @@ where
         }
     }
 
-    async fn _projects_apps_generate_app_attest_challenge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_generate_app_attest_challenge(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2072,22 +3439,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_generate_app_attest_challenge(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaGenerateAppAttestChallengeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_generate_app_attest_challenge(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2095,15 +3481,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2113,22 +3504,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2136,13 +3539,21 @@ where
         }
     }
 
-    async fn _projects_apps_generate_play_integrity_challenge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_generate_play_integrity_challenge(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2156,22 +3567,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaGeneratePlayIntegrityChallengeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_generate_play_integrity_challenge(request, opt.value_of("app").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaGeneratePlayIntegrityChallengeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_generate_play_integrity_challenge(request, opt.value_of("app").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2179,15 +3609,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2197,22 +3632,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2220,30 +3667,47 @@ where
         }
     }
 
-    async fn _projects_apps_play_integrity_config_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_play_integrity_config_batch_get(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_play_integrity_config_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_play_integrity_config_batch_get(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["names"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["names"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2253,22 +3717,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2276,10 +3752,22 @@ where
         }
     }
 
-    async fn _projects_apps_play_integrity_config_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_play_integrity_config_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_play_integrity_config_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_play_integrity_config_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2287,15 +3775,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2305,22 +3798,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2328,13 +3833,21 @@ where
         }
     }
 
-    async fn _projects_apps_play_integrity_config_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_play_integrity_config_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2348,44 +3861,84 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token-ttl" => Some(("tokenTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "token-ttl"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token-ttl" => Some((
+                    "tokenTtl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "token-ttl"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaPlayIntegrityConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_play_integrity_config_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaPlayIntegrityConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_play_integrity_config_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2395,22 +3948,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2418,30 +3983,47 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_config_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_recaptcha_config_batch_get(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_recaptcha_config_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_config_batch_get(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["names"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["names"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2451,22 +4033,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2474,10 +4068,22 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_config_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_recaptcha_config_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_recaptcha_config_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_config_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2485,15 +4091,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2503,22 +4114,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2526,13 +4149,21 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_config_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_recaptcha_config_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2546,46 +4177,101 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-secret" => Some(("siteSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-secret-set" => Some(("siteSecretSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "token-ttl" => Some(("tokenTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "site-secret", "site-secret-set", "token-ttl"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "site-secret" => Some((
+                    "siteSecret",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "site-secret-set" => Some((
+                    "siteSecretSet",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token-ttl" => Some((
+                    "tokenTtl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["name", "site-secret", "site-secret-set", "token-ttl"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaRecaptchaConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_recaptcha_config_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaRecaptchaConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_config_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2595,22 +4281,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2618,30 +4316,47 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_enterprise_config_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_recaptcha_enterprise_config_batch_get(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_recaptcha_enterprise_config_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_enterprise_config_batch_get(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["names"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["names"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2651,22 +4366,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2674,10 +4401,22 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_enterprise_config_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_recaptcha_enterprise_config_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_recaptcha_enterprise_config_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_enterprise_config_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2685,15 +4424,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2703,22 +4447,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2726,13 +4482,21 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_enterprise_config_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_recaptcha_enterprise_config_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2746,45 +4510,92 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-key" => Some(("siteKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token-ttl" => Some(("tokenTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "site-key", "token-ttl"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "site-key" => Some((
+                    "siteKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token-ttl" => Some((
+                    "tokenTtl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["name", "site-key", "token-ttl"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_recaptcha_enterprise_config_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaRecaptchaEnterpriseConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_enterprise_config_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2794,22 +4605,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2817,30 +4640,47 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_v3_config_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_recaptcha_v3_config_batch_get(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_recaptcha_v3_config_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_v3_config_batch_get(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["names"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["names"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2850,22 +4690,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2873,10 +4725,22 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_v3_config_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_recaptcha_v3_config_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_recaptcha_v3_config_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_v3_config_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2884,15 +4748,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2902,22 +4771,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2925,13 +4806,21 @@ where
         }
     }
 
-    async fn _projects_apps_recaptcha_v3_config_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_recaptcha_v3_config_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2945,46 +4834,101 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-secret" => Some(("siteSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "site-secret-set" => Some(("siteSecretSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "token-ttl" => Some(("tokenTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "site-secret", "site-secret-set", "token-ttl"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "site-secret" => Some((
+                    "siteSecret",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "site-secret-set" => Some((
+                    "siteSecretSet",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token-ttl" => Some((
+                    "tokenTtl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["name", "site-secret", "site-secret-set", "token-ttl"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaRecaptchaV3Config = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_recaptcha_v3_config_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaRecaptchaV3Config =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_recaptcha_v3_config_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2994,22 +4938,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3017,30 +4973,47 @@ where
         }
     }
 
-    async fn _projects_apps_safety_net_config_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_safety_net_config_batch_get(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_safety_net_config_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_safety_net_config_batch_get(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "names" => {
                     call = call.add_names(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["names"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["names"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3050,22 +5023,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3073,10 +5058,22 @@ where
         }
     }
 
-    async fn _projects_apps_safety_net_config_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().apps_safety_net_config_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_apps_safety_net_config_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .apps_safety_net_config_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3084,15 +5081,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3102,22 +5104,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3125,13 +5139,21 @@ where
         }
     }
 
-    async fn _projects_apps_safety_net_config_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_apps_safety_net_config_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3145,44 +5167,84 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "token-ttl" => Some(("tokenTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "token-ttl"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "token-ttl" => Some((
+                    "tokenTtl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "token-ttl"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaSafetyNetConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().apps_safety_net_config_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaSafetyNetConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .apps_safety_net_config_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3192,22 +5254,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3215,13 +5289,21 @@ where
         }
     }
 
-    async fn _projects_services_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_services_batch_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3235,23 +5317,48 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["update-mask"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["update-mask"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().services_batch_update(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaBatchUpdateServicesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .services_batch_update(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3259,15 +5366,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3277,22 +5389,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3300,10 +5424,22 @@ where
         }
     }
 
-    async fn _projects_services_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().services_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_services_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .services_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3311,15 +5447,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3329,22 +5470,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3352,33 +5505,54 @@ where
         }
     }
 
-    async fn _projects_services_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().services_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_services_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .services_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3388,22 +5562,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3411,13 +5597,21 @@ where
         }
     }
 
-    async fn _projects_services_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_services_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3431,46 +5625,101 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "enforcement-mode" => Some(("enforcementMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enforcement-mode", "etag", "name", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "enforcement-mode" => Some((
+                    "enforcementMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["enforcement-mode", "etag", "name", "update-time"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaService = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().services_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaService =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .services_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3480,22 +5729,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3503,13 +5764,21 @@ where
         }
     }
 
-    async fn _projects_services_resource_policies_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_services_resource_policies_batch_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3523,23 +5792,48 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["update-mask"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["update-mask"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaBatchUpdateResourcePoliciesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().services_resource_policies_batch_update(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaBatchUpdateResourcePoliciesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .services_resource_policies_batch_update(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3547,15 +5841,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3565,22 +5864,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3588,13 +5899,21 @@ where
         }
     }
 
-    async fn _projects_services_resource_policies_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_services_resource_policies_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3608,27 +5927,85 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "enforcement-mode" => Some(("enforcementMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "target-resource" => Some(("targetResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enforcement-mode", "etag", "name", "target-resource", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "enforcement-mode" => Some((
+                    "enforcementMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "target-resource" => Some((
+                    "targetResource",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "enforcement-mode",
+                            "etag",
+                            "name",
+                            "target-resource",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaResourcePolicy = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().services_resource_policies_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaResourcePolicy =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .services_resource_policies_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3636,15 +6013,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3654,22 +6036,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3677,30 +6071,47 @@ where
         }
     }
 
-    async fn _projects_services_resource_policies_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().services_resource_policies_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_services_resource_policies_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .services_resource_policies_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "etag" => {
                     call = call.etag(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["etag"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["etag"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3710,22 +6121,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3733,10 +6156,22 @@ where
         }
     }
 
-    async fn _projects_services_resource_policies_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().services_resource_policies_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_services_resource_policies_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .services_resource_policies_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3744,15 +6179,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3762,22 +6202,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3785,36 +6237,57 @@ where
         }
     }
 
-    async fn _projects_services_resource_policies_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().services_resource_policies_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_services_resource_policies_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .services_resource_policies_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3824,22 +6297,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3847,13 +6332,21 @@ where
         }
     }
 
-    async fn _projects_services_resource_policies_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_services_resource_policies_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3867,47 +6360,114 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "enforcement-mode" => Some(("enforcementMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "target-resource" => Some(("targetResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["enforcement-mode", "etag", "name", "target-resource", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "enforcement-mode" => Some((
+                    "enforcementMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "etag" => Some((
+                    "etag",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "target-resource" => Some((
+                    "targetResource",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "enforcement-mode",
+                            "etag",
+                            "name",
+                            "target-resource",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaResourcePolicy = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().services_resource_policies_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaResourcePolicy =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .services_resource_policies_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3917,22 +6477,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3940,13 +6512,21 @@ where
         }
     }
 
-    async fn _projects_verify_app_check_token(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_verify_app_check_token(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3960,23 +6540,48 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "app-check-token" => Some(("appCheckToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-check-token"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "app-check-token" => Some((
+                    "appCheckToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["app-check-token"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleFirebaseAppcheckV1betaVerifyAppCheckTokenRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().verify_app_check_token(request, opt.value_of("project").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleFirebaseAppcheckV1betaVerifyAppCheckTokenRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .verify_app_check_token(request, opt.value_of("project").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3984,15 +6589,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4002,22 +6612,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4025,205 +6647,307 @@ where
         }
     }
 
-    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(
+        &self,
+        dry_run: bool,
+    ) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("jwks", Some(opt)) => {
-                match opt.subcommand() {
-                    ("get", Some(opt)) => {
-                        call_result = self._jwks_get(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("jwks".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("jwks", Some(opt)) => match opt.subcommand() {
+                ("get", Some(opt)) => {
+                    call_result = self._jwks_get(opt, dry_run, &mut err).await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("jwks".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
-            ("oauth-clients", Some(opt)) => {
-                match opt.subcommand() {
-                    ("exchange-app-attest-assertion", Some(opt)) => {
-                        call_result = self._oauth_clients_exchange_app_attest_assertion(opt, dry_run, &mut err).await;
-                    },
-                    ("exchange-app-attest-attestation", Some(opt)) => {
-                        call_result = self._oauth_clients_exchange_app_attest_attestation(opt, dry_run, &mut err).await;
-                    },
-                    ("exchange-debug-token", Some(opt)) => {
-                        call_result = self._oauth_clients_exchange_debug_token(opt, dry_run, &mut err).await;
-                    },
-                    ("generate-app-attest-challenge", Some(opt)) => {
-                        call_result = self._oauth_clients_generate_app_attest_challenge(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("oauth-clients".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("oauth-clients", Some(opt)) => match opt.subcommand() {
+                ("exchange-app-attest-assertion", Some(opt)) => {
+                    call_result = self
+                        ._oauth_clients_exchange_app_attest_assertion(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("exchange-app-attest-attestation", Some(opt)) => {
+                    call_result = self
+                        ._oauth_clients_exchange_app_attest_attestation(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("exchange-debug-token", Some(opt)) => {
+                    call_result = self
+                        ._oauth_clients_exchange_debug_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("generate-app-attest-challenge", Some(opt)) => {
+                    call_result = self
+                        ._oauth_clients_generate_app_attest_challenge(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("oauth-clients".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
-            ("projects", Some(opt)) => {
-                match opt.subcommand() {
-                    ("apps-app-attest-config-batch-get", Some(opt)) => {
-                        call_result = self._projects_apps_app_attest_config_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-app-attest-config-get", Some(opt)) => {
-                        call_result = self._projects_apps_app_attest_config_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-app-attest-config-patch", Some(opt)) => {
-                        call_result = self._projects_apps_app_attest_config_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-debug-tokens-create", Some(opt)) => {
-                        call_result = self._projects_apps_debug_tokens_create(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-debug-tokens-delete", Some(opt)) => {
-                        call_result = self._projects_apps_debug_tokens_delete(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-debug-tokens-get", Some(opt)) => {
-                        call_result = self._projects_apps_debug_tokens_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-debug-tokens-list", Some(opt)) => {
-                        call_result = self._projects_apps_debug_tokens_list(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-debug-tokens-patch", Some(opt)) => {
-                        call_result = self._projects_apps_debug_tokens_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-device-check-config-batch-get", Some(opt)) => {
-                        call_result = self._projects_apps_device_check_config_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-device-check-config-get", Some(opt)) => {
-                        call_result = self._projects_apps_device_check_config_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-device-check-config-patch", Some(opt)) => {
-                        call_result = self._projects_apps_device_check_config_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-app-attest-assertion", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_app_attest_assertion(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-app-attest-attestation", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_app_attest_attestation(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-custom-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_custom_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-debug-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_debug_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-device-check-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_device_check_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-play-integrity-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_play_integrity_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-recaptcha-enterprise-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_recaptcha_enterprise_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-recaptcha-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_recaptcha_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-recaptcha-v3-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_recaptcha_v3_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-exchange-safety-net-token", Some(opt)) => {
-                        call_result = self._projects_apps_exchange_safety_net_token(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-generate-app-attest-challenge", Some(opt)) => {
-                        call_result = self._projects_apps_generate_app_attest_challenge(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-generate-play-integrity-challenge", Some(opt)) => {
-                        call_result = self._projects_apps_generate_play_integrity_challenge(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-play-integrity-config-batch-get", Some(opt)) => {
-                        call_result = self._projects_apps_play_integrity_config_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-play-integrity-config-get", Some(opt)) => {
-                        call_result = self._projects_apps_play_integrity_config_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-play-integrity-config-patch", Some(opt)) => {
-                        call_result = self._projects_apps_play_integrity_config_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-config-batch-get", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_config_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-config-get", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_config_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-config-patch", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_config_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-enterprise-config-batch-get", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_enterprise_config_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-enterprise-config-get", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_enterprise_config_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-enterprise-config-patch", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_enterprise_config_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-v3-config-batch-get", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_v3_config_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-v3-config-get", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_v3_config_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-recaptcha-v3-config-patch", Some(opt)) => {
-                        call_result = self._projects_apps_recaptcha_v3_config_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-safety-net-config-batch-get", Some(opt)) => {
-                        call_result = self._projects_apps_safety_net_config_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-safety-net-config-get", Some(opt)) => {
-                        call_result = self._projects_apps_safety_net_config_get(opt, dry_run, &mut err).await;
-                    },
-                    ("apps-safety-net-config-patch", Some(opt)) => {
-                        call_result = self._projects_apps_safety_net_config_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("services-batch-update", Some(opt)) => {
-                        call_result = self._projects_services_batch_update(opt, dry_run, &mut err).await;
-                    },
-                    ("services-get", Some(opt)) => {
-                        call_result = self._projects_services_get(opt, dry_run, &mut err).await;
-                    },
-                    ("services-list", Some(opt)) => {
-                        call_result = self._projects_services_list(opt, dry_run, &mut err).await;
-                    },
-                    ("services-patch", Some(opt)) => {
-                        call_result = self._projects_services_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("services-resource-policies-batch-update", Some(opt)) => {
-                        call_result = self._projects_services_resource_policies_batch_update(opt, dry_run, &mut err).await;
-                    },
-                    ("services-resource-policies-create", Some(opt)) => {
-                        call_result = self._projects_services_resource_policies_create(opt, dry_run, &mut err).await;
-                    },
-                    ("services-resource-policies-delete", Some(opt)) => {
-                        call_result = self._projects_services_resource_policies_delete(opt, dry_run, &mut err).await;
-                    },
-                    ("services-resource-policies-get", Some(opt)) => {
-                        call_result = self._projects_services_resource_policies_get(opt, dry_run, &mut err).await;
-                    },
-                    ("services-resource-policies-list", Some(opt)) => {
-                        call_result = self._projects_services_resource_policies_list(opt, dry_run, &mut err).await;
-                    },
-                    ("services-resource-policies-patch", Some(opt)) => {
-                        call_result = self._projects_services_resource_policies_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("verify-app-check-token", Some(opt)) => {
-                        call_result = self._projects_verify_app_check_token(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("projects".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("projects", Some(opt)) => match opt.subcommand() {
+                ("apps-app-attest-config-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_app_attest_config_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-app-attest-config-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_app_attest_config_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-app-attest-config-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_app_attest_config_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-debug-tokens-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_debug_tokens_create(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-debug-tokens-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_debug_tokens_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-debug-tokens-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_debug_tokens_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-debug-tokens-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_debug_tokens_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-debug-tokens-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_debug_tokens_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-device-check-config-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_device_check_config_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-device-check-config-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_device_check_config_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-device-check-config-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_device_check_config_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-app-attest-assertion", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_app_attest_assertion(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-app-attest-attestation", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_app_attest_attestation(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-custom-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_custom_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-debug-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_debug_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-device-check-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_device_check_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-play-integrity-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_play_integrity_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-recaptcha-enterprise-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_recaptcha_enterprise_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-recaptcha-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_recaptcha_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-recaptcha-v3-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_recaptcha_v3_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-exchange-safety-net-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_exchange_safety_net_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-generate-app-attest-challenge", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_generate_app_attest_challenge(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-generate-play-integrity-challenge", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_generate_play_integrity_challenge(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-play-integrity-config-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_play_integrity_config_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-play-integrity-config-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_play_integrity_config_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-play-integrity-config-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_play_integrity_config_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-config-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_config_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-config-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_config_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-config-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_config_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-enterprise-config-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_enterprise_config_batch_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("apps-recaptcha-enterprise-config-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_enterprise_config_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-enterprise-config-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_enterprise_config_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-v3-config-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_v3_config_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-v3-config-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_v3_config_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-recaptcha-v3-config-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_recaptcha_v3_config_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-safety-net-config-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_safety_net_config_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-safety-net-config-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_safety_net_config_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("apps-safety-net-config-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_apps_safety_net_config_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("services-batch-update", Some(opt)) => {
+                    call_result = self
+                        ._projects_services_batch_update(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("services-get", Some(opt)) => {
+                    call_result = self._projects_services_get(opt, dry_run, &mut err).await;
+                }
+                ("services-list", Some(opt)) => {
+                    call_result = self._projects_services_list(opt, dry_run, &mut err).await;
+                }
+                ("services-patch", Some(opt)) => {
+                    call_result = self._projects_services_patch(opt, dry_run, &mut err).await;
+                }
+                ("services-resource-policies-batch-update", Some(opt)) => {
+                    call_result = self
+                        ._projects_services_resource_policies_batch_update(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("services-resource-policies-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_services_resource_policies_create(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("services-resource-policies-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_services_resource_policies_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("services-resource-policies-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_services_resource_policies_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("services-resource-policies-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_services_resource_policies_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("services-resource-policies-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_services_resource_policies_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("verify-app-check-token", Some(opt)) => {
+                    call_result = self
+                        ._projects_verify_app_check_token(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("projects".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
-                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
+                writeln!(std::io::stderr(), "{}\n", self.opt.usage()).ok();
             }
         }
 
         if dry_run {
-            if err.issues.len() > 0 {
+            if !err.issues.is_empty() {
                 err_opt = Some(err);
             }
             Err(err_opt)
@@ -4233,47 +6957,67 @@ where
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    async fn new(opt: ArgMatches<'n>, connector: S) -> Result<Engine<'n, S>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>, connector: C) -> Result<Engine<'n, C>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match common::assure_config_dir_exists(
+                opt.value_of("folder").unwrap_or("~/.google-service-cli"),
+            ) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match client::application_secret_from_directory(&config_dir, "firebaseappcheck1-beta-secret.json",
+            match common::application_secret_from_directory(&config_dir, "firebaseappcheck1-beta-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let client = hyper::Client::builder().build(connector);
+        let executor = hyper_util::rt::TokioExecutor::new();
+        let client =
+            hyper_util::client::legacy::Client::builder(executor.clone()).build(connector.clone());
 
-        let auth = oauth2::InstalledFlowAuthenticator::with_client(
+        let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
-            oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            client.clone(),
-        ).persist_tokens_to_disk(format!("{}/firebaseappcheck1-beta", config_dir)).build().await.unwrap();
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+            hyper_util::client::legacy::Client::builder(executor).build(connector),
+        )
+        .persist_tokens_to_disk(format!("{}/firebaseappcheck1-beta", config_dir))
+        .build()
+        .await
+        .unwrap();
 
         let engine = Engine {
-            opt: opt,
+            opt,
             hub: api::Firebaseappcheck::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec![
+                "$-xgafv",
+                "access-token",
+                "alt",
+                "callback",
+                "fields",
+                "key",
+                "oauth-token",
+                "pretty-print",
+                "quota-user",
+                "upload-type",
+                "upload-protocol",
+            ],
             gpm: vec![
-                    ("$-xgafv", "$.xgafv"),
-                    ("access-token", "access_token"),
-                    ("oauth-token", "oauth_token"),
-                    ("pretty-print", "prettyPrint"),
-                    ("quota-user", "quotaUser"),
-                    ("upload-type", "uploadType"),
-                    ("upload-protocol", "upload_protocol"),
-                ]
+                ("$-xgafv", "$.xgafv"),
+                ("access-token", "access_token"),
+                ("oauth-token", "oauth_token"),
+                ("pretty-print", "prettyPrint"),
+                ("quota-user", "quotaUser"),
+                ("upload-type", "uploadType"),
+                ("upload-protocol", "upload_protocol"),
+            ],
         };
 
         match engine._doit(true).await {
             Err(Some(err)) => Err(err),
-            Err(None)      => Ok(engine),
-            Ok(_)          => unreachable!(),
+            Err(None) => Ok(engine),
+            Ok(_) => unreachable!(),
         }
     }
 
@@ -4299,13 +7043,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name to the public JWK set. Must always be exactly the string `jwks`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4313,8 +7055,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-        ("oauth-clients", "methods: 'exchange-app-attest-assertion', 'exchange-app-attest-attestation', 'exchange-debug-token' and 'generate-app-attest-challenge'", vec![
+            ("oauth-clients", "methods: 'exchange-app-attest-assertion', 'exchange-app-attest-attestation', 'exchange-debug-token' and 'generate-app-attest-challenge'", vec![
             ("exchange-app-attest-assertion",
                     Some(r##"Accepts an App Attest assertion and an artifact previously obtained from ExchangeAppAttestAttestation and verifies those with Apple. If valid, returns an AppCheckToken."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebaseappcheck1_beta_cli/oauth-clients_exchange-app-attest-assertion",
@@ -4324,19 +7065,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4352,19 +7090,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4380,19 +7115,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4408,19 +7140,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4428,8 +7157,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-        ("projects", "methods: 'apps-app-attest-config-batch-get', 'apps-app-attest-config-get', 'apps-app-attest-config-patch', 'apps-debug-tokens-create', 'apps-debug-tokens-delete', 'apps-debug-tokens-get', 'apps-debug-tokens-list', 'apps-debug-tokens-patch', 'apps-device-check-config-batch-get', 'apps-device-check-config-get', 'apps-device-check-config-patch', 'apps-exchange-app-attest-assertion', 'apps-exchange-app-attest-attestation', 'apps-exchange-custom-token', 'apps-exchange-debug-token', 'apps-exchange-device-check-token', 'apps-exchange-play-integrity-token', 'apps-exchange-recaptcha-enterprise-token', 'apps-exchange-recaptcha-token', 'apps-exchange-recaptcha-v3-token', 'apps-exchange-safety-net-token', 'apps-generate-app-attest-challenge', 'apps-generate-play-integrity-challenge', 'apps-play-integrity-config-batch-get', 'apps-play-integrity-config-get', 'apps-play-integrity-config-patch', 'apps-recaptcha-config-batch-get', 'apps-recaptcha-config-get', 'apps-recaptcha-config-patch', 'apps-recaptcha-enterprise-config-batch-get', 'apps-recaptcha-enterprise-config-get', 'apps-recaptcha-enterprise-config-patch', 'apps-recaptcha-v3-config-batch-get', 'apps-recaptcha-v3-config-get', 'apps-recaptcha-v3-config-patch', 'apps-safety-net-config-batch-get', 'apps-safety-net-config-get', 'apps-safety-net-config-patch', 'services-batch-update', 'services-get', 'services-list', 'services-patch', 'services-resource-policies-batch-update', 'services-resource-policies-create', 'services-resource-policies-delete', 'services-resource-policies-get', 'services-resource-policies-list', 'services-resource-policies-patch' and 'verify-app-check-token'", vec![
+            ("projects", "methods: 'apps-app-attest-config-batch-get', 'apps-app-attest-config-get', 'apps-app-attest-config-patch', 'apps-debug-tokens-create', 'apps-debug-tokens-delete', 'apps-debug-tokens-get', 'apps-debug-tokens-list', 'apps-debug-tokens-patch', 'apps-device-check-config-batch-get', 'apps-device-check-config-get', 'apps-device-check-config-patch', 'apps-exchange-app-attest-assertion', 'apps-exchange-app-attest-attestation', 'apps-exchange-custom-token', 'apps-exchange-debug-token', 'apps-exchange-device-check-token', 'apps-exchange-play-integrity-token', 'apps-exchange-recaptcha-enterprise-token', 'apps-exchange-recaptcha-token', 'apps-exchange-recaptcha-v3-token', 'apps-exchange-safety-net-token', 'apps-generate-app-attest-challenge', 'apps-generate-play-integrity-challenge', 'apps-play-integrity-config-batch-get', 'apps-play-integrity-config-get', 'apps-play-integrity-config-patch', 'apps-recaptcha-config-batch-get', 'apps-recaptcha-config-get', 'apps-recaptcha-config-patch', 'apps-recaptcha-enterprise-config-batch-get', 'apps-recaptcha-enterprise-config-get', 'apps-recaptcha-enterprise-config-patch', 'apps-recaptcha-v3-config-batch-get', 'apps-recaptcha-v3-config-get', 'apps-recaptcha-v3-config-patch', 'apps-safety-net-config-batch-get', 'apps-safety-net-config-get', 'apps-safety-net-config-patch', 'services-batch-update', 'services-get', 'services-list', 'services-patch', 'services-resource-policies-batch-update', 'services-resource-policies-create', 'services-resource-policies-delete', 'services-resource-policies-get', 'services-resource-policies-list', 'services-resource-policies-patch' and 'verify-app-check-token'", vec![
             ("apps-app-attest-config-batch-get",
                     Some(r##"Atomically gets the AppAttestConfigs for the specified list of apps."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebaseappcheck1_beta_cli/projects_apps-app-attest-config-batch-get",
@@ -4439,13 +7167,11 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all AppAttestConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4461,13 +7187,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the AppAttestConfig, in the format: ``` projects/{project_number}/apps/{app_id}/appAttestConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4483,19 +7207,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the App Attest configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/appAttestConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4511,19 +7232,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the parent app in which the specified DebugToken will be created, in the format: ``` projects/{project_number}/apps/{app_id} ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4539,13 +7257,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the DebugToken to delete, in the format: ``` projects/{project_number}/apps/{app_id}/debugTokens/{debug_token_id} ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4561,13 +7277,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the debug token, in the format: ``` projects/{project_number}/apps/{app_id}/debugTokens/{debug_token_id} ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4583,13 +7297,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the parent app for which to list each associated DebugToken, in the format: ``` projects/{project_number}/apps/{app_id} ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4605,19 +7317,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the debug token, in the format: ``` projects/{project_number}/apps/{app_id}/debugTokens/{debug_token_id} ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4633,13 +7342,11 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all DeviceCheckConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4655,13 +7362,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the DeviceCheckConfig, in the format: ``` projects/{project_number}/apps/{app_id}/deviceCheckConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4677,19 +7382,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the DeviceCheck configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/deviceCheckConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4705,19 +7407,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4733,19 +7432,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4761,19 +7457,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4789,19 +7482,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4817,19 +7507,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4845,19 +7532,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the Android app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4873,19 +7557,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the web app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4901,19 +7582,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the web app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4929,19 +7607,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the web app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4957,19 +7632,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the Android app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -4985,19 +7657,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the iOS app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard. Alternatively, if this method is being called for an OAuth client protected by App Check, this field can also be in the format: ``` oauthClients/{oauth_client_id} ``` You can view the OAuth client ID for your OAuth clients in the Google Cloud console. Note that only iOS OAuth clients are supported at this time, and they must be linked to corresponding iOS Firebase apps. Please see [the documentation](https://developers.google.com/identity/sign-in/ios/appcheck/get-started#project-setup) for more information."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5013,19 +7682,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the app, in the format: ``` projects/{project_number}/apps/{app_id} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5041,13 +7707,11 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all PlayIntegrityConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5063,13 +7727,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the PlayIntegrityConfig, in the format: ``` projects/{project_number}/apps/{app_id}/playIntegrityConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5085,19 +7747,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the Play Integrity configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/playIntegrityConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5113,13 +7772,11 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all RecaptchaConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5135,13 +7792,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the RecaptchaConfig, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5157,19 +7812,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the reCAPTCHA v3 configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5185,13 +7837,11 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all RecaptchaEnterpriseConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5207,13 +7857,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the RecaptchaEnterpriseConfig, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaEnterpriseConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5229,19 +7877,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the reCAPTCHA Enterprise configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaEnterpriseConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5257,13 +7902,11 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all RecaptchaV3Configs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5279,13 +7922,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the RecaptchaV3Config, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaV3Config ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5301,19 +7942,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the reCAPTCHA v3 configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/recaptchaV3Config ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5329,13 +7967,11 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all SafetyNetConfigs being retrieved, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being retrieved must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5351,13 +7987,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the SafetyNetConfig, in the format: ``` projects/{project_number}/apps/{app_id}/safetyNetConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5373,19 +8007,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the SafetyNet configuration object, in the format: ``` projects/{project_number}/apps/{app_id}/safetyNetConfig ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5401,19 +8032,16 @@ async fn main() {
                      Some(r##"Required. The parent project name shared by all Service configurations being updated, in the format ``` projects/{project_number} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5429,13 +8057,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the Service to retrieve, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform) * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5451,13 +8077,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the parent project for which to list each associated Service, in the format: ``` projects/{project_number} ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5473,19 +8097,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the service configuration object, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `firebasestorage.googleapis.com` (Cloud Storage for Firebase) * `firebasedatabase.googleapis.com` (Firebase Realtime Database) * `firestore.googleapis.com` (Cloud Firestore) * `identitytoolkit.googleapis.com` (Firebase Authentication with Identity Platform)"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5501,19 +8122,16 @@ async fn main() {
                      Some(r##"Required. The parent service name, in the format ``` projects/{project_number}/services/{service_id} ``` The parent collection in the `name` field of any resource being updated must match this field, or the entire batch fails."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5529,19 +8147,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the parent Service in which the specified ResourcePolicy will be created, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5557,13 +8172,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the ResourcePolicy to delete, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ```"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5579,13 +8192,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the ResourcePolicy to retrieve, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5601,13 +8212,11 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the parent Service for which to list each associated ResourcePolicy, in the format: ``` projects/{project_number}/services/{service_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS)"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5623,19 +8232,16 @@ async fn main() {
                      Some(r##"Required. Identifier. The relative name of the resource policy object, in the format: ``` projects/{project_number}/services/{service_id}/resourcePolicies/{resource_policy_id} ``` Note that the `service_id` element must be a supported service ID. Currently, the following service IDs are supported: * `oauth2.googleapis.com` (Google Identity for iOS) `resource_policy_id` is a system-generated UID."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5651,19 +8257,16 @@ async fn main() {
                      Some(r##"Required. The relative resource name of the project for which the token was minted, in the format: ``` projects/{project_number} ``` If necessary, the `project_number` element can be replaced with the project ID of the Firebase project. Learn more about using project identifiers in Google's [AIP 2510](https://google.aip.dev/cloud/2510) standard."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5671,12 +8274,11 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-    ];
-    
+        ];
+
     let mut app = App::new("firebaseappcheck1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.5+20240617")
+           .version("6.0.0+20240617")
            .about("Firebase App Check works alongside other Firebase services to help protect your backend resources from abuse, such as billing fraud or phishing.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebaseappcheck1_beta_cli")
            .arg(Arg::with_name("url")
@@ -5694,52 +8296,51 @@ async fn main() {
                    .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
-           
-           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
-               let mut mcmd = SubCommand::with_name(main_command_name).about(about);
-           
-               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
-                   let mut scmd = SubCommand::with_name(sub_command_name);
-                   if let &Some(desc) = desc {
-                       scmd = scmd.about(desc);
-                   }
-                   scmd = scmd.after_help(url_info);
-           
-                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str =
-                           match (arg_name, flag) {
-                                   (&Some(an), _       ) => an,
-                                   (_        , &Some(f)) => f,
-                                    _                    => unreachable!(),
-                            };
-                       let mut arg = Arg::with_name(arg_name_str)
-                                         .empty_values(false);
-                       if let &Some(short_flag) = flag {
-                           arg = arg.short(short_flag);
-                       }
-                       if let &Some(desc) = desc {
-                           arg = arg.help(desc);
-                       }
-                       if arg_name.is_some() && flag.is_some() {
-                           arg = arg.takes_value(true);
-                       }
-                       if let &Some(required) = required {
-                           arg = arg.required(required);
-                       }
-                       if let &Some(multi) = multi {
-                           arg = arg.multiple(multi);
-                       }
-                       scmd = scmd.arg(arg);
-                   }
-                   mcmd = mcmd.subcommand(scmd);
-               }
-               app = app.subcommand(mcmd);
-           }
-           
-        let matches = app.get_matches();
+
+    for &(main_command_name, about, ref subcommands) in arg_data.iter() {
+        let mut mcmd = SubCommand::with_name(main_command_name).about(about);
+
+        for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+            let mut scmd = SubCommand::with_name(sub_command_name);
+            if let &Some(desc) = desc {
+                scmd = scmd.about(desc);
+            }
+            scmd = scmd.after_help(url_info);
+
+            for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                let arg_name_str = match (arg_name, flag) {
+                    (&Some(an), _) => an,
+                    (_, &Some(f)) => f,
+                    _ => unreachable!(),
+                };
+                let mut arg = Arg::with_name(arg_name_str).empty_values(false);
+                if let &Some(short_flag) = flag {
+                    arg = arg.short(short_flag);
+                }
+                if let &Some(desc) = desc {
+                    arg = arg.help(desc);
+                }
+                if arg_name.is_some() && flag.is_some() {
+                    arg = arg.takes_value(true);
+                }
+                if let &Some(required) = required {
+                    arg = arg.required(required);
+                }
+                if let &Some(multi) = multi {
+                    arg = arg.multiple(multi);
+                }
+                scmd = scmd.arg(arg);
+            }
+            mcmd = mcmd.subcommand(scmd);
+        }
+        app = app.subcommand(mcmd);
+    }
+
+    let matches = app.get_matches();
 
     let debug = matches.is_present("adebug");
-    let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+    let connector = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
         .unwrap()
         .https_or_http()
         .enable_http1()
@@ -5748,20 +8349,26 @@ async fn main() {
     match Engine::new(matches, connector).await {
         Err(err) => {
             exit_status = err.exit_code;
-            writeln!(io::stderr(), "{}", err).ok();
-        },
+            writeln!(std::io::stderr(), "{}", err).ok();
+        }
         Ok(engine) => {
             if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
-                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
-                    },
+                        writeln!(
+                            std::io::stderr(),
+                            "Failed to open output file '{}': {}",
+                            path,
+                            err
+                        )
+                        .ok();
+                    }
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:#?}", err).ok();
+                            writeln!(std::io::stderr(), "{:#?}", err).ok();
                         } else {
-                            writeln!(io::stderr(), "{}", err).ok();
+                            writeln!(std::io::stderr(), "{}", err).ok();
                         }
                     }
                 }

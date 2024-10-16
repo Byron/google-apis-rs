@@ -1,4 +1,4 @@
-site_name: Vault v5.0.5+20240617
+site_name: Vault v6.0.0+20240617
 site_url: http://byron.github.io/google-apis-rs/google-vault1-cli
 site_description: A complete library to interact with Vault (protocol v1)
 
@@ -48,4 +48,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

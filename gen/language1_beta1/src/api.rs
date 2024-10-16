@@ -1,20 +1,8 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -41,13 +29,12 @@ impl AsRef<str> for Scope {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
         Scope::CloudLanguage
     }
 }
-
-
 
 // ########
 // HUB ###
@@ -66,33 +53,44 @@ impl Default for Scope {
 /// use language1_beta1::api::AnalyzeEntitiesRequest;
 /// use language1_beta1::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use language1_beta1::{CloudNaturalLanguage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use language1_beta1::{CloudNaturalLanguage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = CloudNaturalLanguage::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = AnalyzeEntitiesRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.documents().analyze_entities(req)
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -113,38 +111,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct CloudNaturalLanguage<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct CloudNaturalLanguage<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for CloudNaturalLanguage<S> {}
+impl<C> common::Hub for CloudNaturalLanguage<C> {}
 
-impl<'a, S> CloudNaturalLanguage<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> CloudNaturalLanguage<S> {
+impl<'a, C> CloudNaturalLanguage<C> {
+    pub fn new<A: 'static + common::GetToken>(
+        client: common::Client<C>,
+        auth: A,
+    ) -> CloudNaturalLanguage<C> {
         CloudNaturalLanguage {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://language.googleapis.com/".to_string(),
             _root_url: "https://language.googleapis.com/".to_string(),
         }
     }
 
-    pub fn documents(&'a self) -> DocumentMethods<'a, S> {
-        DocumentMethods { hub: &self }
+    pub fn documents(&'a self) -> DocumentMethods<'a, C> {
+        DocumentMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -152,7 +152,7 @@ impl<'a, S> CloudNaturalLanguage<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -160,487 +160,406 @@ impl<'a, S> CloudNaturalLanguage<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// The entity analysis request message.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [analyze entities documents](DocumentAnalyzeEntityCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnalyzeEntitiesRequest {
     /// Input document.
-    
     pub document: Option<Document>,
     /// The encoding type used by the API to calculate offsets.
-    #[serde(rename="encodingType")]
-    
+    #[serde(rename = "encodingType")]
     pub encoding_type: Option<String>,
 }
 
-impl client::RequestValue for AnalyzeEntitiesRequest {}
-
+impl common::RequestValue for AnalyzeEntitiesRequest {}
 
 /// The entity analysis response message.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [analyze entities documents](DocumentAnalyzeEntityCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnalyzeEntitiesResponse {
     /// The recognized entities in the input document.
-    
     pub entities: Option<Vec<Entity>>,
     /// The language of the text, which will be the same as the language specified in the request or, if not specified, the automatically-detected language. See Document.language field for more details.
-    
     pub language: Option<String>,
 }
 
-impl client::ResponseResult for AnalyzeEntitiesResponse {}
-
+impl common::ResponseResult for AnalyzeEntitiesResponse {}
 
 /// The sentiment analysis request message.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [analyze sentiment documents](DocumentAnalyzeSentimentCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnalyzeSentimentRequest {
     /// Input document.
-    
     pub document: Option<Document>,
     /// The encoding type used by the API to calculate sentence offsets for the sentence sentiment.
-    #[serde(rename="encodingType")]
-    
+    #[serde(rename = "encodingType")]
     pub encoding_type: Option<String>,
 }
 
-impl client::RequestValue for AnalyzeSentimentRequest {}
-
+impl common::RequestValue for AnalyzeSentimentRequest {}
 
 /// The sentiment analysis response message.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [analyze sentiment documents](DocumentAnalyzeSentimentCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnalyzeSentimentResponse {
     /// The overall sentiment of the input document.
-    #[serde(rename="documentSentiment")]
-    
+    #[serde(rename = "documentSentiment")]
     pub document_sentiment: Option<Sentiment>,
     /// The language of the text, which will be the same as the language specified in the request or, if not specified, the automatically-detected language. See Document.language field for more details.
-    
     pub language: Option<String>,
     /// The sentiment for all the sentences in the document.
-    
     pub sentences: Option<Vec<Sentence>>,
 }
 
-impl client::ResponseResult for AnalyzeSentimentResponse {}
-
+impl common::ResponseResult for AnalyzeSentimentResponse {}
 
 /// The syntax analysis request message.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [analyze syntax documents](DocumentAnalyzeSyntaxCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnalyzeSyntaxRequest {
     /// Input document.
-    
     pub document: Option<Document>,
     /// The encoding type used by the API to calculate offsets.
-    #[serde(rename="encodingType")]
-    
+    #[serde(rename = "encodingType")]
     pub encoding_type: Option<String>,
 }
 
-impl client::RequestValue for AnalyzeSyntaxRequest {}
-
+impl common::RequestValue for AnalyzeSyntaxRequest {}
 
 /// The syntax analysis response message.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [analyze syntax documents](DocumentAnalyzeSyntaxCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnalyzeSyntaxResponse {
     /// The language of the text, which will be the same as the language specified in the request or, if not specified, the automatically-detected language. See Document.language field for more details.
-    
     pub language: Option<String>,
     /// Sentences in the input document.
-    
     pub sentences: Option<Vec<Sentence>>,
     /// Tokens, along with their syntactic information, in the input document.
-    
     pub tokens: Option<Vec<Token>>,
 }
 
-impl client::ResponseResult for AnalyzeSyntaxResponse {}
-
+impl common::ResponseResult for AnalyzeSyntaxResponse {}
 
 /// The request message for the text annotation API, which can perform multiple analysis types (sentiment, entities, and syntax) in one call.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [annotate text documents](DocumentAnnotateTextCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnnotateTextRequest {
     /// Input document.
-    
     pub document: Option<Document>,
     /// The encoding type used by the API to calculate offsets.
-    #[serde(rename="encodingType")]
-    
+    #[serde(rename = "encodingType")]
     pub encoding_type: Option<String>,
     /// The enabled features.
-    
     pub features: Option<Features>,
 }
 
-impl client::RequestValue for AnnotateTextRequest {}
-
+impl common::RequestValue for AnnotateTextRequest {}
 
 /// The text annotations response message.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [annotate text documents](DocumentAnnotateTextCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnnotateTextResponse {
     /// The overall sentiment for the document. Populated if the user enables AnnotateTextRequest.Features.extract_document_sentiment.
-    #[serde(rename="documentSentiment")]
-    
+    #[serde(rename = "documentSentiment")]
     pub document_sentiment: Option<Sentiment>,
     /// Entities, along with their semantic information, in the input document. Populated if the user enables AnnotateTextRequest.Features.extract_entities.
-    
     pub entities: Option<Vec<Entity>>,
     /// The language of the text, which will be the same as the language specified in the request or, if not specified, the automatically-detected language. See Document.language field for more details.
-    
     pub language: Option<String>,
     /// Sentences in the input document. Populated if the user enables AnnotateTextRequest.Features.extract_syntax.
-    
     pub sentences: Option<Vec<Sentence>>,
     /// Tokens, along with their syntactic information, in the input document. Populated if the user enables AnnotateTextRequest.Features.extract_syntax.
-    
     pub tokens: Option<Vec<Token>>,
 }
 
-impl client::ResponseResult for AnnotateTextResponse {}
-
+impl common::ResponseResult for AnnotateTextResponse {}
 
 /// Represents dependency parse tree information for a token.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DependencyEdge {
     /// Represents the head of this token in the dependency tree. This is the index of the token which has an arc going to this token. The index is the position of the token in the array of tokens returned by the API method. If this token is a root token, then the `head_token_index` is its own index.
-    #[serde(rename="headTokenIndex")]
-    
+    #[serde(rename = "headTokenIndex")]
     pub head_token_index: Option<i32>,
     /// The parse label for the token.
-    
     pub label: Option<String>,
 }
 
-impl client::Part for DependencyEdge {}
-
+impl common::Part for DependencyEdge {}
 
 /// \################################################################ # Represents the input to API methods.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [analyze entities documents](DocumentAnalyzeEntityCall) (none)
 /// * [analyze sentiment documents](DocumentAnalyzeSentimentCall) (none)
 /// * [analyze syntax documents](DocumentAnalyzeSyntaxCall) (none)
 /// * [annotate text documents](DocumentAnnotateTextCall) (none)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Document {
     /// The content of the input in string format. Cloud audit logging exempt since it is based on user data.
-    
     pub content: Option<String>,
     /// The Google Cloud Storage URI where the file content is located. This URI must be of the form: gs://bucket_name/object_name. For more details, see https://cloud.google.com/storage/docs/reference-uris. NOTE: Cloud Storage object versioning is not supported.
-    #[serde(rename="gcsContentUri")]
-    
+    #[serde(rename = "gcsContentUri")]
     pub gcs_content_uri: Option<String>,
     /// The language of the document (if not specified, the language is automatically detected). Both ISO and BCP-47 language codes are accepted. [Language Support](https://cloud.google.com/natural-language/docs/languages) lists currently supported languages for each API method. If the language (either specified by the caller or automatically detected) is not supported by the called API method, an `INVALID_ARGUMENT` error is returned.
-    
     pub language: Option<String>,
     /// Required. If the type is not set or is `TYPE_UNSPECIFIED`, returns an `INVALID_ARGUMENT` error.
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::Resource for Document {}
-
+impl common::Resource for Document {}
 
 /// Represents a phrase in the text that is a known entity, such as a person, an organization, or location. The API associates information, such as salience and mentions, with entities.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Entity {
     /// The mentions of this entity in the input document. The API currently supports proper noun mentions.
-    
     pub mentions: Option<Vec<EntityMention>>,
     /// Metadata associated with the entity. Currently, Wikipedia URLs and Knowledge Graph MIDs are provided, if available. The associated keys are "wikipedia_url" and "mid", respectively.
-    
     pub metadata: Option<HashMap<String, String>>,
     /// The representative name for the entity.
-    
     pub name: Option<String>,
     /// The salience score associated with the entity in the [0, 1.0] range. The salience score for an entity provides information about the importance or centrality of that entity to the entire document text. Scores closer to 0 are less salient, while scores closer to 1.0 are highly salient.
-    
     pub salience: Option<f32>,
     /// The entity type.
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::Part for Entity {}
-
+impl common::Part for Entity {}
 
 /// Represents a mention for an entity in the text. Currently, proper noun mentions are supported.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct EntityMention {
     /// The mention text.
-    
     pub text: Option<TextSpan>,
     /// The type of the entity mention.
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::Part for EntityMention {}
-
+impl common::Part for EntityMention {}
 
 /// All available features for sentiment, syntax, and semantic analysis. Setting each one to true will enable that specific analysis for the input.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Features {
     /// Extract document-level sentiment.
-    #[serde(rename="extractDocumentSentiment")]
-    
+    #[serde(rename = "extractDocumentSentiment")]
     pub extract_document_sentiment: Option<bool>,
     /// Extract entities.
-    #[serde(rename="extractEntities")]
-    
+    #[serde(rename = "extractEntities")]
     pub extract_entities: Option<bool>,
     /// Extract syntax information.
-    #[serde(rename="extractSyntax")]
-    
+    #[serde(rename = "extractSyntax")]
     pub extract_syntax: Option<bool>,
 }
 
-impl client::Part for Features {}
-
+impl common::Part for Features {}
 
 /// Represents part of speech information for a token.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct PartOfSpeech {
     /// The grammatical aspect.
-    
     pub aspect: Option<String>,
     /// The grammatical case.
-    
     pub case: Option<String>,
     /// The grammatical form.
-    
     pub form: Option<String>,
     /// The grammatical gender.
-    
     pub gender: Option<String>,
     /// The grammatical mood.
-    
     pub mood: Option<String>,
     /// The grammatical number.
-    
     pub number: Option<String>,
     /// The grammatical person.
-    
     pub person: Option<String>,
     /// The grammatical properness.
-    
     pub proper: Option<String>,
     /// The grammatical reciprocity.
-    
     pub reciprocity: Option<String>,
     /// The part of speech tag.
-    
     pub tag: Option<String>,
     /// The grammatical tense.
-    
     pub tense: Option<String>,
     /// The grammatical voice.
-    
     pub voice: Option<String>,
 }
 
-impl client::Part for PartOfSpeech {}
-
+impl common::Part for PartOfSpeech {}
 
 /// Represents a sentence in the input document.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Sentence {
     /// For calls to AnalyzeSentiment or if AnnotateTextRequest.Features.extract_document_sentiment is set to true, this field will contain the sentiment for the sentence.
-    
     pub sentiment: Option<Sentiment>,
     /// The sentence text.
-    
     pub text: Option<TextSpan>,
 }
 
-impl client::Part for Sentence {}
-
+impl common::Part for Sentence {}
 
 /// Represents the feeling associated with the entire text or entities in the text.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Sentiment {
     /// A non-negative number in the [0, +inf) range, which represents the absolute magnitude of sentiment regardless of score (positive or negative).
-    
     pub magnitude: Option<f32>,
     /// DEPRECATED FIELD - This field is being deprecated in favor of score. Please refer to our documentation at https://cloud.google.com/natural-language/docs for more information.
-    
     pub polarity: Option<f32>,
     /// Sentiment score between -1.0 (negative sentiment) and 1.0 (positive sentiment).
-    
     pub score: Option<f32>,
 }
 
-impl client::Part for Sentiment {}
-
+impl common::Part for Sentiment {}
 
 /// Represents an output piece of text.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct TextSpan {
     /// The API calculates the beginning offset of the content in the original document according to the EncodingType specified in the API request.
-    #[serde(rename="beginOffset")]
-    
+    #[serde(rename = "beginOffset")]
     pub begin_offset: Option<i32>,
     /// The content of the output text.
-    
     pub content: Option<String>,
 }
 
-impl client::Part for TextSpan {}
-
+impl common::Part for TextSpan {}
 
 /// Represents the smallest syntactic building block of the text.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Token {
     /// Dependency tree parse for this token.
-    #[serde(rename="dependencyEdge")]
-    
+    #[serde(rename = "dependencyEdge")]
     pub dependency_edge: Option<DependencyEdge>,
     /// [Lemma](https://en.wikipedia.org/wiki/Lemma_%28morphology%29) of the token.
-    
     pub lemma: Option<String>,
     /// Parts of speech tag for this token.
-    #[serde(rename="partOfSpeech")]
-    
+    #[serde(rename = "partOfSpeech")]
     pub part_of_speech: Option<PartOfSpeech>,
     /// The token text.
-    
     pub text: Option<TextSpan>,
 }
 
-impl client::Part for Token {}
-
-
+impl common::Part for Token {}
 
 // ###################
 // MethodBuilders ###
@@ -657,41 +576,55 @@ impl client::Part for Token {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_language1_beta1 as language1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use language1_beta1::{CloudNaturalLanguage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use language1_beta1::{CloudNaturalLanguage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = CloudNaturalLanguage::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `analyze_entities(...)`, `analyze_sentiment(...)`, `analyze_syntax(...)` and `annotate_text(...)`
 /// // to build up your call.
 /// let rb = hub.documents();
 /// # }
 /// ```
-pub struct DocumentMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudNaturalLanguage<S>,
+pub struct DocumentMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudNaturalLanguage<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for DocumentMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for DocumentMethods<'a, C> {}
 
-impl<'a, S> DocumentMethods<'a, S> {
-    
+impl<'a, C> DocumentMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Finds named entities (currently proper names and common nouns) in the text along with entity types, salience, mentions for each entity, and other properties.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_entities(&self, request: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a, S> {
+    pub fn analyze_entities(
+        &self,
+        request: AnalyzeEntitiesRequest,
+    ) -> DocumentAnalyzeEntityCall<'a, C> {
         DocumentAnalyzeEntityCall {
             hub: self.hub,
             _request: request,
@@ -700,15 +633,18 @@ impl<'a, S> DocumentMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Analyzes the sentiment of the provided text.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_sentiment(&self, request: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a, S> {
+    pub fn analyze_sentiment(
+        &self,
+        request: AnalyzeSentimentRequest,
+    ) -> DocumentAnalyzeSentimentCall<'a, C> {
         DocumentAnalyzeSentimentCall {
             hub: self.hub,
             _request: request,
@@ -717,15 +653,18 @@ impl<'a, S> DocumentMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Analyzes the syntax of the text and provides sentence boundaries and tokenization along with part of speech tags, dependency trees, and other properties.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_syntax(&self, request: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a, S> {
+    pub fn analyze_syntax(
+        &self,
+        request: AnalyzeSyntaxRequest,
+    ) -> DocumentAnalyzeSyntaxCall<'a, C> {
         DocumentAnalyzeSyntaxCall {
             hub: self.hub,
             _request: request,
@@ -734,15 +673,15 @@ impl<'a, S> DocumentMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// A convenience method that provides all the features that analyzeSentiment, analyzeEntities, and analyzeSyntax provide in one call.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn annotate_text(&self, request: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, S> {
+    pub fn annotate_text(&self, request: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, C> {
         DocumentAnnotateTextCall {
             hub: self.hub,
             _request: request,
@@ -752,10 +691,6 @@ impl<'a, S> DocumentMethods<'a, S> {
         }
     }
 }
-
-
-
-
 
 // ###################
 // CallBuilders   ###
@@ -776,20 +711,31 @@ impl<'a, S> DocumentMethods<'a, S> {
 /// # extern crate google_language1_beta1 as language1_beta1;
 /// use language1_beta1::api::AnalyzeEntitiesRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use language1_beta1::{CloudNaturalLanguage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use language1_beta1::{CloudNaturalLanguage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudNaturalLanguage::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = AnalyzeEntitiesRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -797,43 +743,42 @@ impl<'a, S> DocumentMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeEntityCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudNaturalLanguage<S>,
+pub struct DocumentAnalyzeEntityCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudNaturalLanguage<C>,
     _request: AnalyzeEntitiesRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DocumentAnalyzeEntityCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DocumentAnalyzeEntityCall<'a, C> {}
 
-impl<'a, S> DocumentAnalyzeEntityCall<'a, S>
+impl<'a, C> DocumentAnalyzeEntityCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AnalyzeEntitiesResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, AnalyzeEntitiesResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "language.documents.analyzeEntities",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "language.documents.analyzeEntities",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -844,39 +789,46 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/documents:analyzeEntities";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudLanguage.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudLanguage.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -889,84 +841,93 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: AnalyzeEntitiesRequest,
+    ) -> DocumentAnalyzeEntityCall<'a, C> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeEntityCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> DocumentAnalyzeEntityCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -991,9 +952,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntityCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntityCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1008,17 +972,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnalyzeEntityCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnalyzeEntityCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnalyzeEntityCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnalyzeEntityCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1027,12 +995,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DocumentAnalyzeEntityCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DocumentAnalyzeEntityCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Analyzes the sentiment of the provided text.
 ///
@@ -1049,20 +1016,31 @@ where
 /// # extern crate google_language1_beta1 as language1_beta1;
 /// use language1_beta1::api::AnalyzeSentimentRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use language1_beta1::{CloudNaturalLanguage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use language1_beta1::{CloudNaturalLanguage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudNaturalLanguage::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = AnalyzeSentimentRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1070,43 +1048,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeSentimentCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudNaturalLanguage<S>,
+pub struct DocumentAnalyzeSentimentCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudNaturalLanguage<C>,
     _request: AnalyzeSentimentRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DocumentAnalyzeSentimentCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DocumentAnalyzeSentimentCall<'a, C> {}
 
-impl<'a, S> DocumentAnalyzeSentimentCall<'a, S>
+impl<'a, C> DocumentAnalyzeSentimentCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AnalyzeSentimentResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, AnalyzeSentimentResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "language.documents.analyzeSentiment",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "language.documents.analyzeSentiment",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1117,39 +1094,46 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/documents:analyzeSentiment";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudLanguage.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudLanguage.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1162,84 +1146,93 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: AnalyzeSentimentRequest,
+    ) -> DocumentAnalyzeSentimentCall<'a, C> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSentimentCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> DocumentAnalyzeSentimentCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1264,9 +1257,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSentimentCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSentimentCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1281,17 +1277,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnalyzeSentimentCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnalyzeSentimentCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnalyzeSentimentCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnalyzeSentimentCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1300,12 +1300,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DocumentAnalyzeSentimentCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DocumentAnalyzeSentimentCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Analyzes the syntax of the text and provides sentence boundaries and tokenization along with part of speech tags, dependency trees, and other properties.
 ///
@@ -1322,20 +1321,31 @@ where
 /// # extern crate google_language1_beta1 as language1_beta1;
 /// use language1_beta1::api::AnalyzeSyntaxRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use language1_beta1::{CloudNaturalLanguage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use language1_beta1::{CloudNaturalLanguage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudNaturalLanguage::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = AnalyzeSyntaxRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1343,43 +1353,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeSyntaxCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudNaturalLanguage<S>,
+pub struct DocumentAnalyzeSyntaxCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudNaturalLanguage<C>,
     _request: AnalyzeSyntaxRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DocumentAnalyzeSyntaxCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DocumentAnalyzeSyntaxCall<'a, C> {}
 
-impl<'a, S> DocumentAnalyzeSyntaxCall<'a, S>
+impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AnalyzeSyntaxResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, AnalyzeSyntaxResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "language.documents.analyzeSyntax",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "language.documents.analyzeSyntax",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1390,39 +1399,46 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/documents:analyzeSyntax";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudLanguage.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudLanguage.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1435,84 +1451,90 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a, S> {
+    pub fn request(mut self, new_value: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a, C> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSyntaxCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> DocumentAnalyzeSyntaxCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1537,9 +1559,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSyntaxCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSyntaxCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1554,17 +1579,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnalyzeSyntaxCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnalyzeSyntaxCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnalyzeSyntaxCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnalyzeSyntaxCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1573,12 +1602,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DocumentAnalyzeSyntaxCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DocumentAnalyzeSyntaxCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// A convenience method that provides all the features that analyzeSentiment, analyzeEntities, and analyzeSyntax provide in one call.
 ///
@@ -1595,20 +1623,31 @@ where
 /// # extern crate google_language1_beta1 as language1_beta1;
 /// use language1_beta1::api::AnnotateTextRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use language1_beta1::{CloudNaturalLanguage, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudNaturalLanguage::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use language1_beta1::{CloudNaturalLanguage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = CloudNaturalLanguage::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = AnnotateTextRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1616,43 +1655,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnnotateTextCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudNaturalLanguage<S>,
+pub struct DocumentAnnotateTextCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a CloudNaturalLanguage<C>,
     _request: AnnotateTextRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DocumentAnnotateTextCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DocumentAnnotateTextCall<'a, C> {}
 
-impl<'a, S> DocumentAnnotateTextCall<'a, S>
+impl<'a, C> DocumentAnnotateTextCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AnnotateTextResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, AnnotateTextResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "language.documents.annotateText",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "language.documents.annotateText",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1663,39 +1701,46 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta1/documents:annotateText";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudLanguage.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudLanguage.as_ref().to_string());
         }
-
 
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1708,84 +1753,90 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, S> {
+    pub fn request(mut self, new_value: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, C> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnnotateTextCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> DocumentAnnotateTextCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1810,9 +1861,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnnotateTextCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnnotateTextCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1827,17 +1881,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnnotateTextCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DocumentAnnotateTextCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnnotateTextCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DocumentAnnotateTextCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1846,10 +1904,8 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DocumentAnnotateTextCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DocumentAnnotateTextCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
-

@@ -1,4 +1,4 @@
-site_name: siteVerification v5.0.5+20191119
+site_name: siteVerification v6.0.0+20191119
 site_url: http://byron.github.io/google-apis-rs/google-siteverification1-cli
 site_description: A complete library to interact with siteVerification (protocol v1)
 
@@ -21,4 +21,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

@@ -6,57 +6,57 @@
 #[macro_use]
 extern crate clap;
 
-use std::env;
-use std::io::{self, Write};
-use clap::{App, SubCommand, Arg};
+use std::io::Write;
 
-use google_content2_sandbox::{api, Error, oauth2, client::chrono, FieldMask};
+use clap::{App, Arg, SubCommand};
 
+use google_content2_sandbox::{api, yup_oauth2, Error};
 
-use google_clis_common as client;
+use google_apis_common as apis_common;
+use google_clis_common as common;
 
-use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
-
-use std::default::Default;
-use std::error::Error as StdError;
 use std::str::FromStr;
 
-use serde_json as json;
 use clap::ArgMatches;
-use http::Uri;
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
-use tower_service;
+use http_body_util::BodyExt;
+
+use common::{
+    arg_from_str, calltype_from_str, input_file_from_opts, input_mime_from_opts, parse_kv_arg,
+    remove_json_null_values, writer_from_opts, CLIError, CallType, ComplexType, FieldCursor,
+    FieldError, InvalidOptionsError, JsonType, JsonTypeInfo, UploadProtocol,
+};
 
 enum DoitError {
-    IoError(String, io::Error),
+    IoError(String, std::io::Error),
     ApiError(Error),
 }
 
-struct Engine<'n, S> {
+struct Engine<'n, C> {
     opt: ArgMatches<'n>,
-    hub: api::ShoppingContent<S>,
+    hub: api::ShoppingContent<C>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
-
-impl<'n, S> Engine<'n, S>
+impl<'n, C> Engine<'n, C>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: apis_common::Connector,
 {
-    async fn _orderinvoices_createchargeinvoice(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orderinvoices_createchargeinvoice(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -70,41 +70,191 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "invoice-id" => Some(("invoiceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.customer-balance.pretax.currency" => Some(("invoiceSummary.customerBalance.pretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.customer-balance.pretax.value" => Some(("invoiceSummary.customerBalance.pretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.customer-balance.tax.currency" => Some(("invoiceSummary.customerBalance.tax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.customer-balance.tax.value" => Some(("invoiceSummary.customerBalance.tax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.google-balance.pretax.currency" => Some(("invoiceSummary.googleBalance.pretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.google-balance.pretax.value" => Some(("invoiceSummary.googleBalance.pretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.google-balance.tax.currency" => Some(("invoiceSummary.googleBalance.tax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.google-balance.tax.value" => Some(("invoiceSummary.googleBalance.tax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.merchant-balance.pretax.currency" => Some(("invoiceSummary.merchantBalance.pretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.merchant-balance.pretax.value" => Some(("invoiceSummary.merchantBalance.pretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.merchant-balance.tax.currency" => Some(("invoiceSummary.merchantBalance.tax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.merchant-balance.tax.value" => Some(("invoiceSummary.merchantBalance.tax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.product-total.pretax.currency" => Some(("invoiceSummary.productTotal.pretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.product-total.pretax.value" => Some(("invoiceSummary.productTotal.pretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.product-total.tax.currency" => Some(("invoiceSummary.productTotal.tax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-summary.product-total.tax.value" => Some(("invoiceSummary.productTotal.tax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "shipment-group-id" => Some(("shipmentGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "customer-balance", "google-balance", "invoice-id", "invoice-summary", "merchant-balance", "operation-id", "pretax", "product-total", "shipment-group-id", "tax", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "invoice-id" => Some((
+                    "invoiceId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.customer-balance.pretax.currency" => Some((
+                    "invoiceSummary.customerBalance.pretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.customer-balance.pretax.value" => Some((
+                    "invoiceSummary.customerBalance.pretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.customer-balance.tax.currency" => Some((
+                    "invoiceSummary.customerBalance.tax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.customer-balance.tax.value" => Some((
+                    "invoiceSummary.customerBalance.tax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.google-balance.pretax.currency" => Some((
+                    "invoiceSummary.googleBalance.pretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.google-balance.pretax.value" => Some((
+                    "invoiceSummary.googleBalance.pretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.google-balance.tax.currency" => Some((
+                    "invoiceSummary.googleBalance.tax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.google-balance.tax.value" => Some((
+                    "invoiceSummary.googleBalance.tax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.merchant-balance.pretax.currency" => Some((
+                    "invoiceSummary.merchantBalance.pretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.merchant-balance.pretax.value" => Some((
+                    "invoiceSummary.merchantBalance.pretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.merchant-balance.tax.currency" => Some((
+                    "invoiceSummary.merchantBalance.tax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.merchant-balance.tax.value" => Some((
+                    "invoiceSummary.merchantBalance.tax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.product-total.pretax.currency" => Some((
+                    "invoiceSummary.productTotal.pretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.product-total.pretax.value" => Some((
+                    "invoiceSummary.productTotal.pretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.product-total.tax.currency" => Some((
+                    "invoiceSummary.productTotal.tax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-summary.product-total.tax.value" => Some((
+                    "invoiceSummary.productTotal.tax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "shipment-group-id" => Some((
+                    "shipmentGroupId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "currency",
+                            "customer-balance",
+                            "google-balance",
+                            "invoice-id",
+                            "invoice-summary",
+                            "merchant-balance",
+                            "operation-id",
+                            "pretax",
+                            "product-total",
+                            "shipment-group-id",
+                            "tax",
+                            "value",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrderinvoicesCreateChargeInvoiceRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orderinvoices().createchargeinvoice(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrderinvoicesCreateChargeInvoiceRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orderinvoices().createchargeinvoice(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -112,15 +262,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -130,22 +285,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -153,13 +320,21 @@ where
         }
     }
 
-    async fn _orderinvoices_createrefundinvoice(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orderinvoices_createrefundinvoice(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -173,28 +348,94 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "invoice-id" => Some(("invoiceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "refund-only-option.description" => Some(("refundOnlyOption.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "refund-only-option.reason" => Some(("refundOnlyOption.reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "return-option.description" => Some(("returnOption.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "return-option.reason" => Some(("returnOption.reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "invoice-id", "operation-id", "reason", "refund-only-option", "return-option"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "invoice-id" => Some((
+                    "invoiceId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "refund-only-option.description" => Some((
+                    "refundOnlyOption.description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "refund-only-option.reason" => Some((
+                    "refundOnlyOption.reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "return-option.description" => Some((
+                    "returnOption.description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "return-option.reason" => Some((
+                    "returnOption.reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "description",
+                            "invoice-id",
+                            "operation-id",
+                            "reason",
+                            "refund-only-option",
+                            "return-option",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrderinvoicesCreateRefundInvoiceRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orderinvoices().createrefundinvoice(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrderinvoicesCreateRefundInvoiceRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orderinvoices().createrefundinvoice(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -202,15 +443,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -220,22 +466,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -243,13 +501,21 @@ where
         }
     }
 
-    async fn _orderpayments_notifyauthapproved(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orderpayments_notifyauthapproved(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -263,26 +529,73 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "auth-amount-pretax.currency" => Some(("authAmountPretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-amount-pretax.value" => Some(("authAmountPretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-amount-tax.currency" => Some(("authAmountTax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auth-amount-tax.value" => Some(("authAmountTax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-amount-pretax", "auth-amount-tax", "currency", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "auth-amount-pretax.currency" => Some((
+                    "authAmountPretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auth-amount-pretax.value" => Some((
+                    "authAmountPretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auth-amount-tax.currency" => Some((
+                    "authAmountTax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auth-amount-tax.value" => Some((
+                    "authAmountTax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["auth-amount-pretax", "auth-amount-tax", "currency", "value"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrderpaymentsNotifyAuthApprovedRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orderpayments().notifyauthapproved(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrderpaymentsNotifyAuthApprovedRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orderpayments().notifyauthapproved(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -290,15 +603,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -308,22 +626,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -331,13 +661,21 @@ where
         }
     }
 
-    async fn _orderpayments_notifyauthdeclined(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orderpayments_notifyauthdeclined(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -351,23 +689,49 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "decline-reason" => Some(("declineReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["decline-reason"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "decline-reason" => Some((
+                    "declineReason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["decline-reason"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrderpaymentsNotifyAuthDeclinedRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orderpayments().notifyauthdeclined(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrderpaymentsNotifyAuthDeclinedRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orderpayments().notifyauthdeclined(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -375,15 +739,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -393,22 +762,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -416,13 +797,21 @@ where
         }
     }
 
-    async fn _orderpayments_notifycharge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orderpayments_notifycharge(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -436,25 +825,66 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "charge-state" => Some(("chargeState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-id" => Some(("invoiceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-ids" => Some(("invoiceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["charge-state", "invoice-id", "invoice-ids"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "charge-state" => Some((
+                    "chargeState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-id" => Some((
+                    "invoiceId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-ids" => Some((
+                    "invoiceIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["charge-state", "invoice-id", "invoice-ids"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrderpaymentsNotifyChargeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orderpayments().notifycharge(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrderpaymentsNotifyChargeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orderpayments().notifycharge(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -462,15 +892,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -480,22 +915,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -503,13 +950,21 @@ where
         }
     }
 
-    async fn _orderpayments_notifyrefund(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orderpayments_notifyrefund(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -523,25 +978,66 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "invoice-id" => Some(("invoiceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invoice-ids" => Some(("invoiceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "refund-state" => Some(("refundState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["invoice-id", "invoice-ids", "refund-state"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "invoice-id" => Some((
+                    "invoiceId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "invoice-ids" => Some((
+                    "invoiceIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "refund-state" => Some((
+                    "refundState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["invoice-id", "invoice-ids", "refund-state"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrderpaymentsNotifyRefundRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orderpayments().notifyrefund(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrderpaymentsNotifyRefundRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orderpayments().notifyrefund(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -549,15 +1045,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -567,22 +1068,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -590,10 +1103,22 @@ where
         }
     }
 
-    async fn _orderreturns_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.orderreturns().get(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("return-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _orderreturns_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.orderreturns().get(
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("return-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -601,15 +1126,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -619,22 +1149,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -642,42 +1184,73 @@ where
         }
     }
 
-    async fn _orderreturns_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.orderreturns().list(opt.value_of("merchant-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _orderreturns_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .orderreturns()
+            .list(opt.value_of("merchant-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
-                },
+                }
                 "max-results" => {
-                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
-                },
+                    call = call.max_results(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-results", "uint32"))
+                            .unwrap_or(0),
+                    );
+                }
                 "created-start-date" => {
                     call = call.created_start_date(value.unwrap_or(""));
-                },
+                }
                 "created-end-date" => {
                     call = call.created_end_date(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["created-end-date", "created-start-date", "max-results", "order-by", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "created-end-date",
+                                        "created-start-date",
+                                        "max-results",
+                                        "order-by",
+                                        "page-token",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -687,22 +1260,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -710,13 +1295,21 @@ where
         }
     }
 
-    async fn _orders_acknowledge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_acknowledge(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -730,23 +1323,49 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["operation-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["operation-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersAcknowledgeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().acknowledge(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersAcknowledgeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().acknowledge(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -754,15 +1373,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -772,22 +1396,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -795,10 +1431,22 @@ where
         }
     }
 
-    async fn _orders_advancetestorder(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.orders().advancetestorder(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _orders_advancetestorder(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.orders().advancetestorder(
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -806,15 +1454,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -824,22 +1477,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -847,13 +1512,21 @@ where
         }
     }
 
-    async fn _orders_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_cancel(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -867,25 +1540,65 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason-text" => Some(("reasonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["operation-id", "reason", "reason-text"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason-text" => Some((
+                    "reasonText",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["operation-id", "reason", "reason-text"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersCancelRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().cancel(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersCancelRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().cancel(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -893,15 +1606,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -911,22 +1629,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -934,13 +1664,21 @@ where
         }
     }
 
-    async fn _orders_cancellineitem(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_cancellineitem(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -954,34 +1692,141 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "amount.currency" => Some(("amount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount.value" => Some(("amount.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-pretax.currency" => Some(("amountPretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-pretax.value" => Some(("amountPretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.currency" => Some(("amountTax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.value" => Some(("amountTax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "line-item-id" => Some(("lineItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason-text" => Some(("reasonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "amount-pretax", "amount-tax", "currency", "line-item-id", "operation-id", "product-id", "quantity", "reason", "reason-text", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "amount.currency" => Some((
+                    "amount.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount.value" => Some((
+                    "amount.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-pretax.currency" => Some((
+                    "amountPretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-pretax.value" => Some((
+                    "amountPretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.currency" => Some((
+                    "amountTax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.value" => Some((
+                    "amountTax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "line-item-id" => Some((
+                    "lineItemId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "quantity" => Some((
+                    "quantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason-text" => Some((
+                    "reasonText",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "amount",
+                            "amount-pretax",
+                            "amount-tax",
+                            "currency",
+                            "line-item-id",
+                            "operation-id",
+                            "product-id",
+                            "quantity",
+                            "reason",
+                            "reason-text",
+                            "value",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersCancelLineItemRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().cancellineitem(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersCancelLineItemRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().cancellineitem(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -989,15 +1834,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1007,22 +1857,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1030,13 +1892,21 @@ where
         }
     }
 
-    async fn _orders_canceltestorderbycustomer(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_canceltestorderbycustomer(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1050,23 +1920,49 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["reason"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["reason"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersCancelTestOrderByCustomerRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().canceltestorderbycustomer(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersCancelTestOrderByCustomerRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().canceltestorderbycustomer(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1074,15 +1970,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1092,22 +1993,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1115,13 +2028,21 @@ where
         }
     }
 
-    async fn _orders_createtestorder(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_createtestorder(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1135,43 +2056,218 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "country" => Some(("country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "template-name" => Some(("templateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.customer.email" => Some(("testOrder.customer.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.customer.explicit-marketing-preference" => Some(("testOrder.customer.explicitMarketingPreference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "test-order.customer.full-name" => Some(("testOrder.customer.fullName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.customer.marketing-rights-info.explicit-marketing-preference" => Some(("testOrder.customer.marketingRightsInfo.explicitMarketingPreference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.customer.marketing-rights-info.last-updated-timestamp" => Some(("testOrder.customer.marketingRightsInfo.lastUpdatedTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.enable-orderinvoices" => Some(("testOrder.enableOrderinvoices", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "test-order.kind" => Some(("testOrder.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.notification-mode" => Some(("testOrder.notificationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.payment-method.expiration-month" => Some(("testOrder.paymentMethod.expirationMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "test-order.payment-method.expiration-year" => Some(("testOrder.paymentMethod.expirationYear", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "test-order.payment-method.last-four-digits" => Some(("testOrder.paymentMethod.lastFourDigits", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.payment-method.predefined-billing-address" => Some(("testOrder.paymentMethod.predefinedBillingAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.payment-method.type" => Some(("testOrder.paymentMethod.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.predefined-delivery-address" => Some(("testOrder.predefinedDeliveryAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.shipping-cost.currency" => Some(("testOrder.shippingCost.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.shipping-cost.value" => Some(("testOrder.shippingCost.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.shipping-cost-tax.currency" => Some(("testOrder.shippingCostTax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.shipping-cost-tax.value" => Some(("testOrder.shippingCostTax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-order.shipping-option" => Some(("testOrder.shippingOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["country", "currency", "customer", "email", "enable-orderinvoices", "expiration-month", "expiration-year", "explicit-marketing-preference", "full-name", "kind", "last-four-digits", "last-updated-timestamp", "marketing-rights-info", "notification-mode", "payment-method", "predefined-billing-address", "predefined-delivery-address", "shipping-cost", "shipping-cost-tax", "shipping-option", "template-name", "test-order", "type", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "country" => Some((
+                    "country",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "template-name" => Some((
+                    "templateName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.customer.email" => Some((
+                    "testOrder.customer.email",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.customer.explicit-marketing-preference" => Some((
+                    "testOrder.customer.explicitMarketingPreference",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.customer.full-name" => Some((
+                    "testOrder.customer.fullName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.customer.marketing-rights-info.explicit-marketing-preference" => {
+                    Some((
+                        "testOrder.customer.marketingRightsInfo.explicitMarketingPreference",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "test-order.customer.marketing-rights-info.last-updated-timestamp" => Some((
+                    "testOrder.customer.marketingRightsInfo.lastUpdatedTimestamp",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.enable-orderinvoices" => Some((
+                    "testOrder.enableOrderinvoices",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.kind" => Some((
+                    "testOrder.kind",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.notification-mode" => Some((
+                    "testOrder.notificationMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.payment-method.expiration-month" => Some((
+                    "testOrder.paymentMethod.expirationMonth",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.payment-method.expiration-year" => Some((
+                    "testOrder.paymentMethod.expirationYear",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.payment-method.last-four-digits" => Some((
+                    "testOrder.paymentMethod.lastFourDigits",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.payment-method.predefined-billing-address" => Some((
+                    "testOrder.paymentMethod.predefinedBillingAddress",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.payment-method.type" => Some((
+                    "testOrder.paymentMethod.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.predefined-delivery-address" => Some((
+                    "testOrder.predefinedDeliveryAddress",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.shipping-cost.currency" => Some((
+                    "testOrder.shippingCost.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.shipping-cost.value" => Some((
+                    "testOrder.shippingCost.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.shipping-cost-tax.currency" => Some((
+                    "testOrder.shippingCostTax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.shipping-cost-tax.value" => Some((
+                    "testOrder.shippingCostTax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "test-order.shipping-option" => Some((
+                    "testOrder.shippingOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "country",
+                            "currency",
+                            "customer",
+                            "email",
+                            "enable-orderinvoices",
+                            "expiration-month",
+                            "expiration-year",
+                            "explicit-marketing-preference",
+                            "full-name",
+                            "kind",
+                            "last-four-digits",
+                            "last-updated-timestamp",
+                            "marketing-rights-info",
+                            "notification-mode",
+                            "payment-method",
+                            "predefined-billing-address",
+                            "predefined-delivery-address",
+                            "shipping-cost",
+                            "shipping-cost-tax",
+                            "shipping-option",
+                            "template-name",
+                            "test-order",
+                            "type",
+                            "value",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersCreateTestOrderRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().createtestorder(request, opt.value_of("merchant-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersCreateTestOrderRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .orders()
+            .createtestorder(request, opt.value_of("merchant-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1179,15 +2275,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1197,22 +2298,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1220,13 +2333,21 @@ where
         }
     }
 
-    async fn _orders_createtestreturn(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_createtestreturn(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1240,22 +2361,42 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersCreateTestReturnRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().createtestreturn(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersCreateTestReturnRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().createtestreturn(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1263,15 +2404,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1281,22 +2427,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1304,13 +2462,21 @@ where
         }
     }
 
-    async fn _orders_custombatch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_custombatch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1324,22 +2490,38 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersCustomBatchRequest = json::value::from_value(object).unwrap();
+        let mut request: api::OrdersCustomBatchRequest =
+            serde_json::value::from_value(object).unwrap();
         let mut call = self.hub.orders().custombatch(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1347,15 +2529,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1365,22 +2552,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1388,10 +2587,22 @@ where
         }
     }
 
-    async fn _orders_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.orders().get(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _orders_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.orders().get(
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1399,15 +2610,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1417,22 +2633,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1440,10 +2668,22 @@ where
         }
     }
 
-    async fn _orders_getbymerchantorderid(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.orders().getbymerchantorderid(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("merchant-order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _orders_getbymerchantorderid(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.orders().getbymerchantorderid(
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("merchant-order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1451,15 +2691,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1469,22 +2714,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1492,30 +2749,47 @@ where
         }
     }
 
-    async fn _orders_gettestordertemplate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.orders().gettestordertemplate(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("template-name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _orders_gettestordertemplate(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.orders().gettestordertemplate(
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("template-name").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "country" => {
                     call = call.country(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["country"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["country"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1525,22 +2799,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1548,13 +2834,21 @@ where
         }
     }
 
-    async fn _orders_instorerefundlineitem(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_instorerefundlineitem(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1568,32 +2862,126 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "amount-pretax.currency" => Some(("amountPretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-pretax.value" => Some(("amountPretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.currency" => Some(("amountTax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.value" => Some(("amountTax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "line-item-id" => Some(("lineItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason-text" => Some(("reasonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount-pretax", "amount-tax", "currency", "line-item-id", "operation-id", "product-id", "quantity", "reason", "reason-text", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "amount-pretax.currency" => Some((
+                    "amountPretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-pretax.value" => Some((
+                    "amountPretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.currency" => Some((
+                    "amountTax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.value" => Some((
+                    "amountTax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "line-item-id" => Some((
+                    "lineItemId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "quantity" => Some((
+                    "quantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason-text" => Some((
+                    "reasonText",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "amount-pretax",
+                            "amount-tax",
+                            "currency",
+                            "line-item-id",
+                            "operation-id",
+                            "product-id",
+                            "quantity",
+                            "reason",
+                            "reason-text",
+                            "value",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersInStoreRefundLineItemRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().instorerefundlineitem(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersInStoreRefundLineItemRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().instorerefundlineitem(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1601,15 +2989,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1619,22 +3012,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1642,48 +3047,85 @@ where
         }
     }
 
-    async fn _orders_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.orders().list(opt.value_of("merchant-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _orders_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .orders()
+            .list(opt.value_of("merchant-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "statuses" => {
                     call = call.add_statuses(value.unwrap_or(""));
-                },
+                }
                 "placed-date-start" => {
                     call = call.placed_date_start(value.unwrap_or(""));
-                },
+                }
                 "placed-date-end" => {
                     call = call.placed_date_end(value.unwrap_or(""));
-                },
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "order-by" => {
                     call = call.order_by(value.unwrap_or(""));
-                },
+                }
                 "max-results" => {
-                    call = call.max_results(        value.map(|v| arg_from_str(v, err, "max-results", "uint32")).unwrap_or(0));
-                },
+                    call = call.max_results(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-results", "uint32"))
+                            .unwrap_or(0),
+                    );
+                }
                 "acknowledged" => {
-                    call = call.acknowledged(        value.map(|v| arg_from_str(v, err, "acknowledged", "boolean")).unwrap_or(false));
-                },
+                    call = call.acknowledged(
+                        value
+                            .map(|v| arg_from_str(v, err, "acknowledged", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["acknowledged", "max-results", "order-by", "page-token", "placed-date-end", "placed-date-start", "statuses"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "acknowledged",
+                                        "max-results",
+                                        "order-by",
+                                        "page-token",
+                                        "placed-date-end",
+                                        "placed-date-start",
+                                        "statuses",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -1693,22 +3135,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1716,13 +3170,21 @@ where
         }
     }
 
-    async fn _orders_refund(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_refund(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1736,31 +3198,116 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "amount.currency" => Some(("amount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount.value" => Some(("amount.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-pretax.currency" => Some(("amountPretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-pretax.value" => Some(("amountPretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.currency" => Some(("amountTax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.value" => Some(("amountTax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason-text" => Some(("reasonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "amount-pretax", "amount-tax", "currency", "operation-id", "reason", "reason-text", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "amount.currency" => Some((
+                    "amount.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount.value" => Some((
+                    "amount.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-pretax.currency" => Some((
+                    "amountPretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-pretax.value" => Some((
+                    "amountPretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.currency" => Some((
+                    "amountTax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.value" => Some((
+                    "amountTax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason-text" => Some((
+                    "reasonText",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "amount",
+                            "amount-pretax",
+                            "amount-tax",
+                            "currency",
+                            "operation-id",
+                            "reason",
+                            "reason-text",
+                            "value",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersRefundRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().refund(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersRefundRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().refund(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1768,15 +3315,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1786,22 +3338,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1809,13 +3373,21 @@ where
         }
     }
 
-    async fn _orders_rejectreturnlineitem(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_rejectreturnlineitem(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1829,28 +3401,94 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "line-item-id" => Some(("lineItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason-text" => Some(("reasonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["line-item-id", "operation-id", "product-id", "quantity", "reason", "reason-text"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "line-item-id" => Some((
+                    "lineItemId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "quantity" => Some((
+                    "quantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason-text" => Some((
+                    "reasonText",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "line-item-id",
+                            "operation-id",
+                            "product-id",
+                            "quantity",
+                            "reason",
+                            "reason-text",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersRejectReturnLineItemRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().rejectreturnlineitem(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersRejectReturnLineItemRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().rejectreturnlineitem(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1858,15 +3496,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1876,22 +3519,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1899,13 +3554,21 @@ where
         }
     }
 
-    async fn _orders_returnlineitem(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_returnlineitem(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1919,28 +3582,94 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "line-item-id" => Some(("lineItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason-text" => Some(("reasonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["line-item-id", "operation-id", "product-id", "quantity", "reason", "reason-text"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "line-item-id" => Some((
+                    "lineItemId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "quantity" => Some((
+                    "quantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason-text" => Some((
+                    "reasonText",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "line-item-id",
+                            "operation-id",
+                            "product-id",
+                            "quantity",
+                            "reason",
+                            "reason-text",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersReturnLineItemRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().returnlineitem(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersReturnLineItemRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().returnlineitem(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1948,15 +3677,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1966,22 +3700,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1989,13 +3735,21 @@ where
         }
     }
 
-    async fn _orders_returnrefundlineitem(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_returnrefundlineitem(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2009,32 +3763,126 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "amount-pretax.currency" => Some(("amountPretax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-pretax.value" => Some(("amountPretax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.currency" => Some(("amountTax.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "amount-tax.value" => Some(("amountTax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "line-item-id" => Some(("lineItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reason-text" => Some(("reasonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount-pretax", "amount-tax", "currency", "line-item-id", "operation-id", "product-id", "quantity", "reason", "reason-text", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "amount-pretax.currency" => Some((
+                    "amountPretax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-pretax.value" => Some((
+                    "amountPretax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.currency" => Some((
+                    "amountTax.currency",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "amount-tax.value" => Some((
+                    "amountTax.value",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "line-item-id" => Some((
+                    "lineItemId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "quantity" => Some((
+                    "quantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason" => Some((
+                    "reason",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reason-text" => Some((
+                    "reasonText",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "amount-pretax",
+                            "amount-tax",
+                            "currency",
+                            "line-item-id",
+                            "operation-id",
+                            "product-id",
+                            "quantity",
+                            "reason",
+                            "reason-text",
+                            "value",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersReturnRefundLineItemRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().returnrefundlineitem(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersReturnRefundLineItemRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().returnrefundlineitem(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2042,15 +3890,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2060,22 +3913,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2083,13 +3948,21 @@ where
         }
     }
 
-    async fn _orders_setlineitemmetadata(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_setlineitemmetadata(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2103,25 +3976,66 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "line-item-id" => Some(("lineItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["line-item-id", "operation-id", "product-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "line-item-id" => Some((
+                    "lineItemId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["line-item-id", "operation-id", "product-id"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersSetLineItemMetadataRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().setlineitemmetadata(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersSetLineItemMetadataRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().setlineitemmetadata(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2129,15 +4043,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2147,22 +4066,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2170,13 +4101,21 @@ where
         }
     }
 
-    async fn _orders_shiplineitems(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_shiplineitems(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2190,27 +4129,86 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "carrier" => Some(("carrier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "shipment-group-id" => Some(("shipmentGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "shipment-id" => Some(("shipmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tracking-id" => Some(("trackingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["carrier", "operation-id", "shipment-group-id", "shipment-id", "tracking-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "carrier" => Some((
+                    "carrier",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "shipment-group-id" => Some((
+                    "shipmentGroupId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "shipment-id" => Some((
+                    "shipmentId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tracking-id" => Some((
+                    "trackingId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "carrier",
+                            "operation-id",
+                            "shipment-group-id",
+                            "shipment-id",
+                            "tracking-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersShipLineItemsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().shiplineitems(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersShipLineItemsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().shiplineitems(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2218,15 +4216,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2236,22 +4239,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2259,13 +4274,21 @@ where
         }
     }
 
-    async fn _orders_updatelineitemshippingdetails(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_updatelineitemshippingdetails(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2279,27 +4302,86 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "deliver-by-date" => Some(("deliverByDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "line-item-id" => Some(("lineItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ship-by-date" => Some(("shipByDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deliver-by-date", "line-item-id", "operation-id", "product-id", "ship-by-date"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "deliver-by-date" => Some((
+                    "deliverByDate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "line-item-id" => Some((
+                    "lineItemId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-id" => Some((
+                    "productId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ship-by-date" => Some((
+                    "shipByDate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "deliver-by-date",
+                            "line-item-id",
+                            "operation-id",
+                            "product-id",
+                            "ship-by-date",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersUpdateLineItemShippingDetailsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().updatelineitemshippingdetails(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersUpdateLineItemShippingDetailsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().updatelineitemshippingdetails(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2307,15 +4389,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2325,22 +4412,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2348,13 +4447,21 @@ where
         }
     }
 
-    async fn _orders_updatemerchantorderid(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_updatemerchantorderid(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2368,24 +4475,57 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "merchant-order-id" => Some(("merchantOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["merchant-order-id", "operation-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "merchant-order-id" => Some((
+                    "merchantOrderId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["merchant-order-id", "operation-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersUpdateMerchantOrderIdRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().updatemerchantorderid(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersUpdateMerchantOrderIdRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().updatemerchantorderid(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2393,15 +4533,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2411,22 +4556,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2434,13 +4591,21 @@ where
         }
     }
 
-    async fn _orders_updateshipment(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _orders_updateshipment(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2454,28 +4619,94 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "carrier" => Some(("carrier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "delivery-date" => Some(("deliveryDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "operation-id" => Some(("operationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "shipment-id" => Some(("shipmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tracking-id" => Some(("trackingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["carrier", "delivery-date", "operation-id", "shipment-id", "status", "tracking-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "carrier" => Some((
+                    "carrier",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "delivery-date" => Some((
+                    "deliveryDate",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "operation-id" => Some((
+                    "operationId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "shipment-id" => Some((
+                    "shipmentId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "status" => Some((
+                    "status",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tracking-id" => Some((
+                    "trackingId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "carrier",
+                            "delivery-date",
+                            "operation-id",
+                            "shipment-id",
+                            "status",
+                            "tracking-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::OrdersUpdateShipmentRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.orders().updateshipment(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::OrdersUpdateShipmentRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.orders().updateshipment(
+            request,
+            opt.value_of("merchant-id").unwrap_or(""),
+            opt.value_of("order-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2483,15 +4714,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2501,22 +4737,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2524,141 +4772,170 @@ where
         }
     }
 
-    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(
+        &self,
+        dry_run: bool,
+    ) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("orderinvoices", Some(opt)) => {
-                match opt.subcommand() {
-                    ("createchargeinvoice", Some(opt)) => {
-                        call_result = self._orderinvoices_createchargeinvoice(opt, dry_run, &mut err).await;
-                    },
-                    ("createrefundinvoice", Some(opt)) => {
-                        call_result = self._orderinvoices_createrefundinvoice(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("orderinvoices".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("orderinvoices", Some(opt)) => match opt.subcommand() {
+                ("createchargeinvoice", Some(opt)) => {
+                    call_result = self
+                        ._orderinvoices_createchargeinvoice(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("createrefundinvoice", Some(opt)) => {
+                    call_result = self
+                        ._orderinvoices_createrefundinvoice(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("orderinvoices".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
-            ("orderpayments", Some(opt)) => {
-                match opt.subcommand() {
-                    ("notifyauthapproved", Some(opt)) => {
-                        call_result = self._orderpayments_notifyauthapproved(opt, dry_run, &mut err).await;
-                    },
-                    ("notifyauthdeclined", Some(opt)) => {
-                        call_result = self._orderpayments_notifyauthdeclined(opt, dry_run, &mut err).await;
-                    },
-                    ("notifycharge", Some(opt)) => {
-                        call_result = self._orderpayments_notifycharge(opt, dry_run, &mut err).await;
-                    },
-                    ("notifyrefund", Some(opt)) => {
-                        call_result = self._orderpayments_notifyrefund(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("orderpayments".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("orderpayments", Some(opt)) => match opt.subcommand() {
+                ("notifyauthapproved", Some(opt)) => {
+                    call_result = self
+                        ._orderpayments_notifyauthapproved(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("notifyauthdeclined", Some(opt)) => {
+                    call_result = self
+                        ._orderpayments_notifyauthdeclined(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("notifycharge", Some(opt)) => {
+                    call_result = self
+                        ._orderpayments_notifycharge(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("notifyrefund", Some(opt)) => {
+                    call_result = self
+                        ._orderpayments_notifyrefund(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("orderpayments".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
-            ("orderreturns", Some(opt)) => {
-                match opt.subcommand() {
-                    ("get", Some(opt)) => {
-                        call_result = self._orderreturns_get(opt, dry_run, &mut err).await;
-                    },
-                    ("list", Some(opt)) => {
-                        call_result = self._orderreturns_list(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("orderreturns".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("orderreturns", Some(opt)) => match opt.subcommand() {
+                ("get", Some(opt)) => {
+                    call_result = self._orderreturns_get(opt, dry_run, &mut err).await;
+                }
+                ("list", Some(opt)) => {
+                    call_result = self._orderreturns_list(opt, dry_run, &mut err).await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("orderreturns".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
-            ("orders", Some(opt)) => {
-                match opt.subcommand() {
-                    ("acknowledge", Some(opt)) => {
-                        call_result = self._orders_acknowledge(opt, dry_run, &mut err).await;
-                    },
-                    ("advancetestorder", Some(opt)) => {
-                        call_result = self._orders_advancetestorder(opt, dry_run, &mut err).await;
-                    },
-                    ("cancel", Some(opt)) => {
-                        call_result = self._orders_cancel(opt, dry_run, &mut err).await;
-                    },
-                    ("cancellineitem", Some(opt)) => {
-                        call_result = self._orders_cancellineitem(opt, dry_run, &mut err).await;
-                    },
-                    ("canceltestorderbycustomer", Some(opt)) => {
-                        call_result = self._orders_canceltestorderbycustomer(opt, dry_run, &mut err).await;
-                    },
-                    ("createtestorder", Some(opt)) => {
-                        call_result = self._orders_createtestorder(opt, dry_run, &mut err).await;
-                    },
-                    ("createtestreturn", Some(opt)) => {
-                        call_result = self._orders_createtestreturn(opt, dry_run, &mut err).await;
-                    },
-                    ("custombatch", Some(opt)) => {
-                        call_result = self._orders_custombatch(opt, dry_run, &mut err).await;
-                    },
-                    ("get", Some(opt)) => {
-                        call_result = self._orders_get(opt, dry_run, &mut err).await;
-                    },
-                    ("getbymerchantorderid", Some(opt)) => {
-                        call_result = self._orders_getbymerchantorderid(opt, dry_run, &mut err).await;
-                    },
-                    ("gettestordertemplate", Some(opt)) => {
-                        call_result = self._orders_gettestordertemplate(opt, dry_run, &mut err).await;
-                    },
-                    ("instorerefundlineitem", Some(opt)) => {
-                        call_result = self._orders_instorerefundlineitem(opt, dry_run, &mut err).await;
-                    },
-                    ("list", Some(opt)) => {
-                        call_result = self._orders_list(opt, dry_run, &mut err).await;
-                    },
-                    ("refund", Some(opt)) => {
-                        call_result = self._orders_refund(opt, dry_run, &mut err).await;
-                    },
-                    ("rejectreturnlineitem", Some(opt)) => {
-                        call_result = self._orders_rejectreturnlineitem(opt, dry_run, &mut err).await;
-                    },
-                    ("returnlineitem", Some(opt)) => {
-                        call_result = self._orders_returnlineitem(opt, dry_run, &mut err).await;
-                    },
-                    ("returnrefundlineitem", Some(opt)) => {
-                        call_result = self._orders_returnrefundlineitem(opt, dry_run, &mut err).await;
-                    },
-                    ("setlineitemmetadata", Some(opt)) => {
-                        call_result = self._orders_setlineitemmetadata(opt, dry_run, &mut err).await;
-                    },
-                    ("shiplineitems", Some(opt)) => {
-                        call_result = self._orders_shiplineitems(opt, dry_run, &mut err).await;
-                    },
-                    ("updatelineitemshippingdetails", Some(opt)) => {
-                        call_result = self._orders_updatelineitemshippingdetails(opt, dry_run, &mut err).await;
-                    },
-                    ("updatemerchantorderid", Some(opt)) => {
-                        call_result = self._orders_updatemerchantorderid(opt, dry_run, &mut err).await;
-                    },
-                    ("updateshipment", Some(opt)) => {
-                        call_result = self._orders_updateshipment(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("orders".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("orders", Some(opt)) => match opt.subcommand() {
+                ("acknowledge", Some(opt)) => {
+                    call_result = self._orders_acknowledge(opt, dry_run, &mut err).await;
+                }
+                ("advancetestorder", Some(opt)) => {
+                    call_result = self._orders_advancetestorder(opt, dry_run, &mut err).await;
+                }
+                ("cancel", Some(opt)) => {
+                    call_result = self._orders_cancel(opt, dry_run, &mut err).await;
+                }
+                ("cancellineitem", Some(opt)) => {
+                    call_result = self._orders_cancellineitem(opt, dry_run, &mut err).await;
+                }
+                ("canceltestorderbycustomer", Some(opt)) => {
+                    call_result = self
+                        ._orders_canceltestorderbycustomer(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("createtestorder", Some(opt)) => {
+                    call_result = self._orders_createtestorder(opt, dry_run, &mut err).await;
+                }
+                ("createtestreturn", Some(opt)) => {
+                    call_result = self._orders_createtestreturn(opt, dry_run, &mut err).await;
+                }
+                ("custombatch", Some(opt)) => {
+                    call_result = self._orders_custombatch(opt, dry_run, &mut err).await;
+                }
+                ("get", Some(opt)) => {
+                    call_result = self._orders_get(opt, dry_run, &mut err).await;
+                }
+                ("getbymerchantorderid", Some(opt)) => {
+                    call_result = self
+                        ._orders_getbymerchantorderid(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("gettestordertemplate", Some(opt)) => {
+                    call_result = self
+                        ._orders_gettestordertemplate(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("instorerefundlineitem", Some(opt)) => {
+                    call_result = self
+                        ._orders_instorerefundlineitem(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("list", Some(opt)) => {
+                    call_result = self._orders_list(opt, dry_run, &mut err).await;
+                }
+                ("refund", Some(opt)) => {
+                    call_result = self._orders_refund(opt, dry_run, &mut err).await;
+                }
+                ("rejectreturnlineitem", Some(opt)) => {
+                    call_result = self
+                        ._orders_rejectreturnlineitem(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("returnlineitem", Some(opt)) => {
+                    call_result = self._orders_returnlineitem(opt, dry_run, &mut err).await;
+                }
+                ("returnrefundlineitem", Some(opt)) => {
+                    call_result = self
+                        ._orders_returnrefundlineitem(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("setlineitemmetadata", Some(opt)) => {
+                    call_result = self
+                        ._orders_setlineitemmetadata(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("shiplineitems", Some(opt)) => {
+                    call_result = self._orders_shiplineitems(opt, dry_run, &mut err).await;
+                }
+                ("updatelineitemshippingdetails", Some(opt)) => {
+                    call_result = self
+                        ._orders_updatelineitemshippingdetails(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("updatemerchantorderid", Some(opt)) => {
+                    call_result = self
+                        ._orders_updatemerchantorderid(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("updateshipment", Some(opt)) => {
+                    call_result = self._orders_updateshipment(opt, dry_run, &mut err).await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("orders".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
-                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
+                writeln!(std::io::stderr(), "{}\n", self.opt.usage()).ok();
             }
         }
 
         if dry_run {
-            if err.issues.len() > 0 {
+            if !err.issues.is_empty() {
                 err_opt = Some(err);
             }
             Err(err_opt)
@@ -2668,44 +4945,60 @@ where
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    async fn new(opt: ArgMatches<'n>, connector: S) -> Result<Engine<'n, S>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>, connector: C) -> Result<Engine<'n, C>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match common::assure_config_dir_exists(
+                opt.value_of("folder").unwrap_or("~/.google-service-cli"),
+            ) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match client::application_secret_from_directory(&config_dir, "content2-sandbox-secret.json",
+            match common::application_secret_from_directory(&config_dir, "content2-sandbox-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let client = hyper::Client::builder().build(connector);
+        let executor = hyper_util::rt::TokioExecutor::new();
+        let client =
+            hyper_util::client::legacy::Client::builder(executor.clone()).build(connector.clone());
 
-        let auth = oauth2::InstalledFlowAuthenticator::with_client(
+        let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
-            oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            client.clone(),
-        ).persist_tokens_to_disk(format!("{}/content2-sandbox", config_dir)).build().await.unwrap();
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+            hyper_util::client::legacy::Client::builder(executor).build(connector),
+        )
+        .persist_tokens_to_disk(format!("{}/content2-sandbox", config_dir))
+        .build()
+        .await
+        .unwrap();
 
         let engine = Engine {
-            opt: opt,
+            opt,
             hub: api::ShoppingContent::new(client, auth),
-            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gp: vec![
+                "alt",
+                "fields",
+                "key",
+                "oauth-token",
+                "pretty-print",
+                "quota-user",
+                "user-ip",
+            ],
             gpm: vec![
-                    ("oauth-token", "oauth_token"),
-                    ("pretty-print", "prettyPrint"),
-                    ("quota-user", "quotaUser"),
-                    ("user-ip", "userIp"),
-                ]
+                ("oauth-token", "oauth_token"),
+                ("pretty-print", "prettyPrint"),
+                ("quota-user", "quotaUser"),
+                ("user-ip", "userIp"),
+            ],
         };
 
         match engine._doit(true).await {
             Err(Some(err)) => Err(err),
-            Err(None)      => Ok(engine),
-            Ok(_)          => unreachable!(),
+            Err(None) => Ok(engine),
+            Ok(_) => unreachable!(),
         }
     }
 
@@ -2731,25 +5024,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2765,25 +5054,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2791,8 +5076,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-        ("orderpayments", "methods: 'notifyauthapproved', 'notifyauthdeclined', 'notifycharge' and 'notifyrefund'", vec![
+            ("orderpayments", "methods: 'notifyauthapproved', 'notifyauthdeclined', 'notifycharge' and 'notifyrefund'", vec![
             ("notifyauthapproved",
                     Some(r##"Notify about successfully authorizing user's payment method for a given amount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orderpayments_notifyauthapproved",
@@ -2802,25 +5086,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order for for which payment authorization is happening."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2836,25 +5116,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order for which payment authorization was declined."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2870,25 +5146,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order for which charge is happening."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2904,25 +5176,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order for which charge is happening."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2930,8 +5198,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-        ("orderreturns", "methods: 'get' and 'list'", vec![
+            ("orderreturns", "methods: 'get' and 'list'", vec![
             ("get",
                     Some(r##"Retrieves an order return from your Merchant Center account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orderreturns_get",
@@ -2941,19 +5208,16 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"return-id"##),
                      None,
                      Some(r##"Merchant order return ID generated by Google."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2969,13 +5233,11 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2983,8 +5245,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-        ("orders", "methods: 'acknowledge', 'advancetestorder', 'cancel', 'cancellineitem', 'canceltestorderbycustomer', 'createtestorder', 'createtestreturn', 'custombatch', 'get', 'getbymerchantorderid', 'gettestordertemplate', 'instorerefundlineitem', 'list', 'refund', 'rejectreturnlineitem', 'returnlineitem', 'returnrefundlineitem', 'setlineitemmetadata', 'shiplineitems', 'updatelineitemshippingdetails', 'updatemerchantorderid' and 'updateshipment'", vec![
+            ("orders", "methods: 'acknowledge', 'advancetestorder', 'cancel', 'cancellineitem', 'canceltestorderbycustomer', 'createtestorder', 'createtestreturn', 'custombatch', 'get', 'getbymerchantorderid', 'gettestordertemplate', 'instorerefundlineitem', 'list', 'refund', 'rejectreturnlineitem', 'returnlineitem', 'returnrefundlineitem', 'setlineitemmetadata', 'shiplineitems', 'updatelineitemshippingdetails', 'updatemerchantorderid' and 'updateshipment'", vec![
             ("acknowledge",
                     Some(r##"Marks an order as acknowledged."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli/orders_acknowledge",
@@ -2994,25 +5255,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3028,19 +5285,16 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the test order to modify."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3056,25 +5310,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order to cancel."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3090,25 +5340,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3124,25 +5370,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the test order to cancel."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3158,19 +5400,16 @@ async fn main() {
                      Some(r##"The ID of the account that should manage the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3186,25 +5425,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3220,13 +5455,11 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3242,19 +5475,16 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3270,19 +5500,16 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"merchant-order-id"##),
                      None,
                      Some(r##"The merchant order id to be looked for."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3298,19 +5525,16 @@ async fn main() {
                      Some(r##"The ID of the account that should manage the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"template-name"##),
                      None,
                      Some(r##"The name of the template to retrieve."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3326,25 +5550,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3360,13 +5580,11 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3382,25 +5600,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order to refund."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3416,25 +5630,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3450,25 +5660,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3484,25 +5690,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3518,25 +5720,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3552,25 +5750,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3586,25 +5780,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3620,25 +5810,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3654,25 +5840,21 @@ async fn main() {
                      Some(r##"The ID of the account that manages the order. This cannot be a multi-client account."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"order-id"##),
                      None,
                      Some(r##"The ID of the order."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -3680,12 +5862,11 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-    ];
-    
+        ];
+
     let mut app = App::new("content2-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.5+20181009")
+           .version("6.0.0+20181009")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_sandbox_cli")
            .arg(Arg::with_name("url")
@@ -3703,52 +5884,51 @@ async fn main() {
                    .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
-           
-           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
-               let mut mcmd = SubCommand::with_name(main_command_name).about(about);
-           
-               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
-                   let mut scmd = SubCommand::with_name(sub_command_name);
-                   if let &Some(desc) = desc {
-                       scmd = scmd.about(desc);
-                   }
-                   scmd = scmd.after_help(url_info);
-           
-                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str =
-                           match (arg_name, flag) {
-                                   (&Some(an), _       ) => an,
-                                   (_        , &Some(f)) => f,
-                                    _                    => unreachable!(),
-                            };
-                       let mut arg = Arg::with_name(arg_name_str)
-                                         .empty_values(false);
-                       if let &Some(short_flag) = flag {
-                           arg = arg.short(short_flag);
-                       }
-                       if let &Some(desc) = desc {
-                           arg = arg.help(desc);
-                       }
-                       if arg_name.is_some() && flag.is_some() {
-                           arg = arg.takes_value(true);
-                       }
-                       if let &Some(required) = required {
-                           arg = arg.required(required);
-                       }
-                       if let &Some(multi) = multi {
-                           arg = arg.multiple(multi);
-                       }
-                       scmd = scmd.arg(arg);
-                   }
-                   mcmd = mcmd.subcommand(scmd);
-               }
-               app = app.subcommand(mcmd);
-           }
-           
-        let matches = app.get_matches();
+
+    for &(main_command_name, about, ref subcommands) in arg_data.iter() {
+        let mut mcmd = SubCommand::with_name(main_command_name).about(about);
+
+        for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+            let mut scmd = SubCommand::with_name(sub_command_name);
+            if let &Some(desc) = desc {
+                scmd = scmd.about(desc);
+            }
+            scmd = scmd.after_help(url_info);
+
+            for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                let arg_name_str = match (arg_name, flag) {
+                    (&Some(an), _) => an,
+                    (_, &Some(f)) => f,
+                    _ => unreachable!(),
+                };
+                let mut arg = Arg::with_name(arg_name_str).empty_values(false);
+                if let &Some(short_flag) = flag {
+                    arg = arg.short(short_flag);
+                }
+                if let &Some(desc) = desc {
+                    arg = arg.help(desc);
+                }
+                if arg_name.is_some() && flag.is_some() {
+                    arg = arg.takes_value(true);
+                }
+                if let &Some(required) = required {
+                    arg = arg.required(required);
+                }
+                if let &Some(multi) = multi {
+                    arg = arg.multiple(multi);
+                }
+                scmd = scmd.arg(arg);
+            }
+            mcmd = mcmd.subcommand(scmd);
+        }
+        app = app.subcommand(mcmd);
+    }
+
+    let matches = app.get_matches();
 
     let debug = matches.is_present("adebug");
-    let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+    let connector = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
         .unwrap()
         .https_or_http()
         .enable_http1()
@@ -3757,20 +5937,26 @@ async fn main() {
     match Engine::new(matches, connector).await {
         Err(err) => {
             exit_status = err.exit_code;
-            writeln!(io::stderr(), "{}", err).ok();
-        },
+            writeln!(std::io::stderr(), "{}", err).ok();
+        }
         Ok(engine) => {
             if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
-                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
-                    },
+                        writeln!(
+                            std::io::stderr(),
+                            "Failed to open output file '{}': {}",
+                            path,
+                            err
+                        )
+                        .ok();
+                    }
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:#?}", err).ok();
+                            writeln!(std::io::stderr(), "{:#?}", err).ok();
                         } else {
-                            writeln!(io::stderr(), "{}", err).ok();
+                            writeln!(std::io::stderr(), "{}", err).ok();
                         }
                     }
                 }

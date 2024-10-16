@@ -6,57 +6,57 @@
 #[macro_use]
 extern crate clap;
 
-use std::env;
-use std::io::{self, Write};
-use clap::{App, SubCommand, Arg};
+use std::io::Write;
 
-use google_retail2::{api, Error, oauth2, client::chrono, FieldMask};
+use clap::{App, Arg, SubCommand};
 
+use google_retail2::{api, yup_oauth2, Error};
 
-use google_clis_common as client;
+use google_apis_common as apis_common;
+use google_clis_common as common;
 
-use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
-
-use std::default::Default;
-use std::error::Error as StdError;
 use std::str::FromStr;
 
-use serde_json as json;
 use clap::ArgMatches;
-use http::Uri;
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
-use tower_service;
+use http_body_util::BodyExt;
+
+use common::{
+    arg_from_str, calltype_from_str, input_file_from_opts, input_mime_from_opts, parse_kv_arg,
+    remove_json_null_values, writer_from_opts, CLIError, CallType, ComplexType, FieldCursor,
+    FieldError, InvalidOptionsError, JsonType, JsonTypeInfo, UploadProtocol,
+};
 
 enum DoitError {
-    IoError(String, io::Error),
+    IoError(String, std::io::Error),
     ApiError(Error),
 }
 
-struct Engine<'n, S> {
+struct Engine<'n, C> {
     opt: ArgMatches<'n>,
-    hub: api::CloudRetail<S>,
+    hub: api::CloudRetail<C>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
-
-impl<'n, S> Engine<'n, S>
+impl<'n, C> Engine<'n, C>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: apis_common::Connector,
 {
-    async fn _projects_locations_catalogs_attributes_config_add_catalog_attribute(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_attributes_config_add_catalog_attribute(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -70,33 +70,140 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "catalog-attribute.dynamic-facetable-option" => Some(("catalogAttribute.dynamicFacetableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.exact-searchable-option" => Some(("catalogAttribute.exactSearchableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.facet-config.merged-facet.merged-facet-key" => Some(("catalogAttribute.facetConfig.mergedFacet.mergedFacetKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.facet-config.rerank-config.facet-values" => Some(("catalogAttribute.facetConfig.rerankConfig.facetValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "catalog-attribute.facet-config.rerank-config.rerank-facet" => Some(("catalogAttribute.facetConfig.rerankConfig.rerankFacet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "catalog-attribute.in-use" => Some(("catalogAttribute.inUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "catalog-attribute.indexable-option" => Some(("catalogAttribute.indexableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.key" => Some(("catalogAttribute.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.retrievable-option" => Some(("catalogAttribute.retrievableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.searchable-option" => Some(("catalogAttribute.searchableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.type" => Some(("catalogAttribute.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["catalog-attribute", "dynamic-facetable-option", "exact-searchable-option", "facet-config", "facet-values", "in-use", "indexable-option", "key", "merged-facet", "merged-facet-key", "rerank-config", "rerank-facet", "retrievable-option", "searchable-option", "type"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "catalog-attribute.dynamic-facetable-option" => Some((
+                    "catalogAttribute.dynamicFacetableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.exact-searchable-option" => Some((
+                    "catalogAttribute.exactSearchableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.facet-config.merged-facet.merged-facet-key" => Some((
+                    "catalogAttribute.facetConfig.mergedFacet.mergedFacetKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.facet-config.rerank-config.facet-values" => Some((
+                    "catalogAttribute.facetConfig.rerankConfig.facetValues",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "catalog-attribute.facet-config.rerank-config.rerank-facet" => Some((
+                    "catalogAttribute.facetConfig.rerankConfig.rerankFacet",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.in-use" => Some((
+                    "catalogAttribute.inUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.indexable-option" => Some((
+                    "catalogAttribute.indexableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.key" => Some((
+                    "catalogAttribute.key",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.retrievable-option" => Some((
+                    "catalogAttribute.retrievableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.searchable-option" => Some((
+                    "catalogAttribute.searchableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.type" => Some((
+                    "catalogAttribute.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "catalog-attribute",
+                            "dynamic-facetable-option",
+                            "exact-searchable-option",
+                            "facet-config",
+                            "facet-values",
+                            "in-use",
+                            "indexable-option",
+                            "key",
+                            "merged-facet",
+                            "merged-facet-key",
+                            "rerank-config",
+                            "rerank-facet",
+                            "retrievable-option",
+                            "searchable-option",
+                            "type",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2AddCatalogAttributeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_attributes_config_add_catalog_attribute(request, opt.value_of("attributes-config").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2AddCatalogAttributeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_attributes_config_add_catalog_attribute(
+                request,
+                opt.value_of("attributes-config").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -104,15 +211,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -122,22 +234,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -145,13 +269,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_attributes_config_remove_catalog_attribute(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_attributes_config_remove_catalog_attribute(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -165,23 +297,51 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "key" => Some(("key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["key"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "key" => Some((
+                    "key",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["key"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2RemoveCatalogAttributeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_attributes_config_remove_catalog_attribute(request, opt.value_of("attributes-config").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2RemoveCatalogAttributeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_attributes_config_remove_catalog_attribute(
+                request,
+                opt.value_of("attributes-config").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -189,15 +349,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -207,22 +372,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -230,13 +407,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_attributes_config_replace_catalog_attribute(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_attributes_config_replace_catalog_attribute(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -250,34 +435,148 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "catalog-attribute.dynamic-facetable-option" => Some(("catalogAttribute.dynamicFacetableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.exact-searchable-option" => Some(("catalogAttribute.exactSearchableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.facet-config.merged-facet.merged-facet-key" => Some(("catalogAttribute.facetConfig.mergedFacet.mergedFacetKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.facet-config.rerank-config.facet-values" => Some(("catalogAttribute.facetConfig.rerankConfig.facetValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "catalog-attribute.facet-config.rerank-config.rerank-facet" => Some(("catalogAttribute.facetConfig.rerankConfig.rerankFacet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "catalog-attribute.in-use" => Some(("catalogAttribute.inUse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "catalog-attribute.indexable-option" => Some(("catalogAttribute.indexableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.key" => Some(("catalogAttribute.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.retrievable-option" => Some(("catalogAttribute.retrievableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.searchable-option" => Some(("catalogAttribute.searchableOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "catalog-attribute.type" => Some(("catalogAttribute.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["catalog-attribute", "dynamic-facetable-option", "exact-searchable-option", "facet-config", "facet-values", "in-use", "indexable-option", "key", "merged-facet", "merged-facet-key", "rerank-config", "rerank-facet", "retrievable-option", "searchable-option", "type", "update-mask"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "catalog-attribute.dynamic-facetable-option" => Some((
+                    "catalogAttribute.dynamicFacetableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.exact-searchable-option" => Some((
+                    "catalogAttribute.exactSearchableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.facet-config.merged-facet.merged-facet-key" => Some((
+                    "catalogAttribute.facetConfig.mergedFacet.mergedFacetKey",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.facet-config.rerank-config.facet-values" => Some((
+                    "catalogAttribute.facetConfig.rerankConfig.facetValues",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "catalog-attribute.facet-config.rerank-config.rerank-facet" => Some((
+                    "catalogAttribute.facetConfig.rerankConfig.rerankFacet",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.in-use" => Some((
+                    "catalogAttribute.inUse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.indexable-option" => Some((
+                    "catalogAttribute.indexableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.key" => Some((
+                    "catalogAttribute.key",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.retrievable-option" => Some((
+                    "catalogAttribute.retrievableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.searchable-option" => Some((
+                    "catalogAttribute.searchableOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "catalog-attribute.type" => Some((
+                    "catalogAttribute.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "catalog-attribute",
+                            "dynamic-facetable-option",
+                            "exact-searchable-option",
+                            "facet-config",
+                            "facet-values",
+                            "in-use",
+                            "indexable-option",
+                            "key",
+                            "merged-facet",
+                            "merged-facet-key",
+                            "rerank-config",
+                            "rerank-facet",
+                            "retrievable-option",
+                            "searchable-option",
+                            "type",
+                            "update-mask",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ReplaceCatalogAttributeRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_attributes_config_replace_catalog_attribute(request, opt.value_of("attributes-config").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ReplaceCatalogAttributeRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_attributes_config_replace_catalog_attribute(
+                request,
+                opt.value_of("attributes-config").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -285,15 +584,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -303,22 +607,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -326,10 +642,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_branches_operations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_branches_operations_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -337,15 +665,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -355,22 +688,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -378,13 +723,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_add_fulfillment_places(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_add_fulfillment_places(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -398,26 +751,75 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "add-time" => Some(("addTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "allow-missing" => Some(("allowMissing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "place-ids" => Some(("placeIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-time", "allow-missing", "place-ids", "type"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "add-time" => Some((
+                    "addTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allow-missing" => Some((
+                    "allowMissing",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "place-ids" => Some((
+                    "placeIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["add-time", "allow-missing", "place-ids", "type"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2AddFulfillmentPlacesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_add_fulfillment_places(request, opt.value_of("product").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2AddFulfillmentPlacesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_add_fulfillment_places(
+                request,
+                opt.value_of("product").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -425,15 +827,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -443,22 +850,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -466,13 +885,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_add_local_inventories(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_add_local_inventories(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -486,25 +913,68 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "add-mask" => Some(("addMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "add-time" => Some(("addTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "allow-missing" => Some(("allowMissing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-mask", "add-time", "allow-missing"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "add-mask" => Some((
+                    "addMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "add-time" => Some((
+                    "addTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allow-missing" => Some((
+                    "allowMissing",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["add-mask", "add-time", "allow-missing"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2AddLocalInventoriesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_add_local_inventories(request, opt.value_of("product").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2AddLocalInventoriesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_add_local_inventories(
+                request,
+                opt.value_of("product").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -512,15 +982,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -530,22 +1005,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -553,13 +1040,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -573,87 +1068,434 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "audience.age-groups" => Some(("audience.ageGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "audience.genders" => Some(("audience.genders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "available-quantity" => Some(("availableQuantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "available-time" => Some(("availableTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "brands" => Some(("brands", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "categories" => Some(("categories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "collection-member-ids" => Some(("collectionMemberIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "color-info.color-families" => Some(("colorInfo.colorFamilies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "color-info.colors" => Some(("colorInfo.colors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "conditions" => Some(("conditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "materials" => Some(("materials", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "patterns" => Some(("patterns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "price-info.cost" => Some(("priceInfo.cost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.currency-code" => Some(("priceInfo.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-info.original-price" => Some(("priceInfo.originalPrice", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price" => Some(("priceInfo.price", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-effective-time" => Some(("priceInfo.priceEffectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-info.price-expire-time" => Some(("priceInfo.priceExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.exclusive-maximum" => Some(("priceInfo.priceRange.originalPrice.exclusiveMaximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.exclusive-minimum" => Some(("priceInfo.priceRange.originalPrice.exclusiveMinimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.maximum" => Some(("priceInfo.priceRange.originalPrice.maximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.minimum" => Some(("priceInfo.priceRange.originalPrice.minimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.exclusive-maximum" => Some(("priceInfo.priceRange.price.exclusiveMaximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.exclusive-minimum" => Some(("priceInfo.priceRange.price.exclusiveMinimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.maximum" => Some(("priceInfo.priceRange.price.maximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.minimum" => Some(("priceInfo.priceRange.price.minimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "primary-product-id" => Some(("primaryProductId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "publish-time" => Some(("publishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rating.average-rating" => Some(("rating.averageRating", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "rating.rating-count" => Some(("rating.ratingCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "rating.rating-histogram" => Some(("rating.ratingHistogram", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
-                    "retrievable-fields" => Some(("retrievableFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sizes" => Some(("sizes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri" => Some(("uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["age-groups", "audience", "availability", "available-quantity", "available-time", "average-rating", "brands", "categories", "collection-member-ids", "color-families", "color-info", "colors", "conditions", "cost", "currency-code", "description", "exclusive-maximum", "exclusive-minimum", "expire-time", "genders", "gtin", "id", "language-code", "materials", "maximum", "minimum", "name", "original-price", "patterns", "price", "price-effective-time", "price-expire-time", "price-info", "price-range", "primary-product-id", "publish-time", "rating", "rating-count", "rating-histogram", "retrievable-fields", "sizes", "tags", "title", "ttl", "type", "uri"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "audience.age-groups" => Some((
+                    "audience.ageGroups",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "audience.genders" => Some((
+                    "audience.genders",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "availability" => Some((
+                    "availability",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "available-quantity" => Some((
+                    "availableQuantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "available-time" => Some((
+                    "availableTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "brands" => Some((
+                    "brands",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "categories" => Some((
+                    "categories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "collection-member-ids" => Some((
+                    "collectionMemberIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "color-info.color-families" => Some((
+                    "colorInfo.colorFamilies",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "color-info.colors" => Some((
+                    "colorInfo.colors",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "conditions" => Some((
+                    "conditions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "expire-time" => Some((
+                    "expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "gtin" => Some((
+                    "gtin",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "language-code" => Some((
+                    "languageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "materials" => Some((
+                    "materials",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "patterns" => Some((
+                    "patterns",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "price-info.cost" => Some((
+                    "priceInfo.cost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.currency-code" => Some((
+                    "priceInfo.currencyCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.original-price" => Some((
+                    "priceInfo.originalPrice",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price" => Some((
+                    "priceInfo.price",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-effective-time" => Some((
+                    "priceInfo.priceEffectiveTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-expire-time" => Some((
+                    "priceInfo.priceExpireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.exclusive-maximum" => Some((
+                    "priceInfo.priceRange.originalPrice.exclusiveMaximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.exclusive-minimum" => Some((
+                    "priceInfo.priceRange.originalPrice.exclusiveMinimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.maximum" => Some((
+                    "priceInfo.priceRange.originalPrice.maximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.minimum" => Some((
+                    "priceInfo.priceRange.originalPrice.minimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.exclusive-maximum" => Some((
+                    "priceInfo.priceRange.price.exclusiveMaximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.exclusive-minimum" => Some((
+                    "priceInfo.priceRange.price.exclusiveMinimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.maximum" => Some((
+                    "priceInfo.priceRange.price.maximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.minimum" => Some((
+                    "priceInfo.priceRange.price.minimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "primary-product-id" => Some((
+                    "primaryProductId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "publish-time" => Some((
+                    "publishTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rating.average-rating" => Some((
+                    "rating.averageRating",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rating.rating-count" => Some((
+                    "rating.ratingCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rating.rating-histogram" => Some((
+                    "rating.ratingHistogram",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "retrievable-fields" => Some((
+                    "retrievableFields",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "sizes" => Some((
+                    "sizes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "title" => Some((
+                    "title",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ttl" => Some((
+                    "ttl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uri" => Some((
+                    "uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "age-groups",
+                            "audience",
+                            "availability",
+                            "available-quantity",
+                            "available-time",
+                            "average-rating",
+                            "brands",
+                            "categories",
+                            "collection-member-ids",
+                            "color-families",
+                            "color-info",
+                            "colors",
+                            "conditions",
+                            "cost",
+                            "currency-code",
+                            "description",
+                            "exclusive-maximum",
+                            "exclusive-minimum",
+                            "expire-time",
+                            "genders",
+                            "gtin",
+                            "id",
+                            "language-code",
+                            "materials",
+                            "maximum",
+                            "minimum",
+                            "name",
+                            "original-price",
+                            "patterns",
+                            "price",
+                            "price-effective-time",
+                            "price-expire-time",
+                            "price-info",
+                            "price-range",
+                            "primary-product-id",
+                            "publish-time",
+                            "rating",
+                            "rating-count",
+                            "rating-histogram",
+                            "retrievable-fields",
+                            "sizes",
+                            "tags",
+                            "title",
+                            "ttl",
+                            "type",
+                            "uri",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2Product = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2Product =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_create(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "product-id" => {
                     call = call.product_id(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["product-id"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["product-id"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -663,22 +1505,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -686,10 +1540,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_branches_products_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_branches_products_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -697,15 +1563,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -715,22 +1586,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -738,10 +1621,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_branches_products_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_branches_products_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -749,15 +1644,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -767,22 +1667,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -790,13 +1702,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_import(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -810,37 +1730,172 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "errors-config.gcs-prefix" => Some(("errorsConfig.gcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.data-schema" => Some(("inputConfig.bigQuerySource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.dataset-id" => Some(("inputConfig.bigQuerySource.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.gcs-staging-dir" => Some(("inputConfig.bigQuerySource.gcsStagingDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.day" => Some(("inputConfig.bigQuerySource.partitionDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.month" => Some(("inputConfig.bigQuerySource.partitionDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.year" => Some(("inputConfig.bigQuerySource.partitionDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.project-id" => Some(("inputConfig.bigQuerySource.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.table-id" => Some(("inputConfig.bigQuerySource.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.gcs-source.data-schema" => Some(("inputConfig.gcsSource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.gcs-source.input-uris" => Some(("inputConfig.gcsSource.inputUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reconciliation-mode" => Some(("reconciliationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["big-query-source", "data-schema", "dataset-id", "day", "errors-config", "gcs-prefix", "gcs-source", "gcs-staging-dir", "input-config", "input-uris", "month", "notification-pubsub-topic", "partition-date", "project-id", "reconciliation-mode", "request-id", "table-id", "update-mask", "year"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "errors-config.gcs-prefix" => Some((
+                    "errorsConfig.gcsPrefix",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.data-schema" => Some((
+                    "inputConfig.bigQuerySource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.dataset-id" => Some((
+                    "inputConfig.bigQuerySource.datasetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.gcs-staging-dir" => Some((
+                    "inputConfig.bigQuerySource.gcsStagingDir",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.day" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.day",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.month" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.month",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.year" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.year",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.project-id" => Some((
+                    "inputConfig.bigQuerySource.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.table-id" => Some((
+                    "inputConfig.bigQuerySource.tableId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.gcs-source.data-schema" => Some((
+                    "inputConfig.gcsSource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.gcs-source.input-uris" => Some((
+                    "inputConfig.gcsSource.inputUris",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "notification-pubsub-topic" => Some((
+                    "notificationPubsubTopic",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "reconciliation-mode" => Some((
+                    "reconciliationMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "request-id" => Some((
+                    "requestId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-mask" => Some((
+                    "updateMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "big-query-source",
+                            "data-schema",
+                            "dataset-id",
+                            "day",
+                            "errors-config",
+                            "gcs-prefix",
+                            "gcs-source",
+                            "gcs-staging-dir",
+                            "input-config",
+                            "input-uris",
+                            "month",
+                            "notification-pubsub-topic",
+                            "partition-date",
+                            "project-id",
+                            "reconciliation-mode",
+                            "request-id",
+                            "table-id",
+                            "update-mask",
+                            "year",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ImportProductsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_import(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ImportProductsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_import(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -848,15 +1903,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -866,22 +1926,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -889,39 +1961,68 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_branches_products_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_branches_products_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "read-mask" => {
-                    call = call.read_mask(        value.map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.read_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "read-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token", "read-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["filter", "page-size", "page-token", "read-mask"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -931,22 +2032,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -954,13 +2067,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -974,90 +2095,445 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "audience.age-groups" => Some(("audience.ageGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "audience.genders" => Some(("audience.genders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "available-quantity" => Some(("availableQuantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "available-time" => Some(("availableTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "brands" => Some(("brands", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "categories" => Some(("categories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "collection-member-ids" => Some(("collectionMemberIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "color-info.color-families" => Some(("colorInfo.colorFamilies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "color-info.colors" => Some(("colorInfo.colors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "conditions" => Some(("conditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "materials" => Some(("materials", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "patterns" => Some(("patterns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "price-info.cost" => Some(("priceInfo.cost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.currency-code" => Some(("priceInfo.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-info.original-price" => Some(("priceInfo.originalPrice", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price" => Some(("priceInfo.price", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-effective-time" => Some(("priceInfo.priceEffectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-info.price-expire-time" => Some(("priceInfo.priceExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.exclusive-maximum" => Some(("priceInfo.priceRange.originalPrice.exclusiveMaximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.exclusive-minimum" => Some(("priceInfo.priceRange.originalPrice.exclusiveMinimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.maximum" => Some(("priceInfo.priceRange.originalPrice.maximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.original-price.minimum" => Some(("priceInfo.priceRange.originalPrice.minimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.exclusive-maximum" => Some(("priceInfo.priceRange.price.exclusiveMaximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.exclusive-minimum" => Some(("priceInfo.priceRange.price.exclusiveMinimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.maximum" => Some(("priceInfo.priceRange.price.maximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "price-info.price-range.price.minimum" => Some(("priceInfo.priceRange.price.minimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "primary-product-id" => Some(("primaryProductId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "publish-time" => Some(("publishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rating.average-rating" => Some(("rating.averageRating", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "rating.rating-count" => Some(("rating.ratingCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "rating.rating-histogram" => Some(("rating.ratingHistogram", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
-                    "retrievable-fields" => Some(("retrievableFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sizes" => Some(("sizes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri" => Some(("uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["age-groups", "audience", "availability", "available-quantity", "available-time", "average-rating", "brands", "categories", "collection-member-ids", "color-families", "color-info", "colors", "conditions", "cost", "currency-code", "description", "exclusive-maximum", "exclusive-minimum", "expire-time", "genders", "gtin", "id", "language-code", "materials", "maximum", "minimum", "name", "original-price", "patterns", "price", "price-effective-time", "price-expire-time", "price-info", "price-range", "primary-product-id", "publish-time", "rating", "rating-count", "rating-histogram", "retrievable-fields", "sizes", "tags", "title", "ttl", "type", "uri"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "audience.age-groups" => Some((
+                    "audience.ageGroups",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "audience.genders" => Some((
+                    "audience.genders",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "availability" => Some((
+                    "availability",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "available-quantity" => Some((
+                    "availableQuantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "available-time" => Some((
+                    "availableTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "brands" => Some((
+                    "brands",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "categories" => Some((
+                    "categories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "collection-member-ids" => Some((
+                    "collectionMemberIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "color-info.color-families" => Some((
+                    "colorInfo.colorFamilies",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "color-info.colors" => Some((
+                    "colorInfo.colors",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "conditions" => Some((
+                    "conditions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "description" => Some((
+                    "description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "expire-time" => Some((
+                    "expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "gtin" => Some((
+                    "gtin",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "id" => Some((
+                    "id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "language-code" => Some((
+                    "languageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "materials" => Some((
+                    "materials",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "patterns" => Some((
+                    "patterns",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "price-info.cost" => Some((
+                    "priceInfo.cost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.currency-code" => Some((
+                    "priceInfo.currencyCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.original-price" => Some((
+                    "priceInfo.originalPrice",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price" => Some((
+                    "priceInfo.price",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-effective-time" => Some((
+                    "priceInfo.priceEffectiveTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-expire-time" => Some((
+                    "priceInfo.priceExpireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.exclusive-maximum" => Some((
+                    "priceInfo.priceRange.originalPrice.exclusiveMaximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.exclusive-minimum" => Some((
+                    "priceInfo.priceRange.originalPrice.exclusiveMinimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.maximum" => Some((
+                    "priceInfo.priceRange.originalPrice.maximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.original-price.minimum" => Some((
+                    "priceInfo.priceRange.originalPrice.minimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.exclusive-maximum" => Some((
+                    "priceInfo.priceRange.price.exclusiveMaximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.exclusive-minimum" => Some((
+                    "priceInfo.priceRange.price.exclusiveMinimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.maximum" => Some((
+                    "priceInfo.priceRange.price.maximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-info.price-range.price.minimum" => Some((
+                    "priceInfo.priceRange.price.minimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "primary-product-id" => Some((
+                    "primaryProductId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "publish-time" => Some((
+                    "publishTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rating.average-rating" => Some((
+                    "rating.averageRating",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rating.rating-count" => Some((
+                    "rating.ratingCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rating.rating-histogram" => Some((
+                    "rating.ratingHistogram",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "retrievable-fields" => Some((
+                    "retrievableFields",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "sizes" => Some((
+                    "sizes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "tags" => Some((
+                    "tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "title" => Some((
+                    "title",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "ttl" => Some((
+                    "ttl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uri" => Some((
+                    "uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "age-groups",
+                            "audience",
+                            "availability",
+                            "available-quantity",
+                            "available-time",
+                            "average-rating",
+                            "brands",
+                            "categories",
+                            "collection-member-ids",
+                            "color-families",
+                            "color-info",
+                            "colors",
+                            "conditions",
+                            "cost",
+                            "currency-code",
+                            "description",
+                            "exclusive-maximum",
+                            "exclusive-minimum",
+                            "expire-time",
+                            "genders",
+                            "gtin",
+                            "id",
+                            "language-code",
+                            "materials",
+                            "maximum",
+                            "minimum",
+                            "name",
+                            "original-price",
+                            "patterns",
+                            "price",
+                            "price-effective-time",
+                            "price-expire-time",
+                            "price-info",
+                            "price-range",
+                            "primary-product-id",
+                            "publish-time",
+                            "rating",
+                            "rating-count",
+                            "rating-histogram",
+                            "retrievable-fields",
+                            "sizes",
+                            "tags",
+                            "title",
+                            "ttl",
+                            "type",
+                            "uri",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2Product = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2Product =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_patch(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 "allow-missing" => {
-                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
-                },
+                    call = call.allow_missing(
+                        value
+                            .map(|v| arg_from_str(v, err, "allow-missing", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["allow-missing", "update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["allow-missing", "update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1067,22 +2543,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1090,13 +2578,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_purge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_purge(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1110,24 +2606,58 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "force" => Some(("force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "force"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "force" => Some((
+                    "force",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "force"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2PurgeProductsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_purge(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2PurgeProductsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_purge(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1135,15 +2665,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1153,22 +2688,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1176,13 +2723,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_remove_fulfillment_places(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_remove_fulfillment_places(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1196,26 +2751,75 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "allow-missing" => Some(("allowMissing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "place-ids" => Some(("placeIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "remove-time" => Some(("removeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-missing", "place-ids", "remove-time", "type"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "allow-missing" => Some((
+                    "allowMissing",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "place-ids" => Some((
+                    "placeIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "remove-time" => Some((
+                    "removeTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["allow-missing", "place-ids", "remove-time", "type"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2RemoveFulfillmentPlacesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_remove_fulfillment_places(request, opt.value_of("product").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2RemoveFulfillmentPlacesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_remove_fulfillment_places(
+                request,
+                opt.value_of("product").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1223,15 +2827,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1241,22 +2850,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1264,13 +2885,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_remove_local_inventories(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_remove_local_inventories(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1284,25 +2913,68 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "allow-missing" => Some(("allowMissing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "place-ids" => Some(("placeIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "remove-time" => Some(("removeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-missing", "place-ids", "remove-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "allow-missing" => Some((
+                    "allowMissing",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "place-ids" => Some((
+                    "placeIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "remove-time" => Some((
+                    "removeTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec!["allow-missing", "place-ids", "remove-time"],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2RemoveLocalInventoriesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_remove_local_inventories(request, opt.value_of("product").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2RemoveLocalInventoriesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_remove_local_inventories(
+                request,
+                opt.value_of("product").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1310,15 +2982,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1328,22 +3005,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1351,13 +3040,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_branches_products_set_inventory(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_branches_products_set_inventory(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1371,70 +3068,434 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "allow-missing" => Some(("allowMissing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "inventory.audience.age-groups" => Some(("inventory.audience.ageGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.audience.genders" => Some(("inventory.audience.genders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.availability" => Some(("inventory.availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.available-quantity" => Some(("inventory.availableQuantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "inventory.available-time" => Some(("inventory.availableTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.brands" => Some(("inventory.brands", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.categories" => Some(("inventory.categories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.collection-member-ids" => Some(("inventory.collectionMemberIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.color-info.color-families" => Some(("inventory.colorInfo.colorFamilies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.color-info.colors" => Some(("inventory.colorInfo.colors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.conditions" => Some(("inventory.conditions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.description" => Some(("inventory.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.expire-time" => Some(("inventory.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.gtin" => Some(("inventory.gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.id" => Some(("inventory.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.language-code" => Some(("inventory.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.materials" => Some(("inventory.materials", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.name" => Some(("inventory.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.patterns" => Some(("inventory.patterns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.price-info.cost" => Some(("inventory.priceInfo.cost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.currency-code" => Some(("inventory.priceInfo.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.price-info.original-price" => Some(("inventory.priceInfo.originalPrice", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price" => Some(("inventory.priceInfo.price", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-effective-time" => Some(("inventory.priceInfo.priceEffectiveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-expire-time" => Some(("inventory.priceInfo.priceExpireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.original-price.exclusive-maximum" => Some(("inventory.priceInfo.priceRange.originalPrice.exclusiveMaximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.original-price.exclusive-minimum" => Some(("inventory.priceInfo.priceRange.originalPrice.exclusiveMinimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.original-price.maximum" => Some(("inventory.priceInfo.priceRange.originalPrice.maximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.original-price.minimum" => Some(("inventory.priceInfo.priceRange.originalPrice.minimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.price.exclusive-maximum" => Some(("inventory.priceInfo.priceRange.price.exclusiveMaximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.price.exclusive-minimum" => Some(("inventory.priceInfo.priceRange.price.exclusiveMinimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.price.maximum" => Some(("inventory.priceInfo.priceRange.price.maximum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.price-info.price-range.price.minimum" => Some(("inventory.priceInfo.priceRange.price.minimum", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.primary-product-id" => Some(("inventory.primaryProductId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.publish-time" => Some(("inventory.publishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.rating.average-rating" => Some(("inventory.rating.averageRating", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "inventory.rating.rating-count" => Some(("inventory.rating.ratingCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "inventory.rating.rating-histogram" => Some(("inventory.rating.ratingHistogram", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
-                    "inventory.retrievable-fields" => Some(("inventory.retrievableFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.sizes" => Some(("inventory.sizes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.tags" => Some(("inventory.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "inventory.title" => Some(("inventory.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.ttl" => Some(("inventory.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.type" => Some(("inventory.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "inventory.uri" => Some(("inventory.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "set-mask" => Some(("setMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "set-time" => Some(("setTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["age-groups", "allow-missing", "audience", "availability", "available-quantity", "available-time", "average-rating", "brands", "categories", "collection-member-ids", "color-families", "color-info", "colors", "conditions", "cost", "currency-code", "description", "exclusive-maximum", "exclusive-minimum", "expire-time", "genders", "gtin", "id", "inventory", "language-code", "materials", "maximum", "minimum", "name", "original-price", "patterns", "price", "price-effective-time", "price-expire-time", "price-info", "price-range", "primary-product-id", "publish-time", "rating", "rating-count", "rating-histogram", "retrievable-fields", "set-mask", "set-time", "sizes", "tags", "title", "ttl", "type", "uri"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "allow-missing" => Some((
+                    "allowMissing",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.audience.age-groups" => Some((
+                    "inventory.audience.ageGroups",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.audience.genders" => Some((
+                    "inventory.audience.genders",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.availability" => Some((
+                    "inventory.availability",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.available-quantity" => Some((
+                    "inventory.availableQuantity",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.available-time" => Some((
+                    "inventory.availableTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.brands" => Some((
+                    "inventory.brands",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.categories" => Some((
+                    "inventory.categories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.collection-member-ids" => Some((
+                    "inventory.collectionMemberIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.color-info.color-families" => Some((
+                    "inventory.colorInfo.colorFamilies",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.color-info.colors" => Some((
+                    "inventory.colorInfo.colors",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.conditions" => Some((
+                    "inventory.conditions",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.description" => Some((
+                    "inventory.description",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.expire-time" => Some((
+                    "inventory.expireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.gtin" => Some((
+                    "inventory.gtin",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.id" => Some((
+                    "inventory.id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.language-code" => Some((
+                    "inventory.languageCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.materials" => Some((
+                    "inventory.materials",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.name" => Some((
+                    "inventory.name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.patterns" => Some((
+                    "inventory.patterns",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.price-info.cost" => Some((
+                    "inventory.priceInfo.cost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.currency-code" => Some((
+                    "inventory.priceInfo.currencyCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.original-price" => Some((
+                    "inventory.priceInfo.originalPrice",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price" => Some((
+                    "inventory.priceInfo.price",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-effective-time" => Some((
+                    "inventory.priceInfo.priceEffectiveTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-expire-time" => Some((
+                    "inventory.priceInfo.priceExpireTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.original-price.exclusive-maximum" => Some((
+                    "inventory.priceInfo.priceRange.originalPrice.exclusiveMaximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.original-price.exclusive-minimum" => Some((
+                    "inventory.priceInfo.priceRange.originalPrice.exclusiveMinimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.original-price.maximum" => Some((
+                    "inventory.priceInfo.priceRange.originalPrice.maximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.original-price.minimum" => Some((
+                    "inventory.priceInfo.priceRange.originalPrice.minimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.price.exclusive-maximum" => Some((
+                    "inventory.priceInfo.priceRange.price.exclusiveMaximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.price.exclusive-minimum" => Some((
+                    "inventory.priceInfo.priceRange.price.exclusiveMinimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.price.maximum" => Some((
+                    "inventory.priceInfo.priceRange.price.maximum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.price-info.price-range.price.minimum" => Some((
+                    "inventory.priceInfo.priceRange.price.minimum",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.primary-product-id" => Some((
+                    "inventory.primaryProductId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.publish-time" => Some((
+                    "inventory.publishTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.rating.average-rating" => Some((
+                    "inventory.rating.averageRating",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.rating.rating-count" => Some((
+                    "inventory.rating.ratingCount",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.rating.rating-histogram" => Some((
+                    "inventory.rating.ratingHistogram",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.retrievable-fields" => Some((
+                    "inventory.retrievableFields",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.sizes" => Some((
+                    "inventory.sizes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.tags" => Some((
+                    "inventory.tags",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "inventory.title" => Some((
+                    "inventory.title",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.ttl" => Some((
+                    "inventory.ttl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.type" => Some((
+                    "inventory.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "inventory.uri" => Some((
+                    "inventory.uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "set-mask" => Some((
+                    "setMask",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "set-time" => Some((
+                    "setTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "age-groups",
+                            "allow-missing",
+                            "audience",
+                            "availability",
+                            "available-quantity",
+                            "available-time",
+                            "average-rating",
+                            "brands",
+                            "categories",
+                            "collection-member-ids",
+                            "color-families",
+                            "color-info",
+                            "colors",
+                            "conditions",
+                            "cost",
+                            "currency-code",
+                            "description",
+                            "exclusive-maximum",
+                            "exclusive-minimum",
+                            "expire-time",
+                            "genders",
+                            "gtin",
+                            "id",
+                            "inventory",
+                            "language-code",
+                            "materials",
+                            "maximum",
+                            "minimum",
+                            "name",
+                            "original-price",
+                            "patterns",
+                            "price",
+                            "price-effective-time",
+                            "price-expire-time",
+                            "price-info",
+                            "price-range",
+                            "primary-product-id",
+                            "publish-time",
+                            "rating",
+                            "rating-count",
+                            "rating-histogram",
+                            "retrievable-fields",
+                            "set-mask",
+                            "set-time",
+                            "sizes",
+                            "tags",
+                            "title",
+                            "ttl",
+                            "type",
+                            "uri",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2SetInventoryRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_branches_products_set_inventory(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2SetInventoryRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_branches_products_set_inventory(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1442,15 +3503,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1460,22 +3526,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1483,51 +3561,91 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_complete_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_complete_query(opt.value_of("catalog").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_complete_query(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_complete_query(opt.value_of("catalog").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "visitor-id" => {
                     call = call.visitor_id(value.unwrap_or(""));
-                },
+                }
                 "query" => {
                     call = call.query(value.unwrap_or(""));
-                },
+                }
                 "max-suggestions" => {
-                    call = call.max_suggestions(        value.map(|v| arg_from_str(v, err, "max-suggestions", "int32")).unwrap_or(-0));
-                },
+                    call = call.max_suggestions(
+                        value
+                            .map(|v| arg_from_str(v, err, "max-suggestions", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 "language-codes" => {
                     call = call.add_language_codes(value.unwrap_or(""));
-                },
+                }
                 "entity" => {
                     call = call.entity(value.unwrap_or(""));
-                },
+                }
                 "enable-attribute-suggestions" => {
-                    call = call.enable_attribute_suggestions(        value.map(|v| arg_from_str(v, err, "enable-attribute-suggestions", "boolean")).unwrap_or(false));
-                },
+                    call = call.enable_attribute_suggestions(
+                        value
+                            .map(|v| {
+                                arg_from_str(v, err, "enable-attribute-suggestions", "boolean")
+                            })
+                            .unwrap_or(false),
+                    );
+                }
                 "device-type" => {
                     call = call.device_type(value.unwrap_or(""));
-                },
+                }
                 "dataset" => {
                     call = call.dataset(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["dataset", "device-type", "enable-attribute-suggestions", "entity", "language-codes", "max-suggestions", "query", "visitor-id"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "dataset",
+                                        "device-type",
+                                        "enable-attribute-suggestions",
+                                        "entity",
+                                        "language-codes",
+                                        "max-suggestions",
+                                        "query",
+                                        "visitor-id",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -1537,22 +3655,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1560,13 +3690,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_completion_data_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_completion_data_import(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1580,31 +3718,123 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "input-config.big-query-source.data-schema" => Some(("inputConfig.bigQuerySource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.dataset-id" => Some(("inputConfig.bigQuerySource.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.gcs-staging-dir" => Some(("inputConfig.bigQuerySource.gcsStagingDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.day" => Some(("inputConfig.bigQuerySource.partitionDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.month" => Some(("inputConfig.bigQuerySource.partitionDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.year" => Some(("inputConfig.bigQuerySource.partitionDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.project-id" => Some(("inputConfig.bigQuerySource.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.table-id" => Some(("inputConfig.bigQuerySource.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["big-query-source", "data-schema", "dataset-id", "day", "gcs-staging-dir", "input-config", "month", "notification-pubsub-topic", "partition-date", "project-id", "table-id", "year"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "input-config.big-query-source.data-schema" => Some((
+                    "inputConfig.bigQuerySource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.dataset-id" => Some((
+                    "inputConfig.bigQuerySource.datasetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.gcs-staging-dir" => Some((
+                    "inputConfig.bigQuerySource.gcsStagingDir",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.day" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.day",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.month" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.month",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.year" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.year",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.project-id" => Some((
+                    "inputConfig.bigQuerySource.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.table-id" => Some((
+                    "inputConfig.bigQuerySource.tableId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "notification-pubsub-topic" => Some((
+                    "notificationPubsubTopic",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "big-query-source",
+                            "data-schema",
+                            "dataset-id",
+                            "day",
+                            "gcs-staging-dir",
+                            "input-config",
+                            "month",
+                            "notification-pubsub-topic",
+                            "partition-date",
+                            "project-id",
+                            "table-id",
+                            "year",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ImportCompletionDataRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_completion_data_import(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ImportCompletionDataRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_completion_data_import(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1612,15 +3842,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1630,22 +3865,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1653,13 +3900,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_controls_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_controls_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1673,64 +3928,254 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "associated-serving-config-ids" => Some(("associatedServingConfigIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.boost-action.boost" => Some(("rule.boostAction.boost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "rule.boost-action.products-filter" => Some(("rule.boostAction.productsFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.condition.page-categories" => Some(("rule.condition.pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.do-not-associate-action.do-not-associate-terms" => Some(("rule.doNotAssociateAction.doNotAssociateTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.do-not-associate-action.query-terms" => Some(("rule.doNotAssociateAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.do-not-associate-action.terms" => Some(("rule.doNotAssociateAction.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.filter-action.filter" => Some(("rule.filterAction.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.ignore-action.ignore-terms" => Some(("rule.ignoreAction.ignoreTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.oneway-synonyms-action.oneway-terms" => Some(("rule.onewaySynonymsAction.onewayTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.oneway-synonyms-action.query-terms" => Some(("rule.onewaySynonymsAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.oneway-synonyms-action.synonyms" => Some(("rule.onewaySynonymsAction.synonyms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.redirect-action.redirect-uri" => Some(("rule.redirectAction.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.remove-facet-action.attribute-names" => Some(("rule.removeFacetAction.attributeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.replacement-action.query-terms" => Some(("rule.replacementAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.replacement-action.replacement-term" => Some(("rule.replacementAction.replacementTerm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.replacement-action.term" => Some(("rule.replacementAction.term", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.twoway-synonyms-action.synonyms" => Some(("rule.twowaySynonymsAction.synonyms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "search-solution-use-case" => Some(("searchSolutionUseCase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["associated-serving-config-ids", "attribute-names", "boost", "boost-action", "condition", "display-name", "do-not-associate-action", "do-not-associate-terms", "filter", "filter-action", "ignore-action", "ignore-terms", "name", "oneway-synonyms-action", "oneway-terms", "page-categories", "products-filter", "query-terms", "redirect-action", "redirect-uri", "remove-facet-action", "replacement-action", "replacement-term", "rule", "search-solution-use-case", "solution-types", "synonyms", "term", "terms", "twoway-synonyms-action"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "associated-serving-config-ids" => Some((
+                    "associatedServingConfigIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.boost-action.boost" => Some((
+                    "rule.boostAction.boost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.boost-action.products-filter" => Some((
+                    "rule.boostAction.productsFilter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.condition.page-categories" => Some((
+                    "rule.condition.pageCategories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.do-not-associate-action.do-not-associate-terms" => Some((
+                    "rule.doNotAssociateAction.doNotAssociateTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.do-not-associate-action.query-terms" => Some((
+                    "rule.doNotAssociateAction.queryTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.do-not-associate-action.terms" => Some((
+                    "rule.doNotAssociateAction.terms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.filter-action.filter" => Some((
+                    "rule.filterAction.filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.ignore-action.ignore-terms" => Some((
+                    "rule.ignoreAction.ignoreTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.oneway-synonyms-action.oneway-terms" => Some((
+                    "rule.onewaySynonymsAction.onewayTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.oneway-synonyms-action.query-terms" => Some((
+                    "rule.onewaySynonymsAction.queryTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.oneway-synonyms-action.synonyms" => Some((
+                    "rule.onewaySynonymsAction.synonyms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.redirect-action.redirect-uri" => Some((
+                    "rule.redirectAction.redirectUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.remove-facet-action.attribute-names" => Some((
+                    "rule.removeFacetAction.attributeNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.replacement-action.query-terms" => Some((
+                    "rule.replacementAction.queryTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.replacement-action.replacement-term" => Some((
+                    "rule.replacementAction.replacementTerm",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.replacement-action.term" => Some((
+                    "rule.replacementAction.term",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.twoway-synonyms-action.synonyms" => Some((
+                    "rule.twowaySynonymsAction.synonyms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "search-solution-use-case" => Some((
+                    "searchSolutionUseCase",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "solution-types" => Some((
+                    "solutionTypes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "associated-serving-config-ids",
+                            "attribute-names",
+                            "boost",
+                            "boost-action",
+                            "condition",
+                            "display-name",
+                            "do-not-associate-action",
+                            "do-not-associate-terms",
+                            "filter",
+                            "filter-action",
+                            "ignore-action",
+                            "ignore-terms",
+                            "name",
+                            "oneway-synonyms-action",
+                            "oneway-terms",
+                            "page-categories",
+                            "products-filter",
+                            "query-terms",
+                            "redirect-action",
+                            "redirect-uri",
+                            "remove-facet-action",
+                            "replacement-action",
+                            "replacement-term",
+                            "rule",
+                            "search-solution-use-case",
+                            "solution-types",
+                            "synonyms",
+                            "term",
+                            "terms",
+                            "twoway-synonyms-action",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2Control = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_controls_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2Control =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_controls_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "control-id" => {
                     call = call.control_id(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["control-id"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["control-id"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1740,22 +4185,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1763,10 +4220,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_controls_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_controls_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_controls_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_controls_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1774,15 +4243,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1792,22 +4266,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1815,10 +4301,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_controls_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_controls_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_controls_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_controls_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1826,15 +4324,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1844,22 +4347,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1867,36 +4382,57 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_controls_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_controls_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_controls_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_controls_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1906,22 +4442,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1929,13 +4477,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_controls_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_controls_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1949,64 +4505,258 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "associated-serving-config-ids" => Some(("associatedServingConfigIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.boost-action.boost" => Some(("rule.boostAction.boost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "rule.boost-action.products-filter" => Some(("rule.boostAction.productsFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.condition.page-categories" => Some(("rule.condition.pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.do-not-associate-action.do-not-associate-terms" => Some(("rule.doNotAssociateAction.doNotAssociateTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.do-not-associate-action.query-terms" => Some(("rule.doNotAssociateAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.do-not-associate-action.terms" => Some(("rule.doNotAssociateAction.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.filter-action.filter" => Some(("rule.filterAction.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.ignore-action.ignore-terms" => Some(("rule.ignoreAction.ignoreTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.oneway-synonyms-action.oneway-terms" => Some(("rule.onewaySynonymsAction.onewayTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.oneway-synonyms-action.query-terms" => Some(("rule.onewaySynonymsAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.oneway-synonyms-action.synonyms" => Some(("rule.onewaySynonymsAction.synonyms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.redirect-action.redirect-uri" => Some(("rule.redirectAction.redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.remove-facet-action.attribute-names" => Some(("rule.removeFacetAction.attributeNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.replacement-action.query-terms" => Some(("rule.replacementAction.queryTerms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "rule.replacement-action.replacement-term" => Some(("rule.replacementAction.replacementTerm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.replacement-action.term" => Some(("rule.replacementAction.term", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "rule.twoway-synonyms-action.synonyms" => Some(("rule.twowaySynonymsAction.synonyms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "search-solution-use-case" => Some(("searchSolutionUseCase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["associated-serving-config-ids", "attribute-names", "boost", "boost-action", "condition", "display-name", "do-not-associate-action", "do-not-associate-terms", "filter", "filter-action", "ignore-action", "ignore-terms", "name", "oneway-synonyms-action", "oneway-terms", "page-categories", "products-filter", "query-terms", "redirect-action", "redirect-uri", "remove-facet-action", "replacement-action", "replacement-term", "rule", "search-solution-use-case", "solution-types", "synonyms", "term", "terms", "twoway-synonyms-action"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "associated-serving-config-ids" => Some((
+                    "associatedServingConfigIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.boost-action.boost" => Some((
+                    "rule.boostAction.boost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.boost-action.products-filter" => Some((
+                    "rule.boostAction.productsFilter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.condition.page-categories" => Some((
+                    "rule.condition.pageCategories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.do-not-associate-action.do-not-associate-terms" => Some((
+                    "rule.doNotAssociateAction.doNotAssociateTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.do-not-associate-action.query-terms" => Some((
+                    "rule.doNotAssociateAction.queryTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.do-not-associate-action.terms" => Some((
+                    "rule.doNotAssociateAction.terms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.filter-action.filter" => Some((
+                    "rule.filterAction.filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.ignore-action.ignore-terms" => Some((
+                    "rule.ignoreAction.ignoreTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.oneway-synonyms-action.oneway-terms" => Some((
+                    "rule.onewaySynonymsAction.onewayTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.oneway-synonyms-action.query-terms" => Some((
+                    "rule.onewaySynonymsAction.queryTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.oneway-synonyms-action.synonyms" => Some((
+                    "rule.onewaySynonymsAction.synonyms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.redirect-action.redirect-uri" => Some((
+                    "rule.redirectAction.redirectUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.remove-facet-action.attribute-names" => Some((
+                    "rule.removeFacetAction.attributeNames",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.replacement-action.query-terms" => Some((
+                    "rule.replacementAction.queryTerms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "rule.replacement-action.replacement-term" => Some((
+                    "rule.replacementAction.replacementTerm",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.replacement-action.term" => Some((
+                    "rule.replacementAction.term",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "rule.twoway-synonyms-action.synonyms" => Some((
+                    "rule.twowaySynonymsAction.synonyms",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "search-solution-use-case" => Some((
+                    "searchSolutionUseCase",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "solution-types" => Some((
+                    "solutionTypes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "associated-serving-config-ids",
+                            "attribute-names",
+                            "boost",
+                            "boost-action",
+                            "condition",
+                            "display-name",
+                            "do-not-associate-action",
+                            "do-not-associate-terms",
+                            "filter",
+                            "filter-action",
+                            "ignore-action",
+                            "ignore-terms",
+                            "name",
+                            "oneway-synonyms-action",
+                            "oneway-terms",
+                            "page-categories",
+                            "products-filter",
+                            "query-terms",
+                            "redirect-action",
+                            "redirect-uri",
+                            "remove-facet-action",
+                            "replacement-action",
+                            "replacement-term",
+                            "rule",
+                            "search-solution-use-case",
+                            "solution-types",
+                            "synonyms",
+                            "term",
+                            "terms",
+                            "twoway-synonyms-action",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2Control = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_controls_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2Control =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_controls_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2016,22 +4766,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2039,13 +4801,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_export_analytics_metrics(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_export_analytics_metrics(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2059,27 +4829,91 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "output-config.bigquery-destination.dataset-id" => Some(("outputConfig.bigqueryDestination.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "output-config.bigquery-destination.table-id-prefix" => Some(("outputConfig.bigqueryDestination.tableIdPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "output-config.bigquery-destination.table-type" => Some(("outputConfig.bigqueryDestination.tableType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "output-config.gcs-destination.output-uri-prefix" => Some(("outputConfig.gcsDestination.outputUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination", "dataset-id", "filter", "gcs-destination", "output-config", "output-uri-prefix", "table-id-prefix", "table-type"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "output-config.bigquery-destination.dataset-id" => Some((
+                    "outputConfig.bigqueryDestination.datasetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "output-config.bigquery-destination.table-id-prefix" => Some((
+                    "outputConfig.bigqueryDestination.tableIdPrefix",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "output-config.bigquery-destination.table-type" => Some((
+                    "outputConfig.bigqueryDestination.tableType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "output-config.gcs-destination.output-uri-prefix" => Some((
+                    "outputConfig.gcsDestination.outputUriPrefix",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "bigquery-destination",
+                            "dataset-id",
+                            "filter",
+                            "gcs-destination",
+                            "output-config",
+                            "output-uri-prefix",
+                            "table-id-prefix",
+                            "table-type",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ExportAnalyticsMetricsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_export_analytics_metrics(request, opt.value_of("catalog").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ExportAnalyticsMetricsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_export_analytics_metrics(
+                request,
+                opt.value_of("catalog").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2087,15 +4921,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2105,22 +4944,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2128,10 +4979,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_get_attributes_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_get_attributes_config(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_get_attributes_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_get_attributes_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2139,15 +5002,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2157,22 +5025,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2180,10 +5060,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_get_completion_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_get_completion_config(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_get_completion_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_get_completion_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2191,15 +5083,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2209,22 +5106,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2232,10 +5141,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_get_default_branch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_get_default_branch(opt.value_of("catalog").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_get_default_branch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_get_default_branch(opt.value_of("catalog").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2243,15 +5164,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2261,22 +5187,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2284,33 +5222,54 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2320,22 +5279,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2343,13 +5314,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_models_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2363,56 +5342,190 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-state" => Some(("dataState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filtering-option" => Some(("filteringOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-tune-time" => Some(("lastTuneTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "model-features-config.frequently-bought-together-config.context-products-type" => Some(("modelFeaturesConfig.frequentlyBoughtTogetherConfig.contextProductsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "optimization-objective" => Some(("optimizationObjective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "periodic-tuning-state" => Some(("periodicTuningState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "serving-state" => Some(("servingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-state" => Some(("trainingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tuning-operation" => Some(("tuningOperation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-products-type", "create-time", "data-state", "display-name", "filtering-option", "frequently-bought-together-config", "last-tune-time", "model-features-config", "name", "optimization-objective", "periodic-tuning-state", "serving-state", "training-state", "tuning-operation", "type", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "data-state" => Some((
+                    "dataState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "filtering-option" => Some((
+                    "filteringOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "last-tune-time" => Some((
+                    "lastTuneTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "model-features-config.frequently-bought-together-config.context-products-type" => {
+                    Some((
+                        "modelFeaturesConfig.frequentlyBoughtTogetherConfig.contextProductsType",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "optimization-objective" => Some((
+                    "optimizationObjective",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "periodic-tuning-state" => Some((
+                    "periodicTuningState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "serving-state" => Some((
+                    "servingState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "training-state" => Some((
+                    "trainingState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tuning-operation" => Some((
+                    "tuningOperation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "context-products-type",
+                            "create-time",
+                            "data-state",
+                            "display-name",
+                            "filtering-option",
+                            "frequently-bought-together-config",
+                            "last-tune-time",
+                            "model-features-config",
+                            "name",
+                            "optimization-objective",
+                            "periodic-tuning-state",
+                            "serving-state",
+                            "training-state",
+                            "tuning-operation",
+                            "type",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2Model = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_models_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2Model =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "dry-run" => {
-                    call = call.dry_run(        value.map(|v| arg_from_str(v, err, "dry-run", "boolean")).unwrap_or(false));
-                },
+                    call = call.dry_run(
+                        value
+                            .map(|v| arg_from_str(v, err, "dry-run", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["dry-run"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["dry-run"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2422,22 +5535,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2445,10 +5570,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_models_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_models_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2456,15 +5593,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2474,22 +5616,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2497,10 +5651,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_models_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_models_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2508,15 +5674,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2526,22 +5697,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2549,33 +5732,54 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_models_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_models_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2585,22 +5789,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2608,13 +5824,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_models_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2628,56 +5852,190 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "data-state" => Some(("dataState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filtering-option" => Some(("filteringOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-tune-time" => Some(("lastTuneTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "model-features-config.frequently-bought-together-config.context-products-type" => Some(("modelFeaturesConfig.frequentlyBoughtTogetherConfig.contextProductsType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "optimization-objective" => Some(("optimizationObjective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "periodic-tuning-state" => Some(("periodicTuningState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "serving-state" => Some(("servingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "training-state" => Some(("trainingState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tuning-operation" => Some(("tuningOperation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["context-products-type", "create-time", "data-state", "display-name", "filtering-option", "frequently-bought-together-config", "last-tune-time", "model-features-config", "name", "optimization-objective", "periodic-tuning-state", "serving-state", "training-state", "tuning-operation", "type", "update-time"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "create-time" => Some((
+                    "createTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "data-state" => Some((
+                    "dataState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "filtering-option" => Some((
+                    "filteringOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "last-tune-time" => Some((
+                    "lastTuneTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "model-features-config.frequently-bought-together-config.context-products-type" => {
+                    Some((
+                        "modelFeaturesConfig.frequentlyBoughtTogetherConfig.contextProductsType",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "optimization-objective" => Some((
+                    "optimizationObjective",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "periodic-tuning-state" => Some((
+                    "periodicTuningState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "serving-state" => Some((
+                    "servingState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "training-state" => Some((
+                    "trainingState",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "tuning-operation" => Some((
+                    "tuningOperation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "type" => Some((
+                    "type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "update-time" => Some((
+                    "updateTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "context-products-type",
+                            "create-time",
+                            "data-state",
+                            "display-name",
+                            "filtering-option",
+                            "frequently-bought-together-config",
+                            "last-tune-time",
+                            "model-features-config",
+                            "name",
+                            "optimization-objective",
+                            "periodic-tuning-state",
+                            "serving-state",
+                            "training-state",
+                            "tuning-operation",
+                            "type",
+                            "update-time",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2Model = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_models_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2Model =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2687,22 +6045,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2710,13 +6080,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_pause(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_models_pause(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2730,22 +6108,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2PauseModelRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_models_pause(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2PauseModelRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_pause(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2753,15 +6150,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2771,22 +6173,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2794,13 +6208,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_resume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_models_resume(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2814,22 +6236,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ResumeModelRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_models_resume(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ResumeModelRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_resume(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2837,15 +6278,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2855,22 +6301,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2878,13 +6336,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_models_tune(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_models_tune(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2898,22 +6364,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2TuneModelRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_models_tune(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2TuneModelRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_models_tune(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2921,15 +6406,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2939,22 +6429,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -2962,10 +6464,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_operations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_operations_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -2973,15 +6487,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -2991,22 +6510,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3014,36 +6545,57 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_operations_list(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_operations_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_operations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3053,22 +6605,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3076,13 +6640,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3096,46 +6668,107 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-level-config.ingestion-product-type" => Some(("productLevelConfig.ingestionProductType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "product-level-config.merchant-center-product-id-field" => Some(("productLevelConfig.merchantCenterProductIdField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "ingestion-product-type", "merchant-center-product-id-field", "name", "product-level-config"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-level-config.ingestion-product-type" => Some((
+                    "productLevelConfig.ingestionProductType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "product-level-config.merchant-center-product-id-field" => Some((
+                    "productLevelConfig.merchantCenterProductIdField",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "display-name",
+                            "ingestion-product-type",
+                            "merchant-center-product-id-field",
+                            "name",
+                            "product-level-config",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2Catalog = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2Catalog =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3145,22 +6778,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3168,13 +6813,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_placements_predict(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_placements_predict(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3188,55 +6841,312 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.attribution-token" => Some(("userEvent.attributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.cart-id" => Some(("userEvent.cartId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.completion-detail.completion-attribution-token" => Some(("userEvent.completionDetail.completionAttributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.completion-detail.selected-position" => Some(("userEvent.completionDetail.selectedPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "user-event.completion-detail.selected-suggestion" => Some(("userEvent.completionDetail.selectedSuggestion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.entity" => Some(("userEvent.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.event-time" => Some(("userEvent.eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.event-type" => Some(("userEvent.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.experiment-ids" => Some(("userEvent.experimentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "user-event.filter" => Some(("userEvent.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.offset" => Some(("userEvent.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "user-event.order-by" => Some(("userEvent.orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.page-categories" => Some(("userEvent.pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "user-event.page-view-id" => Some(("userEvent.pageViewId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.cost" => Some(("userEvent.purchaseTransaction.cost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.currency-code" => Some(("userEvent.purchaseTransaction.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.id" => Some(("userEvent.purchaseTransaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.revenue" => Some(("userEvent.purchaseTransaction.revenue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.tax" => Some(("userEvent.purchaseTransaction.tax", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "user-event.referrer-uri" => Some(("userEvent.referrerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.search-query" => Some(("userEvent.searchQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.session-id" => Some(("userEvent.sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.uri" => Some(("userEvent.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.user-info.direct-user-request" => Some(("userEvent.userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-event.user-info.ip-address" => Some(("userEvent.userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.user-info.user-agent" => Some(("userEvent.userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.user-info.user-id" => Some(("userEvent.userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.visitor-id" => Some(("userEvent.visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "entity", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "labels", "offset", "order-by", "page-categories", "page-size", "page-token", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-event", "user-id", "user-info", "validate-only", "visitor-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "page-size" => Some((
+                    "pageSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-token" => Some((
+                    "pageToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.attribution-token" => Some((
+                    "userEvent.attributionToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.cart-id" => Some((
+                    "userEvent.cartId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.completion-detail.completion-attribution-token" => Some((
+                    "userEvent.completionDetail.completionAttributionToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.completion-detail.selected-position" => Some((
+                    "userEvent.completionDetail.selectedPosition",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.completion-detail.selected-suggestion" => Some((
+                    "userEvent.completionDetail.selectedSuggestion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.entity" => Some((
+                    "userEvent.entity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.event-time" => Some((
+                    "userEvent.eventTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.event-type" => Some((
+                    "userEvent.eventType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.experiment-ids" => Some((
+                    "userEvent.experimentIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "user-event.filter" => Some((
+                    "userEvent.filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.offset" => Some((
+                    "userEvent.offset",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.order-by" => Some((
+                    "userEvent.orderBy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.page-categories" => Some((
+                    "userEvent.pageCategories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "user-event.page-view-id" => Some((
+                    "userEvent.pageViewId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.cost" => Some((
+                    "userEvent.purchaseTransaction.cost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.currency-code" => Some((
+                    "userEvent.purchaseTransaction.currencyCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.id" => Some((
+                    "userEvent.purchaseTransaction.id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.revenue" => Some((
+                    "userEvent.purchaseTransaction.revenue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.tax" => Some((
+                    "userEvent.purchaseTransaction.tax",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.referrer-uri" => Some((
+                    "userEvent.referrerUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.search-query" => Some((
+                    "userEvent.searchQuery",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.session-id" => Some((
+                    "userEvent.sessionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.uri" => Some((
+                    "userEvent.uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.direct-user-request" => Some((
+                    "userEvent.userInfo.directUserRequest",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.ip-address" => Some((
+                    "userEvent.userInfo.ipAddress",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.user-agent" => Some((
+                    "userEvent.userInfo.userAgent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.user-id" => Some((
+                    "userEvent.userInfo.userId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.visitor-id" => Some((
+                    "userEvent.visitorId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "validate-only" => Some((
+                    "validateOnly",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "attribution-token",
+                            "cart-id",
+                            "completion-attribution-token",
+                            "completion-detail",
+                            "cost",
+                            "currency-code",
+                            "direct-user-request",
+                            "entity",
+                            "event-time",
+                            "event-type",
+                            "experiment-ids",
+                            "filter",
+                            "id",
+                            "ip-address",
+                            "labels",
+                            "offset",
+                            "order-by",
+                            "page-categories",
+                            "page-size",
+                            "page-token",
+                            "page-view-id",
+                            "purchase-transaction",
+                            "referrer-uri",
+                            "revenue",
+                            "search-query",
+                            "selected-position",
+                            "selected-suggestion",
+                            "session-id",
+                            "tax",
+                            "uri",
+                            "user-agent",
+                            "user-event",
+                            "user-id",
+                            "user-info",
+                            "validate-only",
+                            "visitor-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2PredictRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_placements_predict(request, opt.value_of("placement").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2PredictRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_catalogs_placements_predict(
+            request,
+            opt.value_of("placement").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3244,15 +7154,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3262,22 +7177,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3285,13 +7212,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_placements_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_placements_search(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3305,46 +7240,241 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "boost-spec.skip-boost-spec-validation" => Some(("boostSpec.skipBoostSpecValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "canonical-filter" => Some(("canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-categories" => Some(("pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "personalization-spec.mode" => Some(("personalizationSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-expansion-spec.condition" => Some(("queryExpansionSpec.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-expansion-spec.pin-unexpanded-results" => Some(("queryExpansionSpec.pinUnexpandedResults", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spell-correction-spec.mode" => Some(("spellCorrectionSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.direct-user-request" => Some(("userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-info.ip-address" => Some(("userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.user-agent" => Some(("userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "variant-rollup-keys" => Some(("variantRollupKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "direct-user-request", "dynamic-facet-spec", "entity", "filter", "ip-address", "labels", "mode", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "query", "query-expansion-spec", "search-mode", "skip-boost-spec-validation", "spell-correction-spec", "user-agent", "user-id", "user-info", "variant-rollup-keys", "visitor-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "boost-spec.skip-boost-spec-validation" => Some((
+                    "boostSpec.skipBoostSpecValidation",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "branch" => Some((
+                    "branch",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "canonical-filter" => Some((
+                    "canonicalFilter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dynamic-facet-spec.mode" => Some((
+                    "dynamicFacetSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "entity" => Some((
+                    "entity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "offset" => Some((
+                    "offset",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "order-by" => Some((
+                    "orderBy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-categories" => Some((
+                    "pageCategories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "page-size" => Some((
+                    "pageSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-token" => Some((
+                    "pageToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "personalization-spec.mode" => Some((
+                    "personalizationSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query" => Some((
+                    "query",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query-expansion-spec.condition" => Some((
+                    "queryExpansionSpec.condition",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query-expansion-spec.pin-unexpanded-results" => Some((
+                    "queryExpansionSpec.pinUnexpandedResults",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "search-mode" => Some((
+                    "searchMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spell-correction-spec.mode" => Some((
+                    "spellCorrectionSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.direct-user-request" => Some((
+                    "userInfo.directUserRequest",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.ip-address" => Some((
+                    "userInfo.ipAddress",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.user-agent" => Some((
+                    "userInfo.userAgent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.user-id" => Some((
+                    "userInfo.userId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "variant-rollup-keys" => Some((
+                    "variantRollupKeys",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "visitor-id" => Some((
+                    "visitorId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "boost-spec",
+                            "branch",
+                            "canonical-filter",
+                            "condition",
+                            "direct-user-request",
+                            "dynamic-facet-spec",
+                            "entity",
+                            "filter",
+                            "ip-address",
+                            "labels",
+                            "mode",
+                            "offset",
+                            "order-by",
+                            "page-categories",
+                            "page-size",
+                            "page-token",
+                            "personalization-spec",
+                            "pin-unexpanded-results",
+                            "query",
+                            "query-expansion-spec",
+                            "search-mode",
+                            "skip-boost-spec-validation",
+                            "spell-correction-spec",
+                            "user-agent",
+                            "user-id",
+                            "user-info",
+                            "variant-rollup-keys",
+                            "visitor-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2SearchRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_placements_search(request, opt.value_of("placement").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2SearchRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_placements_search(request, opt.value_of("placement").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3352,15 +7482,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3370,22 +7505,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3393,13 +7540,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_add_control(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_serving_configs_add_control(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3413,23 +7568,51 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "control-id" => Some(("controlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["control-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "control-id" => Some((
+                    "controlId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["control-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2AddControlRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_add_control(request, opt.value_of("serving-config").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2AddControlRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_add_control(
+                request,
+                opt.value_of("serving-config").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3437,15 +7620,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3455,22 +7643,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3478,13 +7678,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_serving_configs_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3498,62 +7706,234 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "boost-control-ids" => Some(("boostControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "diversity-level" => Some(("diversityLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "diversity-type" => Some(("diversityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "do-not-associate-control-ids" => Some(("doNotAssociateControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "enable-category-filter-level" => Some(("enableCategoryFilterLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "facet-control-ids" => Some(("facetControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "filter-control-ids" => Some(("filterControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "ignore-control-ids" => Some(("ignoreControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "ignore-recs-denylist" => Some(("ignoreRecsDenylist", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "model-id" => Some(("modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "oneway-synonyms-control-ids" => Some(("onewaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "personalization-spec.mode" => Some(("personalizationSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-reranking-level" => Some(("priceRerankingLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "redirect-control-ids" => Some(("redirectControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "replacement-control-ids" => Some(("replacementControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "twoway-synonyms-control-ids" => Some(("twowaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-control-ids", "display-name", "diversity-level", "diversity-type", "do-not-associate-control-ids", "dynamic-facet-spec", "enable-category-filter-level", "facet-control-ids", "filter-control-ids", "ignore-control-ids", "ignore-recs-denylist", "mode", "model-id", "name", "oneway-synonyms-control-ids", "personalization-spec", "price-reranking-level", "redirect-control-ids", "replacement-control-ids", "solution-types", "twoway-synonyms-control-ids"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "boost-control-ids" => Some((
+                    "boostControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "diversity-level" => Some((
+                    "diversityLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "diversity-type" => Some((
+                    "diversityType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "do-not-associate-control-ids" => Some((
+                    "doNotAssociateControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "dynamic-facet-spec.mode" => Some((
+                    "dynamicFacetSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "enable-category-filter-level" => Some((
+                    "enableCategoryFilterLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "facet-control-ids" => Some((
+                    "facetControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "filter-control-ids" => Some((
+                    "filterControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ignore-control-ids" => Some((
+                    "ignoreControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ignore-recs-denylist" => Some((
+                    "ignoreRecsDenylist",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "model-id" => Some((
+                    "modelId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "oneway-synonyms-control-ids" => Some((
+                    "onewaySynonymsControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "personalization-spec.mode" => Some((
+                    "personalizationSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-reranking-level" => Some((
+                    "priceRerankingLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "redirect-control-ids" => Some((
+                    "redirectControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "replacement-control-ids" => Some((
+                    "replacementControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "solution-types" => Some((
+                    "solutionTypes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "twoway-synonyms-control-ids" => Some((
+                    "twowaySynonymsControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "boost-control-ids",
+                            "display-name",
+                            "diversity-level",
+                            "diversity-type",
+                            "do-not-associate-control-ids",
+                            "dynamic-facet-spec",
+                            "enable-category-filter-level",
+                            "facet-control-ids",
+                            "filter-control-ids",
+                            "ignore-control-ids",
+                            "ignore-recs-denylist",
+                            "mode",
+                            "model-id",
+                            "name",
+                            "oneway-synonyms-control-ids",
+                            "personalization-spec",
+                            "price-reranking-level",
+                            "redirect-control-ids",
+                            "replacement-control-ids",
+                            "solution-types",
+                            "twoway-synonyms-control-ids",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ServingConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ServingConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_create(
+                request,
+                opt.value_of("parent").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "serving-config-id" => {
                     call = call.serving_config_id(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["serving-config-id"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["serving-config-id"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3563,22 +7943,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3586,10 +7978,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_serving_configs_delete(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3597,15 +8001,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3615,22 +8024,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3638,10 +8059,22 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_serving_configs_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3649,15 +8082,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3667,22 +8105,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3690,33 +8140,54 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_serving_configs_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3726,22 +8197,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3749,13 +8232,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_serving_configs_patch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3769,62 +8260,235 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "boost-control-ids" => Some(("boostControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "diversity-level" => Some(("diversityLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "diversity-type" => Some(("diversityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "do-not-associate-control-ids" => Some(("doNotAssociateControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "enable-category-filter-level" => Some(("enableCategoryFilterLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "facet-control-ids" => Some(("facetControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "filter-control-ids" => Some(("filterControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "ignore-control-ids" => Some(("ignoreControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "ignore-recs-denylist" => Some(("ignoreRecsDenylist", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "model-id" => Some(("modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "oneway-synonyms-control-ids" => Some(("onewaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "personalization-spec.mode" => Some(("personalizationSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "price-reranking-level" => Some(("priceRerankingLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "redirect-control-ids" => Some(("redirectControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "replacement-control-ids" => Some(("replacementControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "solution-types" => Some(("solutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "twoway-synonyms-control-ids" => Some(("twowaySynonymsControlIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-control-ids", "display-name", "diversity-level", "diversity-type", "do-not-associate-control-ids", "dynamic-facet-spec", "enable-category-filter-level", "facet-control-ids", "filter-control-ids", "ignore-control-ids", "ignore-recs-denylist", "mode", "model-id", "name", "oneway-synonyms-control-ids", "personalization-spec", "price-reranking-level", "redirect-control-ids", "replacement-control-ids", "solution-types", "twoway-synonyms-control-ids"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "boost-control-ids" => Some((
+                    "boostControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "display-name" => Some((
+                    "displayName",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "diversity-level" => Some((
+                    "diversityLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "diversity-type" => Some((
+                    "diversityType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "do-not-associate-control-ids" => Some((
+                    "doNotAssociateControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "dynamic-facet-spec.mode" => Some((
+                    "dynamicFacetSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "enable-category-filter-level" => Some((
+                    "enableCategoryFilterLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "facet-control-ids" => Some((
+                    "facetControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "filter-control-ids" => Some((
+                    "filterControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ignore-control-ids" => Some((
+                    "ignoreControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "ignore-recs-denylist" => Some((
+                    "ignoreRecsDenylist",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "model-id" => Some((
+                    "modelId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "oneway-synonyms-control-ids" => Some((
+                    "onewaySynonymsControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "personalization-spec.mode" => Some((
+                    "personalizationSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "price-reranking-level" => Some((
+                    "priceRerankingLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "redirect-control-ids" => Some((
+                    "redirectControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "replacement-control-ids" => Some((
+                    "replacementControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "solution-types" => Some((
+                    "solutionTypes",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "twoway-synonyms-control-ids" => Some((
+                    "twowaySynonymsControlIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "boost-control-ids",
+                            "display-name",
+                            "diversity-level",
+                            "diversity-type",
+                            "do-not-associate-control-ids",
+                            "dynamic-facet-spec",
+                            "enable-category-filter-level",
+                            "facet-control-ids",
+                            "filter-control-ids",
+                            "ignore-control-ids",
+                            "ignore-recs-denylist",
+                            "mode",
+                            "model-id",
+                            "name",
+                            "oneway-synonyms-control-ids",
+                            "personalization-spec",
+                            "price-reranking-level",
+                            "redirect-control-ids",
+                            "replacement-control-ids",
+                            "solution-types",
+                            "twoway-synonyms-control-ids",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ServingConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_patch(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ServingConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3834,22 +8498,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3857,13 +8533,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_predict(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_serving_configs_predict(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3877,55 +8561,315 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.attribution-token" => Some(("userEvent.attributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.cart-id" => Some(("userEvent.cartId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.completion-detail.completion-attribution-token" => Some(("userEvent.completionDetail.completionAttributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.completion-detail.selected-position" => Some(("userEvent.completionDetail.selectedPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "user-event.completion-detail.selected-suggestion" => Some(("userEvent.completionDetail.selectedSuggestion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.entity" => Some(("userEvent.entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.event-time" => Some(("userEvent.eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.event-type" => Some(("userEvent.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.experiment-ids" => Some(("userEvent.experimentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "user-event.filter" => Some(("userEvent.filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.offset" => Some(("userEvent.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "user-event.order-by" => Some(("userEvent.orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.page-categories" => Some(("userEvent.pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "user-event.page-view-id" => Some(("userEvent.pageViewId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.cost" => Some(("userEvent.purchaseTransaction.cost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.currency-code" => Some(("userEvent.purchaseTransaction.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.id" => Some(("userEvent.purchaseTransaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.revenue" => Some(("userEvent.purchaseTransaction.revenue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "user-event.purchase-transaction.tax" => Some(("userEvent.purchaseTransaction.tax", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "user-event.referrer-uri" => Some(("userEvent.referrerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.search-query" => Some(("userEvent.searchQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.session-id" => Some(("userEvent.sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.uri" => Some(("userEvent.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.user-info.direct-user-request" => Some(("userEvent.userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-event.user-info.ip-address" => Some(("userEvent.userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.user-info.user-agent" => Some(("userEvent.userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.user-info.user-id" => Some(("userEvent.userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-event.visitor-id" => Some(("userEvent.visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "entity", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "labels", "offset", "order-by", "page-categories", "page-size", "page-token", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-event", "user-id", "user-info", "validate-only", "visitor-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "page-size" => Some((
+                    "pageSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-token" => Some((
+                    "pageToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.attribution-token" => Some((
+                    "userEvent.attributionToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.cart-id" => Some((
+                    "userEvent.cartId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.completion-detail.completion-attribution-token" => Some((
+                    "userEvent.completionDetail.completionAttributionToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.completion-detail.selected-position" => Some((
+                    "userEvent.completionDetail.selectedPosition",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.completion-detail.selected-suggestion" => Some((
+                    "userEvent.completionDetail.selectedSuggestion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.entity" => Some((
+                    "userEvent.entity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.event-time" => Some((
+                    "userEvent.eventTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.event-type" => Some((
+                    "userEvent.eventType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.experiment-ids" => Some((
+                    "userEvent.experimentIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "user-event.filter" => Some((
+                    "userEvent.filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.offset" => Some((
+                    "userEvent.offset",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.order-by" => Some((
+                    "userEvent.orderBy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.page-categories" => Some((
+                    "userEvent.pageCategories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "user-event.page-view-id" => Some((
+                    "userEvent.pageViewId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.cost" => Some((
+                    "userEvent.purchaseTransaction.cost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.currency-code" => Some((
+                    "userEvent.purchaseTransaction.currencyCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.id" => Some((
+                    "userEvent.purchaseTransaction.id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.revenue" => Some((
+                    "userEvent.purchaseTransaction.revenue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.purchase-transaction.tax" => Some((
+                    "userEvent.purchaseTransaction.tax",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.referrer-uri" => Some((
+                    "userEvent.referrerUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.search-query" => Some((
+                    "userEvent.searchQuery",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.session-id" => Some((
+                    "userEvent.sessionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.uri" => Some((
+                    "userEvent.uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.direct-user-request" => Some((
+                    "userEvent.userInfo.directUserRequest",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.ip-address" => Some((
+                    "userEvent.userInfo.ipAddress",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.user-agent" => Some((
+                    "userEvent.userInfo.userAgent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.user-info.user-id" => Some((
+                    "userEvent.userInfo.userId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-event.visitor-id" => Some((
+                    "userEvent.visitorId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "validate-only" => Some((
+                    "validateOnly",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "attribution-token",
+                            "cart-id",
+                            "completion-attribution-token",
+                            "completion-detail",
+                            "cost",
+                            "currency-code",
+                            "direct-user-request",
+                            "entity",
+                            "event-time",
+                            "event-type",
+                            "experiment-ids",
+                            "filter",
+                            "id",
+                            "ip-address",
+                            "labels",
+                            "offset",
+                            "order-by",
+                            "page-categories",
+                            "page-size",
+                            "page-token",
+                            "page-view-id",
+                            "purchase-transaction",
+                            "referrer-uri",
+                            "revenue",
+                            "search-query",
+                            "selected-position",
+                            "selected-suggestion",
+                            "session-id",
+                            "tax",
+                            "uri",
+                            "user-agent",
+                            "user-event",
+                            "user-id",
+                            "user-info",
+                            "validate-only",
+                            "visitor-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2PredictRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_predict(request, opt.value_of("placement").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2PredictRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_predict(
+                request,
+                opt.value_of("placement").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -3933,15 +8877,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -3951,22 +8900,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3974,13 +8935,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_remove_control(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_serving_configs_remove_control(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3994,23 +8963,51 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "control-id" => Some(("controlId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["control-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "control-id" => Some((
+                    "controlId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["control-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2RemoveControlRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_remove_control(request, opt.value_of("serving-config").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2RemoveControlRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_remove_control(
+                request,
+                opt.value_of("serving-config").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4018,15 +9015,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4036,22 +9038,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4059,13 +9073,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_serving_configs_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_serving_configs_search(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4079,46 +9101,244 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "boost-spec.skip-boost-spec-validation" => Some(("boostSpec.skipBoostSpecValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "branch" => Some(("branch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "canonical-filter" => Some(("canonicalFilter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "dynamic-facet-spec.mode" => Some(("dynamicFacetSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-categories" => Some(("pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "personalization-spec.mode" => Some(("personalizationSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-expansion-spec.condition" => Some(("queryExpansionSpec.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-expansion-spec.pin-unexpanded-results" => Some(("queryExpansionSpec.pinUnexpandedResults", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "search-mode" => Some(("searchMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spell-correction-spec.mode" => Some(("spellCorrectionSpec.mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.direct-user-request" => Some(("userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-info.ip-address" => Some(("userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.user-agent" => Some(("userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "variant-rollup-keys" => Some(("variantRollupKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost-spec", "branch", "canonical-filter", "condition", "direct-user-request", "dynamic-facet-spec", "entity", "filter", "ip-address", "labels", "mode", "offset", "order-by", "page-categories", "page-size", "page-token", "personalization-spec", "pin-unexpanded-results", "query", "query-expansion-spec", "search-mode", "skip-boost-spec-validation", "spell-correction-spec", "user-agent", "user-id", "user-info", "variant-rollup-keys", "visitor-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "boost-spec.skip-boost-spec-validation" => Some((
+                    "boostSpec.skipBoostSpecValidation",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "branch" => Some((
+                    "branch",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "canonical-filter" => Some((
+                    "canonicalFilter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "dynamic-facet-spec.mode" => Some((
+                    "dynamicFacetSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "entity" => Some((
+                    "entity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "labels" => Some((
+                    "labels",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Map,
+                    },
+                )),
+                "offset" => Some((
+                    "offset",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "order-by" => Some((
+                    "orderBy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-categories" => Some((
+                    "pageCategories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "page-size" => Some((
+                    "pageSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-token" => Some((
+                    "pageToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "personalization-spec.mode" => Some((
+                    "personalizationSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query" => Some((
+                    "query",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query-expansion-spec.condition" => Some((
+                    "queryExpansionSpec.condition",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "query-expansion-spec.pin-unexpanded-results" => Some((
+                    "queryExpansionSpec.pinUnexpandedResults",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "search-mode" => Some((
+                    "searchMode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spell-correction-spec.mode" => Some((
+                    "spellCorrectionSpec.mode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.direct-user-request" => Some((
+                    "userInfo.directUserRequest",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.ip-address" => Some((
+                    "userInfo.ipAddress",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.user-agent" => Some((
+                    "userInfo.userAgent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.user-id" => Some((
+                    "userInfo.userId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "variant-rollup-keys" => Some((
+                    "variantRollupKeys",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "visitor-id" => Some((
+                    "visitorId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "boost-spec",
+                            "branch",
+                            "canonical-filter",
+                            "condition",
+                            "direct-user-request",
+                            "dynamic-facet-spec",
+                            "entity",
+                            "filter",
+                            "ip-address",
+                            "labels",
+                            "mode",
+                            "offset",
+                            "order-by",
+                            "page-categories",
+                            "page-size",
+                            "page-token",
+                            "personalization-spec",
+                            "pin-unexpanded-results",
+                            "query",
+                            "query-expansion-spec",
+                            "search-mode",
+                            "skip-boost-spec-validation",
+                            "spell-correction-spec",
+                            "user-agent",
+                            "user-id",
+                            "user-info",
+                            "variant-rollup-keys",
+                            "visitor-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2SearchRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_serving_configs_search(request, opt.value_of("placement").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2SearchRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_serving_configs_search(
+                request,
+                opt.value_of("placement").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4126,15 +9346,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4144,22 +9369,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4167,13 +9404,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_set_default_branch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_set_default_branch(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4187,25 +9432,63 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "branch-id" => Some(("branchId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "force" => Some(("force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "note" => Some(("note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["branch-id", "force", "note"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "branch-id" => Some((
+                    "branchId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "force" => Some((
+                    "force",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "note" => Some((
+                    "note",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["branch-id", "force", "note"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2SetDefaultBranchRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_set_default_branch(request, opt.value_of("catalog").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2SetDefaultBranchRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_set_default_branch(request, opt.value_of("catalog").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4213,15 +9496,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4231,22 +9519,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4254,13 +9554,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_update_attributes_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_update_attributes_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4274,44 +9582,88 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "attribute-config-level" => Some(("attributeConfigLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-config-level", "name"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "attribute-config-level" => Some((
+                    "attributeConfigLevel",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["attribute-config-level", "name"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2AttributesConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_update_attributes_config(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2AttributesConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_update_attributes_config(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4321,22 +9673,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4344,13 +9708,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_update_completion_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_update_completion_config(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4364,74 +9736,322 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "allowlist-input-config.big-query-source.data-schema" => Some(("allowlistInputConfig.bigQuerySource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "allowlist-input-config.big-query-source.dataset-id" => Some(("allowlistInputConfig.bigQuerySource.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "allowlist-input-config.big-query-source.gcs-staging-dir" => Some(("allowlistInputConfig.bigQuerySource.gcsStagingDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "allowlist-input-config.big-query-source.partition-date.day" => Some(("allowlistInputConfig.bigQuerySource.partitionDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "allowlist-input-config.big-query-source.partition-date.month" => Some(("allowlistInputConfig.bigQuerySource.partitionDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "allowlist-input-config.big-query-source.partition-date.year" => Some(("allowlistInputConfig.bigQuerySource.partitionDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "allowlist-input-config.big-query-source.project-id" => Some(("allowlistInputConfig.bigQuerySource.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "allowlist-input-config.big-query-source.table-id" => Some(("allowlistInputConfig.bigQuerySource.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "auto-learning" => Some(("autoLearning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.data-schema" => Some(("denylistInputConfig.bigQuerySource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.dataset-id" => Some(("denylistInputConfig.bigQuerySource.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.gcs-staging-dir" => Some(("denylistInputConfig.bigQuerySource.gcsStagingDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.partition-date.day" => Some(("denylistInputConfig.bigQuerySource.partitionDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.partition-date.month" => Some(("denylistInputConfig.bigQuerySource.partitionDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.partition-date.year" => Some(("denylistInputConfig.bigQuerySource.partitionDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.project-id" => Some(("denylistInputConfig.bigQuerySource.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "denylist-input-config.big-query-source.table-id" => Some(("denylistInputConfig.bigQuerySource.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-allowlist-import-operation" => Some(("lastAllowlistImportOperation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-denylist-import-operation" => Some(("lastDenylistImportOperation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-suggestions-import-operation" => Some(("lastSuggestionsImportOperation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "matching-order" => Some(("matchingOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "max-suggestions" => Some(("maxSuggestions", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "min-prefix-length" => Some(("minPrefixLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.data-schema" => Some(("suggestionsInputConfig.bigQuerySource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.dataset-id" => Some(("suggestionsInputConfig.bigQuerySource.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.gcs-staging-dir" => Some(("suggestionsInputConfig.bigQuerySource.gcsStagingDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.partition-date.day" => Some(("suggestionsInputConfig.bigQuerySource.partitionDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.partition-date.month" => Some(("suggestionsInputConfig.bigQuerySource.partitionDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.partition-date.year" => Some(("suggestionsInputConfig.bigQuerySource.partitionDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.project-id" => Some(("suggestionsInputConfig.bigQuerySource.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "suggestions-input-config.big-query-source.table-id" => Some(("suggestionsInputConfig.bigQuerySource.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowlist-input-config", "auto-learning", "big-query-source", "data-schema", "dataset-id", "day", "denylist-input-config", "gcs-staging-dir", "last-allowlist-import-operation", "last-denylist-import-operation", "last-suggestions-import-operation", "matching-order", "max-suggestions", "min-prefix-length", "month", "name", "partition-date", "project-id", "suggestions-input-config", "table-id", "year"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "allowlist-input-config.big-query-source.data-schema" => Some((
+                    "allowlistInputConfig.bigQuerySource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowlist-input-config.big-query-source.dataset-id" => Some((
+                    "allowlistInputConfig.bigQuerySource.datasetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowlist-input-config.big-query-source.gcs-staging-dir" => Some((
+                    "allowlistInputConfig.bigQuerySource.gcsStagingDir",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowlist-input-config.big-query-source.partition-date.day" => Some((
+                    "allowlistInputConfig.bigQuerySource.partitionDate.day",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowlist-input-config.big-query-source.partition-date.month" => Some((
+                    "allowlistInputConfig.bigQuerySource.partitionDate.month",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowlist-input-config.big-query-source.partition-date.year" => Some((
+                    "allowlistInputConfig.bigQuerySource.partitionDate.year",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowlist-input-config.big-query-source.project-id" => Some((
+                    "allowlistInputConfig.bigQuerySource.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "allowlist-input-config.big-query-source.table-id" => Some((
+                    "allowlistInputConfig.bigQuerySource.tableId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "auto-learning" => Some((
+                    "autoLearning",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.data-schema" => Some((
+                    "denylistInputConfig.bigQuerySource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.dataset-id" => Some((
+                    "denylistInputConfig.bigQuerySource.datasetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.gcs-staging-dir" => Some((
+                    "denylistInputConfig.bigQuerySource.gcsStagingDir",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.partition-date.day" => Some((
+                    "denylistInputConfig.bigQuerySource.partitionDate.day",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.partition-date.month" => Some((
+                    "denylistInputConfig.bigQuerySource.partitionDate.month",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.partition-date.year" => Some((
+                    "denylistInputConfig.bigQuerySource.partitionDate.year",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.project-id" => Some((
+                    "denylistInputConfig.bigQuerySource.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "denylist-input-config.big-query-source.table-id" => Some((
+                    "denylistInputConfig.bigQuerySource.tableId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "last-allowlist-import-operation" => Some((
+                    "lastAllowlistImportOperation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "last-denylist-import-operation" => Some((
+                    "lastDenylistImportOperation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "last-suggestions-import-operation" => Some((
+                    "lastSuggestionsImportOperation",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "matching-order" => Some((
+                    "matchingOrder",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "max-suggestions" => Some((
+                    "maxSuggestions",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "min-prefix-length" => Some((
+                    "minPrefixLength",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "name" => Some((
+                    "name",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.data-schema" => Some((
+                    "suggestionsInputConfig.bigQuerySource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.dataset-id" => Some((
+                    "suggestionsInputConfig.bigQuerySource.datasetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.gcs-staging-dir" => Some((
+                    "suggestionsInputConfig.bigQuerySource.gcsStagingDir",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.partition-date.day" => Some((
+                    "suggestionsInputConfig.bigQuerySource.partitionDate.day",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.partition-date.month" => Some((
+                    "suggestionsInputConfig.bigQuerySource.partitionDate.month",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.partition-date.year" => Some((
+                    "suggestionsInputConfig.bigQuerySource.partitionDate.year",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.project-id" => Some((
+                    "suggestionsInputConfig.bigQuerySource.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "suggestions-input-config.big-query-source.table-id" => Some((
+                    "suggestionsInputConfig.bigQuerySource.tableId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "allowlist-input-config",
+                            "auto-learning",
+                            "big-query-source",
+                            "data-schema",
+                            "dataset-id",
+                            "day",
+                            "denylist-input-config",
+                            "gcs-staging-dir",
+                            "last-allowlist-import-operation",
+                            "last-denylist-import-operation",
+                            "last-suggestions-import-operation",
+                            "matching-order",
+                            "max-suggestions",
+                            "min-prefix-length",
+                            "month",
+                            "name",
+                            "partition-date",
+                            "project-id",
+                            "suggestions-input-config",
+                            "table-id",
+                            "year",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2CompletionConfig = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_update_completion_config(request, opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2CompletionConfig =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_update_completion_config(
+                request,
+                opt.value_of("name").unwrap_or(""),
+            );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "update-mask" => {
-                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
-                },
+                    call = call.update_mask(
+                        value
+                            .map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask"))
+                            .unwrap_or(apis_common::FieldMask::default()),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["update-mask"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4441,22 +10061,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4464,42 +10096,67 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_user_events_collect(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_catalogs_user_events_collect(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_catalogs_user_events_collect(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_user_events_collect(opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "user-event" => {
                     call = call.user_event(value.unwrap_or(""));
-                },
+                }
                 "uri" => {
                     call = call.uri(value.unwrap_or(""));
-                },
+                }
                 "raw-json" => {
                     call = call.raw_json(value.unwrap_or(""));
-                },
+                }
                 "prebuilt-rule" => {
                     call = call.prebuilt_rule(value.unwrap_or(""));
-                },
+                }
                 "ets" => {
-                    call = call.ets(        value.map(|v| arg_from_str(v, err, "ets", "int64")).unwrap_or(-0));
-                },
+                    call = call.ets(
+                        value
+                            .map(|v| arg_from_str(v, err, "ets", "int64"))
+                            .unwrap_or(-0),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["ets", "prebuilt-rule", "raw-json", "uri", "user-event"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    ["ets", "prebuilt-rule", "raw-json", "uri", "user-event"]
+                                        .iter()
+                                        .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -4509,22 +10166,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4532,13 +10201,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_user_events_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_user_events_import(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4552,33 +10229,137 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "errors-config.gcs-prefix" => Some(("errorsConfig.gcsPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.data-schema" => Some(("inputConfig.bigQuerySource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.dataset-id" => Some(("inputConfig.bigQuerySource.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.gcs-staging-dir" => Some(("inputConfig.bigQuerySource.gcsStagingDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.day" => Some(("inputConfig.bigQuerySource.partitionDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.month" => Some(("inputConfig.bigQuerySource.partitionDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.partition-date.year" => Some(("inputConfig.bigQuerySource.partitionDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.project-id" => Some(("inputConfig.bigQuerySource.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.big-query-source.table-id" => Some(("inputConfig.bigQuerySource.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.gcs-source.data-schema" => Some(("inputConfig.gcsSource.dataSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "input-config.gcs-source.input-uris" => Some(("inputConfig.gcsSource.inputUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["big-query-source", "data-schema", "dataset-id", "day", "errors-config", "gcs-prefix", "gcs-source", "gcs-staging-dir", "input-config", "input-uris", "month", "partition-date", "project-id", "table-id", "year"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "errors-config.gcs-prefix" => Some((
+                    "errorsConfig.gcsPrefix",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.data-schema" => Some((
+                    "inputConfig.bigQuerySource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.dataset-id" => Some((
+                    "inputConfig.bigQuerySource.datasetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.gcs-staging-dir" => Some((
+                    "inputConfig.bigQuerySource.gcsStagingDir",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.day" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.day",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.month" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.month",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.partition-date.year" => Some((
+                    "inputConfig.bigQuerySource.partitionDate.year",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.project-id" => Some((
+                    "inputConfig.bigQuerySource.projectId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.big-query-source.table-id" => Some((
+                    "inputConfig.bigQuerySource.tableId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.gcs-source.data-schema" => Some((
+                    "inputConfig.gcsSource.dataSchema",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "input-config.gcs-source.input-uris" => Some((
+                    "inputConfig.gcsSource.inputUris",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "big-query-source",
+                            "data-schema",
+                            "dataset-id",
+                            "day",
+                            "errors-config",
+                            "gcs-prefix",
+                            "gcs-source",
+                            "gcs-staging-dir",
+                            "input-config",
+                            "input-uris",
+                            "month",
+                            "partition-date",
+                            "project-id",
+                            "table-id",
+                            "year",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2ImportUserEventsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_user_events_import(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2ImportUserEventsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_user_events_import(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4586,15 +10367,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4604,22 +10390,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4627,13 +10425,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_user_events_purge(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_user_events_purge(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4647,24 +10453,55 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "force" => Some(("force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "force"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "force" => Some((
+                    "force",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["filter", "force"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2PurgeUserEventsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_user_events_purge(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2PurgeUserEventsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_user_events_purge(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4672,15 +10509,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4690,22 +10532,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4713,13 +10567,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_user_events_rejoin(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_user_events_rejoin(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4733,23 +10595,49 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "user-event-rejoin-scope" => Some(("userEventRejoinScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["user-event-rejoin-scope"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "user-event-rejoin-scope" => Some((
+                    "userEventRejoinScope",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["user-event-rejoin-scope"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2RejoinUserEventsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_user_events_rejoin(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2RejoinUserEventsRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_user_events_rejoin(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4757,15 +10645,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4775,22 +10668,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4798,13 +10703,21 @@ where
         }
     }
 
-    async fn _projects_locations_catalogs_user_events_write(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _projects_locations_catalogs_user_events_write(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4818,70 +10731,301 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "attribution-token" => Some(("attributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cart-id" => Some(("cartId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "completion-detail.completion-attribution-token" => Some(("completionDetail.completionAttributionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "completion-detail.selected-position" => Some(("completionDetail.selectedPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "completion-detail.selected-suggestion" => Some(("completionDetail.selectedSuggestion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "entity" => Some(("entity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "event-type" => Some(("eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "experiment-ids" => Some(("experimentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "offset" => Some(("offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "order-by" => Some(("orderBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "page-categories" => Some(("pageCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "page-view-id" => Some(("pageViewId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "purchase-transaction.cost" => Some(("purchaseTransaction.cost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "purchase-transaction.currency-code" => Some(("purchaseTransaction.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "purchase-transaction.id" => Some(("purchaseTransaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "purchase-transaction.revenue" => Some(("purchaseTransaction.revenue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "purchase-transaction.tax" => Some(("purchaseTransaction.tax", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "referrer-uri" => Some(("referrerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "search-query" => Some(("searchQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "session-id" => Some(("sessionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri" => Some(("uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.direct-user-request" => Some(("userInfo.directUserRequest", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-info.ip-address" => Some(("userInfo.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.user-agent" => Some(("userInfo.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "visitor-id" => Some(("visitorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution-token", "cart-id", "completion-attribution-token", "completion-detail", "cost", "currency-code", "direct-user-request", "entity", "event-time", "event-type", "experiment-ids", "filter", "id", "ip-address", "offset", "order-by", "page-categories", "page-view-id", "purchase-transaction", "referrer-uri", "revenue", "search-query", "selected-position", "selected-suggestion", "session-id", "tax", "uri", "user-agent", "user-id", "user-info", "visitor-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "attribution-token" => Some((
+                    "attributionToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "cart-id" => Some((
+                    "cartId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "completion-detail.completion-attribution-token" => Some((
+                    "completionDetail.completionAttributionToken",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "completion-detail.selected-position" => Some((
+                    "completionDetail.selectedPosition",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "completion-detail.selected-suggestion" => Some((
+                    "completionDetail.selectedSuggestion",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "entity" => Some((
+                    "entity",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "event-time" => Some((
+                    "eventTime",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "event-type" => Some((
+                    "eventType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "experiment-ids" => Some((
+                    "experimentIds",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "filter" => Some((
+                    "filter",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "offset" => Some((
+                    "offset",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "order-by" => Some((
+                    "orderBy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "page-categories" => Some((
+                    "pageCategories",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                "page-view-id" => Some((
+                    "pageViewId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-transaction.cost" => Some((
+                    "purchaseTransaction.cost",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-transaction.currency-code" => Some((
+                    "purchaseTransaction.currencyCode",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-transaction.id" => Some((
+                    "purchaseTransaction.id",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-transaction.revenue" => Some((
+                    "purchaseTransaction.revenue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "purchase-transaction.tax" => Some((
+                    "purchaseTransaction.tax",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "referrer-uri" => Some((
+                    "referrerUri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "search-query" => Some((
+                    "searchQuery",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "session-id" => Some((
+                    "sessionId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "uri" => Some((
+                    "uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.direct-user-request" => Some((
+                    "userInfo.directUserRequest",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.ip-address" => Some((
+                    "userInfo.ipAddress",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.user-agent" => Some((
+                    "userInfo.userAgent",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "user-info.user-id" => Some((
+                    "userInfo.userId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "visitor-id" => Some((
+                    "visitorId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "attribution-token",
+                            "cart-id",
+                            "completion-attribution-token",
+                            "completion-detail",
+                            "cost",
+                            "currency-code",
+                            "direct-user-request",
+                            "entity",
+                            "event-time",
+                            "event-type",
+                            "experiment-ids",
+                            "filter",
+                            "id",
+                            "ip-address",
+                            "offset",
+                            "order-by",
+                            "page-categories",
+                            "page-view-id",
+                            "purchase-transaction",
+                            "referrer-uri",
+                            "revenue",
+                            "search-query",
+                            "selected-position",
+                            "selected-suggestion",
+                            "session-id",
+                            "tax",
+                            "uri",
+                            "user-agent",
+                            "user-id",
+                            "user-info",
+                            "visitor-id",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GoogleCloudRetailV2UserEvent = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_catalogs_user_events_write(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GoogleCloudRetailV2UserEvent =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .projects()
+            .locations_catalogs_user_events_write(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "write-async" => {
-                    call = call.write_async(        value.map(|v| arg_from_str(v, err, "write-async", "boolean")).unwrap_or(false));
-                },
+                    call = call.write_async(
+                        value
+                            .map(|v| arg_from_str(v, err, "write-async", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["write-async"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["write-async"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4891,22 +11035,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4914,10 +11070,22 @@ where
         }
     }
 
-    async fn _projects_locations_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_operations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_operations_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -4925,15 +11093,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -4943,22 +11116,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -4966,150 +11151,57 @@ where
         }
     }
 
-    async fn _projects_locations_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_operations_list(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
-                "filter" => {
-                    call = call.filter(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().operations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _projects_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().operations_list(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _projects_locations_operations_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .locations_operations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
-                },
+                }
                 "page-size" => {
-                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
-                },
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -5119,22 +11211,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -5142,213 +11246,551 @@ where
         }
     }
 
-    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _projects_operations_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .operations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_operations_list(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .projects()
+            .operations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                }
+                "page-size" => {
+                    call = call.page_size(
+                        value
+                            .map(|v| arg_from_str(v, err, "page-size", "int32"))
+                            .unwrap_or(-0),
+                    );
+                }
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                }
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["filter", "page-size", "page-token"].iter().map(|v| *v));
+                                v
+                            }));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _doit(
+        &self,
+        dry_run: bool,
+    ) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("projects", Some(opt)) => {
-                match opt.subcommand() {
-                    ("locations-catalogs-attributes-config-add-catalog-attribute", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_attributes_config_add_catalog_attribute(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-attributes-config-remove-catalog-attribute", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_attributes_config_remove_catalog_attribute(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-attributes-config-replace-catalog-attribute", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_attributes_config_replace_catalog_attribute(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-operations-get", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_operations_get(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-add-fulfillment-places", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_add_fulfillment_places(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-add-local-inventories", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_add_local_inventories(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-create", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_create(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-delete", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_delete(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-get", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_get(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-import", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_import(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-list", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_list(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-patch", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-purge", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_purge(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-remove-fulfillment-places", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_remove_fulfillment_places(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-remove-local-inventories", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_remove_local_inventories(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-branches-products-set-inventory", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_branches_products_set_inventory(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-complete-query", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_complete_query(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-completion-data-import", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_completion_data_import(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-controls-create", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_controls_create(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-controls-delete", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_controls_delete(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-controls-get", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_controls_get(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-controls-list", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_controls_list(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-controls-patch", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_controls_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-export-analytics-metrics", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_export_analytics_metrics(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-get-attributes-config", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_get_attributes_config(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-get-completion-config", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_get_completion_config(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-get-default-branch", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_get_default_branch(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-list", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_list(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-create", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_create(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-delete", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_delete(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-get", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_get(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-list", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_list(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-patch", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-pause", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_pause(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-resume", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_resume(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-models-tune", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_models_tune(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-operations-get", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_operations_get(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-operations-list", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_operations_list(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-patch", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-placements-predict", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_placements_predict(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-placements-search", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_placements_search(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-add-control", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_add_control(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-create", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_create(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-delete", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_delete(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-get", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_get(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-list", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_list(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-patch", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_patch(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-predict", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_predict(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-remove-control", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_remove_control(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-serving-configs-search", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_serving_configs_search(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-set-default-branch", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_set_default_branch(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-update-attributes-config", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_update_attributes_config(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-update-completion-config", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_update_completion_config(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-user-events-collect", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_user_events_collect(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-user-events-import", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_user_events_import(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-user-events-purge", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_user_events_purge(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-user-events-rejoin", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_user_events_rejoin(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-catalogs-user-events-write", Some(opt)) => {
-                        call_result = self._projects_locations_catalogs_user_events_write(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-operations-get", Some(opt)) => {
-                        call_result = self._projects_locations_operations_get(opt, dry_run, &mut err).await;
-                    },
-                    ("locations-operations-list", Some(opt)) => {
-                        call_result = self._projects_locations_operations_list(opt, dry_run, &mut err).await;
-                    },
-                    ("operations-get", Some(opt)) => {
-                        call_result = self._projects_operations_get(opt, dry_run, &mut err).await;
-                    },
-                    ("operations-list", Some(opt)) => {
-                        call_result = self._projects_operations_list(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("projects".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("projects", Some(opt)) => match opt.subcommand() {
+                ("locations-catalogs-attributes-config-add-catalog-attribute", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_attributes_config_add_catalog_attribute(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-attributes-config-remove-catalog-attribute", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_attributes_config_remove_catalog_attribute(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-attributes-config-replace-catalog-attribute", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_attributes_config_replace_catalog_attribute(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-operations-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_operations_get(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-add-fulfillment-places", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_add_fulfillment_places(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-add-local-inventories", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_add_local_inventories(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_create(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_delete(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-branches-products-import", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_import(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-branches-products-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_patch(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-purge", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_purge(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-remove-fulfillment-places", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_remove_fulfillment_places(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-remove-local-inventories", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_remove_local_inventories(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-branches-products-set-inventory", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_branches_products_set_inventory(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-complete-query", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_complete_query(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-completion-data-import", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_completion_data_import(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-controls-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_controls_create(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-controls-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_controls_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-controls-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_controls_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-controls-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_controls_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-controls-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_controls_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-export-analytics-metrics", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_export_analytics_metrics(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-get-attributes-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_get_attributes_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-get-completion-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_get_completion_config(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-get-default-branch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_get_default_branch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_create(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-pause", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_pause(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-resume", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_resume(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-models-tune", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_models_tune(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-operations-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_operations_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-operations-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_operations_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-placements-predict", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_placements_predict(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-placements-search", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_placements_search(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-add-control", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_add_control(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-create", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_create(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-delete", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_delete(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-patch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_patch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-predict", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_predict(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-remove-control", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_remove_control(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-serving-configs-search", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_serving_configs_search(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-set-default-branch", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_set_default_branch(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-update-attributes-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_update_attributes_config(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-update-completion-config", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_update_completion_config(
+                            opt, dry_run, &mut err,
+                        )
+                        .await;
+                }
+                ("locations-catalogs-user-events-collect", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_user_events_collect(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-user-events-import", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_user_events_import(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-user-events-purge", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_user_events_purge(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-user-events-rejoin", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_user_events_rejoin(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-catalogs-user-events-write", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_catalogs_user_events_write(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-operations-get", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_operations_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("locations-operations-list", Some(opt)) => {
+                    call_result = self
+                        ._projects_locations_operations_list(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("operations-get", Some(opt)) => {
+                    call_result = self._projects_operations_get(opt, dry_run, &mut err).await;
+                }
+                ("operations-list", Some(opt)) => {
+                    call_result = self._projects_operations_list(opt, dry_run, &mut err).await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("projects".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
-                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
+                writeln!(std::io::stderr(), "{}\n", self.opt.usage()).ok();
             }
         }
 
         if dry_run {
-            if err.issues.len() > 0 {
+            if !err.issues.is_empty() {
                 err_opt = Some(err);
             }
             Err(err_opt)
@@ -5358,47 +11800,67 @@ where
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    async fn new(opt: ArgMatches<'n>, connector: S) -> Result<Engine<'n, S>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>, connector: C) -> Result<Engine<'n, C>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match common::assure_config_dir_exists(
+                opt.value_of("folder").unwrap_or("~/.google-service-cli"),
+            ) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match client::application_secret_from_directory(&config_dir, "retail2-secret.json",
+            match common::application_secret_from_directory(&config_dir, "retail2-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let client = hyper::Client::builder().build(connector);
+        let executor = hyper_util::rt::TokioExecutor::new();
+        let client =
+            hyper_util::client::legacy::Client::builder(executor.clone()).build(connector.clone());
 
-        let auth = oauth2::InstalledFlowAuthenticator::with_client(
+        let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
-            oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            client.clone(),
-        ).persist_tokens_to_disk(format!("{}/retail2", config_dir)).build().await.unwrap();
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+            hyper_util::client::legacy::Client::builder(executor).build(connector),
+        )
+        .persist_tokens_to_disk(format!("{}/retail2", config_dir))
+        .build()
+        .await
+        .unwrap();
 
         let engine = Engine {
-            opt: opt,
+            opt,
             hub: api::CloudRetail::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec![
+                "$-xgafv",
+                "access-token",
+                "alt",
+                "callback",
+                "fields",
+                "key",
+                "oauth-token",
+                "pretty-print",
+                "quota-user",
+                "upload-type",
+                "upload-protocol",
+            ],
             gpm: vec![
-                    ("$-xgafv", "$.xgafv"),
-                    ("access-token", "access_token"),
-                    ("oauth-token", "oauth_token"),
-                    ("pretty-print", "prettyPrint"),
-                    ("quota-user", "quotaUser"),
-                    ("upload-type", "uploadType"),
-                    ("upload-protocol", "upload_protocol"),
-                ]
+                ("$-xgafv", "$.xgafv"),
+                ("access-token", "access_token"),
+                ("oauth-token", "oauth_token"),
+                ("pretty-print", "prettyPrint"),
+                ("quota-user", "quotaUser"),
+                ("upload-type", "uploadType"),
+                ("upload-protocol", "upload_protocol"),
+            ],
         };
 
         match engine._doit(true).await {
             Err(Some(err)) => Err(err),
-            Err(None)      => Ok(engine),
-            Ok(_)          => unreachable!(),
+            Err(None) => Ok(engine),
+            Ok(_) => unreachable!(),
         }
     }
 
@@ -5424,19 +11886,16 @@ async fn main() {
                      Some(r##"Required. Full AttributesConfig resource name. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/attributesConfig`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5452,19 +11911,16 @@ async fn main() {
                      Some(r##"Required. Full AttributesConfig resource name. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/attributesConfig`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5480,19 +11936,16 @@ async fn main() {
                      Some(r##"Required. Full AttributesConfig resource name. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/attributesConfig`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5508,13 +11961,11 @@ async fn main() {
                      Some(r##"The name of the operation resource."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5530,19 +11981,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of Product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`. If the caller does not have permission to access the Product, regardless of whether or not it exists, a PERMISSION_DENIED error is returned."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5558,19 +12006,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of Product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`. If the caller does not have permission to access the Product, regardless of whether or not it exists, a PERMISSION_DENIED error is returned."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5586,19 +12031,16 @@ async fn main() {
                      Some(r##"Required. The parent catalog resource name, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5614,13 +12056,11 @@ async fn main() {
                      Some(r##"Required. Full resource name of Product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`. If the caller does not have permission to delete the Product, regardless of whether or not it exists, a PERMISSION_DENIED error is returned. If the Product to delete does not exist, a NOT_FOUND error is returned. The Product to delete can neither be a Product.Type.COLLECTION Product member nor a Product.Type.PRIMARY Product with more than one variants. Otherwise, an INVALID_ARGUMENT error is returned. All inventory information for the named Product will be deleted."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5636,13 +12076,11 @@ async fn main() {
                      Some(r##"Required. Full resource name of Product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`. If the caller does not have permission to access the Product, regardless of whether or not it exists, a PERMISSION_DENIED error is returned. If the requested Product does not exist, a NOT_FOUND error is returned."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5658,19 +12096,16 @@ async fn main() {
                      Some(r##"Required. `projects/1234/locations/global/catalogs/default_catalog/branches/default_branch` If no updateMask is specified, requires products.create permission. If updateMask is specified, requires products.update permission."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5686,13 +12121,11 @@ async fn main() {
                      Some(r##"Required. The parent branch resource name, such as `projects/*/locations/global/catalogs/default_catalog/branches/0`. Use `default_branch` as the branch ID, to list products under the default branch. If the caller does not have permission to list Products under this branch, regardless of whether or not this branch exists, a PERMISSION_DENIED error is returned."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5708,19 +12141,16 @@ async fn main() {
                      Some(r##"Immutable. Full resource name of the product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/product_id`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5736,19 +12166,16 @@ async fn main() {
                      Some(r##"Required. The resource name of the branch under which the products are created. The format is `projects/${projectId}/locations/global/catalogs/${catalogId}/branches/${branchId}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5764,19 +12191,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of Product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`. If the caller does not have permission to access the Product, regardless of whether or not it exists, a PERMISSION_DENIED error is returned."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5792,19 +12216,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of Product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/some_product_id`. If the caller does not have permission to access the Product, regardless of whether or not it exists, a PERMISSION_DENIED error is returned."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5820,19 +12241,16 @@ async fn main() {
                      Some(r##"Immutable. Full resource name of the product, such as `projects/*/locations/global/catalogs/default_catalog/branches/default_branch/products/product_id`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5848,13 +12266,11 @@ async fn main() {
                      Some(r##"Required. Catalog for which the completion is performed. Full resource name of catalog, such as `projects/*/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5870,19 +12286,16 @@ async fn main() {
                      Some(r##"Required. The catalog which the suggestions dataset belongs to. Format: `projects/1234/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5898,19 +12311,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of parent catalog. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5926,13 +12336,11 @@ async fn main() {
                      Some(r##"Required. The resource name of the Control to delete. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/controls/{control_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5948,13 +12356,11 @@ async fn main() {
                      Some(r##"Required. The resource name of the Control to get. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/controls/{control_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5970,13 +12376,11 @@ async fn main() {
                      Some(r##"Required. The catalog resource name. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -5992,19 +12396,16 @@ async fn main() {
                      Some(r##"Immutable. Fully qualified name `projects/*/locations/global/catalogs/*/controls/*`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6020,19 +12421,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of the parent catalog. Expected format: `projects/*/locations/*/catalogs/*`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6048,13 +12446,11 @@ async fn main() {
                      Some(r##"Required. Full AttributesConfig resource name. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/attributesConfig`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6070,13 +12466,11 @@ async fn main() {
                      Some(r##"Required. Full CompletionConfig resource name. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/completionConfig`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6092,13 +12486,11 @@ async fn main() {
                      Some(r##"The parent catalog resource name, such as `projects/*/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6114,13 +12506,11 @@ async fn main() {
                      Some(r##"Required. The account resource name with an associated location. If the caller does not have permission to list Catalogs under this location, regardless of whether or not this location exists, a PERMISSION_DENIED error is returned."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6136,19 +12526,16 @@ async fn main() {
                      Some(r##"Required. The parent resource under which to create the model. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6164,13 +12551,11 @@ async fn main() {
                      Some(r##"Required. The resource name of the Model to delete. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6186,13 +12571,11 @@ async fn main() {
                      Some(r##"Required. The resource name of the Model to get. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog}/models/{model_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6208,13 +12591,11 @@ async fn main() {
                      Some(r##"Required. The parent for which to list models. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6230,19 +12611,16 @@ async fn main() {
                      Some(r##"Required. The fully qualified resource name of the model. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}` catalog_id has char limit of 50. recommendation_model_id has char limit of 40."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6258,19 +12636,16 @@ async fn main() {
                      Some(r##"Required. The name of the model to pause. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6286,19 +12661,16 @@ async fn main() {
                      Some(r##"Required. The name of the model to resume. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6314,19 +12686,16 @@ async fn main() {
                      Some(r##"Required. The resource name of the model to tune. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/models/{model_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6342,13 +12711,11 @@ async fn main() {
                      Some(r##"The name of the operation resource."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6364,13 +12731,11 @@ async fn main() {
                      Some(r##"The name of the operation's parent resource."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6386,19 +12751,16 @@ async fn main() {
                      Some(r##"Required. Immutable. The fully qualified resource name of the catalog."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6414,19 +12776,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of the format: `{placement=projects/*/locations/global/catalogs/default_catalog/servingConfigs/*}` or `{placement=projects/*/locations/global/catalogs/default_catalog/placements/*}`. We recommend using the `servingConfigs` resource. `placements` is a legacy resource. The ID of the Recommendations AI serving config or placement. Before you can request predictions from your model, you must create at least one serving config or placement for it. For more information, see [Manage serving configs] (https://cloud.google.com/retail/docs/manage-configs). The full list of available serving configs can be seen at https://console.cloud.google.com/ai/retail/catalogs/default_catalog/configs"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6442,19 +12801,16 @@ async fn main() {
                      Some(r##"Required. The resource name of the Retail Search serving config, such as `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` or the name of the legacy placement resource, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search`. This field is used to identify the serving config name and the set of models that are used to make the search."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6470,19 +12826,16 @@ async fn main() {
                      Some(r##"Required. The source ServingConfig resource name . Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/servingConfigs/{serving_config_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6498,19 +12851,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of parent. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6526,13 +12876,11 @@ async fn main() {
                      Some(r##"Required. The resource name of the ServingConfig to delete. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/servingConfigs/{serving_config_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6548,13 +12896,11 @@ async fn main() {
                      Some(r##"Required. The resource name of the ServingConfig to get. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/servingConfigs/{serving_config_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6570,13 +12916,11 @@ async fn main() {
                      Some(r##"Required. The catalog resource name. Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6592,19 +12936,16 @@ async fn main() {
                      Some(r##"Immutable. Fully qualified name `projects/*/locations/global/catalogs/*/servingConfig/*`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6620,19 +12961,16 @@ async fn main() {
                      Some(r##"Required. Full resource name of the format: `{placement=projects/*/locations/global/catalogs/default_catalog/servingConfigs/*}` or `{placement=projects/*/locations/global/catalogs/default_catalog/placements/*}`. We recommend using the `servingConfigs` resource. `placements` is a legacy resource. The ID of the Recommendations AI serving config or placement. Before you can request predictions from your model, you must create at least one serving config or placement for it. For more information, see [Manage serving configs] (https://cloud.google.com/retail/docs/manage-configs). The full list of available serving configs can be seen at https://console.cloud.google.com/ai/retail/catalogs/default_catalog/configs"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6648,19 +12986,16 @@ async fn main() {
                      Some(r##"Required. The source ServingConfig resource name . Format: `projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/servingConfigs/{serving_config_id}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6676,19 +13011,16 @@ async fn main() {
                      Some(r##"Required. The resource name of the Retail Search serving config, such as `projects/*/locations/global/catalogs/default_catalog/servingConfigs/default_serving_config` or the name of the legacy placement resource, such as `projects/*/locations/global/catalogs/default_catalog/placements/default_search`. This field is used to identify the serving config name and the set of models that are used to make the search."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6704,19 +13036,16 @@ async fn main() {
                      Some(r##"Full resource name of the catalog, such as `projects/*/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6732,19 +13061,16 @@ async fn main() {
                      Some(r##"Required. Immutable. The fully qualified resource name of the attribute config. Format: `projects/*/locations/*/catalogs/*/attributesConfig`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6760,19 +13086,16 @@ async fn main() {
                      Some(r##"Required. Immutable. Fully qualified name `projects/*/locations/*/catalogs/*/completionConfig`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6788,13 +13111,11 @@ async fn main() {
                      Some(r##"Required. The parent catalog name, such as `projects/1234/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6810,19 +13131,16 @@ async fn main() {
                      Some(r##"Required. `projects/1234/locations/global/catalogs/default_catalog`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6838,19 +13156,16 @@ async fn main() {
                      Some(r##"Required. The resource name of the catalog under which the events are created. The format is `projects/${projectId}/locations/global/catalogs/${catalogId}`"##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6866,19 +13181,16 @@ async fn main() {
                      Some(r##"Required. The parent catalog resource name, such as `projects/1234/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6894,19 +13206,16 @@ async fn main() {
                      Some(r##"Required. The parent catalog resource name, such as `projects/1234/locations/global/catalogs/default_catalog`."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6922,13 +13231,11 @@ async fn main() {
                      Some(r##"The name of the operation resource."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6944,13 +13251,11 @@ async fn main() {
                      Some(r##"The name of the operation's parent resource."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6966,13 +13271,11 @@ async fn main() {
                      Some(r##"The name of the operation resource."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -6988,13 +13291,11 @@ async fn main() {
                      Some(r##"The name of the operation's parent resource."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -7002,12 +13303,11 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-    ];
-    
+        ];
+
     let mut app = App::new("retail2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.5+20240614")
+           .version("6.0.0+20240614")
            .about("Vertex AI Search for Retail API is made up of Retail Search, Browse and Recommendations. These discovery AI solutions help you implement personalized search, browse and recommendations, based on machine learning models, across your websites and mobile applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_retail2_cli")
            .arg(Arg::with_name("url")
@@ -7025,52 +13325,51 @@ async fn main() {
                    .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
-           
-           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
-               let mut mcmd = SubCommand::with_name(main_command_name).about(about);
-           
-               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
-                   let mut scmd = SubCommand::with_name(sub_command_name);
-                   if let &Some(desc) = desc {
-                       scmd = scmd.about(desc);
-                   }
-                   scmd = scmd.after_help(url_info);
-           
-                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str =
-                           match (arg_name, flag) {
-                                   (&Some(an), _       ) => an,
-                                   (_        , &Some(f)) => f,
-                                    _                    => unreachable!(),
-                            };
-                       let mut arg = Arg::with_name(arg_name_str)
-                                         .empty_values(false);
-                       if let &Some(short_flag) = flag {
-                           arg = arg.short(short_flag);
-                       }
-                       if let &Some(desc) = desc {
-                           arg = arg.help(desc);
-                       }
-                       if arg_name.is_some() && flag.is_some() {
-                           arg = arg.takes_value(true);
-                       }
-                       if let &Some(required) = required {
-                           arg = arg.required(required);
-                       }
-                       if let &Some(multi) = multi {
-                           arg = arg.multiple(multi);
-                       }
-                       scmd = scmd.arg(arg);
-                   }
-                   mcmd = mcmd.subcommand(scmd);
-               }
-               app = app.subcommand(mcmd);
-           }
-           
-        let matches = app.get_matches();
+
+    for &(main_command_name, about, ref subcommands) in arg_data.iter() {
+        let mut mcmd = SubCommand::with_name(main_command_name).about(about);
+
+        for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+            let mut scmd = SubCommand::with_name(sub_command_name);
+            if let &Some(desc) = desc {
+                scmd = scmd.about(desc);
+            }
+            scmd = scmd.after_help(url_info);
+
+            for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                let arg_name_str = match (arg_name, flag) {
+                    (&Some(an), _) => an,
+                    (_, &Some(f)) => f,
+                    _ => unreachable!(),
+                };
+                let mut arg = Arg::with_name(arg_name_str).empty_values(false);
+                if let &Some(short_flag) = flag {
+                    arg = arg.short(short_flag);
+                }
+                if let &Some(desc) = desc {
+                    arg = arg.help(desc);
+                }
+                if arg_name.is_some() && flag.is_some() {
+                    arg = arg.takes_value(true);
+                }
+                if let &Some(required) = required {
+                    arg = arg.required(required);
+                }
+                if let &Some(multi) = multi {
+                    arg = arg.multiple(multi);
+                }
+                scmd = scmd.arg(arg);
+            }
+            mcmd = mcmd.subcommand(scmd);
+        }
+        app = app.subcommand(mcmd);
+    }
+
+    let matches = app.get_matches();
 
     let debug = matches.is_present("adebug");
-    let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+    let connector = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
         .unwrap()
         .https_or_http()
         .enable_http1()
@@ -7079,20 +13378,26 @@ async fn main() {
     match Engine::new(matches, connector).await {
         Err(err) => {
             exit_status = err.exit_code;
-            writeln!(io::stderr(), "{}", err).ok();
-        },
+            writeln!(std::io::stderr(), "{}", err).ok();
+        }
         Ok(engine) => {
             if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
-                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
-                    },
+                        writeln!(
+                            std::io::stderr(),
+                            "Failed to open output file '{}': {}",
+                            path,
+                            err
+                        )
+                        .ok();
+                    }
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:#?}", err).ok();
+                            writeln!(std::io::stderr(), "{:#?}", err).ok();
                         } else {
-                            writeln!(io::stderr(), "{}", err).ok();
+                            writeln!(std::io::stderr(), "{}", err).ok();
                         }
                     }
                 }

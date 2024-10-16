@@ -1,20 +1,8 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -37,13 +25,12 @@ impl AsRef<str> for Scope {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
         Scope::AppAlert
     }
 }
-
-
 
 // ########
 // HUB ###
@@ -61,22 +48,33 @@ impl Default for Scope {
 /// extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// use alertcenter1_beta1::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = AlertCenter::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -87,7 +85,7 @@ impl Default for Scope {
 ///              .filter("gubergren")
 ///              .customer_id("Lorem")
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -108,41 +106,43 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AlertCenter<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct AlertCenter<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for AlertCenter<S> {}
+impl<C> common::Hub for AlertCenter<C> {}
 
-impl<'a, S> AlertCenter<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> AlertCenter<S> {
+impl<'a, C> AlertCenter<C> {
+    pub fn new<A: 'static + common::GetToken>(
+        client: common::Client<C>,
+        auth: A,
+    ) -> AlertCenter<C> {
         AlertCenter {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://alertcenter.googleapis.com/".to_string(),
             _root_url: "https://alertcenter.googleapis.com/".to_string(),
         }
     }
 
-    pub fn alerts(&'a self) -> AlertMethods<'a, S> {
-        AlertMethods { hub: &self }
+    pub fn alerts(&'a self) -> AlertMethods<'a, C> {
+        AlertMethods { hub: self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, S> {
-        MethodMethods { hub: &self }
+    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+        MethodMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -150,7 +150,7 @@ impl<'a, S> AlertCenter<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -158,21 +158,20 @@ impl<'a, S> AlertCenter<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// An alert affecting a customer.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [feedback create alerts](AlertFeedbackCreateCall) (none)
 /// * [feedback list alerts](AlertFeedbackListCall) (none)
 /// * [batch delete alerts](AlertBatchDeleteCall) (none)
@@ -183,407 +182,348 @@ impl<'a, S> AlertCenter<S> {
 /// * [list alerts](AlertListCall) (none)
 /// * [undelete alerts](AlertUndeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Alert {
     /// Output only. The unique identifier for the alert.
-    #[serde(rename="alertId")]
-    
+    #[serde(rename = "alertId")]
     pub alert_id: Option<String>,
     /// Output only. The time this alert was created.
-    #[serde(rename="createTime")]
-    
-    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Output only. The unique identifier of the Google Workspace account of the customer.
-    #[serde(rename="customerId")]
-    
+    #[serde(rename = "customerId")]
     pub customer_id: Option<String>,
     /// Optional. The data associated with this alert, for example google.apps.alertcenter.type.DeviceCompromised.
-    
-    pub data: Option<HashMap<String, json::Value>>,
+    pub data: Option<HashMap<String, serde_json::Value>>,
     /// Output only. `True` if this alert is marked for deletion.
-    
     pub deleted: Option<bool>,
     /// Optional. The time the event that caused this alert ceased being active. If provided, the end time must not be earlier than the start time. If not provided, it indicates an ongoing alert.
-    #[serde(rename="endTime")]
-    
-    pub end_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "endTime")]
+    pub end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Optional. `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of an alert from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform alert updates in order to avoid race conditions: An `etag` is returned in the response which contains alerts, and systems are expected to put that etag in the request to update alert to ensure that their change will be applied to the same version of the alert. If no `etag` is provided in the call to update alert, then the existing alert is overwritten blindly.
-    
     pub etag: Option<String>,
     /// Output only. The metadata associated with this alert.
-    
     pub metadata: Option<AlertMetadata>,
     /// Output only. An optional [Security Investigation Tool](https://support.google.com/a/answer/7575955) query for this alert.
-    #[serde(rename="securityInvestigationToolLink")]
-    
+    #[serde(rename = "securityInvestigationToolLink")]
     pub security_investigation_tool_link: Option<String>,
     /// Required. A unique identifier for the system that reported the alert. This is output only after alert is created. Supported sources are any of the following: * Google Operations * Mobile device management * Gmail phishing * Data Loss Prevention * Domain wide takeout * State sponsored attack * Google identity * Apps outage
-    
     pub source: Option<String>,
     /// Required. The time the event that caused this alert was started or detected.
-    #[serde(rename="startTime")]
-    
-    pub start_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "startTime")]
+    pub start_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Required. The type of the alert. This is output only after alert is created. For a list of available alert types see [Google Workspace Alert types](https://developers.google.com/admin-sdk/alertcenter/reference/alert-types).
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
     /// Output only. The time this alert was last updated.
-    #[serde(rename="updateTime")]
-    
-    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
-impl client::Resource for Alert {}
-impl client::ResponseResult for Alert {}
-
+impl common::Resource for Alert {}
+impl common::ResponseResult for Alert {}
 
 /// A customer feedback about an alert.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [feedback create alerts](AlertFeedbackCreateCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AlertFeedback {
     /// Output only. The alert identifier.
-    #[serde(rename="alertId")]
-    
+    #[serde(rename = "alertId")]
     pub alert_id: Option<String>,
     /// Output only. The time this feedback was created.
-    #[serde(rename="createTime")]
-    
-    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// Output only. The unique identifier of the Google Workspace account of the customer.
-    #[serde(rename="customerId")]
-    
+    #[serde(rename = "customerId")]
     pub customer_id: Option<String>,
     /// Output only. The email of the user that provided the feedback.
-    
     pub email: Option<String>,
     /// Output only. The unique identifier for the feedback.
-    #[serde(rename="feedbackId")]
-    
+    #[serde(rename = "feedbackId")]
     pub feedback_id: Option<String>,
     /// Required. The type of the feedback.
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::RequestValue for AlertFeedback {}
-impl client::ResponseResult for AlertFeedback {}
-
+impl common::RequestValue for AlertFeedback {}
+impl common::ResponseResult for AlertFeedback {}
 
 /// An alert metadata.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get metadata alerts](AlertGetMetadataCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AlertMetadata {
     /// Output only. The alert identifier.
-    #[serde(rename="alertId")]
-    
+    #[serde(rename = "alertId")]
     pub alert_id: Option<String>,
     /// The email address of the user assigned to the alert.
-    
     pub assignee: Option<String>,
     /// Output only. The unique identifier of the Google Workspace account of the customer.
-    #[serde(rename="customerId")]
-    
+    #[serde(rename = "customerId")]
     pub customer_id: Option<String>,
     /// Optional. `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of an alert metadata from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform metadata updates in order to avoid race conditions: An `etag` is returned in the response which contains alert metadata, and systems are expected to put that etag in the request to update alert metadata to ensure that their change will be applied to the same version of the alert metadata. If no `etag` is provided in the call to update alert metadata, then the existing alert metadata is overwritten blindly.
-    
     pub etag: Option<String>,
     /// The severity value of the alert. Alert Center will set this field at alert creation time, default's to an empty string when it could not be determined. The supported values for update actions on this field are the following: * HIGH * MEDIUM * LOW
-    
     pub severity: Option<String>,
     /// The current status of the alert. The supported values are the following: * NOT_STARTED * IN_PROGRESS * CLOSED
-    
     pub status: Option<String>,
     /// Output only. The time this metadata was last updated.
-    #[serde(rename="updateTime")]
-    
-    pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "updateTime")]
+    pub update_time: Option<chrono::DateTime<chrono::offset::Utc>>,
 }
 
-impl client::ResponseResult for AlertMetadata {}
-
+impl common::ResponseResult for AlertMetadata {}
 
 /// A request to perform batch delete on alerts.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [batch delete alerts](AlertBatchDeleteCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BatchDeleteAlertsRequest {
     /// Required. The list of alert IDs to delete.
-    #[serde(rename="alertId")]
-    
+    #[serde(rename = "alertId")]
     pub alert_id: Option<Vec<String>>,
     /// Optional. The unique identifier of the Google Workspace account of the customer the alerts are associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
-    #[serde(rename="customerId")]
-    
+    #[serde(rename = "customerId")]
     pub customer_id: Option<String>,
 }
 
-impl client::RequestValue for BatchDeleteAlertsRequest {}
-
+impl common::RequestValue for BatchDeleteAlertsRequest {}
 
 /// Response to batch delete operation on alerts.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [batch delete alerts](AlertBatchDeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BatchDeleteAlertsResponse {
     /// The status details for each failed `alert_id`.
-    #[serde(rename="failedAlertStatus")]
-    
+    #[serde(rename = "failedAlertStatus")]
     pub failed_alert_status: Option<HashMap<String, Status>>,
     /// The successful list of alert IDs.
-    #[serde(rename="successAlertIds")]
-    
+    #[serde(rename = "successAlertIds")]
     pub success_alert_ids: Option<Vec<String>>,
 }
 
-impl client::ResponseResult for BatchDeleteAlertsResponse {}
-
+impl common::ResponseResult for BatchDeleteAlertsResponse {}
 
 /// A request to perform batch undelete on alerts.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [batch undelete alerts](AlertBatchUndeleteCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BatchUndeleteAlertsRequest {
     /// Required. The list of alert IDs to undelete.
-    #[serde(rename="alertId")]
-    
+    #[serde(rename = "alertId")]
     pub alert_id: Option<Vec<String>>,
     /// Optional. The unique identifier of the Google Workspace account of the customer the alerts are associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
-    #[serde(rename="customerId")]
-    
+    #[serde(rename = "customerId")]
     pub customer_id: Option<String>,
 }
 
-impl client::RequestValue for BatchUndeleteAlertsRequest {}
-
+impl common::RequestValue for BatchUndeleteAlertsRequest {}
 
 /// Response to batch undelete operation on alerts.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [batch undelete alerts](AlertBatchUndeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BatchUndeleteAlertsResponse {
     /// The status details for each failed `alert_id`.
-    #[serde(rename="failedAlertStatus")]
-    
+    #[serde(rename = "failedAlertStatus")]
     pub failed_alert_status: Option<HashMap<String, Status>>,
     /// The successful list of alert IDs.
-    #[serde(rename="successAlertIds")]
-    
+    #[serde(rename = "successAlertIds")]
     pub success_alert_ids: Option<Vec<String>>,
 }
 
-impl client::ResponseResult for BatchUndeleteAlertsResponse {}
-
+impl common::ResponseResult for BatchUndeleteAlertsResponse {}
 
 /// A reference to a Cloud Pubsub topic. To register for notifications, the owner of the topic must grant `alerts-api-push-notifications@system.gserviceaccount.com` the `projects.topics.publish` permission.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CloudPubsubTopic {
     /// Optional. The format of the payload that would be sent. If not specified the format will be JSON.
-    #[serde(rename="payloadFormat")]
-    
+    #[serde(rename = "payloadFormat")]
     pub payload_format: Option<String>,
     /// The `name` field of a Cloud Pubsub [Topic] (https://cloud.google.com/pubsub/docs/reference/rest/v1/projects.topics#Topic).
-    #[serde(rename="topicName")]
-    
+    #[serde(rename = "topicName")]
     pub topic_name: Option<String>,
 }
 
-impl client::Part for CloudPubsubTopic {}
-
+impl common::Part for CloudPubsubTopic {}
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [delete alerts](AlertDeleteCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Empty {
+    _never_set: Option<bool>,
+}
 
-impl client::ResponseResult for Empty {}
-
+impl common::ResponseResult for Empty {}
 
 /// Response message for an alert feedback listing request.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [feedback list alerts](AlertFeedbackListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListAlertFeedbackResponse {
     /// The list of alert feedback. Feedback entries for each alert are ordered by creation time descending.
-    
     pub feedback: Option<Vec<AlertFeedback>>,
 }
 
-impl client::ResponseResult for ListAlertFeedbackResponse {}
-
+impl common::ResponseResult for ListAlertFeedbackResponse {}
 
 /// Response message for an alert listing request.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list alerts](AlertListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListAlertsResponse {
     /// The list of alerts.
-    
     pub alerts: Option<Vec<Alert>>,
     /// The token for the next page. If not empty, indicates that there may be more alerts that match the listing request; this value can be used in a subsequent ListAlertsRequest to get alerts continuing from last result of the current list call.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
 }
 
-impl client::ResponseResult for ListAlertsResponse {}
-
+impl common::ResponseResult for ListAlertsResponse {}
 
 /// Settings for callback notifications. For more details see [Google Workspace Alert Notification](https://developers.google.com/admin-sdk/alertcenter/guides/notifications).
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Notification {
     /// A Google Cloud Pub/sub topic destination.
-    #[serde(rename="cloudPubsubTopic")]
-    
+    #[serde(rename = "cloudPubsubTopic")]
     pub cloud_pubsub_topic: Option<CloudPubsubTopic>,
 }
 
-impl client::Part for Notification {}
-
+impl common::Part for Notification {}
 
 /// Customer-level settings.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get settings](MethodGetSettingCall) (response)
 /// * [update settings](MethodUpdateSettingCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Settings {
     /// The list of notifications.
-    
     pub notifications: Option<Vec<Notification>>,
 }
 
-impl client::RequestValue for Settings {}
-impl client::ResponseResult for Settings {}
-
+impl common::RequestValue for Settings {}
+impl common::ResponseResult for Settings {}
 
 /// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Status {
     /// The status code, which should be an enum value of google.rpc.Code.
-    
     pub code: Option<i32>,
     /// A list of messages that carry the error details. There is a common set of message types for APIs to use.
-    
-    pub details: Option<Vec<HashMap<String, json::Value>>>,
+    pub details: Option<Vec<HashMap<String, serde_json::Value>>>,
     /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.
-    
     pub message: Option<String>,
 }
 
-impl client::Part for Status {}
-
+impl common::Part for Status {}
 
 /// A request to undelete a specific alert that was marked for deletion.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [undelete alerts](AlertUndeleteCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct UndeleteAlertRequest {
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
-    #[serde(rename="customerId")]
-    
+    #[serde(rename = "customerId")]
     pub customer_id: Option<String>,
 }
 
-impl client::RequestValue for UndeleteAlertRequest {}
-
-
+impl common::RequestValue for UndeleteAlertRequest {}
 
 // ###################
 // MethodBuilders ###
@@ -600,42 +540,57 @@ impl client::RequestValue for UndeleteAlertRequest {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = AlertCenter::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `batch_delete(...)`, `batch_undelete(...)`, `delete(...)`, `feedback_create(...)`, `feedback_list(...)`, `get(...)`, `get_metadata(...)`, `list(...)` and `undelete(...)`
 /// // to build up your call.
 /// let rb = hub.alerts();
 /// # }
 /// ```
-pub struct AlertMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for AlertMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for AlertMethods<'a, C> {}
 
-impl<'a, S> AlertMethods<'a, S> {
-    
+impl<'a, C> AlertMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates new feedback for an alert. Attempting to create a feedback for a non-existent alert returns `NOT_FOUND` error. Attempting to create a feedback for an alert that is marked for deletion returns `FAILED_PRECONDITION' error.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `alertId` - Required. The identifier of the alert this feedback belongs to.
-    pub fn feedback_create(&self, request: AlertFeedback, alert_id: &str) -> AlertFeedbackCreateCall<'a, S> {
+    pub fn feedback_create(
+        &self,
+        request: AlertFeedback,
+        alert_id: &str,
+    ) -> AlertFeedbackCreateCall<'a, C> {
         AlertFeedbackCreateCall {
             hub: self.hub,
             _request: request,
@@ -646,15 +601,15 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all the feedback for an alert. Attempting to list feedbacks for a non-existent alert returns `NOT_FOUND` error.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `alertId` - Required. The alert identifier. The "-" wildcard could be used to represent all alerts.
-    pub fn feedback_list(&self, alert_id: &str) -> AlertFeedbackListCall<'a, S> {
+    pub fn feedback_list(&self, alert_id: &str) -> AlertFeedbackListCall<'a, C> {
         AlertFeedbackListCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -665,15 +620,15 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Performs batch delete operation on alerts.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_delete(&self, request: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, S> {
+    pub fn batch_delete(&self, request: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, C> {
         AlertBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -682,15 +637,18 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Performs batch undelete operation on alerts.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_undelete(&self, request: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, S> {
+    pub fn batch_undelete(
+        &self,
+        request: BatchUndeleteAlertsRequest,
+    ) -> AlertBatchUndeleteCall<'a, C> {
         AlertBatchUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -699,15 +657,15 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Marks the specified alert for deletion. An alert that has been marked for deletion is removed from Alert Center after 30 days. Marking an alert for deletion has no effect on an alert which has already been marked for deletion. Attempting to mark a nonexistent alert for deletion results in a `NOT_FOUND` error.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert to delete.
-    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a, S> {
+    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a, C> {
         AlertDeleteCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -717,15 +675,15 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the specified alert. Attempting to get a nonexistent alert returns `NOT_FOUND` error.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert to retrieve.
-    pub fn get(&self, alert_id: &str) -> AlertGetCall<'a, S> {
+    pub fn get(&self, alert_id: &str) -> AlertGetCall<'a, C> {
         AlertGetCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -735,15 +693,15 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the metadata of an alert. Attempting to get metadata for a non-existent alert returns `NOT_FOUND` error.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert this metadata belongs to.
-    pub fn get_metadata(&self, alert_id: &str) -> AlertGetMetadataCall<'a, S> {
+    pub fn get_metadata(&self, alert_id: &str) -> AlertGetMetadataCall<'a, C> {
         AlertGetMetadataCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -753,11 +711,11 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the alerts.
-    pub fn list(&self) -> AlertListCall<'a, S> {
+    pub fn list(&self) -> AlertListCall<'a, C> {
         AlertListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -770,16 +728,20 @@ impl<'a, S> AlertMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Restores, or "undeletes", an alert that was marked for deletion within the past 30 days. Attempting to undelete an alert which was marked for deletion over 30 days ago (which has been removed from the Alert Center database) or a nonexistent alert returns a `NOT_FOUND` error. Attempting to undelete an alert which has not been marked for deletion has no effect.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `alertId` - Required. The identifier of the alert to undelete.
-    pub fn undelete(&self, request: UndeleteAlertRequest, alert_id: &str) -> AlertUndeleteCall<'a, S> {
+    pub fn undelete(
+        &self,
+        request: UndeleteAlertRequest,
+        alert_id: &str,
+    ) -> AlertUndeleteCall<'a, C> {
         AlertUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -790,8 +752,6 @@ impl<'a, S> AlertMethods<'a, S> {
         }
     }
 }
-
-
 
 /// A builder providing access to all free methods, which are not associated with a particular resource.
 /// It is not used directly, but through the [`AlertCenter`] hub.
@@ -804,37 +764,48 @@ impl<'a, S> AlertMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = AlertCenter::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_settings(...)` and `update_settings(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct MethodMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for MethodMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for MethodMethods<'a, C> {}
 
-impl<'a, S> MethodMethods<'a, S> {
-    
+impl<'a, C> MethodMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns customer-level settings.
-    pub fn get_settings(&self) -> MethodGetSettingCall<'a, S> {
+    pub fn get_settings(&self) -> MethodGetSettingCall<'a, C> {
         MethodGetSettingCall {
             hub: self.hub,
             _customer_id: Default::default(),
@@ -843,15 +814,15 @@ impl<'a, S> MethodMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates the customer-level settings.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a, S> {
+    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a, C> {
         MethodUpdateSettingCall {
             hub: self.hub,
             _request: request,
@@ -862,10 +833,6 @@ impl<'a, S> MethodMethods<'a, S> {
         }
     }
 }
-
-
-
-
 
 // ###################
 // CallBuilders   ###
@@ -886,20 +853,31 @@ impl<'a, S> MethodMethods<'a, S> {
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// use alertcenter1_beta1::api::AlertFeedback;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = AlertFeedback::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -908,45 +886,44 @@ impl<'a, S> MethodMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertFeedbackCreateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertFeedbackCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _request: AlertFeedback,
     _alert_id: String,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertFeedbackCreateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertFeedbackCreateCall<'a, C> {}
 
-impl<'a, S> AlertFeedbackCreateCall<'a, S>
+impl<'a, C> AlertFeedbackCreateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AlertFeedback)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, AlertFeedback)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.feedback.create",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.feedback.create",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "alertId", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -964,6 +941,7 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{alertId}", "alertId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -975,32 +953,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1013,72 +998,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AlertFeedback) -> AlertFeedbackCreateCall<'a, S> {
+    pub fn request(mut self, new_value: AlertFeedback) -> AlertFeedbackCreateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -1088,26 +1076,29 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, S> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, C> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackCreateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AlertFeedbackCreateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1132,9 +1123,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackCreateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1149,17 +1143,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertFeedbackCreateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertFeedbackCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertFeedbackCreateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertFeedbackCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1168,12 +1166,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertFeedbackCreateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertFeedbackCreateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists all the feedback for an alert. Attempting to list feedbacks for a non-existent alert returns `NOT_FOUND` error.
 ///
@@ -1189,15 +1186,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1207,45 +1215,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertFeedbackListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertFeedbackListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _alert_id: String,
     _filter: Option<String>,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertFeedbackListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertFeedbackListCall<'a, C> {}
 
-impl<'a, S> AlertFeedbackListCall<'a, S>
+impl<'a, C> AlertFeedbackListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAlertFeedbackResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListAlertFeedbackResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.feedback.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.feedback.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "alertId", "filter", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1266,6 +1273,7 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{alertId}", "alertId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -1276,20 +1284,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1303,64 +1312,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The alert identifier. The "-" wildcard could be used to represent all alerts.
     ///
@@ -1368,33 +1378,36 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, S> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, C> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. A query string for filtering alert feedback results. For more details, see [Query filters](https://developers.google.com/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](https://developers.google.com/admin-sdk/alertcenter/reference/filter-fields#alerts.feedback.list).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AlertFeedbackListCall<'a, S> {
+    pub fn filter(mut self, new_value: &str) -> AlertFeedbackListCall<'a, C> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackListCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AlertFeedbackListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1419,9 +1432,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1436,17 +1452,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertFeedbackListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertFeedbackListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertFeedbackListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertFeedbackListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1455,12 +1475,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertFeedbackListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertFeedbackListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Performs batch delete operation on alerts.
 ///
@@ -1477,20 +1496,31 @@ where
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// use alertcenter1_beta1::api::BatchDeleteAlertsRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = BatchDeleteAlertsRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1498,43 +1528,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertBatchDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertBatchDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _request: BatchDeleteAlertsRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertBatchDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertBatchDeleteCall<'a, C> {}
 
-impl<'a, S> AlertBatchDeleteCall<'a, S>
+impl<'a, C> AlertBatchDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchDeleteAlertsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, BatchDeleteAlertsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.batchDelete",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.batchDelete",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1548,36 +1577,42 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
-
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1590,84 +1625,90 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, S> {
+    pub fn request(mut self, new_value: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, C> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AlertBatchDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1692,9 +1733,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1709,17 +1753,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertBatchDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertBatchDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertBatchDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertBatchDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1728,12 +1776,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertBatchDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertBatchDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Performs batch undelete operation on alerts.
 ///
@@ -1750,20 +1797,31 @@ where
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// use alertcenter1_beta1::api::BatchUndeleteAlertsRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = BatchUndeleteAlertsRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1771,43 +1829,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertBatchUndeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertBatchUndeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _request: BatchUndeleteAlertsRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertBatchUndeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertBatchUndeleteCall<'a, C> {}
 
-impl<'a, S> AlertBatchUndeleteCall<'a, S>
+impl<'a, C> AlertBatchUndeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, BatchUndeleteAlertsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, BatchUndeleteAlertsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.batchUndelete",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.batchUndelete",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1821,36 +1878,42 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
-
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1863,84 +1926,93 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: BatchUndeleteAlertsRequest,
+    ) -> AlertBatchUndeleteCall<'a, C> {
         self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchUndeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AlertBatchUndeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1965,9 +2037,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchUndeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchUndeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1982,17 +2057,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertBatchUndeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertBatchUndeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertBatchUndeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertBatchUndeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2001,12 +2080,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertBatchUndeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertBatchUndeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Marks the specified alert for deletion. An alert that has been marked for deletion is removed from Alert Center after 30 days. Marking an alert for deletion has no effect on an alert which has already been marked for deletion. Attempting to mark a nonexistent alert for deletion results in a `NOT_FOUND` error.
 ///
@@ -2022,15 +2100,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2039,44 +2128,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _alert_id: String,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertDeleteCall<'a, C> {}
 
-impl<'a, S> AlertDeleteCall<'a, S>
+impl<'a, C> AlertDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["alt", "alertId", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2094,6 +2182,7 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{alertId}", "alertId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -2104,20 +2193,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2131,64 +2221,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The identifier of the alert to delete.
     ///
@@ -2196,26 +2287,26 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a, S> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a, C> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertDeleteCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertDeleteCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertDeleteCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> AlertDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2240,9 +2331,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2257,17 +2351,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2276,12 +2374,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Gets the specified alert. Attempting to get a nonexistent alert returns `NOT_FOUND` error.
 ///
@@ -2297,15 +2394,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2314,44 +2422,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _alert_id: String,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertGetCall<'a, C> {}
 
-impl<'a, S> AlertGetCall<'a, S>
+impl<'a, C> AlertGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Alert)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Alert)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "alertId", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2369,6 +2476,7 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{alertId}", "alertId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -2379,20 +2487,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2406,64 +2515,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The identifier of the alert to retrieve.
     ///
@@ -2471,26 +2581,26 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertGetCall<'a, S> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertGetCall<'a, C> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert is associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertGetCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertGetCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> AlertGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2515,9 +2625,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2532,17 +2645,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2551,12 +2668,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Returns the metadata of an alert. Attempting to get metadata for a non-existent alert returns `NOT_FOUND` error.
 ///
@@ -2572,15 +2688,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2589,44 +2716,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertGetMetadataCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertGetMetadataCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _alert_id: String,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertGetMetadataCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertGetMetadataCall<'a, C> {}
 
-impl<'a, S> AlertGetMetadataCall<'a, S>
+impl<'a, C> AlertGetMetadataCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AlertMetadata)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, AlertMetadata)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.getMetadata",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.getMetadata",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "alertId", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2644,6 +2770,7 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{alertId}", "alertId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -2654,20 +2781,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2681,64 +2809,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The identifier of the alert this metadata belongs to.
     ///
@@ -2746,26 +2875,29 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, S> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, C> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert metadata is associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetMetadataCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AlertGetMetadataCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2790,9 +2922,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertGetMetadataCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertGetMetadataCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2807,17 +2942,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertGetMetadataCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertGetMetadataCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertGetMetadataCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertGetMetadataCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2826,12 +2965,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertGetMetadataCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertGetMetadataCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists the alerts.
 ///
@@ -2847,15 +2985,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2868,47 +3017,55 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
     _filter: Option<String>,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertListCall<'a, C> {}
 
-impl<'a, S> AlertListCall<'a, S>
+impl<'a, C> AlertListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAlertsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListAlertsResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
 
-        for &field in ["alt", "pageToken", "pageSize", "orderBy", "filter", "customerId"].iter() {
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+            "customerId",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2937,23 +3094,23 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
-
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2967,109 +3124,110 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Optional. A token identifying a page of results the server should return. If empty, a new iteration is started. To continue an iteration, pass in the value from the previous ListAlertsResponse's next_page_token field.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AlertListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> AlertListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The requested page size. Server may return fewer items than requested. If unspecified, server picks an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AlertListCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> AlertListCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The sort order of the list results. If not specified results may be returned in arbitrary order. You can sort the results in descending order based on the creation timestamp using `order_by="create_time desc"`. Currently, supported sorting are `create_time asc`, `create_time desc`, `update_time desc`
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AlertListCall<'a, S> {
+    pub fn order_by(mut self, new_value: &str) -> AlertListCall<'a, C> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. A query string for filtering alert results. For more details, see [Query filters](https://developers.google.com/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](https://developers.google.com/admin-sdk/alertcenter/reference/filter-fields#alerts.list).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AlertListCall<'a, S> {
+    pub fn filter(mut self, new_value: &str) -> AlertListCall<'a, C> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. The unique identifier of the Google Workspace account of the customer the alerts are associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertListCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertListCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> AlertListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3094,9 +3252,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3111,17 +3272,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3130,12 +3295,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Restores, or "undeletes", an alert that was marked for deletion within the past 30 days. Attempting to undelete an alert which was marked for deletion over 30 days ago (which has been removed from the Alert Center database) or a nonexistent alert returns a `NOT_FOUND` error. Attempting to undelete an alert which has not been marked for deletion has no effect.
 ///
@@ -3152,20 +3316,31 @@ where
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// use alertcenter1_beta1::api::UndeleteAlertRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = UndeleteAlertRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3173,44 +3348,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertUndeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct AlertUndeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _request: UndeleteAlertRequest,
     _alert_id: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for AlertUndeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for AlertUndeleteCall<'a, C> {}
 
-impl<'a, S> AlertUndeleteCall<'a, S>
+impl<'a, C> AlertUndeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Alert)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Alert)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.alerts.undelete",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.alerts.undelete",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "alertId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3225,6 +3399,7 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{alertId}", "alertId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -3236,32 +3411,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -3274,72 +3456,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UndeleteAlertRequest) -> AlertUndeleteCall<'a, S> {
+    pub fn request(mut self, new_value: UndeleteAlertRequest) -> AlertUndeleteCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -3349,19 +3534,19 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertUndeleteCall<'a, S> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertUndeleteCall<'a, C> {
         self._alert_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertUndeleteCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> AlertUndeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3386,9 +3571,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertUndeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> AlertUndeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3403,17 +3591,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AlertUndeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> AlertUndeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertUndeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AlertUndeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3422,12 +3614,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> AlertUndeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> AlertUndeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Returns customer-level settings.
 ///
@@ -3443,15 +3634,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3460,43 +3662,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetSettingCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct MethodGetSettingCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for MethodGetSettingCall<'a, S> {}
+impl<'a, C> common::CallBuilder for MethodGetSettingCall<'a, C> {}
 
-impl<'a, S> MethodGetSettingCall<'a, S>
+impl<'a, C> MethodGetSettingCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Settings)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Settings)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.getSettings",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.getSettings",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3513,23 +3714,23 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
-
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3543,81 +3744,85 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert settings are associated with. The `customer_id` must/ have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetSettingCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> MethodGetSettingCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3642,9 +3847,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3659,17 +3867,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> MethodGetSettingCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> MethodGetSettingCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> MethodGetSettingCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MethodGetSettingCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3678,12 +3890,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> MethodGetSettingCall<'a, S> {
+    pub fn clear_scopes(mut self) -> MethodGetSettingCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Updates the customer-level settings.
 ///
@@ -3700,20 +3911,31 @@ where
 /// # extern crate google_alertcenter1_beta1 as alertcenter1_beta1;
 /// use alertcenter1_beta1::api::Settings;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use alertcenter1_beta1::{AlertCenter, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AlertCenter::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use alertcenter1_beta1::{AlertCenter, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AlertCenter::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Settings::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3722,44 +3944,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodUpdateSettingCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AlertCenter<S>,
+pub struct MethodUpdateSettingCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AlertCenter<C>,
     _request: Settings,
     _customer_id: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for MethodUpdateSettingCall<'a, S> {}
+impl<'a, C> common::CallBuilder for MethodUpdateSettingCall<'a, C> {}
 
-impl<'a, S> MethodUpdateSettingCall<'a, S>
+impl<'a, C> MethodUpdateSettingCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Settings)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Settings)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "alertcenter.updateSettings",
-                               http_method: hyper::Method::PATCH });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "alertcenter.updateSettings",
+            http_method: hyper::Method::PATCH,
+        });
 
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3776,36 +3997,42 @@ where
             self._scopes.insert(Scope::AppAlert.as_ref().to_string());
         }
 
-
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -3818,91 +4045,97 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Settings) -> MethodUpdateSettingCall<'a, S> {
+    pub fn request(mut self, new_value: Settings) -> MethodUpdateSettingCall<'a, C> {
         self._request = new_value;
         self
     }
     /// Optional. The unique identifier of the Google Workspace account of the customer the alert settings are associated with. The `customer_id` must have the initial "C" stripped (for example, `046psxkn`). Inferred from the caller identity if not provided. [Find your customer ID](https://support.google.com/cloudidentity/answer/10070793).
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> MethodUpdateSettingCall<'a, S> {
+    pub fn customer_id(mut self, new_value: &str) -> MethodUpdateSettingCall<'a, C> {
         self._customer_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateSettingCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> MethodUpdateSettingCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3927,9 +4160,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateSettingCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateSettingCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3944,17 +4180,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> MethodUpdateSettingCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> MethodUpdateSettingCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> MethodUpdateSettingCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> MethodUpdateSettingCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3963,10 +4203,8 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> MethodUpdateSettingCall<'a, S> {
+    pub fn clear_scopes(mut self) -> MethodUpdateSettingCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
-

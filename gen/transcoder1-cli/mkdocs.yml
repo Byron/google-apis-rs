@@ -1,4 +1,4 @@
-site_name: Transcoder v5.0.5+20240605
+site_name: Transcoder v6.0.0+20240605
 site_url: http://byron.github.io/google-apis-rs/google-transcoder1-cli
 site_description: A complete library to interact with Transcoder (protocol v1)
 
@@ -22,4 +22,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

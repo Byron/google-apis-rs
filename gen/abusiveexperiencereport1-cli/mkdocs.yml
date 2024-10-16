@@ -1,4 +1,4 @@
-site_name: Abusive Experience Report v5.0.5+20240610
+site_name: Abusive Experience Report v6.0.0+20240610
 site_url: http://byron.github.io/google-apis-rs/google-abusiveexperiencereport1-cli
 site_description: A complete library to interact with Abusive Experience Report (protocol v1)
 
@@ -17,4 +17,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Maps Places* crate version *5.0.5+20241013*, where *20241013* is the exact revision of the *places:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
+//! This documentation was generated from *Maps Places* crate version *6.0.0+20241013*, where *20241013* is the exact revision of the *places:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
 //!
 //! Everything else about the *Maps Places* *v1* API can be found at the
 //! [official documentation site](https://mapsplatform.google.com/maps-products/#places-section).

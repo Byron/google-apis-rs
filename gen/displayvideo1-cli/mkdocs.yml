@@ -1,4 +1,4 @@
-site_name: Display Video v5.0.5+20240620
+site_name: Display Video v6.0.0+20240620
 site_url: http://byron.github.io/google-apis-rs/google-displayvideo1-cli
 site_description: A complete library to interact with Display Video (protocol v1)
 
@@ -178,4 +178,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

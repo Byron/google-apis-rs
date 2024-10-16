@@ -1,4 +1,4 @@
-site_name: My Business v5.0.5+0
+site_name: My Business v6.0.0+0
 site_url: http://byron.github.io/google-apis-rs/google-mybusiness4-cli
 site_description: A complete library to interact with My Business (protocol v4)
 
@@ -89,4 +89,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

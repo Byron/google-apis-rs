@@ -1,4 +1,4 @@
-site_name: classroom v5.0.5+20240617
+site_name: classroom v6.0.0+20240617
 site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
 site_description: A complete library to interact with classroom (protocol v1)
 
@@ -106,4 +106,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

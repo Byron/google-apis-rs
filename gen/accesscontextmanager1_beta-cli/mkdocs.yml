@@ -1,4 +1,4 @@
-site_name: Access Context Manager v5.0.5+20230123
+site_name: Access Context Manager v6.0.0+20230123
 site_url: http://byron.github.io/google-apis-rs/google-accesscontextmanager1_beta-cli
 site_description: A complete library to interact with Access Context Manager (protocol v1beta)
 
@@ -31,4 +31,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

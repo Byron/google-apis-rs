@@ -1,20 +1,8 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -37,13 +25,12 @@ impl AsRef<str> for Scope {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
         Scope::CloudPlatform
     }
 }
-
-
 
 // ########
 // HUB ###
@@ -62,34 +49,45 @@ impl Default for Scope {
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1Contact;
 /// use essentialcontacts1::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1Contact::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.folders().contacts_patch(req, "name")
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -110,44 +108,46 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Essentialcontacts<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct Essentialcontacts<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for Essentialcontacts<S> {}
+impl<C> common::Hub for Essentialcontacts<C> {}
 
-impl<'a, S> Essentialcontacts<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Essentialcontacts<S> {
+impl<'a, C> Essentialcontacts<C> {
+    pub fn new<A: 'static + common::GetToken>(
+        client: common::Client<C>,
+        auth: A,
+    ) -> Essentialcontacts<C> {
         Essentialcontacts {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://essentialcontacts.googleapis.com/".to_string(),
             _root_url: "https://essentialcontacts.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a, S> {
-        FolderMethods { hub: &self }
+    pub fn folders(&'a self) -> FolderMethods<'a, C> {
+        FolderMethods { hub: self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a, S> {
-        OrganizationMethods { hub: &self }
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, C> {
+        OrganizationMethods { hub: self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, S> {
-        ProjectMethods { hub: &self }
+    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+        ProjectMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -155,7 +155,7 @@ impl<'a, S> Essentialcontacts<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -163,47 +163,43 @@ impl<'a, S> Essentialcontacts<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// Response message for the ComputeContacts method.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [contacts compute folders](FolderContactComputeCall) (response)
 /// * [contacts compute organizations](OrganizationContactComputeCall) (response)
 /// * [contacts compute projects](ProjectContactComputeCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudEssentialcontactsV1ComputeContactsResponse {
     /// All contacts for the resource that are subscribed to the specified notification categories, including contacts inherited from any parent resources.
-    
     pub contacts: Option<Vec<GoogleCloudEssentialcontactsV1Contact>>,
     /// If there are more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token` and the rest of the parameters the same as the original request.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
 }
 
-impl client::ResponseResult for GoogleCloudEssentialcontactsV1ComputeContactsResponse {}
-
+impl common::ResponseResult for GoogleCloudEssentialcontactsV1ComputeContactsResponse {}
 
 /// A contact that will receive notifications from Google Cloud.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [contacts create folders](FolderContactCreateCall) (request|response)
 /// * [contacts get folders](FolderContactGetCall) (response)
 /// * [contacts patch folders](FolderContactPatchCall) (request|response)
@@ -214,96 +210,83 @@ impl client::ResponseResult for GoogleCloudEssentialcontactsV1ComputeContactsRes
 /// * [contacts get projects](ProjectContactGetCall) (response)
 /// * [contacts patch projects](ProjectContactPatchCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudEssentialcontactsV1Contact {
     /// Required. The email address to send notifications to. The email address does not need to be a Google Account.
-    
     pub email: Option<String>,
     /// Required. The preferred language for notifications, as a ISO 639-1 language code. See [Supported languages](https://cloud.google.com/resource-manager/docs/managing-notification-contacts#supported-languages) for a list of supported languages.
-    #[serde(rename="languageTag")]
-    
+    #[serde(rename = "languageTag")]
     pub language_tag: Option<String>,
     /// Output only. The identifier for the contact. Format: {resource_type}/{resource_id}/contacts/{contact_id}
-    
     pub name: Option<String>,
     /// Required. The categories of notifications that the contact will receive communications for.
-    #[serde(rename="notificationCategorySubscriptions")]
-    
+    #[serde(rename = "notificationCategorySubscriptions")]
     pub notification_category_subscriptions: Option<Vec<String>>,
     /// The last time the validation_state was updated, either manually or automatically. A contact is considered stale if its validation state was updated more than 1 year ago.
-    #[serde(rename="validateTime")]
-    
-    pub validate_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    #[serde(rename = "validateTime")]
+    pub validate_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// The validity of the contact. A contact is considered valid if it is the correct recipient for notifications for a particular resource.
-    #[serde(rename="validationState")]
-    
+    #[serde(rename = "validationState")]
     pub validation_state: Option<String>,
 }
 
-impl client::RequestValue for GoogleCloudEssentialcontactsV1Contact {}
-impl client::ResponseResult for GoogleCloudEssentialcontactsV1Contact {}
-
+impl common::RequestValue for GoogleCloudEssentialcontactsV1Contact {}
+impl common::ResponseResult for GoogleCloudEssentialcontactsV1Contact {}
 
 /// Response message for the ListContacts method.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [contacts list folders](FolderContactListCall) (response)
 /// * [contacts list organizations](OrganizationContactListCall) (response)
 /// * [contacts list projects](ProjectContactListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudEssentialcontactsV1ListContactsResponse {
     /// The contacts for the specified resource.
-    
     pub contacts: Option<Vec<GoogleCloudEssentialcontactsV1Contact>>,
     /// If there are more results than those appearing in this response, then `next_page_token` is included. To get the next set of results, call this method again using the value of `next_page_token` as `page_token` and the rest of the parameters the same as the original request.
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
 }
 
-impl client::ResponseResult for GoogleCloudEssentialcontactsV1ListContactsResponse {}
-
+impl common::ResponseResult for GoogleCloudEssentialcontactsV1ListContactsResponse {}
 
 /// Request message for the SendTestMessage method.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [contacts send test message folders](FolderContactSendTestMessageCall) (request)
 /// * [contacts send test message organizations](OrganizationContactSendTestMessageCall) (request)
 /// * [contacts send test message projects](ProjectContactSendTestMessageCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleCloudEssentialcontactsV1SendTestMessageRequest {
     /// Required. The list of names of the contacts to send a test message to. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    
     pub contacts: Option<Vec<String>>,
     /// Required. The notification category to send the test message for. All contacts must be subscribed to this category.
-    #[serde(rename="notificationCategory")]
-    
+    #[serde(rename = "notificationCategory")]
     pub notification_category: Option<String>,
 }
 
-impl client::RequestValue for GoogleCloudEssentialcontactsV1SendTestMessageRequest {}
-
+impl common::RequestValue for GoogleCloudEssentialcontactsV1SendTestMessageRequest {}
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [contacts delete folders](FolderContactDeleteCall) (response)
 /// * [contacts send test message folders](FolderContactSendTestMessageCall) (response)
 /// * [contacts delete organizations](OrganizationContactDeleteCall) (response)
@@ -311,13 +294,13 @@ impl client::RequestValue for GoogleCloudEssentialcontactsV1SendTestMessageReque
 /// * [contacts delete projects](ProjectContactDeleteCall) (response)
 /// * [contacts send test message projects](ProjectContactSendTestMessageCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GoogleProtobufEmpty {
+    _never_set: Option<bool>,
+}
 
-impl client::ResponseResult for GoogleProtobufEmpty {}
-
-
+impl common::ResponseResult for GoogleProtobufEmpty {}
 
 // ###################
 // MethodBuilders ###
@@ -334,41 +317,52 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_essentialcontacts1 as essentialcontacts1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Essentialcontacts::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `contacts_compute(...)`, `contacts_create(...)`, `contacts_delete(...)`, `contacts_get(...)`, `contacts_list(...)`, `contacts_patch(...)` and `contacts_send_test_message(...)`
 /// // to build up your call.
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for FolderMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for FolderMethods<'a, C> {}
 
-impl<'a, S> FolderMethods<'a, S> {
-    
+impl<'a, C> FolderMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all contacts for the resource that are subscribed to the specified notification categories, including contacts inherited from any parent resources.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_compute(&self, parent: &str) -> FolderContactComputeCall<'a, S> {
+    pub fn contacts_compute(&self, parent: &str) -> FolderContactComputeCall<'a, C> {
         FolderContactComputeCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -380,16 +374,20 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a new contact for a resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource to save this contact for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> FolderContactCreateCall<'a, S> {
+    pub fn contacts_create(
+        &self,
+        request: GoogleCloudEssentialcontactsV1Contact,
+        parent: &str,
+    ) -> FolderContactCreateCall<'a, C> {
         FolderContactCreateCall {
             hub: self.hub,
             _request: request,
@@ -399,15 +397,15 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a contact.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_delete(&self, name: &str) -> FolderContactDeleteCall<'a, S> {
+    pub fn contacts_delete(&self, name: &str) -> FolderContactDeleteCall<'a, C> {
         FolderContactDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -416,15 +414,15 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a single contact.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_get(&self, name: &str) -> FolderContactGetCall<'a, S> {
+    pub fn contacts_get(&self, name: &str) -> FolderContactGetCall<'a, C> {
         FolderContactGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -433,15 +431,15 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the contacts that have been set on a resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_list(&self, parent: &str) -> FolderContactListCall<'a, S> {
+    pub fn contacts_list(&self, parent: &str) -> FolderContactListCall<'a, C> {
         FolderContactListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -452,16 +450,20 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a contact. Note: A contact's email address cannot be changed.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The identifier for the contact. Format: {resource_type}/{resource_id}/contacts/{contact_id}
-    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> FolderContactPatchCall<'a, S> {
+    pub fn contacts_patch(
+        &self,
+        request: GoogleCloudEssentialcontactsV1Contact,
+        name: &str,
+    ) -> FolderContactPatchCall<'a, C> {
         FolderContactPatchCall {
             hub: self.hub,
             _request: request,
@@ -472,16 +474,20 @@ impl<'a, S> FolderMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Allows a contact admin to send a test message to contact to verify that it has been configured correctly.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - Required. The name of the resource to send the test message for. All contacts must either be set directly on this resource or inherited from another resource that is an ancestor of this one. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> FolderContactSendTestMessageCall<'a, S> {
+    pub fn contacts_send_test_message(
+        &self,
+        request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
+        resource: &str,
+    ) -> FolderContactSendTestMessageCall<'a, C> {
         FolderContactSendTestMessageCall {
             hub: self.hub,
             _request: request,
@@ -492,8 +498,6 @@ impl<'a, S> FolderMethods<'a, S> {
         }
     }
 }
-
-
 
 /// A builder providing access to all methods supported on *organization* resources.
 /// It is not used directly, but through the [`Essentialcontacts`] hub.
@@ -506,41 +510,52 @@ impl<'a, S> FolderMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_essentialcontacts1 as essentialcontacts1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Essentialcontacts::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `contacts_compute(...)`, `contacts_create(...)`, `contacts_delete(...)`, `contacts_get(...)`, `contacts_list(...)`, `contacts_patch(...)` and `contacts_send_test_message(...)`
 /// // to build up your call.
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for OrganizationMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for OrganizationMethods<'a, C> {}
 
-impl<'a, S> OrganizationMethods<'a, S> {
-    
+impl<'a, C> OrganizationMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all contacts for the resource that are subscribed to the specified notification categories, including contacts inherited from any parent resources.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_compute(&self, parent: &str) -> OrganizationContactComputeCall<'a, S> {
+    pub fn contacts_compute(&self, parent: &str) -> OrganizationContactComputeCall<'a, C> {
         OrganizationContactComputeCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -552,16 +567,20 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a new contact for a resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource to save this contact for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> OrganizationContactCreateCall<'a, S> {
+    pub fn contacts_create(
+        &self,
+        request: GoogleCloudEssentialcontactsV1Contact,
+        parent: &str,
+    ) -> OrganizationContactCreateCall<'a, C> {
         OrganizationContactCreateCall {
             hub: self.hub,
             _request: request,
@@ -571,15 +590,15 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a contact.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_delete(&self, name: &str) -> OrganizationContactDeleteCall<'a, S> {
+    pub fn contacts_delete(&self, name: &str) -> OrganizationContactDeleteCall<'a, C> {
         OrganizationContactDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -588,15 +607,15 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a single contact.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_get(&self, name: &str) -> OrganizationContactGetCall<'a, S> {
+    pub fn contacts_get(&self, name: &str) -> OrganizationContactGetCall<'a, C> {
         OrganizationContactGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -605,15 +624,15 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the contacts that have been set on a resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_list(&self, parent: &str) -> OrganizationContactListCall<'a, S> {
+    pub fn contacts_list(&self, parent: &str) -> OrganizationContactListCall<'a, C> {
         OrganizationContactListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -624,16 +643,20 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a contact. Note: A contact's email address cannot be changed.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The identifier for the contact. Format: {resource_type}/{resource_id}/contacts/{contact_id}
-    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> OrganizationContactPatchCall<'a, S> {
+    pub fn contacts_patch(
+        &self,
+        request: GoogleCloudEssentialcontactsV1Contact,
+        name: &str,
+    ) -> OrganizationContactPatchCall<'a, C> {
         OrganizationContactPatchCall {
             hub: self.hub,
             _request: request,
@@ -644,16 +667,20 @@ impl<'a, S> OrganizationMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Allows a contact admin to send a test message to contact to verify that it has been configured correctly.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - Required. The name of the resource to send the test message for. All contacts must either be set directly on this resource or inherited from another resource that is an ancestor of this one. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> OrganizationContactSendTestMessageCall<'a, S> {
+    pub fn contacts_send_test_message(
+        &self,
+        request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
+        resource: &str,
+    ) -> OrganizationContactSendTestMessageCall<'a, C> {
         OrganizationContactSendTestMessageCall {
             hub: self.hub,
             _request: request,
@@ -664,8 +691,6 @@ impl<'a, S> OrganizationMethods<'a, S> {
         }
     }
 }
-
-
 
 /// A builder providing access to all methods supported on *project* resources.
 /// It is not used directly, but through the [`Essentialcontacts`] hub.
@@ -678,41 +703,52 @@ impl<'a, S> OrganizationMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_essentialcontacts1 as essentialcontacts1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Essentialcontacts::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `contacts_compute(...)`, `contacts_create(...)`, `contacts_delete(...)`, `contacts_get(...)`, `contacts_list(...)`, `contacts_patch(...)` and `contacts_send_test_message(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for ProjectMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for ProjectMethods<'a, C> {}
 
-impl<'a, S> ProjectMethods<'a, S> {
-    
+impl<'a, C> ProjectMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all contacts for the resource that are subscribed to the specified notification categories, including contacts inherited from any parent resources.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_compute(&self, parent: &str) -> ProjectContactComputeCall<'a, S> {
+    pub fn contacts_compute(&self, parent: &str) -> ProjectContactComputeCall<'a, C> {
         ProjectContactComputeCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -724,16 +760,20 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Adds a new contact for a resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource to save this contact for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_create(&self, request: GoogleCloudEssentialcontactsV1Contact, parent: &str) -> ProjectContactCreateCall<'a, S> {
+    pub fn contacts_create(
+        &self,
+        request: GoogleCloudEssentialcontactsV1Contact,
+        parent: &str,
+    ) -> ProjectContactCreateCall<'a, C> {
         ProjectContactCreateCall {
             hub: self.hub,
             _request: request,
@@ -743,15 +783,15 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a contact.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_delete(&self, name: &str) -> ProjectContactDeleteCall<'a, S> {
+    pub fn contacts_delete(&self, name: &str) -> ProjectContactDeleteCall<'a, C> {
         ProjectContactDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -760,15 +800,15 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a single contact.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `name` - Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
-    pub fn contacts_get(&self, name: &str) -> ProjectContactGetCall<'a, S> {
+    pub fn contacts_get(&self, name: &str) -> ProjectContactGetCall<'a, C> {
         ProjectContactGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -777,15 +817,15 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the contacts that have been set on a resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_list(&self, parent: &str) -> ProjectContactListCall<'a, S> {
+    pub fn contacts_list(&self, parent: &str) -> ProjectContactListCall<'a, C> {
         ProjectContactListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -796,16 +836,20 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a contact. Note: A contact's email address cannot be changed.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The identifier for the contact. Format: {resource_type}/{resource_id}/contacts/{contact_id}
-    pub fn contacts_patch(&self, request: GoogleCloudEssentialcontactsV1Contact, name: &str) -> ProjectContactPatchCall<'a, S> {
+    pub fn contacts_patch(
+        &self,
+        request: GoogleCloudEssentialcontactsV1Contact,
+        name: &str,
+    ) -> ProjectContactPatchCall<'a, C> {
         ProjectContactPatchCall {
             hub: self.hub,
             _request: request,
@@ -816,16 +860,20 @@ impl<'a, S> ProjectMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Allows a contact admin to send a test message to contact to verify that it has been configured correctly.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `resource` - Required. The name of the resource to send the test message for. All contacts must either be set directly on this resource or inherited from another resource that is an ancestor of this one. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
-    pub fn contacts_send_test_message(&self, request: GoogleCloudEssentialcontactsV1SendTestMessageRequest, resource: &str) -> ProjectContactSendTestMessageCall<'a, S> {
+    pub fn contacts_send_test_message(
+        &self,
+        request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
+        resource: &str,
+    ) -> ProjectContactSendTestMessageCall<'a, C> {
         ProjectContactSendTestMessageCall {
             hub: self.hub,
             _request: request,
@@ -836,10 +884,6 @@ impl<'a, S> ProjectMethods<'a, S> {
         }
     }
 }
-
-
-
-
 
 // ###################
 // CallBuilders   ###
@@ -859,15 +903,26 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -878,46 +933,58 @@ impl<'a, S> ProjectMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactComputeCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderContactComputeCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _notification_categories: Vec<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderContactComputeCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderContactComputeCall<'a, C> {}
 
-impl<'a, S> FolderContactComputeCall<'a, S>
+impl<'a, C> FolderContactComputeCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1ComputeContactsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudEssentialcontactsV1ComputeContactsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.folders.contacts.compute",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
 
-        for &field in ["alt", "parent", "pageToken", "pageSize", "notificationCategories"].iter() {
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.folders.contacts.compute",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "notificationCategories",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -929,7 +996,7 @@ where
         if let Some(value) = self._page_size.as_ref() {
             params.push("pageSize", value.to_string());
         }
-        if self._notification_categories.len() > 0 {
+        if !self._notification_categories.is_empty() {
             for f in self._notification_categories.iter() {
                 params.push("notificationCategories", f);
             }
@@ -940,9 +1007,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts:compute";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -953,20 +1022,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -980,64 +1050,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
     ///
@@ -1045,21 +1116,21 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderContactComputeCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> FolderContactComputeCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderContactComputeCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> FolderContactComputeCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderContactComputeCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> FolderContactComputeCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
@@ -1067,19 +1138,25 @@ where
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> FolderContactComputeCall<'a, S> {
+    pub fn add_notification_categories(
+        mut self,
+        new_value: &str,
+    ) -> FolderContactComputeCall<'a, C> {
         self._notification_categories.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactComputeCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderContactComputeCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1104,9 +1181,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactComputeCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactComputeCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1121,17 +1201,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderContactComputeCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderContactComputeCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactComputeCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactComputeCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1140,12 +1224,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderContactComputeCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderContactComputeCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Adds a new contact for a resource.
 ///
@@ -1162,20 +1245,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1Contact;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1Contact::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1183,44 +1277,45 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactCreateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderContactCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _parent: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderContactCreateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderContactCreateCall<'a, C> {}
 
-impl<'a, S> FolderContactCreateCall<'a, S>
+impl<'a, C> FolderContactCreateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.folders.contacts.create",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.folders.contacts.create",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1232,9 +1327,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -1246,32 +1343,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1284,72 +1388,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> FolderContactCreateCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1Contact,
+    ) -> FolderContactCreateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -1359,19 +1469,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderContactCreateCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> FolderContactCreateCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactCreateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderContactCreateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1396,9 +1509,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactCreateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1413,17 +1529,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderContactCreateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderContactCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactCreateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1432,12 +1552,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderContactCreateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderContactCreateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Deletes a contact.
 ///
@@ -1453,15 +1572,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1469,43 +1599,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderContactDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderContactDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderContactDeleteCall<'a, C> {}
 
-impl<'a, S> FolderContactDeleteCall<'a, S>
+impl<'a, C> FolderContactDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleProtobufEmpty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.folders.contacts.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.folders.contacts.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1517,9 +1646,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -1530,20 +1661,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1557,64 +1689,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
     ///
@@ -1622,19 +1755,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderContactDeleteCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> FolderContactDeleteCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderContactDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1659,9 +1795,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1676,17 +1815,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderContactDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderContactDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1695,12 +1838,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderContactDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderContactDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Gets a single contact.
 ///
@@ -1716,15 +1858,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1732,43 +1885,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderContactGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderContactGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderContactGetCall<'a, C> {}
 
-impl<'a, S> FolderContactGetCall<'a, S>
+impl<'a, C> FolderContactGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.folders.contacts.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.folders.contacts.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1780,9 +1934,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -1793,20 +1949,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1820,64 +1977,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
     ///
@@ -1885,19 +2043,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderContactGetCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> FolderContactGetCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactGetCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderContactGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1922,9 +2083,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1939,17 +2103,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderContactGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderContactGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1958,12 +2126,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderContactGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderContactGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists the contacts that have been set on a resource.
 ///
@@ -1979,15 +2146,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1997,45 +2175,49 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderContactListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderContactListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderContactListCall<'a, C> {}
 
-impl<'a, S> FolderContactListCall<'a, S>
+impl<'a, C> FolderContactListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1ListContactsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudEssentialcontactsV1ListContactsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.folders.contacts.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.folders.contacts.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2053,9 +2235,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2066,20 +2250,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2093,64 +2278,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
     ///
@@ -2158,33 +2344,36 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderContactListCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> FolderContactListCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderContactListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> FolderContactListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderContactListCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> FolderContactListCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactListCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderContactListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2209,9 +2398,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2226,17 +2418,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderContactListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderContactListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2245,12 +2441,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderContactListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderContactListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Updates a contact. Note: A contact's email address cannot be changed.
 ///
@@ -2267,20 +2462,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1Contact;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1Contact::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2289,45 +2495,46 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactPatchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderContactPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _name: String,
-    _update_mask: Option<client::FieldMask>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderContactPatchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderContactPatchCall<'a, C> {}
 
-impl<'a, S> FolderContactPatchCall<'a, S>
+impl<'a, C> FolderContactPatchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.folders.contacts.patch",
-                               http_method: hyper::Method::PATCH });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.folders.contacts.patch",
+            http_method: hyper::Method::PATCH,
+        });
 
         for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2342,9 +2549,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2356,32 +2565,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -2394,72 +2610,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> FolderContactPatchCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1Contact,
+    ) -> FolderContactPatchCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -2469,26 +2691,29 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderContactPatchCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> FolderContactPatchCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The update mask applied to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: client::FieldMask) -> FolderContactPatchCall<'a, S> {
+    pub fn update_mask(mut self, new_value: common::FieldMask) -> FolderContactPatchCall<'a, C> {
         self._update_mask = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactPatchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderContactPatchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2513,9 +2738,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactPatchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2530,17 +2758,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderContactPatchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderContactPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactPatchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2549,12 +2781,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderContactPatchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderContactPatchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Allows a contact admin to send a test message to contact to verify that it has been configured correctly.
 ///
@@ -2571,20 +2802,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1SendTestMessageRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1SendTestMessageRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2592,44 +2834,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderContactSendTestMessageCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct FolderContactSendTestMessageCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
     _resource: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for FolderContactSendTestMessageCall<'a, S> {}
+impl<'a, C> common::CallBuilder for FolderContactSendTestMessageCall<'a, C> {}
 
-impl<'a, S> FolderContactSendTestMessageCall<'a, S>
+impl<'a, C> FolderContactSendTestMessageCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleProtobufEmpty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.folders.contacts.sendTestMessage",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.folders.contacts.sendTestMessage",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2641,9 +2882,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+resource}/contacts:sendTestMessage";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2655,32 +2898,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -2693,72 +2943,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> FolderContactSendTestMessageCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
+    ) -> FolderContactSendTestMessageCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -2768,19 +3024,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderContactSendTestMessageCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> FolderContactSendTestMessageCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderContactSendTestMessageCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> FolderContactSendTestMessageCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2805,9 +3064,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderContactSendTestMessageCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> FolderContactSendTestMessageCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2822,17 +3084,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FolderContactSendTestMessageCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> FolderContactSendTestMessageCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactSendTestMessageCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FolderContactSendTestMessageCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2841,12 +3107,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> FolderContactSendTestMessageCall<'a, S> {
+    pub fn clear_scopes(mut self) -> FolderContactSendTestMessageCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists all contacts for the resource that are subscribed to the specified notification categories, including contacts inherited from any parent resources.
 ///
@@ -2862,15 +3127,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2881,46 +3157,58 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactComputeCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationContactComputeCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _notification_categories: Vec<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationContactComputeCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationContactComputeCall<'a, C> {}
 
-impl<'a, S> OrganizationContactComputeCall<'a, S>
+impl<'a, C> OrganizationContactComputeCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1ComputeContactsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudEssentialcontactsV1ComputeContactsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.organizations.contacts.compute",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
 
-        for &field in ["alt", "parent", "pageToken", "pageSize", "notificationCategories"].iter() {
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.organizations.contacts.compute",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "notificationCategories",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2932,7 +3220,7 @@ where
         if let Some(value) = self._page_size.as_ref() {
             params.push("pageSize", value.to_string());
         }
-        if self._notification_categories.len() > 0 {
+        if !self._notification_categories.is_empty() {
             for f in self._notification_categories.iter() {
                 params.push("notificationCategories", f);
             }
@@ -2943,9 +3231,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts:compute";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -2956,20 +3246,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2983,64 +3274,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
     ///
@@ -3048,21 +3340,21 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationContactComputeCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationContactComputeCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
@@ -3070,19 +3362,25 @@ where
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> OrganizationContactComputeCall<'a, S> {
+    pub fn add_notification_categories(
+        mut self,
+        new_value: &str,
+    ) -> OrganizationContactComputeCall<'a, C> {
         self._notification_categories.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactComputeCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationContactComputeCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3107,9 +3405,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactComputeCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactComputeCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3124,17 +3425,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactComputeCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactComputeCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactComputeCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactComputeCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3143,12 +3448,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationContactComputeCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationContactComputeCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Adds a new contact for a resource.
 ///
@@ -3165,20 +3469,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1Contact;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1Contact::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3186,44 +3501,45 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactCreateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationContactCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _parent: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationContactCreateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationContactCreateCall<'a, C> {}
 
-impl<'a, S> OrganizationContactCreateCall<'a, S>
+impl<'a, C> OrganizationContactCreateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.organizations.contacts.create",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.organizations.contacts.create",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3235,9 +3551,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3249,32 +3567,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -3287,72 +3612,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> OrganizationContactCreateCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1Contact,
+    ) -> OrganizationContactCreateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -3362,19 +3693,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationContactCreateCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationContactCreateCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactCreateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationContactCreateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3399,9 +3733,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactCreateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3416,17 +3753,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactCreateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactCreateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3435,12 +3776,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationContactCreateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationContactCreateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Deletes a contact.
 ///
@@ -3456,15 +3796,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3472,43 +3823,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationContactDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationContactDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationContactDeleteCall<'a, C> {}
 
-impl<'a, S> OrganizationContactDeleteCall<'a, S>
+impl<'a, C> OrganizationContactDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleProtobufEmpty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.organizations.contacts.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.organizations.contacts.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3520,9 +3870,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3533,20 +3885,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3560,64 +3913,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
     ///
@@ -3625,19 +3979,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationContactDeleteCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> OrganizationContactDeleteCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationContactDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3662,9 +4019,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3679,17 +4039,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3698,12 +4062,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationContactDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationContactDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Gets a single contact.
 ///
@@ -3719,15 +4082,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3735,43 +4109,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationContactGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationContactGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationContactGetCall<'a, C> {}
 
-impl<'a, S> OrganizationContactGetCall<'a, S>
+impl<'a, C> OrganizationContactGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.organizations.contacts.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.organizations.contacts.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3783,9 +4158,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -3796,20 +4173,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3823,64 +4201,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
     ///
@@ -3888,19 +4267,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationContactGetCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> OrganizationContactGetCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactGetCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationContactGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3925,9 +4307,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3942,17 +4327,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3961,12 +4350,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationContactGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationContactGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists the contacts that have been set on a resource.
 ///
@@ -3982,15 +4370,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4000,45 +4399,49 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationContactListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationContactListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationContactListCall<'a, C> {}
 
-impl<'a, S> OrganizationContactListCall<'a, S>
+impl<'a, C> OrganizationContactListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1ListContactsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudEssentialcontactsV1ListContactsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.organizations.contacts.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.organizations.contacts.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4056,9 +4459,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -4069,20 +4474,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -4096,64 +4502,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
     ///
@@ -4161,33 +4568,36 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationContactListCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationContactListCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationContactListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationContactListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationContactListCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationContactListCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactListCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationContactListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -4212,9 +4622,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4229,17 +4642,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -4248,12 +4665,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationContactListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationContactListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Updates a contact. Note: A contact's email address cannot be changed.
 ///
@@ -4270,20 +4686,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1Contact;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1Contact::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4292,45 +4719,46 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactPatchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationContactPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _name: String,
-    _update_mask: Option<client::FieldMask>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationContactPatchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationContactPatchCall<'a, C> {}
 
-impl<'a, S> OrganizationContactPatchCall<'a, S>
+impl<'a, C> OrganizationContactPatchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.organizations.contacts.patch",
-                               http_method: hyper::Method::PATCH });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.organizations.contacts.patch",
+            http_method: hyper::Method::PATCH,
+        });
 
         for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4345,9 +4773,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -4359,32 +4789,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -4397,72 +4834,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> OrganizationContactPatchCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1Contact,
+    ) -> OrganizationContactPatchCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -4472,26 +4915,32 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationContactPatchCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> OrganizationContactPatchCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The update mask applied to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: client::FieldMask) -> OrganizationContactPatchCall<'a, S> {
+    pub fn update_mask(
+        mut self,
+        new_value: common::FieldMask,
+    ) -> OrganizationContactPatchCall<'a, C> {
         self._update_mask = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactPatchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationContactPatchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -4516,9 +4965,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactPatchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4533,17 +4985,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactPatchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactPatchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -4552,12 +5008,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationContactPatchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationContactPatchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Allows a contact admin to send a test message to contact to verify that it has been configured correctly.
 ///
@@ -4574,20 +5029,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1SendTestMessageRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1SendTestMessageRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4595,44 +5061,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationContactSendTestMessageCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct OrganizationContactSendTestMessageCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
     _resource: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for OrganizationContactSendTestMessageCall<'a, S> {}
+impl<'a, C> common::CallBuilder for OrganizationContactSendTestMessageCall<'a, C> {}
 
-impl<'a, S> OrganizationContactSendTestMessageCall<'a, S>
+impl<'a, C> OrganizationContactSendTestMessageCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleProtobufEmpty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.organizations.contacts.sendTestMessage",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.organizations.contacts.sendTestMessage",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4644,9 +5109,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+resource}/contacts:sendTestMessage";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -4658,32 +5125,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -4696,72 +5170,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> OrganizationContactSendTestMessageCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
+    ) -> OrganizationContactSendTestMessageCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -4771,19 +5251,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationContactSendTestMessageCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationContactSendTestMessageCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationContactSendTestMessageCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> OrganizationContactSendTestMessageCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -4808,9 +5291,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactSendTestMessageCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationContactSendTestMessageCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -4825,17 +5311,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactSendTestMessageCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> OrganizationContactSendTestMessageCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactSendTestMessageCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OrganizationContactSendTestMessageCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -4844,12 +5334,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> OrganizationContactSendTestMessageCall<'a, S> {
+    pub fn clear_scopes(mut self) -> OrganizationContactSendTestMessageCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists all contacts for the resource that are subscribed to the specified notification categories, including contacts inherited from any parent resources.
 ///
@@ -4865,15 +5354,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4884,46 +5384,58 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactComputeCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectContactComputeCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _notification_categories: Vec<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectContactComputeCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectContactComputeCall<'a, C> {}
 
-impl<'a, S> ProjectContactComputeCall<'a, S>
+impl<'a, C> ProjectContactComputeCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1ComputeContactsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudEssentialcontactsV1ComputeContactsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.projects.contacts.compute",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
 
-        for &field in ["alt", "parent", "pageToken", "pageSize", "notificationCategories"].iter() {
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.projects.contacts.compute",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "pageToken",
+            "pageSize",
+            "notificationCategories",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -4935,7 +5447,7 @@ where
         if let Some(value) = self._page_size.as_ref() {
             params.push("pageSize", value.to_string());
         }
-        if self._notification_categories.len() > 0 {
+        if !self._notification_categories.is_empty() {
             for f in self._notification_categories.iter() {
                 params.push("notificationCategories", f);
             }
@@ -4946,9 +5458,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts:compute";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -4959,20 +5473,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -4986,64 +5501,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the resource to compute contacts for. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
     ///
@@ -5051,21 +5567,21 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectContactComputeCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> ProjectContactComputeCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectContactComputeCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectContactComputeCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectContactComputeCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectContactComputeCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
@@ -5073,19 +5589,25 @@ where
     ///
     /// Append the given value to the *notification categories* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_notification_categories(mut self, new_value: &str) -> ProjectContactComputeCall<'a, S> {
+    pub fn add_notification_categories(
+        mut self,
+        new_value: &str,
+    ) -> ProjectContactComputeCall<'a, C> {
         self._notification_categories.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactComputeCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectContactComputeCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -5110,9 +5632,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactComputeCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactComputeCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5127,17 +5652,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactComputeCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactComputeCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactComputeCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactComputeCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -5146,12 +5675,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectContactComputeCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectContactComputeCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Adds a new contact for a resource.
 ///
@@ -5168,20 +5696,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1Contact;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1Contact::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5189,44 +5728,45 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactCreateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectContactCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _parent: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectContactCreateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectContactCreateCall<'a, C> {}
 
-impl<'a, S> ProjectContactCreateCall<'a, S>
+impl<'a, C> ProjectContactCreateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.projects.contacts.create",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.projects.contacts.create",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -5238,9 +5778,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -5252,32 +5794,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -5290,72 +5839,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> ProjectContactCreateCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1Contact,
+    ) -> ProjectContactCreateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -5365,19 +5920,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectContactCreateCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> ProjectContactCreateCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactCreateCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectContactCreateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -5402,9 +5960,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactCreateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5419,17 +5980,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactCreateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactCreateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -5438,12 +6003,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectContactCreateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectContactCreateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Deletes a contact.
 ///
@@ -5459,15 +6023,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5475,43 +6050,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectContactDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectContactDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectContactDeleteCall<'a, C> {}
 
-impl<'a, S> ProjectContactDeleteCall<'a, S>
+impl<'a, C> ProjectContactDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleProtobufEmpty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.projects.contacts.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.projects.contacts.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -5523,9 +6097,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -5536,20 +6112,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -5563,64 +6140,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the contact to delete. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
     ///
@@ -5628,19 +6206,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectContactDeleteCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> ProjectContactDeleteCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectContactDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -5665,9 +6246,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5682,17 +6266,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -5701,12 +6289,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectContactDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectContactDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Gets a single contact.
 ///
@@ -5722,15 +6309,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5738,43 +6336,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectContactGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectContactGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectContactGetCall<'a, C> {}
 
-impl<'a, S> ProjectContactGetCall<'a, S>
+impl<'a, C> ProjectContactGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.projects.contacts.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.projects.contacts.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -5786,9 +6385,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -5799,20 +6400,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -5826,64 +6428,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The name of the contact to retrieve. Format: organizations/{organization_id}/contacts/{contact_id}, folders/{folder_id}/contacts/{contact_id} or projects/{project_id}/contacts/{contact_id}
     ///
@@ -5891,19 +6494,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectContactGetCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> ProjectContactGetCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactGetCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectContactGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -5928,9 +6534,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -5945,17 +6554,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -5964,12 +6577,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectContactGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectContactGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists the contacts that have been set on a resource.
 ///
@@ -5985,15 +6597,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6003,45 +6626,49 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectContactListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectContactListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectContactListCall<'a, C> {}
 
-impl<'a, S> ProjectContactListCall<'a, S>
+impl<'a, C> ProjectContactListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1ListContactsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        GoogleCloudEssentialcontactsV1ListContactsResponse,
+    )> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.projects.contacts.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.projects.contacts.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -6059,9 +6686,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/contacts";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -6072,20 +6701,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -6099,64 +6729,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// Required. The parent resource name. Format: organizations/{organization_id}, folders/{folder_id} or projects/{project_id}
     ///
@@ -6164,33 +6795,36 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectContactListCall<'a, S> {
+    pub fn parent(mut self, new_value: &str) -> ProjectContactListCall<'a, C> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters should be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectContactListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectContactListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. The presence of `next_page_token` in the response indicates that more results might be available. If not specified, the default page_size is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectContactListCall<'a, S> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectContactListCall<'a, C> {
         self._page_size = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactListCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectContactListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -6215,9 +6849,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6232,17 +6869,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -6251,12 +6892,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectContactListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectContactListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Updates a contact. Note: A contact's email address cannot be changed.
 ///
@@ -6273,20 +6913,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1Contact;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1Contact::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6295,45 +6946,46 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactPatchCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectContactPatchCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1Contact,
     _name: String,
-    _update_mask: Option<client::FieldMask>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _update_mask: Option<common::FieldMask>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectContactPatchCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectContactPatchCall<'a, C> {}
 
-impl<'a, S> ProjectContactPatchCall<'a, S>
+impl<'a, C> ProjectContactPatchCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudEssentialcontactsV1Contact)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(common::Response, GoogleCloudEssentialcontactsV1Contact)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.projects.contacts.patch",
-                               http_method: hyper::Method::PATCH });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.projects.contacts.patch",
+            http_method: hyper::Method::PATCH,
+        });
 
         for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -6348,9 +7000,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -6362,32 +7016,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -6400,72 +7061,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1Contact) -> ProjectContactPatchCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1Contact,
+    ) -> ProjectContactPatchCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -6475,26 +7142,29 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectContactPatchCall<'a, S> {
+    pub fn name(mut self, new_value: &str) -> ProjectContactPatchCall<'a, C> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The update mask applied to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectContactPatchCall<'a, S> {
+    pub fn update_mask(mut self, new_value: common::FieldMask) -> ProjectContactPatchCall<'a, C> {
         self._update_mask = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactPatchCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectContactPatchCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -6519,9 +7189,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactPatchCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactPatchCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6536,17 +7209,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactPatchCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactPatchCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactPatchCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactPatchCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -6555,12 +7232,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectContactPatchCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectContactPatchCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Allows a contact admin to send a test message to contact to verify that it has been configured correctly.
 ///
@@ -6577,20 +7253,31 @@ where
 /// # extern crate google_essentialcontacts1 as essentialcontacts1;
 /// use essentialcontacts1::api::GoogleCloudEssentialcontactsV1SendTestMessageRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use essentialcontacts1::{Essentialcontacts, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Essentialcontacts::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use essentialcontacts1::{Essentialcontacts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Essentialcontacts::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = GoogleCloudEssentialcontactsV1SendTestMessageRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6598,44 +7285,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectContactSendTestMessageCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Essentialcontacts<S>,
+pub struct ProjectContactSendTestMessageCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Essentialcontacts<C>,
     _request: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
     _resource: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for ProjectContactSendTestMessageCall<'a, S> {}
+impl<'a, C> common::CallBuilder for ProjectContactSendTestMessageCall<'a, C> {}
 
-impl<'a, S> ProjectContactSendTestMessageCall<'a, S>
+impl<'a, C> ProjectContactSendTestMessageCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, GoogleProtobufEmpty)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "essentialcontacts.projects.contacts.sendTestMessage",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "essentialcontacts.projects.contacts.sendTestMessage",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -6647,9 +7333,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/{+resource}/contacts:sendTestMessage";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
             url = params.uri_replacement(url, param_name, find_this, true);
         }
@@ -6661,32 +7349,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -6699,72 +7394,78 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest) -> ProjectContactSendTestMessageCall<'a, S> {
+    pub fn request(
+        mut self,
+        new_value: GoogleCloudEssentialcontactsV1SendTestMessageRequest,
+    ) -> ProjectContactSendTestMessageCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -6774,19 +7475,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectContactSendTestMessageCall<'a, S> {
+    pub fn resource(mut self, new_value: &str) -> ProjectContactSendTestMessageCall<'a, C> {
         self._resource = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectContactSendTestMessageCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectContactSendTestMessageCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -6811,9 +7515,12 @@ where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactSendTestMessageCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectContactSendTestMessageCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -6828,17 +7535,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactSendTestMessageCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectContactSendTestMessageCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactSendTestMessageCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectContactSendTestMessageCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -6847,10 +7558,8 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> ProjectContactSendTestMessageCall<'a, S> {
+    pub fn clear_scopes(mut self) -> ProjectContactSendTestMessageCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
-

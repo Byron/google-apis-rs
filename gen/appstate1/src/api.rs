@@ -1,20 +1,8 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -37,13 +25,12 @@ impl AsRef<str> for Scope {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
         Scope::Full
     }
 }
-
-
 
 // ########
 // HUB ###
@@ -62,34 +49,45 @@ impl Default for Scope {
 /// use appstate1::api::UpdateRequest;
 /// use appstate1::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use appstate1::{AppState, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use appstate1::{AppState, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = AppState::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = AppState::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = UpdateRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.states().update(req, -28)
 ///              .current_state_version("At")
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -110,38 +108,37 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct AppState<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct AppState<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for AppState<S> {}
+impl<C> common::Hub for AppState<C> {}
 
-impl<'a, S> AppState<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> AppState<S> {
+impl<'a, C> AppState<C> {
+    pub fn new<A: 'static + common::GetToken>(client: common::Client<C>, auth: A) -> AppState<C> {
         AppState {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://www.googleapis.com/appstate/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn states(&'a self) -> StateMethods<'a, S> {
-        StateMethods { hub: &self }
+    pub fn states(&'a self) -> StateMethods<'a, C> {
+        StateMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -149,7 +146,7 @@ impl<'a, S> AppState<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -157,124 +154,106 @@ impl<'a, S> AppState<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// This is a JSON template for an app state resource.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get states](StateGetCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GetResponse {
     /// The current app state version.
-    #[serde(rename="currentStateVersion")]
-    
+    #[serde(rename = "currentStateVersion")]
     pub current_state_version: Option<String>,
     /// The requested data.
-    
     pub data: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#getResponse.
-    
     pub kind: Option<String>,
     /// The key for the data.
-    #[serde(rename="stateKey")]
-    
+    #[serde(rename = "stateKey")]
     pub state_key: Option<i32>,
 }
 
-impl client::ResponseResult for GetResponse {}
-
+impl common::ResponseResult for GetResponse {}
 
 /// This is a JSON template to convert a list-response for app state.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list states](StateListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListResponse {
     /// The app state data.
-    
     pub items: Option<Vec<GetResponse>>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#listResponse.
-    
     pub kind: Option<String>,
     /// The maximum number of keys allowed for this user.
-    #[serde(rename="maximumKeyCount")]
-    
+    #[serde(rename = "maximumKeyCount")]
     pub maximum_key_count: Option<i32>,
 }
 
-impl client::ResponseResult for ListResponse {}
-
+impl common::ResponseResult for ListResponse {}
 
 /// This is a JSON template for a requests which update app state
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [update states](StateUpdateCall) (request)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct UpdateRequest {
     /// The new app state data that your application is trying to update with.
-    
     pub data: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#updateRequest.
-    
     pub kind: Option<String>,
 }
 
-impl client::RequestValue for UpdateRequest {}
-
+impl common::RequestValue for UpdateRequest {}
 
 /// This is a JSON template for an app state write result.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [clear states](StateClearCall) (response)
 /// * [update states](StateUpdateCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct WriteResult {
     /// The version of the data for this key on the server.
-    #[serde(rename="currentStateVersion")]
-    
+    #[serde(rename = "currentStateVersion")]
     pub current_state_version: Option<String>,
     /// Uniquely identifies the type of this resource. Value is always the fixed string appstate#writeResult.
-    
     pub kind: Option<String>,
     /// The written key.
-    #[serde(rename="stateKey")]
-    
+    #[serde(rename = "stateKey")]
     pub state_key: Option<i32>,
 }
 
-impl client::ResponseResult for WriteResult {}
-
-
+impl common::ResponseResult for WriteResult {}
 
 // ###################
 // MethodBuilders ###
@@ -291,41 +270,52 @@ impl client::ResponseResult for WriteResult {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_appstate1 as appstate1;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use appstate1::{AppState, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = AppState::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use appstate1::{AppState, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = AppState::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `clear(...)`, `delete(...)`, `get(...)`, `list(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.states();
 /// # }
 /// ```
-pub struct StateMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a AppState<S>,
+pub struct StateMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AppState<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for StateMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for StateMethods<'a, C> {}
 
-impl<'a, S> StateMethods<'a, S> {
-    
+impl<'a, C> StateMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Clears (sets to empty) the data for the passed key if and only if the passed version matches the currently stored version. This method results in a conflict error on version mismatch.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn clear(&self, state_key: i32) -> StateClearCall<'a, S> {
+    pub fn clear(&self, state_key: i32) -> StateClearCall<'a, C> {
         StateClearCall {
             hub: self.hub,
             _state_key: state_key,
@@ -335,15 +325,15 @@ impl<'a, S> StateMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes a key and the data associated with it. The key is removed and no longer counts against the key quota. Note that since this method is not safe in the face of concurrent modifications, it should only be used for development and testing purposes. Invoking this method in shipping code can result in data loss and data corruption.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn delete(&self, state_key: i32) -> StateDeleteCall<'a, S> {
+    pub fn delete(&self, state_key: i32) -> StateDeleteCall<'a, C> {
         StateDeleteCall {
             hub: self.hub,
             _state_key: state_key,
@@ -352,15 +342,15 @@ impl<'a, S> StateMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves the data corresponding to the passed key. If the key does not exist on the server, an HTTP 404 will be returned.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn get(&self, state_key: i32) -> StateGetCall<'a, S> {
+    pub fn get(&self, state_key: i32) -> StateGetCall<'a, C> {
         StateGetCall {
             hub: self.hub,
             _state_key: state_key,
@@ -369,11 +359,11 @@ impl<'a, S> StateMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all the states keys, and optionally the state data.
-    pub fn list(&self) -> StateListCall<'a, S> {
+    pub fn list(&self) -> StateListCall<'a, C> {
         StateListCall {
             hub: self.hub,
             _include_data: Default::default(),
@@ -382,16 +372,16 @@ impl<'a, S> StateMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Update the data associated with the input key if and only if the passed version matches the currently stored version. This method is safe in the face of concurrent writes. Maximum per-key size is 128KB.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn update(&self, request: UpdateRequest, state_key: i32) -> StateUpdateCall<'a, S> {
+    pub fn update(&self, request: UpdateRequest, state_key: i32) -> StateUpdateCall<'a, C> {
         StateUpdateCall {
             hub: self.hub,
             _request: request,
@@ -403,10 +393,6 @@ impl<'a, S> StateMethods<'a, S> {
         }
     }
 }
-
-
-
-
 
 // ###################
 // CallBuilders   ###
@@ -426,15 +412,26 @@ impl<'a, S> StateMethods<'a, S> {
 /// # extern crate hyper_rustls;
 /// # extern crate google_appstate1 as appstate1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use appstate1::{AppState, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AppState::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use appstate1::{AppState, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AppState::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -443,44 +440,43 @@ impl<'a, S> StateMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateClearCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AppState<S>,
+pub struct StateClearCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AppState<C>,
     _state_key: i32,
     _current_data_version: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for StateClearCall<'a, S> {}
+impl<'a, C> common::CallBuilder for StateClearCall<'a, C> {}
 
-impl<'a, S> StateClearCall<'a, S>
+impl<'a, C> StateClearCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, WriteResult)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, WriteResult)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "appstate.states.clear",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "appstate.states.clear",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "stateKey", "currentDataVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -498,6 +494,7 @@ where
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{stateKey}", "stateKey")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -508,20 +505,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -535,64 +533,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// The key for the data to be retrieved.
     ///
@@ -600,26 +599,26 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateClearCall<'a, S> {
+    pub fn state_key(mut self, new_value: i32) -> StateClearCall<'a, C> {
         self._state_key = new_value;
         self
     }
     /// The version of the data to be cleared. Version strings are returned by the server.
     ///
     /// Sets the *current data version* query property to the given value.
-    pub fn current_data_version(mut self, new_value: &str) -> StateClearCall<'a, S> {
+    pub fn current_data_version(mut self, new_value: &str) -> StateClearCall<'a, C> {
         self._current_data_version = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateClearCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> StateClearCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -640,9 +639,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateClearCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> StateClearCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -657,17 +659,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> StateClearCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> StateClearCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateClearCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateClearCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -676,12 +682,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> StateClearCall<'a, S> {
+    pub fn clear_scopes(mut self) -> StateClearCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Deletes a key and the data associated with it. The key is removed and no longer counts against the key quota. Note that since this method is not safe in the face of concurrent modifications, it should only be used for development and testing purposes. Invoking this method in shipping code can result in data loss and data corruption.
 ///
@@ -697,15 +702,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_appstate1 as appstate1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use appstate1::{AppState, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AppState::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use appstate1::{AppState, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AppState::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -713,43 +729,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AppState<S>,
+pub struct StateDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AppState<C>,
     _state_key: i32,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for StateDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for StateDeleteCall<'a, C> {}
 
-impl<'a, S> StateDeleteCall<'a, S>
+impl<'a, C> StateDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<common::Response> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "appstate.states.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "appstate.states.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["stateKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -763,6 +778,7 @@ where
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{stateKey}", "stateKey")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -773,20 +789,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -800,54 +817,52 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = res;
+                    let response = common::Response::from_parts(parts, body);
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// The key for the data to be retrieved.
     ///
@@ -855,19 +870,19 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateDeleteCall<'a, S> {
+    pub fn state_key(mut self, new_value: i32) -> StateDeleteCall<'a, C> {
         self._state_key = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateDeleteCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> StateDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -888,9 +903,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> StateDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -905,17 +923,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> StateDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> StateDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -924,12 +946,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> StateDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> StateDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Retrieves the data corresponding to the passed key. If the key does not exist on the server, an HTTP 404 will be returned.
 ///
@@ -945,15 +966,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_appstate1 as appstate1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use appstate1::{AppState, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AppState::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use appstate1::{AppState, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AppState::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -961,43 +993,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AppState<S>,
+pub struct StateGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AppState<C>,
     _state_key: i32,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for StateGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for StateGetCall<'a, C> {}
 
-impl<'a, S> StateGetCall<'a, S>
+impl<'a, C> StateGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GetResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, GetResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "appstate.states.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "appstate.states.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "stateKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1012,6 +1043,7 @@ where
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{stateKey}", "stateKey")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -1022,20 +1054,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1049,64 +1082,65 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     /// The key for the data to be retrieved.
     ///
@@ -1114,19 +1148,19 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateGetCall<'a, S> {
+    pub fn state_key(mut self, new_value: i32) -> StateGetCall<'a, C> {
         self._state_key = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> StateGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1147,9 +1181,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> StateGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1164,17 +1201,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> StateGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> StateGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1183,12 +1224,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> StateGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> StateGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Lists all the states keys, and optionally the state data.
 ///
@@ -1204,15 +1244,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_appstate1 as appstate1;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use appstate1::{AppState, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AppState::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use appstate1::{AppState, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AppState::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1221,43 +1272,42 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AppState<S>,
+pub struct StateListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AppState<C>,
     _include_data: Option<bool>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for StateListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for StateListCall<'a, C> {}
 
-impl<'a, S> StateListCall<'a, S>
+impl<'a, C> StateListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "appstate.states.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "appstate.states.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "includeData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1274,23 +1324,23 @@ where
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
-
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1304,81 +1354,82 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
 
-
     /// Whether to include the full data in addition to the version number
     ///
     /// Sets the *include data* query property to the given value.
-    pub fn include_data(mut self, new_value: bool) -> StateListCall<'a, S> {
+    pub fn include_data(mut self, new_value: bool) -> StateListCall<'a, C> {
         self._include_data = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> StateListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1399,9 +1450,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> StateListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1416,17 +1470,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> StateListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> StateListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1435,12 +1493,11 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> StateListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> StateListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
 
 /// Update the data associated with the input key if and only if the passed version matches the currently stored version. This method is safe in the face of concurrent writes. Maximum per-key size is 128KB.
 ///
@@ -1457,20 +1514,31 @@ where
 /// # extern crate google_appstate1 as appstate1;
 /// use appstate1::api::UpdateRequest;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use appstate1::{AppState, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AppState::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use appstate1::{AppState, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = AppState::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = UpdateRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1479,45 +1547,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateUpdateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AppState<S>,
+pub struct StateUpdateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a AppState<C>,
     _request: UpdateRequest,
     _state_key: i32,
     _current_state_version: Option<String>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for StateUpdateCall<'a, S> {}
+impl<'a, C> common::CallBuilder for StateUpdateCall<'a, C> {}
 
-impl<'a, S> StateUpdateCall<'a, S>
+impl<'a, C> StateUpdateCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, WriteResult)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, WriteResult)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "appstate.states.update",
-                               http_method: hyper::Method::PUT });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "appstate.states.update",
+            http_method: hyper::Method::PUT,
+        });
 
         for &field in ["alt", "stateKey", "currentStateVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1535,6 +1602,7 @@ where
             self._scopes.insert(Scope::Full.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{stateKey}", "stateKey")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -1546,32 +1614,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -1584,72 +1659,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateRequest) -> StateUpdateCall<'a, S> {
+    pub fn request(mut self, new_value: UpdateRequest) -> StateUpdateCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -1659,26 +1737,26 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateUpdateCall<'a, S> {
+    pub fn state_key(mut self, new_value: i32) -> StateUpdateCall<'a, C> {
         self._state_key = new_value;
         self
     }
     /// The version of the app state your application is attempting to update. If this does not match the current version, this method will return a conflict error. If there is no data stored on the server for this key, the update will succeed irrespective of the value of this parameter.
     ///
     /// Sets the *current state version* query property to the given value.
-    pub fn current_state_version(mut self, new_value: &str) -> StateUpdateCall<'a, S> {
+    pub fn current_state_version(mut self, new_value: &str) -> StateUpdateCall<'a, C> {
         self._current_state_version = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateUpdateCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> StateUpdateCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1699,9 +1777,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateUpdateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> StateUpdateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1716,17 +1797,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> StateUpdateCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> StateUpdateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateUpdateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> StateUpdateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1735,10 +1820,8 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> StateUpdateCall<'a, S> {
+    pub fn clear_scopes(mut self) -> StateUpdateCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
-

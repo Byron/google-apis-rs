@@ -1,4 +1,4 @@
-site_name: Cloud Dataplex v5.0.5+20240611
+site_name: Cloud Dataplex v6.0.0+20240611
 site_url: http://byron.github.io/google-apis-rs/google-dataplex1-cli
 site_description: A complete library to interact with Cloud Dataplex (protocol v1)
 
@@ -164,4 +164,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

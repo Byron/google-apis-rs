@@ -1,4 +1,4 @@
-site_name: Cloud Iot v5.0.5+0
+site_name: Cloud Iot v6.0.0+0
 site_url: http://byron.github.io/google-apis-rs/google-cloudiot1-cli
 site_description: A complete library to interact with Cloud Iot (protocol v1)
 
@@ -37,4 +37,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

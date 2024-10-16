@@ -1,4 +1,4 @@
-site_name: replicapool v5.0.5+20160512
+site_name: replicapool v6.0.0+20160512
 site_url: http://byron.github.io/google-apis-rs/google-replicapool1_beta2-cli
 site_description: A complete library to interact with replicapool (protocol v1beta2)
 
@@ -27,4 +27,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

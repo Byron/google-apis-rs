@@ -1,4 +1,4 @@
-site_name: AdMob v5.0.5+20240626
+site_name: AdMob v6.0.0+20240626
 site_url: http://byron.github.io/google-apis-rs/google-admob1-cli
 site_description: A complete library to interact with AdMob (protocol v1)
 
@@ -20,4 +20,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

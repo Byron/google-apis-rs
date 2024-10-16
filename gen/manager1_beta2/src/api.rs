@@ -1,20 +1,8 @@
-use std::collections::HashMap;
-use std::cell::RefCell;
-use std::default::Default;
-use std::collections::BTreeSet;
-use std::error::Error as StdError;
-use serde_json as json;
-use std::io;
-use std::fs;
-use std::mem;
+#![allow(clippy::ptr_arg)]
 
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
+use std::collections::{BTreeSet, HashMap};
+
 use tokio::time::sleep;
-use tower_service;
-use serde::{Serialize, Deserialize};
-
-use crate::{client, client::GetToken, client::serde_with};
 
 // ##############
 // UTILITIES ###
@@ -52,7 +40,9 @@ impl AsRef<str> for Scope {
         match *self {
             Scope::AppengineAdmin => "https://www.googleapis.com/auth/appengine.admin",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
-            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
+            Scope::CloudPlatformReadOnly => {
+                "https://www.googleapis.com/auth/cloud-platform.read-only"
+            }
             Scope::Compute => "https://www.googleapis.com/auth/compute",
             Scope::DevstorageReadWrite => "https://www.googleapis.com/auth/devstorage.read_write",
             Scope::NdevCloudman => "https://www.googleapis.com/auth/ndev.cloudman",
@@ -61,13 +51,12 @@ impl AsRef<str> for Scope {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Scope {
     fn default() -> Scope {
         Scope::NdevCloudmanReadonly
     }
 }
-
-
 
 // ########
 // HUB ###
@@ -85,22 +74,33 @@ impl Default for Scope {
 /// extern crate google_manager1_beta2 as manager1_beta2;
 /// use manager1_beta2::{Result, Error};
 /// # async fn dox() {
-/// use std::default::Default;
-/// use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Manager::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -108,7 +108,7 @@ impl Default for Scope {
 ///              .page_token("amet.")
 ///              .max_results(-20)
 ///              .doit().await;
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -129,41 +129,40 @@ impl Default for Scope {
 /// # }
 /// ```
 #[derive(Clone)]
-pub struct Manager<S> {
-    pub client: hyper::Client<S, hyper::body::Body>,
-    pub auth: Box<dyn client::GetToken>,
+pub struct Manager<C> {
+    pub client: common::Client<C>,
+    pub auth: Box<dyn common::GetToken>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, S> client::Hub for Manager<S> {}
+impl<C> common::Hub for Manager<C> {}
 
-impl<'a, S> Manager<S> {
-
-    pub fn new<A: 'static + client::GetToken>(client: hyper::Client<S, hyper::body::Body>, auth: A) -> Manager<S> {
+impl<'a, C> Manager<C> {
+    pub fn new<A: 'static + common::GetToken>(client: common::Client<C>, auth: A) -> Manager<C> {
         Manager {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.5".to_string(),
+            _user_agent: "google-api-rust-client/6.0.0".to_string(),
             _base_url: "https://www.googleapis.com/manager/v1beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn deployments(&'a self) -> DeploymentMethods<'a, S> {
-        DeploymentMethods { hub: &self }
+    pub fn deployments(&'a self) -> DeploymentMethods<'a, C> {
+        DeploymentMethods { hub: self }
     }
-    pub fn templates(&'a self) -> TemplateMethods<'a, S> {
-        TemplateMethods { hub: &self }
+    pub fn templates(&'a self) -> TemplateMethods<'a, C> {
+        TemplateMethods { hub: self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.5`.
+    /// It defaults to `google-api-rust-client/6.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
-        mem::replace(&mut self._user_agent, agent_name)
+        std::mem::replace(&mut self._user_agent, agent_name)
     }
 
     /// Set the base url to use in all requests to the server.
@@ -171,7 +170,7 @@ impl<'a, S> Manager<S> {
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
-        mem::replace(&mut self._base_url, new_base_url)
+        std::mem::replace(&mut self._base_url, new_base_url)
     }
 
     /// Set the root url to use in all requests to the server.
@@ -179,147 +178,125 @@ impl<'a, S> Manager<S> {
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
-        mem::replace(&mut self._root_url, new_root_url)
+        std::mem::replace(&mut self._root_url, new_root_url)
     }
 }
-
 
 // ############
 // SCHEMAS ###
 // ##########
 /// A Compute Engine network accessConfig. Identical to the accessConfig on corresponding Compute Engine resource.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AccessConfig {
     /// Name of this access configuration.
-    
     pub name: Option<String>,
     /// An external IP address associated with this instance.
-    #[serde(rename="natIp")]
-    
+    #[serde(rename = "natIp")]
     pub nat_ip: Option<String>,
     /// Type of this access configuration file. (Currently only ONE_TO_ONE_NAT is legal.)
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::Part for AccessConfig {}
-
+impl common::Part for AccessConfig {}
 
 /// An Action encapsulates a set of commands as a single runnable module with additional information needed during run-time.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Action {
     /// A list of commands to run sequentially for this action.
-    
     pub commands: Option<Vec<String>>,
     /// The timeout in milliseconds for this action to run.
-    #[serde(rename="timeoutMs")]
-    
+    #[serde(rename = "timeoutMs")]
     pub timeout_ms: Option<i32>,
 }
 
-impl client::Part for Action {}
-
+impl common::Part for Action {}
 
 /// An allowed port resource.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AllowedRule {
     /// ?tcp?, ?udp? or ?icmp?
-    #[serde(rename="IPProtocol")]
-    
+    #[serde(rename = "IPProtocol")]
     pub ip_protocol: Option<String>,
     /// List of ports or port ranges (Example inputs include: ["22"], [?33?, "12345-12349"].
-    
     pub ports: Option<Vec<String>>,
 }
 
-impl client::Part for AllowedRule {}
-
+impl common::Part for AllowedRule {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AutoscalingModule {
     /// no description provided
-    #[serde(rename="coolDownPeriodSec")]
-    
+    #[serde(rename = "coolDownPeriodSec")]
     pub cool_down_period_sec: Option<i32>,
     /// no description provided
-    
     pub description: Option<String>,
     /// no description provided
-    #[serde(rename="maxNumReplicas")]
-    
+    #[serde(rename = "maxNumReplicas")]
     pub max_num_replicas: Option<i32>,
     /// no description provided
-    #[serde(rename="minNumReplicas")]
-    
+    #[serde(rename = "minNumReplicas")]
     pub min_num_replicas: Option<i32>,
     /// no description provided
-    #[serde(rename="signalType")]
-    
+    #[serde(rename = "signalType")]
     pub signal_type: Option<String>,
     /// no description provided
-    #[serde(rename="targetModule")]
-    
+    #[serde(rename = "targetModule")]
     pub target_module: Option<String>,
     /// target_utilization should be in range [0,1].
-    #[serde(rename="targetUtilization")]
-    
+    #[serde(rename = "targetUtilization")]
     pub target_utilization: Option<f64>,
 }
 
-impl client::Part for AutoscalingModule {}
-
+impl common::Part for AutoscalingModule {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AutoscalingModuleStatus {
     /// [Output Only] The URL of the corresponding Autoscaling configuration.
-    #[serde(rename="autoscalingConfigUrl")]
-    
+    #[serde(rename = "autoscalingConfigUrl")]
     pub autoscaling_config_url: Option<String>,
 }
 
-impl client::Part for AutoscalingModuleStatus {}
-
+impl common::Part for AutoscalingModuleStatus {}
 
 /// [Output Only] The current state of a replica or module.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DeployState {
     /// [Output Only] Human readable details about the current state.
-    
     pub details: Option<String>,
-    /// [Output Only] The status of the deployment. Possible values include: 
+    /// [Output Only] The status of the deployment. Possible values include:
     /// - UNKNOWN
     /// - DEPLOYING
     /// - DEPLOYED
@@ -327,806 +304,666 @@ pub struct DeployState {
     /// - DELETING
     /// - DELETED
     /// - DELETE_FAILED
-    
     pub status: Option<String>,
 }
 
-impl client::Part for DeployState {}
-
+impl common::Part for DeployState {}
 
 /// A deployment represents a physical instantiation of a Template.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [delete deployments](DeploymentDeleteCall) (none)
 /// * [get deployments](DeploymentGetCall) (response)
 /// * [insert deployments](DeploymentInsertCall) (request|response)
 /// * [list deployments](DeploymentListCall) (none)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Deployment {
     /// [Output Only] The time when this deployment was created.
-    #[serde(rename="creationDate")]
-    
+    #[serde(rename = "creationDate")]
     pub creation_date: Option<String>,
     /// A user-supplied description of this Deployment.
-    
     pub description: Option<String>,
     /// [Output Only] List of status for the modules in this deployment.
-    
     pub modules: Option<HashMap<String, ModuleStatus>>,
     /// Name of this deployment. The name must conform to the following regular expression: [a-zA-Z0-9-_]{1,64}
-    
     pub name: Option<String>,
     /// The set of parameter overrides to apply to the corresponding Template before deploying.
-    
     pub overrides: Option<Vec<ParamOverride>>,
     /// [Output Only] Current status of this deployment.
-    
     pub state: Option<DeployState>,
     /// The name of the Template on which this deployment is based.
-    #[serde(rename="templateName")]
-    
+    #[serde(rename = "templateName")]
     pub template_name: Option<String>,
 }
 
-impl client::RequestValue for Deployment {}
-impl client::Resource for Deployment {}
-impl client::ResponseResult for Deployment {}
-
+impl common::RequestValue for Deployment {}
+impl common::Resource for Deployment {}
+impl common::ResponseResult for Deployment {}
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list deployments](DeploymentListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DeploymentsListResponse {
     /// no description provided
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
-    
     pub resources: Option<Vec<Deployment>>,
 }
 
-impl client::ResponseResult for DeploymentsListResponse {}
-
+impl common::ResponseResult for DeploymentsListResponse {}
 
 /// How to attach a disk to a Replica.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DiskAttachment {
     /// The device name of this disk.
-    #[serde(rename="deviceName")]
-    
+    #[serde(rename = "deviceName")]
     pub device_name: Option<String>,
     /// A zero-based index to assign to this disk, where 0 is reserved for the boot disk. If not specified, this is assigned by the server.
-    
     pub index: Option<u32>,
 }
 
-impl client::Part for DiskAttachment {}
-
+impl common::Part for DiskAttachment {}
 
 /// An environment variable.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct EnvVariable {
     /// Whether this variable is hidden or visible.
-    
     pub hidden: Option<bool>,
     /// Value of the environment variable.
-    
     pub value: Option<String>,
 }
 
-impl client::Part for EnvVariable {}
-
+impl common::Part for EnvVariable {}
 
 /// A pre-existing persistent disk that will be attached to every Replica in the Pool.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExistingDisk {
     /// Optional. How the disk will be attached to the Replica.
-    
     pub attachment: Option<DiskAttachment>,
     /// The fully-qualified URL of the Persistent Disk resource. It must be in the same zone as the Pool.
-    
     pub source: Option<String>,
 }
 
-impl client::Part for ExistingDisk {}
-
+impl common::Part for ExistingDisk {}
 
 /// A Firewall resource
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FirewallModule {
     /// The allowed ports or port ranges.
-    
     pub allowed: Option<Vec<AllowedRule>>,
     /// The description of the firewall (optional)
-    
     pub description: Option<String>,
     /// The NetworkModule to which this firewall should apply. If not specified, or if specified as 'default', this firewall will be applied to the 'default' network.
-    
     pub network: Option<String>,
     /// Source IP ranges to apply this firewall to, see the GCE Spec for details on syntax
-    #[serde(rename="sourceRanges")]
-    
+    #[serde(rename = "sourceRanges")]
     pub source_ranges: Option<Vec<String>>,
     /// Source Tags to apply this firewall to, see the GCE Spec for details on syntax
-    #[serde(rename="sourceTags")]
-    
+    #[serde(rename = "sourceTags")]
     pub source_tags: Option<Vec<String>>,
     /// Target Tags to apply this firewall to, see the GCE Spec for details on syntax
-    #[serde(rename="targetTags")]
-    
+    #[serde(rename = "targetTags")]
     pub target_tags: Option<Vec<String>>,
 }
 
-impl client::Part for FirewallModule {}
-
+impl common::Part for FirewallModule {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FirewallModuleStatus {
     /// [Output Only] The URL of the corresponding Firewall resource.
-    #[serde(rename="firewallUrl")]
-    
+    #[serde(rename = "firewallUrl")]
     pub firewall_url: Option<String>,
 }
 
-impl client::Part for FirewallModuleStatus {}
-
+impl common::Part for FirewallModuleStatus {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct HealthCheckModule {
     /// no description provided
-    #[serde(rename="checkIntervalSec")]
-    
+    #[serde(rename = "checkIntervalSec")]
     pub check_interval_sec: Option<i32>,
     /// no description provided
-    
     pub description: Option<String>,
     /// no description provided
-    #[serde(rename="healthyThreshold")]
-    
+    #[serde(rename = "healthyThreshold")]
     pub healthy_threshold: Option<i32>,
     /// no description provided
-    
     pub host: Option<String>,
     /// no description provided
-    
     pub path: Option<String>,
     /// no description provided
-    
     pub port: Option<i32>,
     /// no description provided
-    #[serde(rename="timeoutSec")]
-    
+    #[serde(rename = "timeoutSec")]
     pub timeout_sec: Option<i32>,
     /// no description provided
-    #[serde(rename="unhealthyThreshold")]
-    
+    #[serde(rename = "unhealthyThreshold")]
     pub unhealthy_threshold: Option<i32>,
 }
 
-impl client::Part for HealthCheckModule {}
-
+impl common::Part for HealthCheckModule {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct HealthCheckModuleStatus {
     /// [Output Only] The HealthCheck URL.
-    #[serde(rename="healthCheckUrl")]
-    
+    #[serde(rename = "healthCheckUrl")]
     pub health_check_url: Option<String>,
 }
 
-impl client::Part for HealthCheckModuleStatus {}
-
+impl common::Part for HealthCheckModuleStatus {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct LbModule {
     /// no description provided
-    
     pub description: Option<String>,
     /// no description provided
-    #[serde(rename="healthChecks")]
-    
+    #[serde(rename = "healthChecks")]
     pub health_checks: Option<Vec<String>>,
     /// no description provided
-    #[serde(rename="ipAddress")]
-    
+    #[serde(rename = "ipAddress")]
     pub ip_address: Option<String>,
     /// no description provided
-    #[serde(rename="ipProtocol")]
-    
+    #[serde(rename = "ipProtocol")]
     pub ip_protocol: Option<String>,
     /// no description provided
-    #[serde(rename="portRange")]
-    
+    #[serde(rename = "portRange")]
     pub port_range: Option<String>,
     /// no description provided
-    #[serde(rename="sessionAffinity")]
-    
+    #[serde(rename = "sessionAffinity")]
     pub session_affinity: Option<String>,
     /// no description provided
-    #[serde(rename="targetModules")]
-    
+    #[serde(rename = "targetModules")]
     pub target_modules: Option<Vec<String>>,
 }
 
-impl client::Part for LbModule {}
-
+impl common::Part for LbModule {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct LbModuleStatus {
     /// [Output Only] The URL of the corresponding ForwardingRule in GCE.
-    #[serde(rename="forwardingRuleUrl")]
-    
+    #[serde(rename = "forwardingRuleUrl")]
     pub forwarding_rule_url: Option<String>,
     /// [Output Only] The URL of the corresponding TargetPool resource in GCE.
-    #[serde(rename="targetPoolUrl")]
-    
+    #[serde(rename = "targetPoolUrl")]
     pub target_pool_url: Option<String>,
 }
 
-impl client::Part for LbModuleStatus {}
-
+impl common::Part for LbModuleStatus {}
 
 /// A Compute Engine metadata entry. Identical to the metadata on the corresponding Compute Engine resource.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Metadata {
     /// The fingerprint of the metadata.
-    #[serde(rename="fingerPrint")]
-    
+    #[serde(rename = "fingerPrint")]
     pub finger_print: Option<String>,
     /// A list of metadata items.
-    
     pub items: Option<Vec<MetadataItem>>,
 }
 
-impl client::Part for Metadata {}
-
+impl common::Part for Metadata {}
 
 /// A Compute Engine metadata item, defined as a key:value pair. Identical to the metadata on the corresponding Compute Engine resource.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MetadataItem {
     /// A metadata key.
-    
     pub key: Option<String>,
     /// A metadata value.
-    
     pub value: Option<String>,
 }
 
-impl client::Part for MetadataItem {}
-
+impl common::Part for MetadataItem {}
 
 /// A module in a configuration. A module represents a single homogeneous, possibly replicated task.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Module {
     /// no description provided
-    #[serde(rename="autoscalingModule")]
-    
+    #[serde(rename = "autoscalingModule")]
     pub autoscaling_module: Option<AutoscalingModule>,
     /// no description provided
-    #[serde(rename="firewallModule")]
-    
+    #[serde(rename = "firewallModule")]
     pub firewall_module: Option<FirewallModule>,
     /// no description provided
-    #[serde(rename="healthCheckModule")]
-    
+    #[serde(rename = "healthCheckModule")]
     pub health_check_module: Option<HealthCheckModule>,
     /// no description provided
-    #[serde(rename="lbModule")]
-    
+    #[serde(rename = "lbModule")]
     pub lb_module: Option<LbModule>,
     /// no description provided
-    #[serde(rename="networkModule")]
-    
+    #[serde(rename = "networkModule")]
     pub network_module: Option<NetworkModule>,
     /// no description provided
-    #[serde(rename="replicaPoolModule")]
-    
+    #[serde(rename = "replicaPoolModule")]
     pub replica_pool_module: Option<ReplicaPoolModule>,
     /// The type of this module. Valid values ("AUTOSCALING", "FIREWALL", "HEALTH_CHECK", "LOAD_BALANCING", "NETWORK", "REPLICA_POOL")
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::Part for Module {}
-
+impl common::Part for Module {}
 
 /// [Output Only] Aggregate status for a module.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ModuleStatus {
     /// [Output Only] The status of the AutoscalingModule, set for type AUTOSCALING.
-    #[serde(rename="autoscalingModuleStatus")]
-    
+    #[serde(rename = "autoscalingModuleStatus")]
     pub autoscaling_module_status: Option<AutoscalingModuleStatus>,
     /// [Output Only] The status of the FirewallModule, set for type FIREWALL.
-    #[serde(rename="firewallModuleStatus")]
-    
+    #[serde(rename = "firewallModuleStatus")]
     pub firewall_module_status: Option<FirewallModuleStatus>,
     /// [Output Only] The status of the HealthCheckModule, set for type HEALTH_CHECK.
-    #[serde(rename="healthCheckModuleStatus")]
-    
+    #[serde(rename = "healthCheckModuleStatus")]
     pub health_check_module_status: Option<HealthCheckModuleStatus>,
     /// [Output Only] The status of the LbModule, set for type LOAD_BALANCING.
-    #[serde(rename="lbModuleStatus")]
-    
+    #[serde(rename = "lbModuleStatus")]
     pub lb_module_status: Option<LbModuleStatus>,
     /// [Output Only] The status of the NetworkModule, set for type NETWORK.
-    #[serde(rename="networkModuleStatus")]
-    
+    #[serde(rename = "networkModuleStatus")]
     pub network_module_status: Option<NetworkModuleStatus>,
     /// [Output Only] The status of the ReplicaPoolModule, set for type VM.
-    #[serde(rename="replicaPoolModuleStatus")]
-    
+    #[serde(rename = "replicaPoolModuleStatus")]
     pub replica_pool_module_status: Option<ReplicaPoolModuleStatus>,
     /// [Output Only] The current state of the module.
-    
     pub state: Option<DeployState>,
     /// [Output Only] The type of the module.
-    #[serde(rename="type")]
-    
+    #[serde(rename = "type")]
     pub type_: Option<String>,
 }
 
-impl client::Part for ModuleStatus {}
-
+impl common::Part for ModuleStatus {}
 
 /// A Compute Engine NetworkInterface resource. Identical to the NetworkInterface on the corresponding Compute Engine resource.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NetworkInterface {
     /// An array of configurations for this interface. This specifies how this interface is configured to interact with other network services
-    #[serde(rename="accessConfigs")]
-    
+    #[serde(rename = "accessConfigs")]
     pub access_configs: Option<Vec<AccessConfig>>,
     /// Name of the interface.
-    
     pub name: Option<String>,
     /// The name of the NetworkModule to which this interface applies. If not specified, or specified as 'default', this will use the 'default' network.
-    
     pub network: Option<String>,
     /// An optional IPV4 internal network address to assign to the instance for this network interface.
-    #[serde(rename="networkIp")]
-    
+    #[serde(rename = "networkIp")]
     pub network_ip: Option<String>,
 }
 
-impl client::Part for NetworkInterface {}
-
+impl common::Part for NetworkInterface {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NetworkModule {
     /// Required; The range of internal addresses that are legal on this network. This range is a CIDR specification, for example: 192.168.0.0/16.
-    #[serde(rename="IPv4Range")]
-    
+    #[serde(rename = "IPv4Range")]
     pub i_pv4_range: Option<String>,
     /// The description of the network.
-    
     pub description: Option<String>,
     /// An optional address that is used for default routing to other networks. This must be within the range specified by IPv4Range, and is typicall the first usable address in that range. If not specified, the default value is the first usable address in IPv4Range.
-    #[serde(rename="gatewayIPv4")]
-    
+    #[serde(rename = "gatewayIPv4")]
     pub gateway_i_pv4: Option<String>,
 }
 
-impl client::Part for NetworkModule {}
-
+impl common::Part for NetworkModule {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NetworkModuleStatus {
     /// [Output Only] The URL of the corresponding Network resource.
-    #[serde(rename="networkUrl")]
-    
+    #[serde(rename = "networkUrl")]
     pub network_url: Option<String>,
 }
 
-impl client::Part for NetworkModuleStatus {}
-
+impl common::Part for NetworkModuleStatus {}
 
 /// A Persistent Disk resource that will be created and attached to each Replica in the Pool. Each Replica will have a unique persistent disk that is created and attached to that Replica.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NewDisk {
     /// How the disk will be attached to the Replica.
-    
     pub attachment: Option<DiskAttachment>,
     /// If true, then this disk will be deleted when the instance is deleted.
-    #[serde(rename="autoDelete")]
-    
+    #[serde(rename = "autoDelete")]
     pub auto_delete: Option<bool>,
     /// If true, indicates that this is the root persistent disk.
-    
     pub boot: Option<bool>,
     /// Create the new disk using these parameters. The name of the disk will be <instance_name>-<five_random_charactersgt;.
-    #[serde(rename="initializeParams")]
-    
+    #[serde(rename = "initializeParams")]
     pub initialize_params: Option<NewDiskInitializeParams>,
 }
 
-impl client::Part for NewDisk {}
-
+impl common::Part for NewDisk {}
 
 /// Initialization parameters for creating a new disk.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NewDiskInitializeParams {
     /// The size of the created disk in gigabytes.
-    #[serde(rename="diskSizeGb")]
-    
-    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    #[serde(rename = "diskSizeGb")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub disk_size_gb: Option<i64>,
     /// Name of the disk type resource describing which disk type to use to create the disk. For example 'pd-ssd' or 'pd-standard'. Default is 'pd-standard'
-    #[serde(rename="diskType")]
-    
+    #[serde(rename = "diskType")]
     pub disk_type: Option<String>,
     /// The fully-qualified URL of a source image to use to create this disk.
-    #[serde(rename="sourceImage")]
-    
+    #[serde(rename = "sourceImage")]
     pub source_image: Option<String>,
 }
 
-impl client::Part for NewDiskInitializeParams {}
-
+impl common::Part for NewDiskInitializeParams {}
 
 /// A specification for overriding parameters in a Template that corresponds to the Deployment.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ParamOverride {
     /// A JSON Path expression that specifies which parameter should be overridden.
-    
     pub path: Option<String>,
     /// The new value to assign to the overridden parameter.
-    
     pub value: Option<String>,
 }
 
-impl client::Part for ParamOverride {}
-
+impl common::Part for ParamOverride {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReplicaPoolModule {
     /// A list of environment variables.
-    #[serde(rename="envVariables")]
-    
+    #[serde(rename = "envVariables")]
     pub env_variables: Option<HashMap<String, EnvVariable>>,
     /// The Health Checks to configure for the ReplicaPoolModule
-    #[serde(rename="healthChecks")]
-    
+    #[serde(rename = "healthChecks")]
     pub health_checks: Option<Vec<String>>,
     /// Number of replicas in this module.
-    #[serde(rename="numReplicas")]
-    
+    #[serde(rename = "numReplicas")]
     pub num_replicas: Option<i32>,
     /// Information for a ReplicaPoolModule.
-    #[serde(rename="replicaPoolParams")]
-    
+    #[serde(rename = "replicaPoolParams")]
     pub replica_pool_params: Option<ReplicaPoolParams>,
     /// [Output Only] The name of the Resource View associated with a ReplicaPoolModule. This field will be generated by the service.
-    #[serde(rename="resourceView")]
-    
+    #[serde(rename = "resourceView")]
     pub resource_view: Option<String>,
 }
 
-impl client::Part for ReplicaPoolModule {}
-
+impl common::Part for ReplicaPoolModule {}
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReplicaPoolModuleStatus {
     /// [Output Only] The URL of the associated ReplicaPool resource.
-    #[serde(rename="replicaPoolUrl")]
-    
+    #[serde(rename = "replicaPoolUrl")]
     pub replica_pool_url: Option<String>,
     /// [Output Only] The URL of the Resource Group associated with this ReplicaPool.
-    #[serde(rename="resourceViewUrl")]
-    
+    #[serde(rename = "resourceViewUrl")]
     pub resource_view_url: Option<String>,
 }
 
-impl client::Part for ReplicaPoolModuleStatus {}
-
+impl common::Part for ReplicaPoolModuleStatus {}
 
 /// Configuration information for a ReplicaPools resource. Specifying an item within will determine the ReplicaPools API version used for a ReplicaPoolModule. Only one may be specified.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReplicaPoolParams {
     /// ReplicaPoolParams specifications for use with ReplicaPools v1beta1.
-    
     pub v1beta1: Option<ReplicaPoolParamsV1Beta1>,
 }
 
-impl client::Part for ReplicaPoolParams {}
-
+impl common::Part for ReplicaPoolParams {}
 
 /// Configuration information for a ReplicaPools v1beta1 API resource. Directly maps to ReplicaPool InitTemplate.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ReplicaPoolParamsV1Beta1 {
     /// Whether these replicas should be restarted if they experience a failure. The default value is true.
-    #[serde(rename="autoRestart")]
-    
+    #[serde(rename = "autoRestart")]
     pub auto_restart: Option<bool>,
     /// The base name for instances within this ReplicaPool.
-    #[serde(rename="baseInstanceName")]
-    
+    #[serde(rename = "baseInstanceName")]
     pub base_instance_name: Option<String>,
     /// Enables IP Forwarding
-    #[serde(rename="canIpForward")]
-    
+    #[serde(rename = "canIpForward")]
     pub can_ip_forward: Option<bool>,
     /// An optional textual description of the resource.
-    
     pub description: Option<String>,
     /// A list of existing Persistent Disk resources to attach to each replica in the pool. Each disk will be attached in read-only mode to every replica.
-    #[serde(rename="disksToAttach")]
-    
+    #[serde(rename = "disksToAttach")]
     pub disks_to_attach: Option<Vec<ExistingDisk>>,
     /// A list of Disk resources to create and attach to each Replica in the Pool. Currently, you can only define one disk and it must be a root persistent disk. Note that Replica Pool will create a root persistent disk for each replica.
-    #[serde(rename="disksToCreate")]
-    
+    #[serde(rename = "disksToCreate")]
     pub disks_to_create: Option<Vec<NewDisk>>,
     /// Name of the Action to be run during initialization of a ReplicaPoolModule.
-    #[serde(rename="initAction")]
-    
+    #[serde(rename = "initAction")]
     pub init_action: Option<String>,
     /// The machine type for this instance. Either a complete URL, or the resource name (e.g. n1-standard-1).
-    #[serde(rename="machineType")]
-    
+    #[serde(rename = "machineType")]
     pub machine_type: Option<String>,
     /// The metadata key/value pairs assigned to this instance.
-    
     pub metadata: Option<Metadata>,
     /// A list of network interfaces for the instance. Currently only one interface is supported by Google Compute Engine.
-    #[serde(rename="networkInterfaces")]
-    
+    #[serde(rename = "networkInterfaces")]
     pub network_interfaces: Option<Vec<NetworkInterface>>,
     /// no description provided
-    #[serde(rename="onHostMaintenance")]
-    
+    #[serde(rename = "onHostMaintenance")]
     pub on_host_maintenance: Option<String>,
     /// A list of Service Accounts to enable for this instance.
-    #[serde(rename="serviceAccounts")]
-    
+    #[serde(rename = "serviceAccounts")]
     pub service_accounts: Option<Vec<ServiceAccount>>,
     /// A list of tags to apply to the Google Compute Engine instance to identify resources.
-    
     pub tags: Option<Tag>,
     /// The zone for this ReplicaPool.
-    
     pub zone: Option<String>,
 }
 
-impl client::Part for ReplicaPoolParamsV1Beta1 {}
-
+impl common::Part for ReplicaPoolParamsV1Beta1 {}
 
 /// A Compute Engine service account, identical to the Compute Engine resource.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ServiceAccount {
     /// Service account email address.
-    
     pub email: Option<String>,
     /// List of OAuth2 scopes to obtain for the service account.
-    
     pub scopes: Option<Vec<String>>,
 }
 
-impl client::Part for ServiceAccount {}
-
+impl common::Part for ServiceAccount {}
 
 /// A Compute Engine Instance tag, identical to the tags on the corresponding Compute Engine Instance resource.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Tag {
     /// The fingerprint of the tag.
-    #[serde(rename="fingerPrint")]
-    
+    #[serde(rename = "fingerPrint")]
     pub finger_print: Option<String>,
     /// Items contained in this tag.
-    
     pub items: Option<Vec<String>>,
 }
 
-impl client::Part for Tag {}
-
+impl common::Part for Tag {}
 
 /// A Template represents a complete configuration for a Deployment.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [delete templates](TemplateDeleteCall) (none)
 /// * [get templates](TemplateGetCall) (response)
 /// * [insert templates](TemplateInsertCall) (request|response)
 /// * [list templates](TemplateListCall) (none)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Template {
     /// Action definitions for use in Module intents in this Template.
-    
     pub actions: Option<HashMap<String, Action>>,
     /// A user-supplied description of this Template.
-    
     pub description: Option<String>,
     /// A list of modules for this Template.
-    
     pub modules: Option<HashMap<String, Module>>,
     /// Name of this Template. The name must conform to the expression: [a-zA-Z0-9-_]{1,64}
-    
     pub name: Option<String>,
 }
 
-impl client::RequestValue for Template {}
-impl client::Resource for Template {}
-impl client::ResponseResult for Template {}
-
+impl common::RequestValue for Template {}
+impl common::Resource for Template {}
+impl common::ResponseResult for Template {}
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list templates](TemplateListCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct TemplatesListResponse {
     /// no description provided
-    #[serde(rename="nextPageToken")]
-    
+    #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
     /// no description provided
-    
     pub resources: Option<Vec<Template>>,
 }
 
-impl client::ResponseResult for TemplatesListResponse {}
-
-
+impl common::ResponseResult for TemplatesListResponse {}
 
 // ###################
 // MethodBuilders ###
@@ -1143,43 +980,59 @@ impl client::ResponseResult for TemplatesListResponse {}
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_manager1_beta2 as manager1_beta2;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Manager::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.deployments();
 /// # }
 /// ```
-pub struct DeploymentMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct DeploymentMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for DeploymentMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for DeploymentMethods<'a, C> {}
 
-impl<'a, S> DeploymentMethods<'a, S> {
-    
+impl<'a, C> DeploymentMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
     /// * `deploymentName` - No description provided.
-    pub fn delete(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentDeleteCall<'a, S> {
+    pub fn delete(
+        &self,
+        project_id: &str,
+        region: &str,
+        deployment_name: &str,
+    ) -> DeploymentDeleteCall<'a, C> {
         DeploymentDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1190,17 +1043,22 @@ impl<'a, S> DeploymentMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
     /// * `deploymentName` - No description provided.
-    pub fn get(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentGetCall<'a, S> {
+    pub fn get(
+        &self,
+        project_id: &str,
+        region: &str,
+        deployment_name: &str,
+    ) -> DeploymentGetCall<'a, C> {
         DeploymentGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1211,17 +1069,22 @@ impl<'a, S> DeploymentMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
-    pub fn insert(&self, request: Deployment, project_id: &str, region: &str) -> DeploymentInsertCall<'a, S> {
+    pub fn insert(
+        &self,
+        request: Deployment,
+        project_id: &str,
+        region: &str,
+    ) -> DeploymentInsertCall<'a, C> {
         DeploymentInsertCall {
             hub: self.hub,
             _request: request,
@@ -1232,16 +1095,16 @@ impl<'a, S> DeploymentMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
-    pub fn list(&self, project_id: &str, region: &str) -> DeploymentListCall<'a, S> {
+    pub fn list(&self, project_id: &str, region: &str) -> DeploymentListCall<'a, C> {
         DeploymentListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1255,8 +1118,6 @@ impl<'a, S> DeploymentMethods<'a, S> {
     }
 }
 
-
-
 /// A builder providing access to all methods supported on *template* resources.
 /// It is not used directly, but through the [`Manager`] hub.
 ///
@@ -1268,42 +1129,53 @@ impl<'a, S> DeploymentMethods<'a, S> {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_manager1_beta2 as manager1_beta2;
-/// 
+///
 /// # async fn dox() {
-/// use std::default::Default;
-/// use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http1()
+///         .build()
+/// );
+/// let mut hub = Manager::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.templates();
 /// # }
 /// ```
-pub struct TemplateMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct TemplateMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
 }
 
-impl<'a, S> client::MethodsBuilder for TemplateMethods<'a, S> {}
+impl<'a, C> common::MethodsBuilder for TemplateMethods<'a, C> {}
 
-impl<'a, S> TemplateMethods<'a, S> {
-    
+impl<'a, C> TemplateMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `projectId` - No description provided.
     /// * `templateName` - No description provided.
-    pub fn delete(&self, project_id: &str, template_name: &str) -> TemplateDeleteCall<'a, S> {
+    pub fn delete(&self, project_id: &str, template_name: &str) -> TemplateDeleteCall<'a, C> {
         TemplateDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1313,16 +1185,16 @@ impl<'a, S> TemplateMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `projectId` - No description provided.
     /// * `templateName` - No description provided.
-    pub fn get(&self, project_id: &str, template_name: &str) -> TemplateGetCall<'a, S> {
+    pub fn get(&self, project_id: &str, template_name: &str) -> TemplateGetCall<'a, C> {
         TemplateGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1332,16 +1204,16 @@ impl<'a, S> TemplateMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `projectId` - No description provided.
-    pub fn insert(&self, request: Template, project_id: &str) -> TemplateInsertCall<'a, S> {
+    pub fn insert(&self, request: Template, project_id: &str) -> TemplateInsertCall<'a, C> {
         TemplateInsertCall {
             hub: self.hub,
             _request: request,
@@ -1351,15 +1223,15 @@ impl<'a, S> TemplateMethods<'a, S> {
             _scopes: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
-    /// 
-    /// 
+    ///
+    ///
     /// # Arguments
     ///
     /// * `projectId` - No description provided.
-    pub fn list(&self, project_id: &str) -> TemplateListCall<'a, S> {
+    pub fn list(&self, project_id: &str) -> TemplateListCall<'a, C> {
         TemplateListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1372,15 +1244,11 @@ impl<'a, S> TemplateMethods<'a, S> {
     }
 }
 
-
-
-
-
 // ###################
 // CallBuilders   ###
 // #################
 
-/// 
+///
 ///
 /// A builder for the *delete* method supported by a *deployment* resource.
 /// It is not used directly, but through a [`DeploymentMethods`] instance.
@@ -1394,15 +1262,26 @@ impl<'a, S> TemplateMethods<'a, S> {
 /// # extern crate hyper_rustls;
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1410,45 +1289,44 @@ impl<'a, S> TemplateMethods<'a, S> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct DeploymentDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _project_id: String,
     _region: String,
     _deployment_name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DeploymentDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DeploymentDeleteCall<'a, C> {}
 
-impl<'a, S> DeploymentDeleteCall<'a, S>
+impl<'a, C> DeploymentDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<common::Response> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.deployments.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.deployments.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["projectId", "region", "deploymentName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1459,12 +1337,21 @@ where
 
         params.extend(self._additional_params.iter());
 
-        let mut url = self.hub._base_url.clone() + "{projectId}/regions/{region}/deployments/{deploymentName}";
+        let mut url = self.hub._base_url.clone()
+            + "{projectId}/regions/{region}/deployments/{deploymentName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{region}", "region"), ("{deploymentName}", "deploymentName")].iter() {
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{projectId}", "projectId"),
+            ("{region}", "region"),
+            ("{deploymentName}", "deploymentName"),
+        ]
+        .iter()
+        {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
@@ -1474,20 +1361,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1501,61 +1389,59 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = res;
+                    let response = common::Response::from_parts(parts, body);
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentDeleteCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1564,7 +1450,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentDeleteCall<'a, S> {
+    pub fn region(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C> {
         self._region = new_value.to_string();
         self
     }
@@ -1573,19 +1459,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment_name(mut self, new_value: &str) -> DeploymentDeleteCall<'a, S> {
+    pub fn deployment_name(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C> {
         self._deployment_name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> DeploymentDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1606,9 +1495,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1623,17 +1515,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DeploymentDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DeploymentDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1642,14 +1538,13 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DeploymentDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DeploymentDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
-/// 
+///
 ///
 /// A builder for the *get* method supported by a *deployment* resource.
 /// It is not used directly, but through a [`DeploymentMethods`] instance.
@@ -1663,15 +1558,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1679,45 +1585,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct DeploymentGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _project_id: String,
     _region: String,
     _deployment_name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DeploymentGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DeploymentGetCall<'a, C> {}
 
-impl<'a, S> DeploymentGetCall<'a, S>
+impl<'a, C> DeploymentGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Deployment)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Deployment)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.deployments.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.deployments.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "projectId", "region", "deploymentName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -1729,12 +1634,21 @@ where
         params.extend(self._additional_params.iter());
 
         params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "{projectId}/regions/{region}/deployments/{deploymentName}";
+        let mut url = self.hub._base_url.clone()
+            + "{projectId}/regions/{region}/deployments/{deploymentName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
+            self._scopes
+                .insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{region}", "region"), ("{deploymentName}", "deploymentName")].iter() {
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{projectId}", "projectId"),
+            ("{region}", "region"),
+            ("{deploymentName}", "deploymentName"),
+        ]
+        .iter()
+        {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
@@ -1744,20 +1658,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -1771,71 +1686,72 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentGetCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentGetCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1844,7 +1760,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentGetCall<'a, S> {
+    pub fn region(mut self, new_value: &str) -> DeploymentGetCall<'a, C> {
         self._region = new_value.to_string();
         self
     }
@@ -1853,19 +1769,19 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment_name(mut self, new_value: &str) -> DeploymentGetCall<'a, S> {
+    pub fn deployment_name(mut self, new_value: &str) -> DeploymentGetCall<'a, C> {
         self._deployment_name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> DeploymentGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -1886,9 +1802,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -1903,17 +1822,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DeploymentGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DeploymentGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -1922,14 +1845,13 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DeploymentGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DeploymentGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
-/// 
+///
 ///
 /// A builder for the *insert* method supported by a *deployment* resource.
 /// It is not used directly, but through a [`DeploymentMethods`] instance.
@@ -1944,20 +1866,31 @@ where
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// use manager1_beta2::api::Deployment;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Deployment::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1965,45 +1898,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentInsertCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct DeploymentInsertCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _request: Deployment,
     _project_id: String,
     _region: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DeploymentInsertCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DeploymentInsertCall<'a, C> {}
 
-impl<'a, S> DeploymentInsertCall<'a, S>
+impl<'a, C> DeploymentInsertCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Deployment)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Deployment)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.deployments.insert",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.deployments.insert",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "projectId", "region"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2016,10 +1948,14 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{projectId}/regions/{region}/deployments";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::AppengineAdmin.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AppengineAdmin.as_ref().to_string());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{region}", "region")].iter() {
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in
+            [("{projectId}", "projectId"), ("{region}", "region")].iter()
+        {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
@@ -2030,32 +1966,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -2068,72 +2011,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Deployment) -> DeploymentInsertCall<'a, S> {
+    pub fn request(mut self, new_value: Deployment) -> DeploymentInsertCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -2142,7 +2088,7 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentInsertCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentInsertCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2151,19 +2097,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentInsertCall<'a, S> {
+    pub fn region(mut self, new_value: &str) -> DeploymentInsertCall<'a, C> {
         self._region = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentInsertCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> DeploymentInsertCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2184,9 +2133,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2201,17 +2153,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DeploymentInsertCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DeploymentInsertCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentInsertCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentInsertCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2220,14 +2176,13 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DeploymentInsertCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DeploymentInsertCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
-/// 
+///
 ///
 /// A builder for the *list* method supported by a *deployment* resource.
 /// It is not used directly, but through a [`DeploymentMethods`] instance.
@@ -2241,15 +2196,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2259,46 +2225,45 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct DeploymentListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _project_id: String,
     _region: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for DeploymentListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for DeploymentListCall<'a, C> {}
 
-impl<'a, S> DeploymentListCall<'a, S>
+impl<'a, C> DeploymentListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, DeploymentsListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, DeploymentsListResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.deployments.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.deployments.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "projectId", "region", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2317,10 +2282,14 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{projectId}/regions/{region}/deployments";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
+            self._scopes
+                .insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{region}", "region")].iter() {
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in
+            [("{projectId}", "projectId"), ("{region}", "region")].iter()
+        {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
@@ -2330,20 +2299,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2357,71 +2327,72 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentListCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentListCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2430,33 +2401,36 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentListCall<'a, S> {
+    pub fn region(mut self, new_value: &str) -> DeploymentListCall<'a, C> {
         self._region = new_value.to_string();
         self
     }
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a, S> {
+    pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a, C> {
         self._max_results = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentListCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> DeploymentListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2477,9 +2451,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2494,17 +2471,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> DeploymentListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> DeploymentListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> DeploymentListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2513,14 +2494,13 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> DeploymentListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> DeploymentListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
-/// 
+///
 ///
 /// A builder for the *delete* method supported by a *template* resource.
 /// It is not used directly, but through a [`TemplateMethods`] instance.
@@ -2534,15 +2514,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2550,44 +2541,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct TemplateDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _project_id: String,
     _template_name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for TemplateDeleteCall<'a, S> {}
+impl<'a, C> common::CallBuilder for TemplateDeleteCall<'a, C> {}
 
-impl<'a, S> TemplateDeleteCall<'a, S>
+impl<'a, C> TemplateDeleteCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<hyper::Response<hyper::body::Body>> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<common::Response> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.templates.delete",
-                               http_method: hyper::Method::DELETE });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.templates.delete",
+            http_method: hyper::Method::DELETE,
+        });
 
         for &field in ["projectId", "templateName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2599,10 +2589,17 @@ where
 
         let mut url = self.hub._base_url.clone() + "{projectId}/templates/{templateName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{templateName}", "templateName")].iter() {
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{projectId}", "projectId"),
+            ("{templateName}", "templateName"),
+        ]
+        .iter()
+        {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
@@ -2612,20 +2609,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2639,61 +2637,59 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = res;
+                    let response = common::Response::from_parts(parts, body);
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateDeleteCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateDeleteCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2702,19 +2698,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> TemplateDeleteCall<'a, S> {
+    pub fn template_name(mut self, new_value: &str) -> TemplateDeleteCall<'a, C> {
         self._template_name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateDeleteCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> TemplateDeleteCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -2735,9 +2734,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -2752,17 +2754,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> TemplateDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> TemplateDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -2771,14 +2777,13 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> TemplateDeleteCall<'a, S> {
+    pub fn clear_scopes(mut self) -> TemplateDeleteCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
-/// 
+///
 ///
 /// A builder for the *get* method supported by a *template* resource.
 /// It is not used directly, but through a [`TemplateMethods`] instance.
@@ -2792,15 +2797,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2808,44 +2824,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateGetCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct TemplateGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _project_id: String,
     _template_name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for TemplateGetCall<'a, S> {}
+impl<'a, C> common::CallBuilder for TemplateGetCall<'a, C> {}
 
-impl<'a, S> TemplateGetCall<'a, S>
+impl<'a, C> TemplateGetCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Template)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Template)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.templates.get",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.templates.get",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "projectId", "templateName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -2858,10 +2873,17 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{projectId}/templates/{templateName}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
+            self._scopes
+                .insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId"), ("{templateName}", "templateName")].iter() {
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{projectId}", "projectId"),
+            ("{templateName}", "templateName"),
+        ]
+        .iter()
+        {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
         {
@@ -2871,20 +2893,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -2898,71 +2921,72 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateGetCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateGetCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2971,19 +2995,19 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> TemplateGetCall<'a, S> {
+    pub fn template_name(mut self, new_value: &str) -> TemplateGetCall<'a, C> {
         self._template_name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateGetCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> TemplateGetCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3004,9 +3028,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3021,17 +3048,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> TemplateGetCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> TemplateGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateGetCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3040,14 +3071,13 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> TemplateGetCall<'a, S> {
+    pub fn clear_scopes(mut self) -> TemplateGetCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
-/// 
+///
 ///
 /// A builder for the *insert* method supported by a *template* resource.
 /// It is not used directly, but through a [`TemplateMethods`] instance.
@@ -3062,20 +3092,31 @@ where
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// use manager1_beta2::api::Template;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Template::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3083,44 +3124,43 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateInsertCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct TemplateInsertCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _request: Template,
     _project_id: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for TemplateInsertCall<'a, S> {}
+impl<'a, C> common::CallBuilder for TemplateInsertCall<'a, C> {}
 
-impl<'a, S> TemplateInsertCall<'a, S>
+impl<'a, C> TemplateInsertCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Template)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, Template)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.templates.insert",
-                               http_method: hyper::Method::POST });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.templates.insert",
+            http_method: hyper::Method::POST,
+        });
 
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3132,9 +3172,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{projectId}/templates";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -3146,32 +3188,39 @@ where
         let url = params.parse_with_url(&url);
 
         let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
 
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
             let mut req_result = {
                 let client = &self.hub.client;
                 dlg.pre_request();
@@ -3184,72 +3233,75 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Template) -> TemplateInsertCall<'a, S> {
+    pub fn request(mut self, new_value: Template) -> TemplateInsertCall<'a, C> {
         self._request = new_value;
         self
     }
@@ -3258,19 +3310,22 @@ where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateInsertCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateInsertCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateInsertCall<'a, S> {
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> TemplateInsertCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3291,9 +3346,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3308,17 +3366,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> TemplateInsertCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> TemplateInsertCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateInsertCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateInsertCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3327,14 +3389,13 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> TemplateInsertCall<'a, S> {
+    pub fn clear_scopes(mut self) -> TemplateInsertCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
 
-
-/// 
+///
 ///
 /// A builder for the *list* method supported by a *template* resource.
 /// It is not used directly, but through a [`TemplateMethods`] instance.
@@ -3348,15 +3409,26 @@ where
 /// # extern crate hyper_rustls;
 /// # extern crate google_manager1_beta2 as manager1_beta2;
 /// # async fn dox() {
-/// # use std::default::Default;
-/// # use manager1_beta2::{Manager, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = Manager::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// # use manager1_beta2::{Manager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http1()
+/// #         .build()
+/// # );
+/// # let mut hub = Manager::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3366,45 +3438,44 @@ where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateListCall<'a, S>
-    where S: 'a {
-
-    hub: &'a Manager<S>,
+pub struct TemplateListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Manager<C>,
     _project_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
-    _delegate: Option<&'a mut dyn client::Delegate>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
+    _scopes: BTreeSet<String>,
 }
 
-impl<'a, S> client::CallBuilder for TemplateListCall<'a, S> {}
+impl<'a, C> common::CallBuilder for TemplateListCall<'a, C> {}
 
-impl<'a, S> TemplateListCall<'a, S>
+impl<'a, C> TemplateListCall<'a, C>
 where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: common::Connector,
 {
-
-
     /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, TemplatesListResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
+    pub async fn doit(mut self) -> common::Result<(common::Response, TemplatesListResponse)> {
         use std::borrow::Cow;
+        use std::io::{Read, Seek};
 
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "manager.templates.list",
-                               http_method: hyper::Method::GET });
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "manager.templates.list",
+            http_method: hyper::Method::GET,
+        });
 
         for &field in ["alt", "projectId", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
+                return Err(common::Error::FieldClash(field));
             }
         }
 
@@ -3422,9 +3493,11 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "{projectId}/templates";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
+            self._scopes
+                .insert(Scope::NdevCloudmanReadonly.as_ref().to_string());
         }
 
+        #[allow(clippy::single_element_loop)]
         for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
             url = params.uri_replacement(url, param_name, find_this, false);
         }
@@ -3435,20 +3508,21 @@ where
 
         let url = params.parse_with_url(&url);
 
-
-
         loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
                 Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
                     }
-                }
+                },
             };
             let mut req_result = {
                 let client = &self.hub.client;
@@ -3462,97 +3536,98 @@ where
                     req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
                 }
 
-
-                        let request = req_builder
-                        .header(CONTENT_LENGTH, 0_u64)
-                        .body(hyper::body::Body::empty());
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
 
                 client.request(request.unwrap()).await
-
             };
 
             match req_result {
                 Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
                         sleep(d).await;
                         continue;
                     }
                     dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
+                    return Err(common::Error::HttpError(err));
                 }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
 
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
                             sleep(d).await;
                             continue;
                         }
 
                         dlg.finished(false);
 
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
                     }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
                             }
                         }
                     };
 
                     dlg.finished(true);
-                    return Ok(result_value)
+                    return Ok(response);
                 }
             }
         }
     }
-
 
     ///
     /// Sets the *project id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateListCall<'a, S> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateListCall<'a, C> {
         self._project_id = new_value.to_string();
         self
     }
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, S> {
+    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, C> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> TemplateListCall<'a, S> {
+    pub fn max_results(mut self, new_value: i32) -> TemplateListCall<'a, C> {
         self._max_results = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// ````text
     ///                   It should be used to handle progress information, and to implement a certain level of resilience.
     /// ````
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateListCall<'a, S> {
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> TemplateListCall<'a, C> {
         self._delegate = Some(new_value);
         self
     }
@@ -3573,9 +3648,12 @@ where
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
@@ -3590,17 +3668,21 @@ where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> TemplateListCall<'a, S>
-                                                        where St: AsRef<str> {
+    pub fn add_scope<St>(mut self, scope: St) -> TemplateListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
         self._scopes.insert(String::from(scope.as_ref()));
         self
     }
     /// Identifies the authorization scope(s) for the method you are building.
     ///
     /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateListCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> TemplateListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
         self._scopes
             .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
         self
@@ -3609,10 +3691,8 @@ where
     /// Removes all scopes, and no default scope will be used either.
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
-    pub fn clear_scopes(mut self) -> TemplateListCall<'a, S> {
+    pub fn clear_scopes(mut self) -> TemplateListCall<'a, C> {
         self._scopes.clear();
         self
     }
 }
-
-

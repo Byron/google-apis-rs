@@ -1,4 +1,4 @@
-site_name: Cloud Functions v5.0.5+20240620
+site_name: Cloud Functions v6.0.0+20240620
 site_url: http://byron.github.io/google-apis-rs/google-cloudfunctions1-cli
 site_description: A complete library to interact with Cloud Functions (protocol v1)
 
@@ -29,4 +29,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

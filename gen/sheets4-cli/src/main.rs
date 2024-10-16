@@ -6,57 +6,57 @@
 #[macro_use]
 extern crate clap;
 
-use std::env;
-use std::io::{self, Write};
-use clap::{App, SubCommand, Arg};
+use std::io::Write;
 
-use google_sheets4::{api, Error, oauth2, client::chrono, FieldMask};
+use clap::{App, Arg, SubCommand};
 
+use google_sheets4::{api, yup_oauth2, Error};
 
-use google_clis_common as client;
+use google_apis_common as apis_common;
+use google_clis_common as common;
 
-use client::{InvalidOptionsError, CLIError, arg_from_str, writer_from_opts, parse_kv_arg,
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
-
-use std::default::Default;
-use std::error::Error as StdError;
 use std::str::FromStr;
 
-use serde_json as json;
 use clap::ArgMatches;
-use http::Uri;
-use hyper::client::connect;
-use tokio::io::{AsyncRead, AsyncWrite};
-use tower_service;
+use http_body_util::BodyExt;
+
+use common::{
+    arg_from_str, calltype_from_str, input_file_from_opts, input_mime_from_opts, parse_kv_arg,
+    remove_json_null_values, writer_from_opts, CLIError, CallType, ComplexType, FieldCursor,
+    FieldError, InvalidOptionsError, JsonType, JsonTypeInfo, UploadProtocol,
+};
 
 enum DoitError {
-    IoError(String, io::Error),
+    IoError(String, std::io::Error),
     ApiError(Error),
 }
 
-struct Engine<'n, S> {
+struct Engine<'n, C> {
     opt: ArgMatches<'n>,
-    hub: api::Sheets<S>,
+    hub: api::Sheets<C>,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
 
-
-impl<'n, S> Engine<'n, S>
+impl<'n, C> Engine<'n, C>
 where
-    S: tower_service::Service<Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+    C: apis_common::Connector,
 {
-    async fn _spreadsheets_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_batch_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -70,25 +70,69 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "include-spreadsheet-in-response" => Some(("includeSpreadsheetInResponse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "response-include-grid-data" => Some(("responseIncludeGridData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "response-ranges" => Some(("responseRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["include-spreadsheet-in-response", "response-include-grid-data", "response-ranges"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "include-spreadsheet-in-response" => Some((
+                    "includeSpreadsheetInResponse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "response-include-grid-data" => Some((
+                    "responseIncludeGridData",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "response-ranges" => Some((
+                    "responseRanges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "include-spreadsheet-in-response",
+                            "response-include-grid-data",
+                            "response-ranges",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::BatchUpdateSpreadsheetRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().batch_update(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::BatchUpdateSpreadsheetRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .batch_update(request, opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -96,15 +140,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -114,22 +163,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -137,13 +198,21 @@ where
         }
     }
 
-    async fn _spreadsheets_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_create(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -157,114 +226,749 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "properties.auto-recalc" => Some(("properties.autoRecalc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color.alpha" => Some(("properties.defaultFormat.backgroundColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color.blue" => Some(("properties.defaultFormat.backgroundColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color.green" => Some(("properties.defaultFormat.backgroundColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color.red" => Some(("properties.defaultFormat.backgroundColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color-style.rgb-color.alpha" => Some(("properties.defaultFormat.backgroundColorStyle.rgbColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color-style.rgb-color.blue" => Some(("properties.defaultFormat.backgroundColorStyle.rgbColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color-style.rgb-color.green" => Some(("properties.defaultFormat.backgroundColorStyle.rgbColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color-style.rgb-color.red" => Some(("properties.defaultFormat.backgroundColorStyle.rgbColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.background-color-style.theme-color" => Some(("properties.defaultFormat.backgroundColorStyle.themeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color.alpha" => Some(("properties.defaultFormat.borders.bottom.color.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color.blue" => Some(("properties.defaultFormat.borders.bottom.color.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color.green" => Some(("properties.defaultFormat.borders.bottom.color.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color.red" => Some(("properties.defaultFormat.borders.bottom.color.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color-style.rgb-color.alpha" => Some(("properties.defaultFormat.borders.bottom.colorStyle.rgbColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color-style.rgb-color.blue" => Some(("properties.defaultFormat.borders.bottom.colorStyle.rgbColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color-style.rgb-color.green" => Some(("properties.defaultFormat.borders.bottom.colorStyle.rgbColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color-style.rgb-color.red" => Some(("properties.defaultFormat.borders.bottom.colorStyle.rgbColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.color-style.theme-color" => Some(("properties.defaultFormat.borders.bottom.colorStyle.themeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.style" => Some(("properties.defaultFormat.borders.bottom.style", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.bottom.width" => Some(("properties.defaultFormat.borders.bottom.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color.alpha" => Some(("properties.defaultFormat.borders.left.color.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color.blue" => Some(("properties.defaultFormat.borders.left.color.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color.green" => Some(("properties.defaultFormat.borders.left.color.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color.red" => Some(("properties.defaultFormat.borders.left.color.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color-style.rgb-color.alpha" => Some(("properties.defaultFormat.borders.left.colorStyle.rgbColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color-style.rgb-color.blue" => Some(("properties.defaultFormat.borders.left.colorStyle.rgbColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color-style.rgb-color.green" => Some(("properties.defaultFormat.borders.left.colorStyle.rgbColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color-style.rgb-color.red" => Some(("properties.defaultFormat.borders.left.colorStyle.rgbColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.color-style.theme-color" => Some(("properties.defaultFormat.borders.left.colorStyle.themeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.style" => Some(("properties.defaultFormat.borders.left.style", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.left.width" => Some(("properties.defaultFormat.borders.left.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color.alpha" => Some(("properties.defaultFormat.borders.right.color.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color.blue" => Some(("properties.defaultFormat.borders.right.color.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color.green" => Some(("properties.defaultFormat.borders.right.color.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color.red" => Some(("properties.defaultFormat.borders.right.color.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color-style.rgb-color.alpha" => Some(("properties.defaultFormat.borders.right.colorStyle.rgbColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color-style.rgb-color.blue" => Some(("properties.defaultFormat.borders.right.colorStyle.rgbColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color-style.rgb-color.green" => Some(("properties.defaultFormat.borders.right.colorStyle.rgbColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color-style.rgb-color.red" => Some(("properties.defaultFormat.borders.right.colorStyle.rgbColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.color-style.theme-color" => Some(("properties.defaultFormat.borders.right.colorStyle.themeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.style" => Some(("properties.defaultFormat.borders.right.style", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.right.width" => Some(("properties.defaultFormat.borders.right.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color.alpha" => Some(("properties.defaultFormat.borders.top.color.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color.blue" => Some(("properties.defaultFormat.borders.top.color.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color.green" => Some(("properties.defaultFormat.borders.top.color.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color.red" => Some(("properties.defaultFormat.borders.top.color.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color-style.rgb-color.alpha" => Some(("properties.defaultFormat.borders.top.colorStyle.rgbColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color-style.rgb-color.blue" => Some(("properties.defaultFormat.borders.top.colorStyle.rgbColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color-style.rgb-color.green" => Some(("properties.defaultFormat.borders.top.colorStyle.rgbColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color-style.rgb-color.red" => Some(("properties.defaultFormat.borders.top.colorStyle.rgbColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.color-style.theme-color" => Some(("properties.defaultFormat.borders.top.colorStyle.themeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.style" => Some(("properties.defaultFormat.borders.top.style", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.borders.top.width" => Some(("properties.defaultFormat.borders.top.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.horizontal-alignment" => Some(("properties.defaultFormat.horizontalAlignment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.hyperlink-display-type" => Some(("properties.defaultFormat.hyperlinkDisplayType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.number-format.pattern" => Some(("properties.defaultFormat.numberFormat.pattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.number-format.type" => Some(("properties.defaultFormat.numberFormat.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.padding.bottom" => Some(("properties.defaultFormat.padding.bottom", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.padding.left" => Some(("properties.defaultFormat.padding.left", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.padding.right" => Some(("properties.defaultFormat.padding.right", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.padding.top" => Some(("properties.defaultFormat.padding.top", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-direction" => Some(("properties.defaultFormat.textDirection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.bold" => Some(("properties.defaultFormat.textFormat.bold", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.font-family" => Some(("properties.defaultFormat.textFormat.fontFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.font-size" => Some(("properties.defaultFormat.textFormat.fontSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color.alpha" => Some(("properties.defaultFormat.textFormat.foregroundColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color.blue" => Some(("properties.defaultFormat.textFormat.foregroundColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color.green" => Some(("properties.defaultFormat.textFormat.foregroundColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color.red" => Some(("properties.defaultFormat.textFormat.foregroundColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color-style.rgb-color.alpha" => Some(("properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.alpha", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color-style.rgb-color.blue" => Some(("properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.blue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color-style.rgb-color.green" => Some(("properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.green", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color-style.rgb-color.red" => Some(("properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.red", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.foreground-color-style.theme-color" => Some(("properties.defaultFormat.textFormat.foregroundColorStyle.themeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.italic" => Some(("properties.defaultFormat.textFormat.italic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.link.uri" => Some(("properties.defaultFormat.textFormat.link.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.strikethrough" => Some(("properties.defaultFormat.textFormat.strikethrough", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-format.underline" => Some(("properties.defaultFormat.textFormat.underline", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-rotation.angle" => Some(("properties.defaultFormat.textRotation.angle", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.default-format.text-rotation.vertical" => Some(("properties.defaultFormat.textRotation.vertical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "properties.default-format.vertical-alignment" => Some(("properties.defaultFormat.verticalAlignment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.default-format.wrap-strategy" => Some(("properties.defaultFormat.wrapStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.import-functions-external-url-access-allowed" => Some(("properties.importFunctionsExternalUrlAccessAllowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "properties.iterative-calculation-settings.convergence-threshold" => Some(("properties.iterativeCalculationSettings.convergenceThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "properties.iterative-calculation-settings.max-iterations" => Some(("properties.iterativeCalculationSettings.maxIterations", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "properties.locale" => Some(("properties.locale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.spreadsheet-theme.primary-font-family" => Some(("properties.spreadsheetTheme.primaryFontFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.time-zone" => Some(("properties.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "properties.title" => Some(("properties.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spreadsheet-id" => Some(("spreadsheetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "spreadsheet-url" => Some(("spreadsheetUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alpha", "angle", "auto-recalc", "background-color", "background-color-style", "blue", "bold", "borders", "bottom", "color", "color-style", "convergence-threshold", "default-format", "font-family", "font-size", "foreground-color", "foreground-color-style", "green", "horizontal-alignment", "hyperlink-display-type", "import-functions-external-url-access-allowed", "italic", "iterative-calculation-settings", "left", "link", "locale", "max-iterations", "number-format", "padding", "pattern", "primary-font-family", "properties", "red", "rgb-color", "right", "spreadsheet-id", "spreadsheet-theme", "spreadsheet-url", "strikethrough", "style", "text-direction", "text-format", "text-rotation", "theme-color", "time-zone", "title", "top", "type", "underline", "uri", "vertical", "vertical-alignment", "width", "wrap-strategy"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "properties.auto-recalc" => Some((
+                    "properties.autoRecalc",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color.alpha" => Some((
+                    "properties.defaultFormat.backgroundColor.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color.blue" => Some((
+                    "properties.defaultFormat.backgroundColor.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color.green" => Some((
+                    "properties.defaultFormat.backgroundColor.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color.red" => Some((
+                    "properties.defaultFormat.backgroundColor.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color-style.rgb-color.alpha" => Some((
+                    "properties.defaultFormat.backgroundColorStyle.rgbColor.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color-style.rgb-color.blue" => Some((
+                    "properties.defaultFormat.backgroundColorStyle.rgbColor.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color-style.rgb-color.green" => Some((
+                    "properties.defaultFormat.backgroundColorStyle.rgbColor.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color-style.rgb-color.red" => Some((
+                    "properties.defaultFormat.backgroundColorStyle.rgbColor.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.background-color-style.theme-color" => Some((
+                    "properties.defaultFormat.backgroundColorStyle.themeColor",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color.alpha" => Some((
+                    "properties.defaultFormat.borders.bottom.color.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color.blue" => Some((
+                    "properties.defaultFormat.borders.bottom.color.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color.green" => Some((
+                    "properties.defaultFormat.borders.bottom.color.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color.red" => Some((
+                    "properties.defaultFormat.borders.bottom.color.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color-style.rgb-color.alpha" => Some((
+                    "properties.defaultFormat.borders.bottom.colorStyle.rgbColor.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color-style.rgb-color.blue" => Some((
+                    "properties.defaultFormat.borders.bottom.colorStyle.rgbColor.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color-style.rgb-color.green" => Some((
+                    "properties.defaultFormat.borders.bottom.colorStyle.rgbColor.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color-style.rgb-color.red" => Some((
+                    "properties.defaultFormat.borders.bottom.colorStyle.rgbColor.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.color-style.theme-color" => Some((
+                    "properties.defaultFormat.borders.bottom.colorStyle.themeColor",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.style" => Some((
+                    "properties.defaultFormat.borders.bottom.style",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.bottom.width" => Some((
+                    "properties.defaultFormat.borders.bottom.width",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color.alpha" => Some((
+                    "properties.defaultFormat.borders.left.color.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color.blue" => Some((
+                    "properties.defaultFormat.borders.left.color.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color.green" => Some((
+                    "properties.defaultFormat.borders.left.color.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color.red" => Some((
+                    "properties.defaultFormat.borders.left.color.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color-style.rgb-color.alpha" => Some((
+                    "properties.defaultFormat.borders.left.colorStyle.rgbColor.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color-style.rgb-color.blue" => Some((
+                    "properties.defaultFormat.borders.left.colorStyle.rgbColor.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color-style.rgb-color.green" => Some((
+                    "properties.defaultFormat.borders.left.colorStyle.rgbColor.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color-style.rgb-color.red" => Some((
+                    "properties.defaultFormat.borders.left.colorStyle.rgbColor.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.color-style.theme-color" => Some((
+                    "properties.defaultFormat.borders.left.colorStyle.themeColor",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.style" => Some((
+                    "properties.defaultFormat.borders.left.style",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.left.width" => Some((
+                    "properties.defaultFormat.borders.left.width",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color.alpha" => Some((
+                    "properties.defaultFormat.borders.right.color.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color.blue" => Some((
+                    "properties.defaultFormat.borders.right.color.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color.green" => Some((
+                    "properties.defaultFormat.borders.right.color.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color.red" => Some((
+                    "properties.defaultFormat.borders.right.color.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color-style.rgb-color.alpha" => Some((
+                    "properties.defaultFormat.borders.right.colorStyle.rgbColor.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color-style.rgb-color.blue" => Some((
+                    "properties.defaultFormat.borders.right.colorStyle.rgbColor.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color-style.rgb-color.green" => Some((
+                    "properties.defaultFormat.borders.right.colorStyle.rgbColor.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color-style.rgb-color.red" => Some((
+                    "properties.defaultFormat.borders.right.colorStyle.rgbColor.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.color-style.theme-color" => Some((
+                    "properties.defaultFormat.borders.right.colorStyle.themeColor",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.style" => Some((
+                    "properties.defaultFormat.borders.right.style",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.right.width" => Some((
+                    "properties.defaultFormat.borders.right.width",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color.alpha" => Some((
+                    "properties.defaultFormat.borders.top.color.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color.blue" => Some((
+                    "properties.defaultFormat.borders.top.color.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color.green" => Some((
+                    "properties.defaultFormat.borders.top.color.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color.red" => Some((
+                    "properties.defaultFormat.borders.top.color.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color-style.rgb-color.alpha" => Some((
+                    "properties.defaultFormat.borders.top.colorStyle.rgbColor.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color-style.rgb-color.blue" => Some((
+                    "properties.defaultFormat.borders.top.colorStyle.rgbColor.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color-style.rgb-color.green" => Some((
+                    "properties.defaultFormat.borders.top.colorStyle.rgbColor.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color-style.rgb-color.red" => Some((
+                    "properties.defaultFormat.borders.top.colorStyle.rgbColor.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.color-style.theme-color" => Some((
+                    "properties.defaultFormat.borders.top.colorStyle.themeColor",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.style" => Some((
+                    "properties.defaultFormat.borders.top.style",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.borders.top.width" => Some((
+                    "properties.defaultFormat.borders.top.width",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.horizontal-alignment" => Some((
+                    "properties.defaultFormat.horizontalAlignment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.hyperlink-display-type" => Some((
+                    "properties.defaultFormat.hyperlinkDisplayType",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.number-format.pattern" => Some((
+                    "properties.defaultFormat.numberFormat.pattern",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.number-format.type" => Some((
+                    "properties.defaultFormat.numberFormat.type",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.padding.bottom" => Some((
+                    "properties.defaultFormat.padding.bottom",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.padding.left" => Some((
+                    "properties.defaultFormat.padding.left",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.padding.right" => Some((
+                    "properties.defaultFormat.padding.right",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.padding.top" => Some((
+                    "properties.defaultFormat.padding.top",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-direction" => Some((
+                    "properties.defaultFormat.textDirection",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.bold" => Some((
+                    "properties.defaultFormat.textFormat.bold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.font-family" => Some((
+                    "properties.defaultFormat.textFormat.fontFamily",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.font-size" => Some((
+                    "properties.defaultFormat.textFormat.fontSize",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.foreground-color.alpha" => Some((
+                    "properties.defaultFormat.textFormat.foregroundColor.alpha",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.foreground-color.blue" => Some((
+                    "properties.defaultFormat.textFormat.foregroundColor.blue",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.foreground-color.green" => Some((
+                    "properties.defaultFormat.textFormat.foregroundColor.green",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.foreground-color.red" => Some((
+                    "properties.defaultFormat.textFormat.foregroundColor.red",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.foreground-color-style.rgb-color.alpha" => {
+                    Some((
+                        "properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.alpha",
+                        JsonTypeInfo {
+                            jtype: JsonType::Float,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "properties.default-format.text-format.foreground-color-style.rgb-color.blue" => {
+                    Some((
+                        "properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.blue",
+                        JsonTypeInfo {
+                            jtype: JsonType::Float,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "properties.default-format.text-format.foreground-color-style.rgb-color.green" => {
+                    Some((
+                        "properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.green",
+                        JsonTypeInfo {
+                            jtype: JsonType::Float,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "properties.default-format.text-format.foreground-color-style.rgb-color.red" => {
+                    Some((
+                        "properties.defaultFormat.textFormat.foregroundColorStyle.rgbColor.red",
+                        JsonTypeInfo {
+                            jtype: JsonType::Float,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "properties.default-format.text-format.foreground-color-style.theme-color" => {
+                    Some((
+                        "properties.defaultFormat.textFormat.foregroundColorStyle.themeColor",
+                        JsonTypeInfo {
+                            jtype: JsonType::String,
+                            ctype: ComplexType::Pod,
+                        },
+                    ))
+                }
+                "properties.default-format.text-format.italic" => Some((
+                    "properties.defaultFormat.textFormat.italic",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.link.uri" => Some((
+                    "properties.defaultFormat.textFormat.link.uri",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.strikethrough" => Some((
+                    "properties.defaultFormat.textFormat.strikethrough",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-format.underline" => Some((
+                    "properties.defaultFormat.textFormat.underline",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-rotation.angle" => Some((
+                    "properties.defaultFormat.textRotation.angle",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.text-rotation.vertical" => Some((
+                    "properties.defaultFormat.textRotation.vertical",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.vertical-alignment" => Some((
+                    "properties.defaultFormat.verticalAlignment",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.default-format.wrap-strategy" => Some((
+                    "properties.defaultFormat.wrapStrategy",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.import-functions-external-url-access-allowed" => Some((
+                    "properties.importFunctionsExternalUrlAccessAllowed",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.iterative-calculation-settings.convergence-threshold" => Some((
+                    "properties.iterativeCalculationSettings.convergenceThreshold",
+                    JsonTypeInfo {
+                        jtype: JsonType::Float,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.iterative-calculation-settings.max-iterations" => Some((
+                    "properties.iterativeCalculationSettings.maxIterations",
+                    JsonTypeInfo {
+                        jtype: JsonType::Int,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.locale" => Some((
+                    "properties.locale",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.spreadsheet-theme.primary-font-family" => Some((
+                    "properties.spreadsheetTheme.primaryFontFamily",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.time-zone" => Some((
+                    "properties.timeZone",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "properties.title" => Some((
+                    "properties.title",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spreadsheet-id" => Some((
+                    "spreadsheetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "spreadsheet-url" => Some((
+                    "spreadsheetUrl",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "alpha",
+                            "angle",
+                            "auto-recalc",
+                            "background-color",
+                            "background-color-style",
+                            "blue",
+                            "bold",
+                            "borders",
+                            "bottom",
+                            "color",
+                            "color-style",
+                            "convergence-threshold",
+                            "default-format",
+                            "font-family",
+                            "font-size",
+                            "foreground-color",
+                            "foreground-color-style",
+                            "green",
+                            "horizontal-alignment",
+                            "hyperlink-display-type",
+                            "import-functions-external-url-access-allowed",
+                            "italic",
+                            "iterative-calculation-settings",
+                            "left",
+                            "link",
+                            "locale",
+                            "max-iterations",
+                            "number-format",
+                            "padding",
+                            "pattern",
+                            "primary-font-family",
+                            "properties",
+                            "red",
+                            "rgb-color",
+                            "right",
+                            "spreadsheet-id",
+                            "spreadsheet-theme",
+                            "spreadsheet-url",
+                            "strikethrough",
+                            "style",
+                            "text-direction",
+                            "text-format",
+                            "text-rotation",
+                            "theme-color",
+                            "time-zone",
+                            "title",
+                            "top",
+                            "type",
+                            "underline",
+                            "uri",
+                            "vertical",
+                            "vertical-alignment",
+                            "width",
+                            "wrap-strategy",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::Spreadsheet = json::value::from_value(object).unwrap();
+        let mut request: api::Spreadsheet = serde_json::value::from_value(object).unwrap();
         let mut call = self.hub.spreadsheets().create(request);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -272,15 +976,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -290,22 +999,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -313,11 +1034,28 @@ where
         }
     }
 
-    async fn _spreadsheets_developer_metadata_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let metadata_id: i32 = arg_from_str(&opt.value_of("metadata-id").unwrap_or(""), err, "<metadata-id>", "integer");
-        let mut call = self.hub.spreadsheets().developer_metadata_get(opt.value_of("spreadsheet-id").unwrap_or(""), metadata_id);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _spreadsheets_developer_metadata_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let metadata_id: i32 = arg_from_str(
+            &opt.value_of("metadata-id").unwrap_or(""),
+            err,
+            "<metadata-id>",
+            "integer",
+        );
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .developer_metadata_get(opt.value_of("spreadsheet-id").unwrap_or(""), metadata_id);
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -325,15 +1063,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -343,22 +1086,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -366,13 +1121,21 @@ where
         }
     }
 
-    async fn _spreadsheets_developer_metadata_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_developer_metadata_search(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -386,22 +1149,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::SearchDeveloperMetadataRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().developer_metadata_search(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::SearchDeveloperMetadataRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .developer_metadata_search(request, opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -409,15 +1191,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -427,22 +1214,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -450,33 +1249,54 @@ where
         }
     }
 
-    async fn _spreadsheets_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.spreadsheets().get(opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _spreadsheets_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .get(opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "ranges" => {
                     call = call.add_ranges(value.unwrap_or(""));
-                },
+                }
                 "include-grid-data" => {
-                    call = call.include_grid_data(        value.map(|v| arg_from_str(v, err, "include-grid-data", "boolean")).unwrap_or(false));
-                },
+                    call = call.include_grid_data(
+                        value
+                            .map(|v| arg_from_str(v, err, "include-grid-data", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-grid-data", "ranges"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(["include-grid-data", "ranges"].iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -486,22 +1306,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -509,13 +1341,21 @@ where
         }
     }
 
-    async fn _spreadsheets_get_by_data_filter(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_get_by_data_filter(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -529,23 +1369,48 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "include-grid-data" => Some(("includeGridData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["include-grid-data"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "include-grid-data" => Some((
+                    "includeGridData",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["include-grid-data"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::GetSpreadsheetByDataFilterRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().get_by_data_filter(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::GetSpreadsheetByDataFilterRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .get_by_data_filter(request, opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -553,15 +1418,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -571,22 +1441,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -594,13 +1476,21 @@ where
         }
     }
 
-    async fn _spreadsheets_sheets_copy_to(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_sheets_copy_to(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -614,24 +1504,56 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "destination-spreadsheet-id" => Some(("destinationSpreadsheetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["destination-spreadsheet-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "destination-spreadsheet-id" => Some((
+                    "destinationSpreadsheetId",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["destination-spreadsheet-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::CopySheetToAnotherSpreadsheetRequest = json::value::from_value(object).unwrap();
-        let sheet_id: i32 = arg_from_str(&opt.value_of("sheet-id").unwrap_or(""), err, "<sheet-id>", "integer");
-        let mut call = self.hub.spreadsheets().sheets_copy_to(request, opt.value_of("spreadsheet-id").unwrap_or(""), sheet_id);
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::CopySheetToAnotherSpreadsheetRequest =
+            serde_json::value::from_value(object).unwrap();
+        let sheet_id: i32 = arg_from_str(
+            &opt.value_of("sheet-id").unwrap_or(""),
+            err,
+            "<sheet-id>",
+            "integer",
+        );
+        let mut call = self.hub.spreadsheets().sheets_copy_to(
+            request,
+            opt.value_of("spreadsheet-id").unwrap_or(""),
+            sheet_id,
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -639,15 +1561,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -657,22 +1584,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -680,13 +1619,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_append(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_append(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -700,56 +1647,107 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "major-dimension" => Some(("majorDimension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "range" => Some(("range", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["major-dimension", "range"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "major-dimension" => Some((
+                    "majorDimension",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "range" => Some((
+                    "range",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["major-dimension", "range"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::ValueRange = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_append(request, opt.value_of("spreadsheet-id").unwrap_or(""), opt.value_of("range").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::ValueRange = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.spreadsheets().values_append(
+            request,
+            opt.value_of("spreadsheet-id").unwrap_or(""),
+            opt.value_of("range").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "value-input-option" => {
                     call = call.value_input_option(value.unwrap_or(""));
-                },
+                }
                 "response-value-render-option" => {
                     call = call.response_value_render_option(value.unwrap_or(""));
-                },
+                }
                 "response-date-time-render-option" => {
                     call = call.response_date_time_render_option(value.unwrap_or(""));
-                },
+                }
                 "insert-data-option" => {
                     call = call.insert_data_option(value.unwrap_or(""));
-                },
+                }
                 "include-values-in-response" => {
-                    call = call.include_values_in_response(        value.map(|v| arg_from_str(v, err, "include-values-in-response", "boolean")).unwrap_or(false));
-                },
+                    call = call.include_values_in_response(
+                        value
+                            .map(|v| arg_from_str(v, err, "include-values-in-response", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-values-in-response", "insert-data-option", "response-date-time-render-option", "response-value-render-option", "value-input-option"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "include-values-in-response",
+                                        "insert-data-option",
+                                        "response-date-time-render-option",
+                                        "response-value-render-option",
+                                        "value-input-option",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -759,22 +1757,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -782,13 +1792,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_batch_clear(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_batch_clear(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -802,23 +1820,48 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "ranges" => Some(("ranges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ranges"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "ranges" => Some((
+                    "ranges",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Vec,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["ranges"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::BatchClearValuesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_batch_clear(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::BatchClearValuesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .values_batch_clear(request, opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -826,15 +1869,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -844,22 +1892,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -867,13 +1927,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_batch_clear_by_data_filter(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_batch_clear_by_data_filter(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -887,22 +1955,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::BatchClearValuesByDataFilterRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_batch_clear_by_data_filter(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::BatchClearValuesByDataFilterRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.spreadsheets().values_batch_clear_by_data_filter(
+            request,
+            opt.value_of("spreadsheet-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -910,15 +1997,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -928,22 +2020,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -951,39 +2055,65 @@ where
         }
     }
 
-    async fn _spreadsheets_values_batch_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.spreadsheets().values_batch_get(opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _spreadsheets_values_batch_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .values_batch_get(opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "value-render-option" => {
                     call = call.value_render_option(value.unwrap_or(""));
-                },
+                }
                 "ranges" => {
                     call = call.add_ranges(value.unwrap_or(""));
-                },
+                }
                 "major-dimension" => {
                     call = call.major_dimension(value.unwrap_or(""));
-                },
+                }
                 "date-time-render-option" => {
                     call = call.date_time_render_option(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["date-time-render-option", "major-dimension", "ranges", "value-render-option"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "date-time-render-option",
+                                        "major-dimension",
+                                        "ranges",
+                                        "value-render-option",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -993,22 +2123,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1016,13 +2158,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_batch_get_by_data_filter(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_batch_get_by_data_filter(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1036,25 +2186,69 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "date-time-render-option" => Some(("dateTimeRenderOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "major-dimension" => Some(("majorDimension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "value-render-option" => Some(("valueRenderOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["date-time-render-option", "major-dimension", "value-render-option"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "date-time-render-option" => Some((
+                    "dateTimeRenderOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "major-dimension" => Some((
+                    "majorDimension",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "value-render-option" => Some((
+                    "valueRenderOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "date-time-render-option",
+                            "major-dimension",
+                            "value-render-option",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::BatchGetValuesByDataFilterRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_batch_get_by_data_filter(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::BatchGetValuesByDataFilterRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .values_batch_get_by_data_filter(request, opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1062,15 +2256,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1080,22 +2279,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1103,13 +2314,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_batch_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1123,26 +2342,77 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "include-values-in-response" => Some(("includeValuesInResponse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "response-date-time-render-option" => Some(("responseDateTimeRenderOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "response-value-render-option" => Some(("responseValueRenderOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "value-input-option" => Some(("valueInputOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["include-values-in-response", "response-date-time-render-option", "response-value-render-option", "value-input-option"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "include-values-in-response" => Some((
+                    "includeValuesInResponse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "response-date-time-render-option" => Some((
+                    "responseDateTimeRenderOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "response-value-render-option" => Some((
+                    "responseValueRenderOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "value-input-option" => Some((
+                    "valueInputOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "include-values-in-response",
+                            "response-date-time-render-option",
+                            "response-value-render-option",
+                            "value-input-option",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::BatchUpdateValuesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_batch_update(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::BatchUpdateValuesRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self
+            .hub
+            .spreadsheets()
+            .values_batch_update(request, opt.value_of("spreadsheet-id").unwrap_or(""));
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1150,15 +2420,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1168,22 +2443,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1191,13 +2478,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_batch_update_by_data_filter(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_batch_update_by_data_filter(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1211,26 +2506,77 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "include-values-in-response" => Some(("includeValuesInResponse", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "response-date-time-render-option" => Some(("responseDateTimeRenderOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "response-value-render-option" => Some(("responseValueRenderOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "value-input-option" => Some(("valueInputOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["include-values-in-response", "response-date-time-render-option", "response-value-render-option", "value-input-option"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "include-values-in-response" => Some((
+                    "includeValuesInResponse",
+                    JsonTypeInfo {
+                        jtype: JsonType::Boolean,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "response-date-time-render-option" => Some((
+                    "responseDateTimeRenderOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "response-value-render-option" => Some((
+                    "responseValueRenderOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "value-input-option" => Some((
+                    "valueInputOption",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(
+                        key,
+                        &vec![
+                            "include-values-in-response",
+                            "response-date-time-render-option",
+                            "response-value-render-option",
+                            "value-input-option",
+                        ],
+                    );
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::BatchUpdateValuesByDataFilterRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_batch_update_by_data_filter(request, opt.value_of("spreadsheet-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::BatchUpdateValuesByDataFilterRequest =
+            serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.spreadsheets().values_batch_update_by_data_filter(
+            request,
+            opt.value_of("spreadsheet-id").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1238,15 +2584,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1256,22 +2607,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1279,13 +2642,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_clear(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_clear(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1299,22 +2670,41 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::ClearValuesRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_clear(request, opt.value_of("spreadsheet-id").unwrap_or(""), opt.value_of("range").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::ClearValuesRequest = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.spreadsheets().values_clear(
+            request,
+            opt.value_of("spreadsheet-id").unwrap_or(""),
+            opt.value_of("range").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 _ => {
@@ -1322,15 +2712,20 @@ where
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v
+                            }));
                     }
                 }
             }
@@ -1340,22 +2735,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1363,36 +2770,61 @@ where
         }
     }
 
-    async fn _spreadsheets_values_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.spreadsheets().values_get(opt.value_of("spreadsheet-id").unwrap_or(""), opt.value_of("range").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+    async fn _spreadsheets_values_get(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
+        let mut call = self.hub.spreadsheets().values_get(
+            opt.value_of("spreadsheet-id").unwrap_or(""),
+            opt.value_of("range").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "value-render-option" => {
                     call = call.value_render_option(value.unwrap_or(""));
-                },
+                }
                 "major-dimension" => {
                     call = call.major_dimension(value.unwrap_or(""));
-                },
+                }
                 "date-time-render-option" => {
                     call = call.date_time_render_option(value.unwrap_or(""));
-                },
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["date-time-render-option", "major-dimension", "value-render-option"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "date-time-render-option",
+                                        "major-dimension",
+                                        "value-render-option",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -1402,22 +2834,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1425,13 +2869,21 @@ where
         }
     }
 
-    async fn _spreadsheets_values_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
+    async fn _spreadsheets_values_update(
+        &self,
+        opt: &ArgMatches<'n>,
+        dry_run: bool,
+        err: &mut InvalidOptionsError,
+    ) -> Result<(), DoitError> {
         let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut object = serde_json::value::Value::Object(Default::default());
+
+        for kvarg in opt
+            .values_of("kv")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1445,53 +2897,103 @@ where
                 }
                 continue;
             }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "major-dimension" => Some(("majorDimension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "range" => Some(("range", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["major-dimension", "range"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
+
+            let type_info: Option<(&'static str, JsonTypeInfo)> = match &temp_cursor.to_string()[..]
+            {
+                "major-dimension" => Some((
+                    "majorDimension",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                "range" => Some((
+                    "range",
+                    JsonTypeInfo {
+                        jtype: JsonType::String,
+                        ctype: ComplexType::Pod,
+                    },
+                )),
+                _ => {
+                    let suggestion =
+                        FieldCursor::did_you_mean(key, &vec!["major-dimension", "range"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(
+                        temp_cursor.to_string(),
+                        suggestion,
+                        value.map(|v| v.to_string()),
+                    )));
+                    None
+                }
+            };
             if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+                FieldCursor::from(field_cursor_str).set_json_value(
+                    &mut object,
+                    value.unwrap(),
+                    type_info,
+                    err,
+                    &temp_cursor,
+                );
             }
         }
-        let mut request: api::ValueRange = json::value::from_value(object).unwrap();
-        let mut call = self.hub.spreadsheets().values_update(request, opt.value_of("spreadsheet-id").unwrap_or(""), opt.value_of("range").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+        let mut request: api::ValueRange = serde_json::value::from_value(object).unwrap();
+        let mut call = self.hub.spreadsheets().values_update(
+            request,
+            opt.value_of("spreadsheet-id").unwrap_or(""),
+            opt.value_of("range").unwrap_or(""),
+        );
+        for parg in opt
+            .values_of("v")
+            .map(|i| i.collect())
+            .unwrap_or(Vec::new())
+            .iter()
+        {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "value-input-option" => {
                     call = call.value_input_option(value.unwrap_or(""));
-                },
+                }
                 "response-value-render-option" => {
                     call = call.response_value_render_option(value.unwrap_or(""));
-                },
+                }
                 "response-date-time-render-option" => {
                     call = call.response_date_time_render_option(value.unwrap_or(""));
-                },
+                }
                 "include-values-in-response" => {
-                    call = call.include_values_in_response(        value.map(|v| arg_from_str(v, err, "include-values-in-response", "boolean")).unwrap_or(false));
-                },
+                    call = call.include_values_in_response(
+                        value
+                            .map(|v| arg_from_str(v, err, "include-values-in-response", "boolean"))
+                            .unwrap_or(false),
+                    );
+                }
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
                             found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            call = call.param(
+                                self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1,
+                                value.unwrap_or("unset"),
+                            );
                             break;
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["include-values-in-response", "response-date-time-render-option", "response-value-render-option", "value-input-option"].iter().map(|v|*v));
-                                                                           v } ));
+                        err.issues
+                            .push(CLIError::UnknownParameter(key.to_string(), {
+                                let mut v = Vec::new();
+                                v.extend(self.gp.iter().map(|v| *v));
+                                v.extend(
+                                    [
+                                        "include-values-in-response",
+                                        "response-date-time-render-option",
+                                        "response-value-render-option",
+                                        "value-input-option",
+                                    ]
+                                    .iter()
+                                    .map(|v| *v),
+                                );
+                                v
+                            }));
                     }
                 }
             }
@@ -1501,22 +3003,34 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            for scope in self
+                .opt
+                .values_of("url")
+                .map(|i| i.collect())
+                .unwrap_or(Vec::new())
+                .iter()
+            {
                 call = call.add_scope(scope);
             }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+                Err(io_err) => {
+                    return Err(DoitError::IoError(
+                        opt.value_of("out").unwrap_or("-").to_string(),
+                        io_err,
+                    ))
+                }
             };
             match match protocol {
                 CallType::Standard => call.doit().await,
-                _ => unreachable!()
+                _ => unreachable!(),
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    let mut value =
+                        serde_json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    serde_json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -1524,78 +3038,108 @@ where
         }
     }
 
-    async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+    async fn _doit(
+        &self,
+        dry_run: bool,
+    ) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("spreadsheets", Some(opt)) => {
-                match opt.subcommand() {
-                    ("batch-update", Some(opt)) => {
-                        call_result = self._spreadsheets_batch_update(opt, dry_run, &mut err).await;
-                    },
-                    ("create", Some(opt)) => {
-                        call_result = self._spreadsheets_create(opt, dry_run, &mut err).await;
-                    },
-                    ("developer-metadata-get", Some(opt)) => {
-                        call_result = self._spreadsheets_developer_metadata_get(opt, dry_run, &mut err).await;
-                    },
-                    ("developer-metadata-search", Some(opt)) => {
-                        call_result = self._spreadsheets_developer_metadata_search(opt, dry_run, &mut err).await;
-                    },
-                    ("get", Some(opt)) => {
-                        call_result = self._spreadsheets_get(opt, dry_run, &mut err).await;
-                    },
-                    ("get-by-data-filter", Some(opt)) => {
-                        call_result = self._spreadsheets_get_by_data_filter(opt, dry_run, &mut err).await;
-                    },
-                    ("sheets-copy-to", Some(opt)) => {
-                        call_result = self._spreadsheets_sheets_copy_to(opt, dry_run, &mut err).await;
-                    },
-                    ("values-append", Some(opt)) => {
-                        call_result = self._spreadsheets_values_append(opt, dry_run, &mut err).await;
-                    },
-                    ("values-batch-clear", Some(opt)) => {
-                        call_result = self._spreadsheets_values_batch_clear(opt, dry_run, &mut err).await;
-                    },
-                    ("values-batch-clear-by-data-filter", Some(opt)) => {
-                        call_result = self._spreadsheets_values_batch_clear_by_data_filter(opt, dry_run, &mut err).await;
-                    },
-                    ("values-batch-get", Some(opt)) => {
-                        call_result = self._spreadsheets_values_batch_get(opt, dry_run, &mut err).await;
-                    },
-                    ("values-batch-get-by-data-filter", Some(opt)) => {
-                        call_result = self._spreadsheets_values_batch_get_by_data_filter(opt, dry_run, &mut err).await;
-                    },
-                    ("values-batch-update", Some(opt)) => {
-                        call_result = self._spreadsheets_values_batch_update(opt, dry_run, &mut err).await;
-                    },
-                    ("values-batch-update-by-data-filter", Some(opt)) => {
-                        call_result = self._spreadsheets_values_batch_update_by_data_filter(opt, dry_run, &mut err).await;
-                    },
-                    ("values-clear", Some(opt)) => {
-                        call_result = self._spreadsheets_values_clear(opt, dry_run, &mut err).await;
-                    },
-                    ("values-get", Some(opt)) => {
-                        call_result = self._spreadsheets_values_get(opt, dry_run, &mut err).await;
-                    },
-                    ("values-update", Some(opt)) => {
-                        call_result = self._spreadsheets_values_update(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("spreadsheets".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
+            ("spreadsheets", Some(opt)) => match opt.subcommand() {
+                ("batch-update", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_batch_update(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("create", Some(opt)) => {
+                    call_result = self._spreadsheets_create(opt, dry_run, &mut err).await;
+                }
+                ("developer-metadata-get", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_developer_metadata_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("developer-metadata-search", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_developer_metadata_search(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("get", Some(opt)) => {
+                    call_result = self._spreadsheets_get(opt, dry_run, &mut err).await;
+                }
+                ("get-by-data-filter", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_get_by_data_filter(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("sheets-copy-to", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_sheets_copy_to(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-append", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_append(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-batch-clear", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_batch_clear(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-batch-clear-by-data-filter", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_batch_clear_by_data_filter(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-batch-get", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_batch_get(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-batch-get-by-data-filter", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_batch_get_by_data_filter(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-batch-update", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_batch_update(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-batch-update-by-data-filter", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_batch_update_by_data_filter(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-clear", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_clear(opt, dry_run, &mut err)
+                        .await;
+                }
+                ("values-get", Some(opt)) => {
+                    call_result = self._spreadsheets_values_get(opt, dry_run, &mut err).await;
+                }
+                ("values-update", Some(opt)) => {
+                    call_result = self
+                        ._spreadsheets_values_update(opt, dry_run, &mut err)
+                        .await;
+                }
+                _ => {
+                    err.issues
+                        .push(CLIError::MissingMethodError("spreadsheets".to_string()));
+                    writeln!(std::io::stderr(), "{}\n", opt.usage()).ok();
                 }
             },
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
-                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
+                writeln!(std::io::stderr(), "{}\n", self.opt.usage()).ok();
             }
         }
 
         if dry_run {
-            if err.issues.len() > 0 {
+            if !err.issues.is_empty() {
                 err_opt = Some(err);
             }
             Err(err_opt)
@@ -1605,47 +3149,67 @@ where
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    async fn new(opt: ArgMatches<'n>, connector: S) -> Result<Engine<'n, S>, InvalidOptionsError> {
+    async fn new(opt: ArgMatches<'n>, connector: C) -> Result<Engine<'n, C>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match client::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
+            let config_dir = match common::assure_config_dir_exists(
+                opt.value_of("folder").unwrap_or("~/.google-service-cli"),
+            ) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match client::application_secret_from_directory(&config_dir, "sheets4-secret.json",
+            match common::application_secret_from_directory(&config_dir, "sheets4-secret.json",
                                                          "{\"installed\":{\"auth_uri\":\"https://accounts.google.com/o/oauth2/auth\",\"client_secret\":\"hCsslbCUyfehWMmbkG8vTYxG\",\"token_uri\":\"https://accounts.google.com/o/oauth2/token\",\"client_email\":\"\",\"redirect_uris\":[\"urn:ietf:wg:oauth:2.0:oob\",\"oob\"],\"client_x509_cert_url\":\"\",\"client_id\":\"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com\",\"auth_provider_x509_cert_url\":\"https://www.googleapis.com/oauth2/v1/certs\"}}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
             }
         };
 
-        let client = hyper::Client::builder().build(connector);
+        let executor = hyper_util::rt::TokioExecutor::new();
+        let client =
+            hyper_util::client::legacy::Client::builder(executor.clone()).build(connector.clone());
 
-        let auth = oauth2::InstalledFlowAuthenticator::with_client(
+        let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
-            oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            client.clone(),
-        ).persist_tokens_to_disk(format!("{}/sheets4", config_dir)).build().await.unwrap();
+            yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+            hyper_util::client::legacy::Client::builder(executor).build(connector),
+        )
+        .persist_tokens_to_disk(format!("{}/sheets4", config_dir))
+        .build()
+        .await
+        .unwrap();
 
         let engine = Engine {
-            opt: opt,
+            opt,
             hub: api::Sheets::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec![
+                "$-xgafv",
+                "access-token",
+                "alt",
+                "callback",
+                "fields",
+                "key",
+                "oauth-token",
+                "pretty-print",
+                "quota-user",
+                "upload-type",
+                "upload-protocol",
+            ],
             gpm: vec![
-                    ("$-xgafv", "$.xgafv"),
-                    ("access-token", "access_token"),
-                    ("oauth-token", "oauth_token"),
-                    ("pretty-print", "prettyPrint"),
-                    ("quota-user", "quotaUser"),
-                    ("upload-type", "uploadType"),
-                    ("upload-protocol", "upload_protocol"),
-                ]
+                ("$-xgafv", "$.xgafv"),
+                ("access-token", "access_token"),
+                ("oauth-token", "oauth_token"),
+                ("pretty-print", "prettyPrint"),
+                ("quota-user", "quotaUser"),
+                ("upload-type", "uploadType"),
+                ("upload-protocol", "upload_protocol"),
+            ],
         };
 
         match engine._doit(true).await {
             Err(Some(err)) => Err(err),
-            Err(None)      => Ok(engine),
-            Ok(_)          => unreachable!(),
+            Err(None) => Ok(engine),
+            Ok(_) => unreachable!(),
         }
     }
 
@@ -1671,19 +3235,16 @@ async fn main() {
                      Some(r##"The spreadsheet to apply the updates to."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1699,13 +3260,11 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1721,19 +3280,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to retrieve metadata from."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"metadata-id"##),
                      None,
                      Some(r##"The ID of the developer metadata to retrieve."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1749,19 +3305,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to retrieve metadata from."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1777,13 +3330,11 @@ async fn main() {
                      Some(r##"The spreadsheet to request."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1799,19 +3350,16 @@ async fn main() {
                      Some(r##"The spreadsheet to request."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1827,25 +3375,21 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet containing the sheet to copy."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"sheet-id"##),
                      None,
                      Some(r##"The ID of the sheet to copy."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1861,25 +3405,21 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"range"##),
                      None,
                      Some(r##"The [A1 notation](/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1895,19 +3435,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1923,19 +3460,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1951,13 +3485,11 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to retrieve data from."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -1973,19 +3505,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to retrieve data from."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2001,19 +3530,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2029,19 +3555,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2057,25 +3580,21 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"range"##),
                      None,
                      Some(r##"The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the values to clear."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2091,19 +3610,16 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to retrieve data from."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"range"##),
                      None,
                      Some(r##"The [A1 notation or R1C1 notation](/sheets/api/guides/concepts#cell) of the range to retrieve values from."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2119,25 +3635,21 @@ async fn main() {
                      Some(r##"The ID of the spreadsheet to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"range"##),
                      None,
                      Some(r##"The [A1 notation](/sheets/api/guides/concepts#cell) of the values to update."##),
                      Some(true),
                      Some(false)),
-        
                     (Some(r##"kv"##),
                      Some(r##"r"##),
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
-        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
-        
                     (Some(r##"out"##),
                      Some(r##"o"##),
                      Some(r##"Specify the file into which to write the program's output"##),
@@ -2145,12 +3657,11 @@ async fn main() {
                      Some(false)),
                   ]),
             ]),
-        
-    ];
-    
+        ];
+
     let mut app = App::new("sheets4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.5+20240621")
+           .version("6.0.0+20240621")
            .about("Reads and writes Google Sheets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sheets4_cli")
            .arg(Arg::with_name("url")
@@ -2168,52 +3679,51 @@ async fn main() {
                    .help("Debug print all errors")
                    .multiple(false)
                    .takes_value(false));
-           
-           for &(main_command_name, about, ref subcommands) in arg_data.iter() {
-               let mut mcmd = SubCommand::with_name(main_command_name).about(about);
-           
-               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
-                   let mut scmd = SubCommand::with_name(sub_command_name);
-                   if let &Some(desc) = desc {
-                       scmd = scmd.about(desc);
-                   }
-                   scmd = scmd.after_help(url_info);
-           
-                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-                       let arg_name_str =
-                           match (arg_name, flag) {
-                                   (&Some(an), _       ) => an,
-                                   (_        , &Some(f)) => f,
-                                    _                    => unreachable!(),
-                            };
-                       let mut arg = Arg::with_name(arg_name_str)
-                                         .empty_values(false);
-                       if let &Some(short_flag) = flag {
-                           arg = arg.short(short_flag);
-                       }
-                       if let &Some(desc) = desc {
-                           arg = arg.help(desc);
-                       }
-                       if arg_name.is_some() && flag.is_some() {
-                           arg = arg.takes_value(true);
-                       }
-                       if let &Some(required) = required {
-                           arg = arg.required(required);
-                       }
-                       if let &Some(multi) = multi {
-                           arg = arg.multiple(multi);
-                       }
-                       scmd = scmd.arg(arg);
-                   }
-                   mcmd = mcmd.subcommand(scmd);
-               }
-               app = app.subcommand(mcmd);
-           }
-           
-        let matches = app.get_matches();
+
+    for &(main_command_name, about, ref subcommands) in arg_data.iter() {
+        let mut mcmd = SubCommand::with_name(main_command_name).about(about);
+
+        for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+            let mut scmd = SubCommand::with_name(sub_command_name);
+            if let &Some(desc) = desc {
+                scmd = scmd.about(desc);
+            }
+            scmd = scmd.after_help(url_info);
+
+            for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                let arg_name_str = match (arg_name, flag) {
+                    (&Some(an), _) => an,
+                    (_, &Some(f)) => f,
+                    _ => unreachable!(),
+                };
+                let mut arg = Arg::with_name(arg_name_str).empty_values(false);
+                if let &Some(short_flag) = flag {
+                    arg = arg.short(short_flag);
+                }
+                if let &Some(desc) = desc {
+                    arg = arg.help(desc);
+                }
+                if arg_name.is_some() && flag.is_some() {
+                    arg = arg.takes_value(true);
+                }
+                if let &Some(required) = required {
+                    arg = arg.required(required);
+                }
+                if let &Some(multi) = multi {
+                    arg = arg.multiple(multi);
+                }
+                scmd = scmd.arg(arg);
+            }
+            mcmd = mcmd.subcommand(scmd);
+        }
+        app = app.subcommand(mcmd);
+    }
+
+    let matches = app.get_matches();
 
     let debug = matches.is_present("adebug");
-    let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+    let connector = hyper_rustls::HttpsConnectorBuilder::new()
+        .with_native_roots()
         .unwrap()
         .https_or_http()
         .enable_http1()
@@ -2222,20 +3732,26 @@ async fn main() {
     match Engine::new(matches, connector).await {
         Err(err) => {
             exit_status = err.exit_code;
-            writeln!(io::stderr(), "{}", err).ok();
-        },
+            writeln!(std::io::stderr(), "{}", err).ok();
+        }
         Ok(engine) => {
             if let Err(doit_err) = engine.doit().await {
                 exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
-                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
-                    },
+                        writeln!(
+                            std::io::stderr(),
+                            "Failed to open output file '{}': {}",
+                            path,
+                            err
+                        )
+                        .ok();
+                    }
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:#?}", err).ok();
+                            writeln!(std::io::stderr(), "{:#?}", err).ok();
                         } else {
-                            writeln!(io::stderr(), "{}", err).ok();
+                            writeln!(std::io::stderr(), "{}", err).ok();
                         }
                     }
                 }

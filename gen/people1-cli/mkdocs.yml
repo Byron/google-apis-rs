@@ -1,4 +1,4 @@
-site_name: People Service v5.0.5+20240625
+site_name: People Service v6.0.0+20240625
 site_url: http://byron.github.io/google-apis-rs/google-people1-cli
 site_description: A complete library to interact with People Service (protocol v1)
 
@@ -40,4 +40,3 @@ nav:
 theme: readthedocs
 
 copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
-

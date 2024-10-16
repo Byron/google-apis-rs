@@ -1,0 +1,21 @@
+site_name: Maps Places v6.0.0+20241013
+site_url: http://byron.github.io/google-apis-rs/google-places1-cli
+site_description: A complete library to interact with Maps Places (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/places1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Places':
+    - 'Autocomplete': 'places_autocomplete.md'
+    - 'Get': 'places_get.md'
+    - 'Photos Get Media': 'places_photos-get-media.md'
+    - 'Search Nearby': 'places_search-nearby.md'
+    - 'Search Text': 'places_search-text.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015–2024, `Sebastian Thiel`
