@@ -5795,8 +5795,21 @@ pub struct Product {
     pub validated_destinations: Option<Vec<String>>,
     /// Read-only warnings.
     pub warnings: Option<Vec<Error>>,
+    #[serde(rename = "productHighlights")]
+    pub product_highlights: Option<Vec<String>>,
+    #[serde(rename = "productDetails")]
+    pub product_details: Option<Vec<ProductProductDetail>>,
 }
 
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ProductProductDetail {
+    #[serde(rename = "sectionName")]
+    pub section_name: Option<String>, // can be set without section
+    #[serde(rename = "attributeName")]
+    pub attribute_name: String,
+    #[serde(rename = "attributeValue")]
+    pub attribute_value: String,
+}
 impl common::RequestValue for Product {}
 impl common::Resource for Product {}
 impl common::ResponseResult for Product {}
