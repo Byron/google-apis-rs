@@ -38,7 +38,7 @@ impl FieldMask {
     /// Create a new `FieldMask` from a list of paths. These are converted to snake
     /// case if they aren't already.
     pub fn new<S: AsRef<str>>(values: &[S]) -> Self {
-        return Self(values.iter().map(|s| snakecase(s.as_ref())).collect());
+        Self(values.iter().map(|s| snakecase(s.as_ref())).collect())
     }
 }
 
