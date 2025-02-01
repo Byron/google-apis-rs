@@ -13,7 +13,6 @@ use std::time::Duration;
 use hyper::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT};
 use hyper::Method;
 use hyper::StatusCode;
-use itertools::Itertools;
 use mime::Mime;
 use tokio::time::sleep;
 
@@ -414,22 +413,25 @@ impl Read for MultiPartReader<'_> {
             }
             (0, true, true) => return Ok(0),
             (n, true, _) if n > 0 => {
+                use std::fmt::Write as _;
                 let (headers, reader) = self.raw_parts.remove(0);
+
+                let mut encoded_headers = String::new();
+                for (k, v) in &headers {
+                    if !encoded_headers.is_empty() {
+                        encoded_headers.push_str(LINE_ENDING);
+                    }
+
+                    write!(encoded_headers, "{}: {}", k, v.to_str().unwrap()).unwrap();
+                }
+
                 let mut c = Cursor::new(Vec::<u8>::new());
                 //TODO: The first line ending should be omitted for the first part,
                 // fortunately Google's API serves don't seem to mind.
                 (write!(
                     &mut c,
                     "{}--{}{}{}{}{}",
-                    LINE_ENDING,
-                    BOUNDARY,
-                    LINE_ENDING,
-                    headers
-                        .iter()
-                        .map(|(k, v)| format!("{}: {}", k, v.to_str().unwrap()))
-                        .join(LINE_ENDING),
-                    LINE_ENDING,
-                    LINE_ENDING,
+                    LINE_ENDING, BOUNDARY, LINE_ENDING, encoded_headers, LINE_ENDING, LINE_ENDING,
                 ))?;
                 c.rewind()?;
                 self.current_part = Some((c, reader));
