@@ -27,4 +27,4 @@ serde_json = "1"
 serde_with = "3"
 tokio = { version = "1", features = ["time"] }
 url = "2"
-yup-oauth2 = { version = "11", optional = true }
+yup-oauth2 = { version = "12", optional = true }
