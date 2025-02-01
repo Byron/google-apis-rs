@@ -422,7 +422,8 @@ impl Read for MultiPartReader<'_> {
                         encoded_headers.push_str(LINE_ENDING);
                     }
 
-                    write!(encoded_headers, "{}: {}", k, v.to_str().unwrap()).unwrap();
+                    write!(encoded_headers, "{}: {}", k, v.to_str().unwrap())
+                        .map_err(|err| std::io::Error::other(err))?;
                 }
 
                 let mut c = Cursor::new(Vec::<u8>::new());
