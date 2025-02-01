@@ -393,7 +393,7 @@ impl<'a> MultiPartReader<'a> {
     }
 }
 
-impl<'a> Read for MultiPartReader<'a> {
+impl Read for MultiPartReader<'_> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         match (
             self.raw_parts.len(),
@@ -593,7 +593,7 @@ where
     pub content_length: u64,
 }
 
-impl<'a, A, C> ResumableUploadHelper<'a, A, C>
+impl<A, C> ResumableUploadHelper<'_, A, C>
 where
     C: Connector,
 {
