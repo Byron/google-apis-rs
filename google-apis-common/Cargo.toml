@@ -27,4 +27,21 @@ serde_json = "1"
 serde_with = "3"
 tokio = { version = "1", features = ["time"] }
 url = "2"
-yup-oauth2 = { version = "12", optional = true }
+yup-oauth2 = { version = "12", default-features = false, optional = true }
+
+[features]
+## Enable OAuth 2.0 authentication support via the `yup-oauth2` crate
+yup-oauth2 = ["dep:yup-oauth2"]
+
+## Enable Service Account support for the `yup-oauth2 crate
+yup-oauth2-service-account = ["yup-oauth2", "yup-oauth2/service-account"]
+
+## Use AWS-LC as the crypto backend
+##
+## Either this feature or `ring` must be enabled when enabling `yup-oauth2-service-account`
+aws-lc-rs = ["yup-oauth2?/aws-lc-rs"]
+
+## Use Ring as the crypto backend
+##
+## Either this feature or `aws-lc-rs` must be enabled when enabling `yup-oauth2-service-account`
+ring = ["yup-oauth2?/ring"]

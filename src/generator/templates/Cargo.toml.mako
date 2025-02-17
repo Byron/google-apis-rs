@@ -32,7 +32,7 @@ clap = "2"
 http-body-util = "0.1"
 % endif
 hyper = "1"
-hyper-rustls = { version = "0.27", default-features = false }
+hyper-rustls = { version = "0.27", default-features = false, features = ["http2", "rustls-native-certs", "native-tokio"] }
 hyper-util = "0.1"
 mime = "0.3"
 serde = { version = "1", features = ["derive"] }
@@ -47,7 +47,7 @@ tokio = { version = "1", features = ["full"] }
 % endif
 url = "2"
 utoipa = { version = "4", optional = true }
-yup-oauth2 = { version = "12", optional = true }
+yup-oauth2 = { version = "12", default-features = false, optional = true }
 
 google-apis-common = { path = "../../google-apis-common", version = "7" }
 % if cargo.get('is_executable'):
@@ -71,7 +71,22 @@ version = "${util.crate_version()}"
 
 % if not cargo.get('is_executable'):
 [features]
-default = ["yup-oauth2"]
+default = ["yup-oauth2", "ring"]
 utoipa = ["dep:utoipa"]
+
+## Enable OAuth 2.0 authentication support via the `yup-oauth2` crate
 yup-oauth2 = ["dep:yup-oauth2", "google-apis-common/yup-oauth2"]
+
+## Enable Service Account support for the `yup-oauth2 crate
+yup-oauth2-service-account = ["yup-oauth2", "yup-oauth2/service-account", "google-apis-common/yup-oauth2-service-account"]
+
+## Use AWS-LC as the crypto backend
+##
+## Either this feature or `ring` must be enabled when enabling `yup-oauth2-service-account`
+aws-lc-rs = ["yup-oauth2?/aws-lc-rs", "google-apis-common/aws-lc-rs", "hyper-rustls/aws-lc-rs"]
+
+## Use Ring as the crypto backend
+##
+## Either this feature or `aws-lc-rs` must be enabled when enabling `yup-oauth2-service-account`
+ring = ["yup-oauth2?/ring", "google-apis-common/ring", "hyper-rustls/ring"]
 % endif

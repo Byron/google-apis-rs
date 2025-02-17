@@ -21,4 +21,4 @@ mime = "0.3"
 serde = "1"
 serde_json = "1"
 strsim = "0.11"
-yup-oauth2 = "12"
+yup-oauth2 = { version = "12", default-features = false }
