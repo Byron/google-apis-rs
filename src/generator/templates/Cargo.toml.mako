@@ -49,9 +49,9 @@ url = "2"
 utoipa = { version = "4", optional = true }
 yup-oauth2 = { version = "12", default-features = false, optional = true }
 
-google-apis-common = { path = "../../google-apis-common", version = "7" }
+google-apis-common = { path = "../../google-apis-common", version = "8" }
 % if cargo.get('is_executable'):
-google-clis-common = { path = "../../google-clis-common", version = "7" }
+google-clis-common = { path = "../../google-clis-common", version = "8" }
 % endif
 
 <%
