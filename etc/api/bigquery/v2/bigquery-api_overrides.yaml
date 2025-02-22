@@ -1,2 +1,7 @@
 api:
   no_upload_prefix: JobInsertCall
+schemas:
+  RangeValue:
+    properties:
+      end: ~
+      start: ~

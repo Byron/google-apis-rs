@@ -372,6 +372,8 @@ def merge(a, b, path=None):
         if key in a:
             if isinstance(a[key], dict) and isinstance(b[key], dict):
                 merge(a[key], b[key], path + [str(key)])
+            elif b[key] is None:
+                del a[key]
             else:
                 # overwrite leafs unconditionally !
                 if isinstance(a[key], list) and isinstance(b[key], list):
