@@ -36,7 +36,7 @@ hyper-rustls = { version = "0.27", default-features = false, features = ["http2"
 hyper-util = "0.1"
 mime = "0.3"
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = "1.0.130"
 % if not cargo.get('is_executable'):
 serde_with = "3"
 % endif
