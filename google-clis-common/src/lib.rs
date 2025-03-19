@@ -279,12 +279,12 @@ impl FieldCursor {
                                 Value::Bool(arg_from_str(value, err, field, "boolean"))
                             }
                             JsonType::Int => Value::Number(
-                                json::Number::from_f64(arg_from_str(value, err, field, "int"))
-                                    .expect("valid f64"),
+                                json::Number::from_i128(arg_from_str(value, err, field, "int"))
+                                    .expect("valid i128"),
                             ),
                             JsonType::Uint => Value::Number(
-                                json::Number::from_f64(arg_from_str(value, err, field, "uint"))
-                                    .expect("valid f64"),
+                                json::Number::from_u128(arg_from_str(value, err, field, "uint"))
+                                    .expect("valid u128"),
                             ),
                             JsonType::Float => Value::Number(
                                 json::Number::from_f64(arg_from_str(value, err, field, "float"))
