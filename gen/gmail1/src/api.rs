@@ -8010,8 +8010,7 @@ where
         let mut url = self.hub._base_url.clone()
             + "gmail/v1/users/{userId}/messages/{messageId}/attachments/{id}";
         if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::AddonCurrentMessageReadonly.as_ref().to_string());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9241,8 +9240,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "gmail/v1/users/{userId}/messages/{id}";
         if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::AddonCurrentMessageReadonly.as_ref().to_string());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -26549,8 +26547,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "gmail/v1/users/{userId}/threads/{id}";
         if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::AddonCurrentMessageReadonly.as_ref().to_string());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
