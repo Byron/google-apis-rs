@@ -67,7 +67,7 @@ impl FromStr for FieldMask {
         let mut in_quotes = false;
         let mut prev_ind = 0;
         let mut paths = Vec::new();
-        for (i, c) in s.chars().enumerate() {
+        for (i, c) in s.char_indices() {
             if c == '`' {
                 in_quotes = !in_quotes;
             } else if in_quotes {
