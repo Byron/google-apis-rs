@@ -199,14 +199,14 @@ where
     % if is_request_value_property(mc, p):
 <% request_prop_type = prop_type %>\
 ${self._request_value_impl(c, request_cli_schema, prop_name, request_prop_type)}\
-    % elif p.type != 'string':
+    % elif p.type != 'string' or p.get('format') == 'int64':
     % if p.get('repeated', False):
-let ${prop_name}: Vec<${prop_type} = Vec::new();
+let ${prop_name}: Vec<${prop_type}> = Vec::new();
 for (arg_id, arg) in ${opt_values(mangle_subcommand(p.name))}.enumerate() {
-    ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", arg_id), "${p.type}"));
+    ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", "${p.get('format', p.type)}"));
 }
     % else:
-let ${prop_name}: ${prop_type} = arg_from_str(&${opt_value(p.name)}, err, "<${mangle_subcommand(p.name)}>", "${p.type}");
+let ${prop_name}: ${prop_type} = arg_from_str(&${opt_value(p.name)}, err, "<${mangle_subcommand(p.name)}>", "${p.get('format', p.type)}");
     % endif # handle repeated values
     % endif # handle request value
 % endfor # each required parameter
@@ -217,11 +217,12 @@ let ${prop_name}: ${prop_type} = arg_from_str(&${opt_value(p.name)}, err, "<${ma
         # if type is not available, we know it's the request value, which should also be borrowed
         borrow = borrow_prefix(p)
         arg_name = mangle_ident(p.name)
-        if p.get('type', '') == 'string':
+        if p.get('type', '') == 'string' and p.get('format') != 'int64':
             if p.get('repeated', False):
                 arg_name = opt_values(p.name) + '.map(|&v| v.to_string()).collect::<Vec<String>>()'
             else:
                 arg_name = opt_value(p.name)
+        # For non-string types or int64 format, we already parsed them above
         call_args.append(borrow + arg_name)
     # end for each required prop
 %>\

@@ -2855,9 +2855,15 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let if_metageneration_match: i64 = arg_from_str(
+            &opt.value_of("if-metageneration-match").unwrap_or(""),
+            err,
+            "<if-metageneration-match>",
+            "int64",
+        );
         let mut call = self.hub.buckets().lock_retention_policy(
             opt.value_of("bucket").unwrap_or(""),
-            opt.value_of("if-metageneration-match").unwrap_or(""),
+            if_metageneration_match,
         );
         for parg in opt
             .values_of("v")
@@ -11299,10 +11305,16 @@ where
         dry_run: bool,
         err: &mut InvalidOptionsError,
     ) -> Result<(), DoitError> {
+        let generation: i64 = arg_from_str(
+            &opt.value_of("generation").unwrap_or(""),
+            err,
+            "<generation>",
+            "int64",
+        );
         let mut call = self.hub.objects().restore(
             opt.value_of("bucket").unwrap_or(""),
             opt.value_of("object").unwrap_or(""),
-            opt.value_of("generation").unwrap_or(""),
+            generation,
         );
         for parg in opt
             .values_of("v")
@@ -14082,7 +14094,9 @@ where
         let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
             secret,
             yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-            hyper_util::client::legacy::Client::builder(executor).build(connector),
+            yup_oauth2::client::CustomHyperClientBuilder::from(
+                hyper_util::client::legacy::Client::builder(executor).build(connector),
+            ),
         )
         .persist_tokens_to_disk(format!("{}/storage1", config_dir))
         .build()
@@ -16092,7 +16106,7 @@ async fn main() {
 
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("6.0.0+20240621")
+           .version("7.0.0+20240621")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")
@@ -16170,7 +16184,7 @@ async fn main() {
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build();
 
     match Engine::new(matches, connector).await {
