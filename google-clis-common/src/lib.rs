@@ -435,7 +435,7 @@ where
                 arg_name.to_owned(),
                 arg_type.to_owned(),
                 arg.to_string(),
-                format!("{}", perr),
+                format!("{perr}"),
             ));
             Default::default()
         }
@@ -454,13 +454,11 @@ impl fmt::Display for ApplicationSecretError {
         match *self {
             ApplicationSecretError::DecoderError((ref path, ref err)) => writeln!(
                 f,
-                "Could not decode file at '{}' with error: {}.",
-                path, err
+                "Could not decode file at '{path}' with error: {err}."
             ),
             ApplicationSecretError::FormatError(ref path) => writeln!(
                 f,
-                "'installed' field is unset in secret file at '{}'.",
-                path
+                "'installed' field is unset in secret file at '{path}'."
             ),
         }
     }
@@ -480,20 +478,17 @@ impl fmt::Display for ConfigurationError {
         match *self {
             ConfigurationError::DirectoryCreationFailed((ref dir, ref err)) => writeln!(
                 f,
-                "Directory '{}' could not be created with error: {}.",
-                dir, err
+                "Directory '{dir}' could not be created with error: {err}."
             ),
             ConfigurationError::DirectoryUnset => writeln!(f, "--config-dir was unset or empty."),
             ConfigurationError::HomeExpansionFailed(ref dir) => writeln!(
                 f,
-                "Couldn't find HOME directory of current user, failed to expand '{}'.",
-                dir
+                "Couldn't find HOME directory of current user, failed to expand '{dir}'."
             ),
-            ConfigurationError::Secret(ref err) => writeln!(f, "Secret -> {}", err),
+            ConfigurationError::Secret(ref err) => writeln!(f, "Secret -> {err}"),
             ConfigurationError::Io((ref path, ref err)) => writeln!(
                 f,
-                "IO operation failed on path '{}' with error: {}.",
-                path, err
+                "IO operation failed on path '{path}' with error: {err}."
             ),
         }
     }
@@ -510,10 +505,9 @@ impl fmt::Display for InputError {
         match *self {
             InputError::Io((ref file_path, ref io_err)) => writeln!(
                 f,
-                "Failed to open '{}' for reading with error: {}.",
-                file_path, io_err
+                "Failed to open '{file_path}' for reading with error: {io_err}."
             ),
-            InputError::Mime(ref mime) => writeln!(f, "'{}' is not a known mime-type.", mime),
+            InputError::Mime(ref mime) => writeln!(f, "'{mime}' is not a known mime-type."),
         }
     }
 }
@@ -531,28 +525,27 @@ impl fmt::Display for FieldError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             FieldError::PopOnEmpty(ref field) => {
-                writeln!(f, "'{}': Cannot move up on empty field cursor.", field)
+                writeln!(f, "'{field}': Cannot move up on empty field cursor.")
             }
             FieldError::TrailingFieldSep(ref field) => writeln!(
                 f,
-                "'{}': Single field separator may not be last character.",
-                field
+                "'{field}': Single field separator may not be last character."
             ),
             FieldError::Unknown(ref field, ref suggestion, ref value) => {
                 let suffix = match *suggestion {
                     Some(ref s) => {
                         let kv = match *value {
-                            Some(ref v) => format!("{}={}", s, v),
+                            Some(ref v) => format!("{s}={v}"),
                             None => s.clone(),
                         };
-                        format!(" Did you mean '{}' ?", kv)
+                        format!(" Did you mean '{kv}' ?")
                     }
                     None => String::new(),
                 };
-                writeln!(f, "Field '{}' does not exist.{}", field, suffix)
+                writeln!(f, "Field '{field}' does not exist.{suffix}")
             }
             FieldError::Duplicate(ref cursor) => {
-                writeln!(f, "Value at '{}' was already set", cursor)
+                writeln!(f, "Value at '{cursor}' was already set")
             }
             FieldError::Empty => writeln!(f, "Field names must not be empty."),
         }
@@ -575,9 +568,9 @@ pub enum CLIError {
 impl fmt::Display for CLIError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
-            CLIError::Configuration(ref err) => write!(f, "Configuration -> {}", err),
-            CLIError::Input(ref err) => write!(f, "Input -> {}", err),
-            CLIError::Field(ref err) => write!(f, "Field -> {}", err),
+            CLIError::Configuration(ref err) => write!(f, "Configuration -> {err}"),
+            CLIError::Input(ref err) => write!(f, "Input -> {err}"),
+            CLIError::Field(ref err) => write!(f, "Field -> {err}"),
             CLIError::InvalidUploadProtocol(ref proto_name, ref valid_names) => writeln!(
                 f,
                 "'{}' is not a valid upload protocol. Choose from one of {}.",
@@ -586,29 +579,26 @@ impl fmt::Display for CLIError {
             ),
             CLIError::ParseError(ref arg_name, ref type_name, ref value, ref err_desc) => writeln!(
                 f,
-                "Failed to parse argument '{}' with value '{}' as {} with error: {}.",
-                arg_name, value, type_name, err_desc
+                "Failed to parse argument '{arg_name}' with value '{value}' as {type_name} with error: {err_desc}."
             ),
             CLIError::UnknownParameter(ref param_name, ref possible_values) => {
                 let suffix = match did_you_mean(param_name, possible_values) {
-                    Some(v) => format!(" Did you mean '{}' ?", v),
+                    Some(v) => format!(" Did you mean '{v}' ?"),
                     None => String::new(),
                 };
-                writeln!(f, "Parameter '{}' is unknown.{}", param_name, suffix)
+                writeln!(f, "Parameter '{param_name}' is unknown.{suffix}")
             }
             CLIError::InvalidKeyValueSyntax(ref kv, is_hashmap) => {
                 let hashmap_info = if is_hashmap { "hashmap " } else { "" };
                 writeln!(
                     f,
-                    "'{}' does not match {}pattern <key>=<value>.",
-                    kv, hashmap_info
+                    "'{kv}' does not match {hashmap_info}pattern <key>=<value>."
                 )
             }
             CLIError::MissingCommandError => writeln!(f, "Please specify the main sub-command."),
             CLIError::MissingMethodError(ref cmd) => writeln!(
                 f,
-                "Please specify the method to call on the '{}' command.",
-                cmd
+                "Please specify the method to call on the '{cmd}' command."
             ),
         }
     }
@@ -720,7 +710,7 @@ pub fn application_secret_from_directory(
                                 json::from_str(json_console_secret).unwrap();
                             match json::to_writer_pretty(&mut f, &console_secret) {
                                 Err(serde_err) => {
-                                    panic!("Unexpected serde error: {:#?}", serde_err)
+                                    panic!("Unexpected serde error: {serde_err:#?}")
                                 }
                                 Ok(_) => continue,
                             }

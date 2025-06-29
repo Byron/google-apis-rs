@@ -32,22 +32,20 @@ pub mod duration {
                 ParseDurationError::NanosTooSmall => {
                     write!(f, "more than 9 digits of second precision required")
                 }
-                ParseDurationError::ParseIntError(pie) => write!(f, "{:?}", pie),
+                ParseDurationError::ParseIntError(pie) => write!(f, "{pie:?}"),
                 ParseDurationError::SecondOverflow {
                     seconds,
                     max_seconds,
                 } => write!(
                     f,
-                    "seconds overflow (got {}, maximum seconds possible {})",
-                    seconds, max_seconds
+                    "seconds overflow (got {seconds}, maximum seconds possible {max_seconds})"
                 ),
                 ParseDurationError::SecondUnderflow {
                     seconds,
                     min_seconds,
                 } => write!(
                     f,
-                    "seconds underflow (got {}, minimum seconds possible {})",
-                    seconds, min_seconds
+                    "seconds underflow (got {seconds}, minimum seconds possible {min_seconds})"
                 ),
                 ParseDurationError::DurationSeconds { seconds } => {
                     write!(f, "Could not create a duration from {seconds}")
@@ -118,7 +116,7 @@ pub mod duration {
                 format!("{}.{:0>9}s", seconds, nanoseconds.abs())
             }
         } else {
-            format!("{}s", seconds)
+            format!("{seconds}s")
         }
     }
 
@@ -272,13 +270,11 @@ mod tests {
         ];
         for (repr, nanos) in durations.into_iter() {
             let wrapper: DurationWrapper =
-                serde_json::from_str(&format!("{{\"duration\": \"{}\"}}", repr)).unwrap();
+                serde_json::from_str(&format!("{{\"duration\": \"{repr}\"}}")).unwrap();
             assert_eq!(
                 Some(nanos),
                 wrapper.duration.unwrap().num_nanoseconds(),
-                "parsed \"{}\" expecting Duration with {}ns",
-                repr,
-                nanos
+                "parsed \"{repr}\" expecting Duration with {nanos}ns",
             );
         }
     }
@@ -288,10 +284,9 @@ mod tests {
         let durations = ["1.-3s", "1.1111111111s", "1.2"];
         for repr in durations.into_iter() {
             assert!(
-                serde_json::from_str::<DurationWrapper>(&format!("{{\"duration\": \"{}\"}}", repr))
+                serde_json::from_str::<DurationWrapper>(&format!("{{\"duration\": \"{repr}\"}}"))
                     .is_err(),
-                "parsed \"{}\" expecting err",
-                repr
+                "parsed \"{repr}\" expecting err",
             );
         }
     }
@@ -311,7 +306,7 @@ mod tests {
                 duration: Some(chrono::Duration::nanoseconds(nanos)),
             };
             let s = serde_json::to_string(&wrapper);
-            assert!(s.is_ok(), "Could not serialize {}ns", nanos);
+            assert!(s.is_ok(), "Could not serialize {nanos}ns");
             let s = s.unwrap();
             assert_eq!(
                 wrapper,

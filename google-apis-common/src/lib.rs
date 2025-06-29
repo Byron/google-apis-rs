@@ -215,7 +215,7 @@ pub trait Delegate: Send {
     /// # Arguments
     ///
     /// * `is_success` - a true value indicates the operation was successful. If false, you should
-    ///                  discard all values stored during `store_upload_url`.
+    ///   discard all values stored during `store_upload_url`.
     fn finished(&mut self, is_success: bool) {
         let _ = is_success;
     }
@@ -272,8 +272,7 @@ impl std::fmt::Display for Error {
             Error::HttpError(err) => err.fmt(f),
             Error::UploadSizeLimitExceeded(resource_size, max_size) => writeln!(
                 f,
-                "The media size {} exceeds the maximum allowed upload size of {}",
-                resource_size, max_size
+                "The media size {resource_size} exceeds the maximum allowed upload size of {max_size}"
             ),
             Error::MissingAPIKey => {
                 writeln!(
@@ -285,17 +284,16 @@ impl std::fmt::Display for Error {
                     "It is used as there are no Scopes defined for this method."
                 )
             }
-            Error::BadRequest(message) => writeln!(f, "Bad Request: {}", message),
-            Error::MissingToken(e) => writeln!(f, "Token retrieval failed: {}", e),
+            Error::BadRequest(message) => writeln!(f, "Bad Request: {message}"),
+            Error::MissingToken(e) => writeln!(f, "Token retrieval failed: {e}"),
             Error::Cancelled => writeln!(f, "Operation cancelled by delegate"),
             Error::FieldClash(field) => writeln!(
                 f,
-                "The custom parameter '{}' is already provided natively by the CallBuilder.",
-                field
+                "The custom parameter '{field}' is already provided natively by the CallBuilder."
             ),
-            Error::JsonDecodeError(json_str, err) => writeln!(f, "{}: {}", err, json_str),
+            Error::JsonDecodeError(json_str, err) => writeln!(f, "{err}: {json_str}"),
             Error::Failure(response) => {
-                writeln!(f, "Http status indicates failure: {:?}", response)
+                writeln!(f, "Http status indicates failure: {response:?}")
             }
         }
     }
@@ -344,7 +342,7 @@ impl<'a> MultiPartReader<'a> {
     /// Returns the mime-type representing our multi-part message.
     /// Use it with the ContentType header.
     pub fn mime_type() -> Mime {
-        Mime::from_str(&format!("multipart/related;boundary={}", BOUNDARY)).expect("valid mimetype")
+        Mime::from_str(&format!("multipart/related;boundary={BOUNDARY}")).expect("valid mimetype")
     }
 
     /// Reserve memory for exactly the given amount of parts
@@ -431,8 +429,7 @@ impl Read for MultiPartReader<'_> {
                 // fortunately Google's API serves don't seem to mind.
                 (write!(
                     &mut c,
-                    "{}--{}{}{}{}{}",
-                    LINE_ENDING, BOUNDARY, LINE_ENDING, encoded_headers, LINE_ENDING, LINE_ENDING,
+                    "{LINE_ENDING}--{BOUNDARY}{LINE_ENDING}{encoded_headers}{LINE_ENDING}{LINE_ENDING}"
                 ))?;
                 c.rewind()?;
                 self.current_part = Some((c, reader));
@@ -454,7 +451,7 @@ impl Read for MultiPartReader<'_> {
                         // before clearing the last part, we will add the boundary that
                         // will be written last
                         self.last_part_boundary = Some(Cursor::new(
-                            format!("{}--{}--{}", LINE_ENDING, BOUNDARY, LINE_ENDING).into_bytes(),
+                            format!("{LINE_ENDING}--{BOUNDARY}--{LINE_ENDING}").into_bytes(),
                         ))
                     }
                     // We are depleted - this can trigger the next part to come in
@@ -551,7 +548,7 @@ impl ContentRange {
         format!(
             "bytes {}/{}",
             match self.range {
-                Some(ref c) => format!("{}", c),
+                Some(ref c) => format!("{c}"),
                 None => "*".to_string(),
             },
             self.total_length
@@ -575,7 +572,7 @@ impl RangeResponseHeader {
             }
         }
 
-        panic!("Unable to parse Range header {:?}", raw)
+        panic!("Unable to parse Range header {raw:?}")
     }
 }
 
@@ -865,7 +862,7 @@ mod tests {
     fn dyn_delegate_is_send() {
         fn with_send(_x: impl Send) {}
 
-        let mut dd = DefaultDelegate::default();
+        let mut dd = DefaultDelegate;
         let dlg: &mut dyn Delegate = &mut dd;
         with_send(dlg);
     }
