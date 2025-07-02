@@ -1130,10 +1130,32 @@ def supports_scopes(auth):
 def method_default_scope(m):
     if "scopes" not in m:
         return None
-    default_scope = sorted(m.scopes)[0]
+
+    # Define scope precedence order (most restrictive first)
+    precedence_patterns = [
+        "read_only",
+        "readonly",
+        "read_write",
+        "full_control",
+        "cloud-platform.read-only",
+        "cloud-platform",
+    ]
+
+    def get_scope_priority(scope_url):
+        scope_lower = scope_url.lower()
+        for i, pattern in enumerate(precedence_patterns):
+            if pattern in scope_lower:
+                return i
+        return len(precedence_patterns)  # Unknown scopes last
+
+    # Sort scopes by priority instead of alphabetically
+    sorted_scopes = sorted(m.scopes, key=get_scope_priority)
+    default_scope = sorted_scopes[0]
+
+    # For read-only methods, prefer readonly scopes
     if m.httpMethod in ("HEAD", "GET", "OPTIONS", "TRACE"):
-        for scope in m.scopes:
-            if "readonly" in scope:
+        for scope in sorted_scopes:
+            if "readonly" in scope.lower():
                 default_scope = scope
                 break
         # end for each scope
