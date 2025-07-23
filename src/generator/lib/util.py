@@ -31,6 +31,7 @@ RESERVED_WORDS = set(
     (
         "abstract",
         "alignof",
+        "async",
         "as",
         "become",
         "box",
