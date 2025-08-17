@@ -36,7 +36,7 @@ New features will not be implemented but PRs are welcome. Please feel free to [s
 **Please be aware of the [alternative implementation][all-rust-org]** of these crates, which may be better suited for you.
 
 [discussions]: https://github.com/Byron/google-apis-rs/discussions
-[all-rust-org]: http://github.com/google-apis-rs
+[all-rust-org]: https://github.com/google-apis-rs
 
 # Project Features
 
@@ -173,8 +173,8 @@ The license of everything not explicitly under a different license are licensed 
 
 Licensed under either of
 
-- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or https://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or https://opensource.org/licenses/MIT)
 
 at your option.
 
@@ -187,7 +187,7 @@ additional terms or conditions.
 # Archive of Development Videos
 
 ![Rust](https://github.com/Byron/google-apis-rs/workflows/Rust/badge.svg)
-[![Stackshare.io](https://img.shields.io/badge/stackshare.io-GO-blue.svg)](http://stackshare.io/Byron/google-apis-for-rust)
+[![Stackshare.io](https://img.shields.io/badge/stackshare.io-GO-blue.svg)](https://stackshare.io/Byron/google-apis-for-rust)
 
 All work done on the project is based on [github issues][issues], not only to track progress and show what's going on, but
 to have a place to link screen-recordings to. [Milestones][milestones] are used to provide a bigger picture.
@@ -203,18 +203,18 @@ Click the image below to see the playlist with all project related content:
 
 Each episode sums up one major step in project development:
 
-- [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
+- [Episode 1](https://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
 - [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
 - [Episode 3](https://youtu.be/zrw2Qy-Ho5A): To make it work right
 
-[oauth]: https://crates.io/crates/yup-oauth2
-[google-lic]: https://github.com/google/google-api-go-client/blob/master/LICENSE
-[api-discovery-video]: https://www.youtube.com/watch?v=lQbT1NrxpUo
+[oauth]: yup-oauth2 ([crates.io](https://crates.io/crates/yup-oauth2), [Docs](https://docs.rs/yup-oauth2/latest/yup_oauth2/))
+[google-lic]: https://github.com/googleapis/google-api-go-client/blob/main/LICENSE
+[api-discovery-video]: https://youtu.be/lQbT1NrxpUo
 [api-discovery]: https://developers.google.com/discovery
-[mako]: http://www.makotemplates.org/
+[mako]: https://www.makotemplates.org/
 [api-index]: http://byron.github.io/google-apis-rs
 [issues]: https://github.com/Byron/google-apis-rs/issues
 [playlist]: https://www.youtube.com/playlist?list=PLMHbQxe1e9Mnnqj3Hs1hRDUXFEK-TgCnz
 [playlist-thumb]: http://img.youtube.com/vi/aGXuGEl90Mo/0.jpg
 [milestones]: https://github.com/Byron/google-apis-rs/milestones
-[rustup]: https://github.com/rust-lang-nursery/rustup.rs
+[rustup]: https://github.com/rust-lang/rustup
