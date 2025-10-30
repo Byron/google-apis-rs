@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *6.0.0+20240621*, where *20240621* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *storage* crate version *8.0.0+20251023*, where *20251023* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -16,7 +16,7 @@
 //! * [bucket access controls](api::BucketAccessControl)
 //!  * [*delete*](api::BucketAccessControlDeleteCall), [*get*](api::BucketAccessControlGetCall), [*insert*](api::BucketAccessControlInsertCall), [*list*](api::BucketAccessControlListCall), [*patch*](api::BucketAccessControlPatchCall) and [*update*](api::BucketAccessControlUpdateCall)
 //! * [buckets](api::Bucket)
-//!  * [*delete*](api::BucketDeleteCall), [*get*](api::BucketGetCall), [*get iam policy*](api::BucketGetIamPolicyCall), [*get storage layout*](api::BucketGetStorageLayoutCall), [*insert*](api::BucketInsertCall), [*list*](api::BucketListCall), [*lock retention policy*](api::BucketLockRetentionPolicyCall), [*operations cancel*](api::BucketOperationCancelCall), [*operations get*](api::BucketOperationGetCall), [*operations list*](api::BucketOperationListCall), [*patch*](api::BucketPatchCall), [*set iam policy*](api::BucketSetIamPolicyCall), [*test iam permissions*](api::BucketTestIamPermissionCall) and [*update*](api::BucketUpdateCall)
+//!  * [*delete*](api::BucketDeleteCall), [*get*](api::BucketGetCall), [*get iam policy*](api::BucketGetIamPolicyCall), [*get storage layout*](api::BucketGetStorageLayoutCall), [*insert*](api::BucketInsertCall), [*list*](api::BucketListCall), [*lock retention policy*](api::BucketLockRetentionPolicyCall), [*operations advance relocate bucket*](api::BucketOperationAdvanceRelocateBucketCall), [*operations cancel*](api::BucketOperationCancelCall), [*operations get*](api::BucketOperationGetCall), [*operations list*](api::BucketOperationListCall), [*patch*](api::BucketPatchCall), [*relocate*](api::BucketRelocateCall), [*restore*](api::BucketRestoreCall), [*set iam policy*](api::BucketSetIamPolicyCall), [*test iam permissions*](api::BucketTestIamPermissionCall) and [*update*](api::BucketUpdateCall)
 //! * [channels](api::Channel)
 //!  * [*stop*](api::ChannelStopCall)
 //! * default object access controls
@@ -30,7 +30,7 @@
 //! * [object access controls](api::ObjectAccessControl)
 //!  * [*delete*](api::ObjectAccessControlDeleteCall), [*get*](api::ObjectAccessControlGetCall), [*insert*](api::ObjectAccessControlInsertCall), [*list*](api::ObjectAccessControlListCall), [*patch*](api::ObjectAccessControlPatchCall) and [*update*](api::ObjectAccessControlUpdateCall)
 //! * [objects](api::Object)
-//!  * [*bulk restore*](api::ObjectBulkRestoreCall), [*compose*](api::ObjectComposeCall), [*copy*](api::ObjectCopyCall), [*delete*](api::ObjectDeleteCall), [*get*](api::ObjectGetCall), [*get iam policy*](api::ObjectGetIamPolicyCall), [*insert*](api::ObjectInsertCall), [*list*](api::ObjectListCall), [*patch*](api::ObjectPatchCall), [*restore*](api::ObjectRestoreCall), [*rewrite*](api::ObjectRewriteCall), [*set iam policy*](api::ObjectSetIamPolicyCall), [*test iam permissions*](api::ObjectTestIamPermissionCall), [*update*](api::ObjectUpdateCall) and [*watch all*](api::ObjectWatchAllCall)
+//!  * [*bulk restore*](api::ObjectBulkRestoreCall), [*compose*](api::ObjectComposeCall), [*copy*](api::ObjectCopyCall), [*delete*](api::ObjectDeleteCall), [*get*](api::ObjectGetCall), [*get iam policy*](api::ObjectGetIamPolicyCall), [*insert*](api::ObjectInsertCall), [*list*](api::ObjectListCall), [*move*](api::ObjectMoveCall), [*patch*](api::ObjectPatchCall), [*restore*](api::ObjectRestoreCall), [*rewrite*](api::ObjectRewriteCall), [*set iam policy*](api::ObjectSetIamPolicyCall), [*test iam permissions*](api::ObjectTestIamPermissionCall), [*update*](api::ObjectUpdateCall) and [*watch all*](api::ObjectWatchAllCall)
 //! * projects
 //!  * [*hmac keys create*](api::ProjectHmacKeyCreateCall), [*hmac keys delete*](api::ProjectHmacKeyDeleteCall), [*hmac keys get*](api::ProjectHmacKeyGetCall), [*hmac keys list*](api::ProjectHmacKeyListCall), [*hmac keys update*](api::ProjectHmacKeyUpdateCall) and [*service account get*](api::ProjectServiceAccountGetCall)
 //!
@@ -80,21 +80,23 @@
 //! Or specifically ...
 //!
 //! ```ignore
-//! let r = hub.objects().bulk_restore(...).doit().await
-//! let r = hub.objects().compose(...).doit().await
-//! let r = hub.objects().copy(...).doit().await
-//! let r = hub.objects().delete(...).doit().await
-//! let r = hub.objects().get(...).doit().await
-//! let r = hub.objects().get_iam_policy(...).doit().await
-//! let r = hub.objects().insert(...).doit().await
-//! let r = hub.objects().list(...).doit().await
-//! let r = hub.objects().patch(...).doit().await
-//! let r = hub.objects().restore(...).doit().await
-//! let r = hub.objects().rewrite(...).doit().await
-//! let r = hub.objects().set_iam_policy(...).doit().await
-//! let r = hub.objects().test_iam_permissions(...).doit().await
-//! let r = hub.objects().update(...).doit().await
-//! let r = hub.objects().watch_all(...).doit().await
+//! let r = hub.buckets().delete(...).doit().await
+//! let r = hub.buckets().get(...).doit().await
+//! let r = hub.buckets().get_iam_policy(...).doit().await
+//! let r = hub.buckets().get_storage_layout(...).doit().await
+//! let r = hub.buckets().insert(...).doit().await
+//! let r = hub.buckets().list(...).doit().await
+//! let r = hub.buckets().lock_retention_policy(...).doit().await
+//! let r = hub.buckets().patch(...).doit().await
+//! let r = hub.buckets().relocate(...).doit().await
+//! let r = hub.buckets().restore(...).doit().await
+//! let r = hub.buckets().set_iam_policy(...).doit().await
+//! let r = hub.buckets().test_iam_permissions(...).doit().await
+//! let r = hub.buckets().update(...).doit().await
+//! let r = hub.buckets().operations_advance_relocate_bucket(...).doit().await
+//! let r = hub.buckets().operations_cancel(...).doit().await
+//! let r = hub.buckets().operations_get(...).doit().await
+//! let r = hub.buckets().operations_list(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -121,7 +123,6 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_storage1 as storage1;
-//! use storage1::api::Object;
 //! use storage1::{Result, Error};
 //! # async fn dox() {
 //! use storage1::{Storage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -134,9 +135,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -147,34 +159,21 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Storage::new(client, auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = Object::default();
-//!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.objects().rewrite(req, "sourceBucket", "sourceObject", "destinationBucket", "destinationObject")
-//!              .user_project("ipsum")
-//!              .source_generation(-93)
-//!              .rewrite_token("ut")
-//!              .projection("gubergren")
-//!              .max_bytes_rewritten_per_call(-16)
-//!              .if_source_metageneration_not_match(-57)
-//!              .if_source_metageneration_match(-50)
-//!              .if_source_generation_not_match(-50)
-//!              .if_source_generation_match(-7)
-//!              .if_metageneration_not_match(-62)
-//!              .if_metageneration_match(-17)
-//!              .if_generation_not_match(-99)
-//!              .if_generation_match(-56)
-//!              .destination_predefined_acl("eos")
-//!              .destination_kms_key_name("labore")
+//! let result = hub.buckets().list("project")
+//!              .user_project("gubergren")
+//!              .soft_deleted(true)
+//!              .return_partial_success(false)
+//!              .projection("dolor")
+//!              .prefix("ea")
+//!              .page_token("ipsum")
+//!              .max_results(13)
 //!              .doit().await;
 //!
 //! match result {

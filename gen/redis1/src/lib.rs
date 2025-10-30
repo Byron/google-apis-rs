@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Redis* crate version *6.0.0+20240613*, where *20240613* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloud Redis* crate version *8.0.0+20251021*, where *20251021* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Cloud Redis* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/memorystore/docs/redis/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudRedis) ...
 //!
 //! * projects
-//!  * [*locations clusters create*](api::ProjectLocationClusterCreateCall), [*locations clusters delete*](api::ProjectLocationClusterDeleteCall), [*locations clusters get*](api::ProjectLocationClusterGetCall), [*locations clusters get certificate authority*](api::ProjectLocationClusterGetCertificateAuthorityCall), [*locations clusters list*](api::ProjectLocationClusterListCall), [*locations clusters patch*](api::ProjectLocationClusterPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances export*](api::ProjectLocationInstanceExportCall), [*locations instances failover*](api::ProjectLocationInstanceFailoverCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get auth string*](api::ProjectLocationInstanceGetAuthStringCall), [*locations instances import*](api::ProjectLocationInstanceImportCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reschedule maintenance*](api::ProjectLocationInstanceRescheduleMaintenanceCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations backup collections backups delete*](api::ProjectLocationBackupCollectionBackupDeleteCall), [*locations backup collections backups export*](api::ProjectLocationBackupCollectionBackupExportCall), [*locations backup collections backups get*](api::ProjectLocationBackupCollectionBackupGetCall), [*locations backup collections backups list*](api::ProjectLocationBackupCollectionBackupListCall), [*locations backup collections get*](api::ProjectLocationBackupCollectionGetCall), [*locations backup collections list*](api::ProjectLocationBackupCollectionListCall), [*locations clusters backup*](api::ProjectLocationClusterBackupCall), [*locations clusters create*](api::ProjectLocationClusterCreateCall), [*locations clusters delete*](api::ProjectLocationClusterDeleteCall), [*locations clusters get*](api::ProjectLocationClusterGetCall), [*locations clusters get certificate authority*](api::ProjectLocationClusterGetCertificateAuthorityCall), [*locations clusters list*](api::ProjectLocationClusterListCall), [*locations clusters patch*](api::ProjectLocationClusterPatchCall), [*locations clusters reschedule cluster maintenance*](api::ProjectLocationClusterRescheduleClusterMaintenanceCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances export*](api::ProjectLocationInstanceExportCall), [*locations instances failover*](api::ProjectLocationInstanceFailoverCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get auth string*](api::ProjectLocationInstanceGetAuthStringCall), [*locations instances import*](api::ProjectLocationInstanceImportCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reschedule maintenance*](api::ProjectLocationInstanceRescheduleMaintenanceCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //!
 //!
 //!
@@ -47,9 +47,13 @@
 //! Or specifically ...
 //!
 //! ```ignore
+//! let r = hub.projects().locations_backup_collections_backups_delete(...).doit().await
+//! let r = hub.projects().locations_backup_collections_backups_export(...).doit().await
+//! let r = hub.projects().locations_clusters_backup(...).doit().await
 //! let r = hub.projects().locations_clusters_create(...).doit().await
 //! let r = hub.projects().locations_clusters_delete(...).doit().await
 //! let r = hub.projects().locations_clusters_patch(...).doit().await
+//! let r = hub.projects().locations_clusters_reschedule_cluster_maintenance(...).doit().await
 //! let r = hub.projects().locations_instances_create(...).doit().await
 //! let r = hub.projects().locations_instances_delete(...).doit().await
 //! let r = hub.projects().locations_instances_export(...).doit().await
@@ -98,9 +102,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -111,7 +126,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CloudRedis::new(client, auth);

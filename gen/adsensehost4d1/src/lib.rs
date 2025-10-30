@@ -2,27 +2,17 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdSense Host* crate version *6.0.0+20200930*, where *20200930* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *AdSense Host* crate version *8.0.0+20251029*, where *20251029* is the exact revision of the *adsensehost:v4.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *AdSense Host* *v4d1* API can be found at the
-//! [official documentation site](https://developers.google.com/adsense/host/).
+//! [official documentation site](https://developers.google.com/adsense/host/index).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/adsensehost4d1).
 //! # Features
 //!
 //! Handle the following *Resources* with ease from the central [hub](AdSenseHost) ...
 //!
-//! * [accounts](api::Account)
-//!  * [*adclients get*](api::AccountAdclientGetCall), [*adclients list*](api::AccountAdclientListCall), [*adunits delete*](api::AccountAdunitDeleteCall), [*adunits get*](api::AccountAdunitGetCall), [*adunits get ad code*](api::AccountAdunitGetAdCodeCall), [*adunits insert*](api::AccountAdunitInsertCall), [*adunits list*](api::AccountAdunitListCall), [*adunits patch*](api::AccountAdunitPatchCall), [*adunits update*](api::AccountAdunitUpdateCall), [*get*](api::AccountGetCall), [*list*](api::AccountListCall) and [*reports generate*](api::AccountReportGenerateCall)
-//! * adclients
-//!  * [*get*](api::AdclientGetCall) and [*list*](api::AdclientListCall)
 //! * associationsessions
 //!  * [*start*](api::AssociationsessionStartCall) and [*verify*](api::AssociationsessionVerifyCall)
-//! * customchannels
-//!  * [*delete*](api::CustomchannelDeleteCall), [*get*](api::CustomchannelGetCall), [*insert*](api::CustomchannelInsertCall), [*list*](api::CustomchannelListCall), [*patch*](api::CustomchannelPatchCall) and [*update*](api::CustomchannelUpdateCall)
-//! * [reports](api::Report)
-//!  * [*generate*](api::ReportGenerateCall)
-//! * urlchannels
-//!  * [*delete*](api::UrlchannelDeleteCall), [*insert*](api::UrlchannelInsertCall) and [*list*](api::UrlchannelListCall)
 //!
 //!
 //!
@@ -57,18 +47,8 @@
 //! Or specifically ...
 //!
 //! ```ignore
-//! let r = hub.accounts().adclients_get(...).doit().await
-//! let r = hub.accounts().adclients_list(...).doit().await
-//! let r = hub.accounts().adunits_delete(...).doit().await
-//! let r = hub.accounts().adunits_get(...).doit().await
-//! let r = hub.accounts().adunits_get_ad_code(...).doit().await
-//! let r = hub.accounts().adunits_insert(...).doit().await
-//! let r = hub.accounts().adunits_list(...).doit().await
-//! let r = hub.accounts().adunits_patch(...).doit().await
-//! let r = hub.accounts().adunits_update(...).doit().await
-//! let r = hub.accounts().reports_generate(...).doit().await
-//! let r = hub.accounts().get(...).doit().await
-//! let r = hub.accounts().list(...).doit().await
+//! let r = hub.associationsessions().start(...).doit().await
+//! let r = hub.associationsessions().verify(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -107,9 +87,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -120,21 +111,17 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = AdSenseHost::new(client, auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.accounts().reports_generate("accountId", "startDate", "endDate")
-//!              .start_index(39)
-//!              .add_sort("Lorem")
-//!              .add_metric("gubergren")
-//!              .max_results(26)
-//!              .locale("dolor")
-//!              .add_filter("ea")
-//!              .add_dimension("ipsum")
+//! let result = hub.associationsessions().start(&vec!["At".into()], "websiteUrl")
+//!              .website_locale("sed")
+//!              .user_locale("amet.")
+//!              .callback_url("takimata")
 //!              .doit().await;
 //!
 //! match result {

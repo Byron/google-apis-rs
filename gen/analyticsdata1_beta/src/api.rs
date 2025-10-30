@@ -63,9 +63,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -76,7 +87,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = AnalyticsData::new(client, auth);
@@ -129,7 +140,7 @@ impl<'a, C> AnalyticsData<C> {
         AnalyticsData {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://analyticsdata.googleapis.com/".to_string(),
             _root_url: "https://analyticsdata.googleapis.com/".to_string(),
         }
@@ -140,7 +151,7 @@ impl<'a, C> AnalyticsData<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -667,6 +678,19 @@ pub struct DimensionValue {
 
 impl common::Part for DimensionValue {}
 
+/// Filter for empty values.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EmptyFilter {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for EmptyFilter {}
+
 /// An expression to filter dimension or metric values.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -678,6 +702,9 @@ pub struct Filter {
     /// A filter for two values.
     #[serde(rename = "betweenFilter")]
     pub between_filter: Option<BetweenFilter>,
+    /// A filter for empty values such as "(not set)" and "" values.
+    #[serde(rename = "emptyFilter")]
+    pub empty_filter: Option<EmptyFilter>,
     /// The dimension name or metric name. In most methods, dimensions & metrics can be used for the first time in this field. However in a RunPivotReportRequest, this field must be additionally specified by name in the RunPivotReportRequest's dimensions or metrics.
     #[serde(rename = "fieldName")]
     pub field_name: Option<String>,
@@ -1280,7 +1307,7 @@ pub struct RunPivotReportRequest {
     pub dimension_filter: Option<FilterExpression>,
     /// The dimensions requested. All defined dimensions must be used by one of the following: dimension_expression, dimension_filter, pivots, order_bys.
     pub dimensions: Option<Vec<Dimension>>,
-    /// If false or unspecified, each row with all metrics equal to 0 will not be returned. If true, these rows will be returned if they are not separately removed by a filter. Regardless of this `keep_empty_rows` setting, only data recorded by the Google Analytics (GA4) property can be displayed in a report. For example if a property never logs a `purchase` event, then a query for the `eventName` dimension and `eventCount` metric will not have a row eventName: "purchase" and eventCount: 0.
+    /// If false or unspecified, each row with all metrics equal to 0 will not be returned. If true, these rows will be returned if they are not separately removed by a filter. Regardless of this `keep_empty_rows` setting, only data recorded by the Google Analytics property can be displayed in a report. For example if a property never logs a `purchase` event, then a query for the `eventName` dimension and `eventCount` metric will not have a row eventName: "purchase" and eventCount: 0.
     #[serde(rename = "keepEmptyRows")]
     pub keep_empty_rows: Option<bool>,
     /// The filter clause of metrics. Applied at post aggregation phase, similar to SQL having-clause. Metrics must be requested to be used in this filter. Dimensions cannot be used in this filter.
@@ -1290,9 +1317,9 @@ pub struct RunPivotReportRequest {
     pub metrics: Option<Vec<Metric>>,
     /// Describes the visual format of the report's dimensions in columns or rows. The union of the fieldNames (dimension names) in all pivots must be a subset of dimension names defined in Dimensions. No two pivots can share a dimension. A dimension is only visible if it appears in a pivot.
     pub pivots: Option<Vec<Pivot>>,
-    /// A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
     pub property: Option<String>,
-    /// Toggles whether to return the current state of this Analytics Property’s quota. Quota is returned in [PropertyQuota](#PropertyQuota).
+    /// Toggles whether to return the current state of this Google Analytics property’s quota. Quota is returned in [PropertyQuota](#PropertyQuota).
     #[serde(rename = "returnPropertyQuota")]
     pub return_property_quota: Option<bool>,
 }
@@ -1326,7 +1353,7 @@ pub struct RunPivotReportResponse {
     /// Summarizes the columns and rows created by a pivot. Each pivot in the request produces one header in the response. If we have a request like this: "pivots": [{ "fieldNames": ["country", "city"] }, { "fieldNames": "eventName" }] We will have the following `pivotHeaders` in the response: "pivotHeaders" : [{ "dimensionHeaders": [{ "dimensionValues": [ { "value": "United Kingdom" }, { "value": "London" } ] }, { "dimensionValues": [ { "value": "Japan" }, { "value": "Osaka" } ] }] }, { "dimensionHeaders": [{ "dimensionValues": [{ "value": "session_start" }] }, { "dimensionValues": [{ "value": "scroll" }] }] }]
     #[serde(rename = "pivotHeaders")]
     pub pivot_headers: Option<Vec<PivotHeader>>,
-    /// This Analytics Property's quota state including this request.
+    /// This Google Analytics property's quota state including this request.
     #[serde(rename = "propertyQuota")]
     pub property_quota: Option<PropertyQuota>,
     /// Rows of dimension value combinations and metric values in the report.
@@ -1369,7 +1396,7 @@ pub struct RunRealtimeReportRequest {
     /// Specifies how rows are ordered in the response.
     #[serde(rename = "orderBys")]
     pub order_bys: Option<Vec<OrderBy>>,
-    /// Toggles whether to return the current state of this Analytics Property’s Realtime quota. Quota is returned in [PropertyQuota](#PropertyQuota).
+    /// Toggles whether to return the current state of this Google Analytics property’s Realtime quota. Quota is returned in [PropertyQuota](#PropertyQuota).
     #[serde(rename = "returnPropertyQuota")]
     pub return_property_quota: Option<bool>,
 }
@@ -1400,7 +1427,7 @@ pub struct RunRealtimeReportResponse {
     pub metric_headers: Option<Vec<MetricHeader>>,
     /// If requested, the minimum values of metrics.
     pub minimums: Option<Vec<Row>>,
-    /// This Analytics Property's Realtime quota state including this request.
+    /// This Google Analytics property's Realtime quota state including this request.
     #[serde(rename = "propertyQuota")]
     pub property_quota: Option<PropertyQuota>,
     /// The total number of rows in the query result. `rowCount` is independent of the number of rows returned in the response and the `limit` request parameter. For example if a query returns 175 rows and includes `limit` of 50 in the API request, the response will contain `rowCount` of 175 but only 50 rows.
@@ -1442,13 +1469,13 @@ pub struct RunReportRequest {
     pub dimension_filter: Option<FilterExpression>,
     /// The dimensions requested and displayed.
     pub dimensions: Option<Vec<Dimension>>,
-    /// If false or unspecified, each row with all metrics equal to 0 will not be returned. If true, these rows will be returned if they are not separately removed by a filter. Regardless of this `keep_empty_rows` setting, only data recorded by the Google Analytics (GA4) property can be displayed in a report. For example if a property never logs a `purchase` event, then a query for the `eventName` dimension and `eventCount` metric will not have a row eventName: "purchase" and eventCount: 0.
+    /// If false or unspecified, each row with all metrics equal to 0 will not be returned. If true, these rows will be returned if they are not separately removed by a filter. Regardless of this `keep_empty_rows` setting, only data recorded by the Google Analytics property can be displayed in a report. For example if a property never logs a `purchase` event, then a query for the `eventName` dimension and `eventCount` metric will not have a row eventName: "purchase" and eventCount: 0.
     #[serde(rename = "keepEmptyRows")]
     pub keep_empty_rows: Option<bool>,
     /// The number of rows to return. If unspecified, 10,000 rows are returned. The API returns a maximum of 250,000 rows per request, no matter how many you ask for. `limit` must be positive. The API can also return fewer rows than the requested `limit`, if there aren't as many dimension values as the `limit`. For instance, there are fewer than 300 possible values for the dimension `country`, so when reporting on only `country`, you can't get more than 300 rows, even if you set `limit` to a higher value. To learn more about this pagination parameter, see [Pagination](https://developers.google.com/analytics/devguides/reporting/data/v1/basics#pagination).
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub limit: Option<i64>,
-    /// Aggregation of metrics. Aggregated metric values will be shown in rows where the dimension_values are set to "RESERVED_(MetricAggregation)".
+    /// Aggregation of metrics. Aggregated metric values will be shown in rows where the dimension_values are set to "RESERVED_(MetricAggregation)". Aggregates including both comparisons and multiple date ranges will be aggregated based on the date ranges.
     #[serde(rename = "metricAggregations")]
     pub metric_aggregations: Option<Vec<String>>,
     /// The filter clause of metrics. Applied after aggregating the report's rows, similar to SQL having-clause. Dimensions cannot be used in this filter.
@@ -1459,12 +1486,12 @@ pub struct RunReportRequest {
     /// The row count of the start row. The first row is counted as row 0. When paging, the first request does not specify offset; or equivalently, sets offset to 0; the first request returns the first `limit` of rows. The second request sets offset to the `limit` of the first request; the second request returns the second `limit` of rows. To learn more about this pagination parameter, see [Pagination](https://developers.google.com/analytics/devguides/reporting/data/v1/basics#pagination).
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub offset: Option<i64>,
-    /// Specifies how rows are ordered in the response.
+    /// Specifies how rows are ordered in the response. Requests including both comparisons and multiple date ranges will have order bys applied on the comparisons.
     #[serde(rename = "orderBys")]
     pub order_bys: Option<Vec<OrderBy>>,
-    /// A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
     pub property: Option<String>,
-    /// Toggles whether to return the current state of this Analytics Property’s quota. Quota is returned in [PropertyQuota](#PropertyQuota).
+    /// Toggles whether to return the current state of this Google Analytics property’s quota. Quota is returned in [PropertyQuota](#PropertyQuota).
     #[serde(rename = "returnPropertyQuota")]
     pub return_property_quota: Option<bool>,
 }
@@ -1497,7 +1524,7 @@ pub struct RunReportResponse {
     pub metric_headers: Option<Vec<MetricHeader>>,
     /// If requested, the minimum values of metrics.
     pub minimums: Option<Vec<Row>>,
-    /// This Analytics Property's quota state including this request.
+    /// This Google Analytics property's quota state including this request.
     #[serde(rename = "propertyQuota")]
     pub property_quota: Option<PropertyQuota>,
     /// The total number of rows in the query result. `rowCount` is independent of the number of rows returned in the response, the `limit` request parameter, and the `offset` request parameter. For example if a query returns 175 rows and includes `limit` of 50 in the API request, the response will contain `rowCount` of 175 but only 50 rows. To learn more about this pagination parameter, see [Pagination](https://developers.google.com/analytics/devguides/reporting/data/v1/basics#pagination).
@@ -1648,9 +1675,20 @@ impl common::Part for V1betaAudienceRow {}
 /// use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1661,7 +1699,7 @@ impl common::Part for V1betaAudienceRow {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = AnalyticsData::new(client, auth);
@@ -1765,12 +1803,12 @@ impl<'a, C> PropertyMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns multiple pivot reports in a batch. All reports must be for the same GA4 Property.
+    /// Returns multiple pivot reports in a batch. All reports must be for the same Google Analytics property.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunPivotReportRequest may either be unspecified or consistent with this property. Example: properties/1234
+    /// * `property` - A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunPivotReportRequest may either be unspecified or consistent with this property. Example: properties/1234
     pub fn batch_run_pivot_reports(
         &self,
         request: BatchRunPivotReportsRequest,
@@ -1788,12 +1826,12 @@ impl<'a, C> PropertyMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns multiple reports in a batch. All reports must be for the same GA4 Property.
+    /// Returns multiple reports in a batch. All reports must be for the same Google Analytics property.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunReportRequest may either be unspecified or consistent with this property. Example: properties/1234
+    /// * `property` - A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunReportRequest may either be unspecified or consistent with this property. Example: properties/1234
     pub fn batch_run_reports(
         &self,
         request: BatchRunReportsRequest,
@@ -1816,7 +1854,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234
+    /// * `property` - A Google Analytics property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234
     pub fn check_compatibility(
         &self,
         request: CheckCompatibilityRequest,
@@ -1834,11 +1872,11 @@ impl<'a, C> PropertyMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns metadata for dimensions and metrics available in reporting methods. Used to explore the dimensions and metrics. In this method, a Google Analytics GA4 Property Identifier is specified in the request, and the metadata response includes Custom dimensions and metrics as well as Universal metadata. For example if a custom metric with parameter name `levels_unlocked` is registered to a property, the Metadata response will contain `customEvent:levels_unlocked`. Universal metadata are dimensions and metrics applicable to any property such as `country` and `totalUsers`.
+    /// Returns metadata for dimensions and metrics available in reporting methods. Used to explore the dimensions and metrics. In this method, a Google Analytics property identifier is specified in the request, and the metadata response includes Custom dimensions and metrics as well as Universal metadata. For example if a custom metric with parameter name `levels_unlocked` is registered to a property, the Metadata response will contain `customEvent:levels_unlocked`. Universal metadata are dimensions and metrics applicable to any property such as `country` and `totalUsers`.
     ///
     /// # Arguments
     ///
-    /// * `name` - Required. The resource name of the metadata to retrieve. This name field is specified in the URL path and not URL parameters. Property is a numeric Google Analytics GA4 Property identifier. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234/metadata Set the Property ID to 0 for dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics.
+    /// * `name` - Required. The resource name of the metadata to retrieve. This name field is specified in the URL path and not URL parameters. Property is a numeric Google Analytics property identifier. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234/metadata Set the Property ID to 0 for dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics.
     pub fn get_metadata(&self, name: &str) -> PropertyGetMetadataCall<'a, C> {
         PropertyGetMetadataCall {
             hub: self.hub,
@@ -1856,7 +1894,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
+    /// * `property` - A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
     pub fn run_pivot_report(
         &self,
         request: RunPivotReportRequest,
@@ -1879,7 +1917,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234
+    /// * `property` - A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234
     pub fn run_realtime_report(
         &self,
         request: RunRealtimeReportRequest,
@@ -1902,7 +1940,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
+    /// * `property` - A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
     pub fn run_report(
         &self,
         request: RunReportRequest,
@@ -1941,9 +1979,20 @@ impl<'a, C> PropertyMethods<'a, C> {
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1954,7 +2003,7 @@ impl<'a, C> PropertyMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -2018,7 +2067,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+parent}/audienceExports";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -2208,7 +2258,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2262,9 +2312,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2275,7 +2336,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -2548,9 +2609,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2561,7 +2633,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -2859,9 +2931,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2872,7 +2955,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -2936,7 +3019,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+name}:query";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -3129,7 +3213,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3166,7 +3250,7 @@ where
     }
 }
 
-/// Returns multiple pivot reports in a batch. All reports must be for the same GA4 Property.
+/// Returns multiple pivot reports in a batch. All reports must be for the same Google Analytics property.
 ///
 /// A builder for the *batchRunPivotReports* method supported by a *property* resource.
 /// It is not used directly, but through a [`PropertyMethods`] instance.
@@ -3184,9 +3268,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3197,7 +3292,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -3263,7 +3358,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+property}:batchRunPivotReports";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -3398,7 +3494,7 @@ where
         self._request = new_value;
         self
     }
-    /// A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunPivotReportRequest may either be unspecified or consistent with this property. Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunPivotReportRequest may either be unspecified or consistent with this property. Example: properties/1234
     ///
     /// Sets the *property* path property to the given value.
     ///
@@ -3456,7 +3552,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3493,7 +3589,7 @@ where
     }
 }
 
-/// Returns multiple reports in a batch. All reports must be for the same GA4 Property.
+/// Returns multiple reports in a batch. All reports must be for the same Google Analytics property.
 ///
 /// A builder for the *batchRunReports* method supported by a *property* resource.
 /// It is not used directly, but through a [`PropertyMethods`] instance.
@@ -3511,9 +3607,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3524,7 +3631,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -3588,7 +3695,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+property}:batchRunReports";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -3723,7 +3831,7 @@ where
         self._request = new_value;
         self
     }
-    /// A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunReportRequest may either be unspecified or consistent with this property. Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunReportRequest may either be unspecified or consistent with this property. Example: properties/1234
     ///
     /// Sets the *property* path property to the given value.
     ///
@@ -3781,7 +3889,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -3836,9 +3944,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3849,7 +3968,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -3913,7 +4032,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+property}:checkCompatibility";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -4048,7 +4168,7 @@ where
         self._request = new_value;
         self
     }
-    /// A Google Analytics GA4 property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). `property` should be the same value as in your `runReport` request. Example: properties/1234
     ///
     /// Sets the *property* path property to the given value.
     ///
@@ -4106,7 +4226,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4143,7 +4263,7 @@ where
     }
 }
 
-/// Returns metadata for dimensions and metrics available in reporting methods. Used to explore the dimensions and metrics. In this method, a Google Analytics GA4 Property Identifier is specified in the request, and the metadata response includes Custom dimensions and metrics as well as Universal metadata. For example if a custom metric with parameter name `levels_unlocked` is registered to a property, the Metadata response will contain `customEvent:levels_unlocked`. Universal metadata are dimensions and metrics applicable to any property such as `country` and `totalUsers`.
+/// Returns metadata for dimensions and metrics available in reporting methods. Used to explore the dimensions and metrics. In this method, a Google Analytics property identifier is specified in the request, and the metadata response includes Custom dimensions and metrics as well as Universal metadata. For example if a custom metric with parameter name `levels_unlocked` is registered to a property, the Metadata response will contain `customEvent:levels_unlocked`. Universal metadata are dimensions and metrics applicable to any property such as `country` and `totalUsers`.
 ///
 /// A builder for the *getMetadata* method supported by a *property* resource.
 /// It is not used directly, but through a [`PropertyMethods`] instance.
@@ -4160,9 +4280,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4173,7 +4304,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -4334,7 +4465,7 @@ where
         }
     }
 
-    /// Required. The resource name of the metadata to retrieve. This name field is specified in the URL path and not URL parameters. Property is a numeric Google Analytics GA4 Property identifier. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234/metadata Set the Property ID to 0 for dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics.
+    /// Required. The resource name of the metadata to retrieve. This name field is specified in the URL path and not URL parameters. Property is a numeric Google Analytics property identifier. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234/metadata Set the Property ID to 0 for dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4447,9 +4578,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4460,7 +4602,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -4524,7 +4666,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+property}:runPivotReport";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -4659,7 +4802,7 @@ where
         self._request = new_value;
         self
     }
-    /// A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
     ///
     /// Sets the *property* path property to the given value.
     ///
@@ -4717,7 +4860,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -4772,9 +4915,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4785,7 +4939,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -4849,7 +5003,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+property}:runRealtimeReport";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -4984,7 +5139,7 @@ where
         self._request = new_value;
         self
     }
-    /// A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234
     ///
     /// Sets the *property* path property to the given value.
     ///
@@ -5042,7 +5197,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5097,9 +5252,20 @@ where
 /// # use analyticsdata1_beta::{AnalyticsData, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5110,7 +5276,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = AnalyticsData::new(client, auth);
@@ -5174,7 +5340,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1beta/{+property}:runReport";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Analytic.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AnalyticReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -5306,7 +5473,7 @@ where
         self._request = new_value;
         self
     }
-    /// A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
+    /// A Google Analytics property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
     ///
     /// Sets the *property* path property to the given value.
     ///
@@ -5364,7 +5531,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Analytic`].
+    /// [`Scope::AnalyticReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

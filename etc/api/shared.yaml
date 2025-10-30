@@ -12,6 +12,7 @@ api:
     - cloudsearch
     - compute # assertion error
     - dataflow # in beta
+    - dialogflow # recursive type
     - firebaserules
     - gkehub
     - kgsearch # illegal characters

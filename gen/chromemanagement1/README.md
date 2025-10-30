@@ -5,16 +5,18 @@ DO NOT EDIT !
 -->
 The `google-chromemanagement1` library allows access to all features of the *Google Chrome Management* service.
 
-This documentation was generated from *Chrome Management* crate version *6.0.0+20240624*, where *20240624* is the exact revision of the *chromemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+This documentation was generated from *Chrome Management* crate version *8.0.0+20251028*, where *20251028* is the exact revision of the *chromemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 
 Everything else about the *Chrome Management* *v1* API can be found at the
-[official documentation site](http://developers.google.com/chrome/management/).
+[official documentation site](https://developers.google.com/chrome/management/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/ChromeManagement) ...
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/ChromeManagement) ...
 
 * customers
- * [*apps android get*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerAppAndroidGetCall), [*apps chrome get*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerAppChromeGetCall), [*apps count chrome app requests*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerAppCountChromeAppRequestCall), [*apps fetch devices requesting extension*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerAppFetchDevicesRequestingExtensionCall), [*apps fetch users requesting extension*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerAppFetchUsersRequestingExtensionCall), [*apps web get*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerAppWebGetCall), [*reports count chrome browsers needing attention*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountChromeBrowsersNeedingAttentionCall), [*reports count chrome crash events*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountChromeCrashEventCall), [*reports count chrome devices reaching auto expiration date*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountChromeDevicesReachingAutoExpirationDateCall), [*reports count chrome devices that need attention*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountChromeDevicesThatNeedAttentionCall), [*reports count chrome hardware fleet devices*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountChromeHardwareFleetDeviceCall), [*reports count chrome versions*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountChromeVersionCall), [*reports count installed apps*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountInstalledAppCall), [*reports count print jobs by printer*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountPrintJobsByPrinterCall), [*reports count print jobs by user*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportCountPrintJobsByUserCall), [*reports enumerate print jobs*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportEnumeratePrintJobCall), [*reports find installed app devices*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerReportFindInstalledAppDeviceCall), [*telemetry devices get*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryDeviceGetCall), [*telemetry devices list*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryDeviceListCall), [*telemetry events list*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryEventListCall), [*telemetry notification configs create*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryNotificationConfigCreateCall), [*telemetry notification configs delete*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryNotificationConfigDeleteCall), [*telemetry notification configs list*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryNotificationConfigListCall), [*telemetry users get*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryUserGetCall) and [*telemetry users list*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/api::CustomerTelemetryUserListCall)
+ * [*apps android get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerAppAndroidGetCall), [*apps chrome get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerAppChromeGetCall), [*apps count chrome app requests*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerAppCountChromeAppRequestCall), [*apps fetch devices requesting extension*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerAppFetchDevicesRequestingExtensionCall), [*apps fetch users requesting extension*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerAppFetchUsersRequestingExtensionCall), [*apps web get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerAppWebGetCall), [*certificate provisioning processes claim*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerCertificateProvisioningProcessClaimCall), [*certificate provisioning processes get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerCertificateProvisioningProcessGetCall), [*certificate provisioning processes operations get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerCertificateProvisioningProcessOperationGetCall), [*certificate provisioning processes set failure*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerCertificateProvisioningProcessSetFailureCall), [*certificate provisioning processes sign data*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerCertificateProvisioningProcessSignDataCall), [*certificate provisioning processes upload certificate*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerCertificateProvisioningProcessUploadCertificateCall), [*profiles commands create*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerProfileCommandCreateCall), [*profiles commands get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerProfileCommandGetCall), [*profiles commands list*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerProfileCommandListCall), [*profiles delete*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerProfileDeleteCall), [*profiles get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerProfileGetCall), [*profiles list*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerProfileListCall), [*reports count chrome browsers needing attention*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountChromeBrowsersNeedingAttentionCall), [*reports count chrome crash events*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountChromeCrashEventCall), [*reports count chrome devices reaching auto expiration date*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountChromeDevicesReachingAutoExpirationDateCall), [*reports count chrome devices that need attention*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountChromeDevicesThatNeedAttentionCall), [*reports count chrome hardware fleet devices*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountChromeHardwareFleetDeviceCall), [*reports count chrome versions*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountChromeVersionCall), [*reports count installed apps*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountInstalledAppCall), [*reports count print jobs by printer*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountPrintJobsByPrinterCall), [*reports count print jobs by user*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportCountPrintJobsByUserCall), [*reports enumerate print jobs*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportEnumeratePrintJobCall), [*reports find installed app devices*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerReportFindInstalledAppDeviceCall), [*telemetry devices get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryDeviceGetCall), [*telemetry devices list*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryDeviceListCall), [*telemetry events list*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryEventListCall), [*telemetry notification configs create*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryNotificationConfigCreateCall), [*telemetry notification configs delete*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryNotificationConfigDeleteCall), [*telemetry notification configs list*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryNotificationConfigListCall), [*telemetry users get*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryUserGetCall), [*telemetry users list*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerTelemetryUserListCall) and [*third party profile users move*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::CustomerThirdPartyProfileUserMoveCall)
+* operations
+ * [*cancel*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::OperationCancelCall), [*delete*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::OperationDeleteCall) and [*list*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/api::OperationListCall)
 
 
 
@@ -23,17 +25,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/ChromeManagement)**
+* **[Hub](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/ChromeManagement)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::CallBuilder)
-* **[Resources](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::CallBuilder)
+* **[Resources](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Part)**
+    * **[Parts](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::CallBuilder)**
+* **[Activities](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -47,9 +49,10 @@ let r = hub.resource().activity(...).doit().await
 Or specifically ...
 
 ```ignore
-let r = hub.customers().apps_android_get(...).doit().await
-let r = hub.customers().apps_chrome_get(...).doit().await
-let r = hub.customers().apps_web_get(...).doit().await
+let r = hub.customers().profiles_delete(...).doit().await
+let r = hub.customers().telemetry_notification_configs_delete(...).doit().await
+let r = hub.operations().cancel(...).doit().await
+let r = hub.operations().delete(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -76,6 +79,7 @@ serde_json = "1"
 extern crate hyper;
 extern crate hyper_rustls;
 extern crate google_chromemanagement1 as chromemanagement1;
+use chromemanagement1::api::GoogleLongrunningCancelOperationRequest;
 use chromemanagement1::{Result, Error};
 use chromemanagement1::{ChromeManagement, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 
@@ -87,9 +91,20 @@ let secret: yup_oauth2::ApplicationSecret = Default::default();
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let connector = hyper_rustls::HttpsConnectorBuilder::new()
+    .with_native_roots()
+    .unwrap()
+    .https_only()
+    .enable_http2()
+    .build();
+
+let executor = hyper_util::rt::TokioExecutor::new();
+let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
     secret,
     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    yup_oauth2::client::CustomHyperClientBuilder::from(
+        hyper_util::client::legacy::Client::builder(executor).build(connector),
+    ),
 ).build().await.unwrap();
 
 let client = hyper_util::client::legacy::Client::builder(
@@ -100,14 +115,19 @@ let client = hyper_util::client::legacy::Client::builder(
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build()
 );
 let mut hub = ChromeManagement::new(client, auth);
+// As the method needs a request, you would usually fill it with the desired information
+// into the respective structure. Some of the parts shown here might not be applicable !
+// Values shown here are possibly random and not representative !
+let mut req = GoogleLongrunningCancelOperationRequest::default();
+
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.customers().apps_android_get("name")
+let result = hub.operations().cancel(req, "name")
              .doit().await;
 
 match result {
@@ -131,17 +151,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the
-[Hub Delegate](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -151,29 +171,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Delegate) to the
-[Method Builder](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::CallBuilder) before making the final `doit()` call.
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Delegate) to the
+[Method Builder](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::CallBuilder) before making the final `doit()` call.
 Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::RequestValue) and
-[decodable](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
+All structures provided by this library are made to be [encodable](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::RequestValue) and
+[decodable](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::Part) which are identifiable by name, which will be sent to
+Most optionals are are considered [Parts](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-chromemanagement1/6.0.0+20240624/google_chromemanagement1/common::RequestValue) are moved
+* [request values](https://docs.rs/google-chromemanagement1/8.0.0+20251028/google_chromemanagement1/common::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

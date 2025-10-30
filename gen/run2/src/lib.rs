@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Run* crate version *6.0.0+20240621*, where *20240621* is the exact revision of the *run:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloud Run* crate version *8.0.0+20251024*, where *20251024* is the exact revision of the *run:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Cloud Run* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/run/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudRun) ...
 //!
 //! * projects
-//!  * [*locations export image*](api::ProjectLocationExportImageCall), [*locations export image metadata*](api::ProjectLocationExportImageMetadataCall), [*locations export metadata*](api::ProjectLocationExportMetadataCall), [*locations jobs create*](api::ProjectLocationJobCreateCall), [*locations jobs delete*](api::ProjectLocationJobDeleteCall), [*locations jobs executions cancel*](api::ProjectLocationJobExecutionCancelCall), [*locations jobs executions delete*](api::ProjectLocationJobExecutionDeleteCall), [*locations jobs executions export status*](api::ProjectLocationJobExecutionExportStatuCall), [*locations jobs executions get*](api::ProjectLocationJobExecutionGetCall), [*locations jobs executions list*](api::ProjectLocationJobExecutionListCall), [*locations jobs executions tasks get*](api::ProjectLocationJobExecutionTaskGetCall), [*locations jobs executions tasks list*](api::ProjectLocationJobExecutionTaskListCall), [*locations jobs get*](api::ProjectLocationJobGetCall), [*locations jobs get iam policy*](api::ProjectLocationJobGetIamPolicyCall), [*locations jobs list*](api::ProjectLocationJobListCall), [*locations jobs patch*](api::ProjectLocationJobPatchCall), [*locations jobs run*](api::ProjectLocationJobRunCall), [*locations jobs set iam policy*](api::ProjectLocationJobSetIamPolicyCall), [*locations jobs test iam permissions*](api::ProjectLocationJobTestIamPermissionCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations operations wait*](api::ProjectLocationOperationWaitCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services patch*](api::ProjectLocationServicePatchCall), [*locations services revisions delete*](api::ProjectLocationServiceRevisionDeleteCall), [*locations services revisions export status*](api::ProjectLocationServiceRevisionExportStatuCall), [*locations services revisions get*](api::ProjectLocationServiceRevisionGetCall), [*locations services revisions list*](api::ProjectLocationServiceRevisionListCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall)
+//!  * [*locations builds submit*](api::ProjectLocationBuildSubmitCall), [*locations export image*](api::ProjectLocationExportImageCall), [*locations export image metadata*](api::ProjectLocationExportImageMetadataCall), [*locations export metadata*](api::ProjectLocationExportMetadataCall), [*locations export project metadata*](api::ProjectLocationExportProjectMetadataCall), [*locations jobs create*](api::ProjectLocationJobCreateCall), [*locations jobs delete*](api::ProjectLocationJobDeleteCall), [*locations jobs executions cancel*](api::ProjectLocationJobExecutionCancelCall), [*locations jobs executions delete*](api::ProjectLocationJobExecutionDeleteCall), [*locations jobs executions export status*](api::ProjectLocationJobExecutionExportStatuCall), [*locations jobs executions get*](api::ProjectLocationJobExecutionGetCall), [*locations jobs executions list*](api::ProjectLocationJobExecutionListCall), [*locations jobs executions tasks get*](api::ProjectLocationJobExecutionTaskGetCall), [*locations jobs executions tasks list*](api::ProjectLocationJobExecutionTaskListCall), [*locations jobs get*](api::ProjectLocationJobGetCall), [*locations jobs get iam policy*](api::ProjectLocationJobGetIamPolicyCall), [*locations jobs list*](api::ProjectLocationJobListCall), [*locations jobs patch*](api::ProjectLocationJobPatchCall), [*locations jobs run*](api::ProjectLocationJobRunCall), [*locations jobs set iam policy*](api::ProjectLocationJobSetIamPolicyCall), [*locations jobs test iam permissions*](api::ProjectLocationJobTestIamPermissionCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations operations wait*](api::ProjectLocationOperationWaitCall), [*locations services create*](api::ProjectLocationServiceCreateCall), [*locations services delete*](api::ProjectLocationServiceDeleteCall), [*locations services get*](api::ProjectLocationServiceGetCall), [*locations services get iam policy*](api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](api::ProjectLocationServiceListCall), [*locations services patch*](api::ProjectLocationServicePatchCall), [*locations services revisions delete*](api::ProjectLocationServiceRevisionDeleteCall), [*locations services revisions export status*](api::ProjectLocationServiceRevisionExportStatuCall), [*locations services revisions get*](api::ProjectLocationServiceRevisionGetCall), [*locations services revisions list*](api::ProjectLocationServiceRevisionListCall), [*locations services set iam policy*](api::ProjectLocationServiceSetIamPolicyCall), [*locations services test iam permissions*](api::ProjectLocationServiceTestIamPermissionCall), [*locations worker pools create*](api::ProjectLocationWorkerPoolCreateCall), [*locations worker pools delete*](api::ProjectLocationWorkerPoolDeleteCall), [*locations worker pools get*](api::ProjectLocationWorkerPoolGetCall), [*locations worker pools get iam policy*](api::ProjectLocationWorkerPoolGetIamPolicyCall), [*locations worker pools list*](api::ProjectLocationWorkerPoolListCall), [*locations worker pools patch*](api::ProjectLocationWorkerPoolPatchCall), [*locations worker pools revisions delete*](api::ProjectLocationWorkerPoolRevisionDeleteCall), [*locations worker pools revisions get*](api::ProjectLocationWorkerPoolRevisionGetCall), [*locations worker pools revisions list*](api::ProjectLocationWorkerPoolRevisionListCall), [*locations worker pools set iam policy*](api::ProjectLocationWorkerPoolSetIamPolicyCall) and [*locations worker pools test iam permissions*](api::ProjectLocationWorkerPoolTestIamPermissionCall)
 //!
 //!
 //!
@@ -59,6 +59,10 @@
 //! let r = hub.projects().locations_services_create(...).doit().await
 //! let r = hub.projects().locations_services_delete(...).doit().await
 //! let r = hub.projects().locations_services_patch(...).doit().await
+//! let r = hub.projects().locations_worker_pools_revisions_delete(...).doit().await
+//! let r = hub.projects().locations_worker_pools_create(...).doit().await
+//! let r = hub.projects().locations_worker_pools_delete(...).doit().await
+//! let r = hub.projects().locations_worker_pools_patch(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -85,7 +89,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_run2 as run2;
-//! use run2::api::GoogleCloudRunV2Service;
+//! use run2::api::GoogleCloudRunV2WorkerPool;
 //! use run2::{Result, Error};
 //! # async fn dox() {
 //! use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -98,9 +102,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -111,21 +126,22 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CloudRun::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GoogleCloudRunV2Service::default();
+//! let mut req = GoogleCloudRunV2WorkerPool::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_services_patch(req, "name")
+//! let result = hub.projects().locations_worker_pools_patch(req, "name")
 //!              .validate_only(true)
 //!              .update_mask(FieldMask::new::<&str>(&[]))
+//!              .force_new_revision(true)
 //!              .allow_missing(true)
 //!              .doit().await;
 //!

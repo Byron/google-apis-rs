@@ -198,7 +198,7 @@ impl<'a, C> Gmail<C> {
         Gmail {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/7.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://gmail.googleapis.com/".to_string(),
             _root_url: "https://gmail.googleapis.com/".to_string(),
         }
@@ -209,7 +209,7 @@ impl<'a, C> Gmail<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/7.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -303,7 +303,7 @@ pub struct BatchModifyMessagesRequest {
 
 impl common::RequestValue for BatchModifyMessagesRequest {}
 
-/// The client-side encryption (CSE) configuration for the email address of an authenticated user. Gmail uses CSE configurations to save drafts of client-side encrypted email messages, and to sign and send encrypted email messages.
+/// The client-side encryption (CSE) configuration for the email address of an authenticated user. Gmail uses CSE configurations to save drafts of client-side encrypted email messages, and to sign and send encrypted email messages. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// # Activities
 ///
@@ -331,7 +331,7 @@ pub struct CseIdentity {
 impl common::RequestValue for CseIdentity {}
 impl common::ResponseResult for CseIdentity {}
 
-/// A client-side encryption S/MIME key pair, which is comprised of a public key, its certificate chain, and metadata for its paired private key. Gmail uses the key pair to complete the following tasks: - Sign outgoing client-side encrypted messages. - Save and reopen drafts of client-side encrypted messages. - Save and reopen sent messages. - Decrypt incoming or archived S/MIME messages.
+/// A client-side encryption S/MIME key pair, which is comprised of a public key, its certificate chain, and metadata for its paired private key. Gmail uses the key pair to complete the following tasks: - Sign outgoing client-side encrypted messages. - Save and reopen drafts of client-side encrypted messages. - Save and reopen sent messages. - Decrypt incoming or archived S/MIME messages. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// # Activities
 ///
@@ -575,7 +575,7 @@ pub struct ForwardingAddress {
 impl common::RequestValue for ForwardingAddress {}
 impl common::ResponseResult for ForwardingAddress {}
 
-/// Metadata for hardware keys.
+/// Metadata for hardware keys. If [hardware key encryption](https://support.google.com/a/answer/14153163) is set up for the Google Workspace organization, users can optionally store their private key on their smart card and use it to sign and decrypt email messages in Gmail by inserting their smart card into a reader attached to their Windows device.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -805,7 +805,7 @@ impl common::Part for LabelColor {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct LanguageSettings {
-    /// The language to display Gmail in, formatted as an RFC 3066 Language Tag (for example `en-GB`, `fr` or `ja` for British English, French, or Japanese respectively). The set of languages supported by Gmail evolves over time, so please refer to the "Language" dropdown in the Gmail settings for all available options, as described in the language settings help article. A table of sample values is also provided in the Managing Language Settings guide Not all Gmail clients can display the same set of languages. In the case that a user's display language is not available for use on a particular client, said client automatically chooses to display in the closest supported variant (or a reasonable default).
+    /// The language to display Gmail in, formatted as an RFC 3066 Language Tag (for example `en-GB`, `fr` or `ja` for British English, French, or Japanese respectively). The set of languages supported by Gmail evolves over time, so please refer to the "Language" dropdown in the Gmail settings for all available options, as described in the language settings help article. For a table of sample values, see [Manage language settings](https://developers.google.com/workspace/gmail/api/guides/language-settings). Not all Gmail clients can display the same set of languages. In the case that a user's display language is not available for use on a particular client, said client automatically chooses to display in the closest supported variant (or a reasonable default).
     #[serde(rename = "displayLanguage")]
     pub display_language: Option<String>,
 }
@@ -887,7 +887,7 @@ impl common::ResponseResult for ListDelegatesResponse {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListDraftsResponse {
-    /// List of drafts. Note that the `Message` property in each `Draft` resource only contains an `id` and a `threadId`. The messages.get method can fetch additional message details.
+    /// List of drafts. Note that the `Message` property in each `Draft` resource only contains an `id` and a `threadId`. The [`messages.get`](https://developers.google.com/workspace/gmail/api/v1/reference/users/messages/get) method can fetch additional message details.
     pub drafts: Option<Vec<Draft>>,
     /// Token to retrieve the next page of results in the list.
     #[serde(rename = "nextPageToken")]
@@ -973,7 +973,7 @@ impl common::ResponseResult for ListHistoryResponse {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ListLabelsResponse {
-    /// List of labels. Note that each label resource only contains an `id`, `name`, `messageListVisibility`, `labelListVisibility`, and `type`. The labels.get method can fetch additional label details.
+    /// List of labels. Note that each label resource only contains an `id`, `name`, `messageListVisibility`, `labelListVisibility`, and `type`. The [`labels.get`](https://developers.google.com/workspace/gmail/api/v1/reference/users/labels/get) method can fetch additional label details.
     pub labels: Option<Vec<Label>>,
 }
 
@@ -1059,7 +1059,7 @@ pub struct ListThreadsResponse {
     /// Estimated total number of results.
     #[serde(rename = "resultSizeEstimate")]
     pub result_size_estimate: Option<u32>,
-    /// List of threads. Note that each thread resource does not contain a list of `messages`. The list of `messages` for a given thread can be fetched using the threads.get method.
+    /// List of threads. Note that each thread resource does not contain a list of `messages`. The list of `messages` for a given thread can be fetched using the [`threads.get`](https://developers.google.com/workspace/gmail/api/v1/reference/users/threads/get) method.
     pub threads: Option<Vec<Thread>>,
 }
 
@@ -2036,7 +2036,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the messages in the user's mailbox.
+    /// Lists the messages in the user's mailbox. For example usage, see [List Gmail messages](https://developers.google.com/workspace/gmail/api/guides/list-messages).
     ///
     /// # Arguments
     ///
@@ -2084,7 +2084,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/gmail/api/guides/sending).
+    /// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/workspace/gmail/api/guides/sending).
     ///
     /// # Arguments
     ///
@@ -2141,7 +2141,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates and configures a client-side encryption identity that's authorized to send mail from the user account. Google publishes the S/MIME certificate to a shared domain-wide directory so that people within a Google Workspace organization can encrypt and send mail to the identity.
+    /// Creates and configures a client-side encryption identity that's authorized to send mail from the user account. Google publishes the S/MIME certificate to a shared domain-wide directory so that people within a Google Workspace organization can encrypt and send mail to the identity. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2164,7 +2164,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a client-side encryption identity. The authenticated user can no longer use the identity to send encrypted messages. You cannot restore the identity after you delete it. Instead, use the CreateCseIdentity method to create another identity with the same configuration.
+    /// Deletes a client-side encryption identity. The authenticated user can no longer use the identity to send encrypted messages. You cannot restore the identity after you delete it. Instead, use the CreateCseIdentity method to create another identity with the same configuration. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2187,7 +2187,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a client-side encryption identity configuration.
+    /// Retrieves a client-side encryption identity configuration. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2210,7 +2210,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the client-side encrypted identities for an authenticated user.
+    /// Lists the client-side encrypted identities for an authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2232,7 +2232,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Associates a different key pair with an existing client-side encryption identity. The updated key pair must validate against Google's [S/MIME certificate profiles](https://support.google.com/a/answer/7300887).
+    /// Associates a different key pair with an existing client-side encryption identity. The updated key pair must validate against Google's [S/MIME certificate profiles](https://support.google.com/a/answer/7300887). For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2258,7 +2258,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates and uploads a client-side encryption S/MIME public key certificate chain and private key metadata for the authenticated user.
+    /// Creates and uploads a client-side encryption S/MIME public key certificate chain and private key metadata for the authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2281,7 +2281,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Turns off a client-side encryption key pair. The authenticated user can no longer use the key pair to decrypt incoming CSE message texts or sign outgoing CSE mail. To regain access, use the EnableCseKeyPair to turn on the key pair. After 30 days, you can permanently delete the key pair by using the ObliterateCseKeyPair method.
+    /// Turns off a client-side encryption key pair. The authenticated user can no longer use the key pair to decrypt incoming CSE message texts or sign outgoing CSE mail. To regain access, use the EnableCseKeyPair to turn on the key pair. After 30 days, you can permanently delete the key pair by using the ObliterateCseKeyPair method. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2307,7 +2307,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Turns on a client-side encryption key pair that was turned off. The key pair becomes active again for any associated client-side encryption identities.
+    /// Turns on a client-side encryption key pair that was turned off. The key pair becomes active again for any associated client-side encryption identities. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2333,7 +2333,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an existing client-side encryption key pair.
+    /// Retrieves an existing client-side encryption key pair. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2356,7 +2356,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists client-side encryption key pairs for an authenticated user.
+    /// Lists client-side encryption key pairs for an authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -2378,7 +2378,7 @@ impl<'a, C> UserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a client-side encryption key pair permanently and immediately. You can only permanently delete key pairs that have been turned off for more than 30 days. To turn off a key pair, use the DisableCseKeyPair method. Gmail can't restore or decrypt any messages that were encrypted by an obliterated key. Authenticated users and Google Workspace administrators lose access to reading the encrypted messages.
+    /// Deletes a client-side encryption key pair permanently and immediately. You can only permanently delete key pairs that have been turned off for more than 30 days. To turn off a key pair, use the DisableCseKeyPair method. Gmail can't restore or decrypt any messages that were encrypted by an obliterated key. Authenticated users and Google Workspace administrators lose access to reading the encrypted messages. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
     ///
     /// # Arguments
     ///
@@ -8186,7 +8186,8 @@ where
         let mut url = self.hub._base_url.clone()
             + "gmail/v1/users/{userId}/messages/{messageId}/attachments/{id}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AddonCurrentMessageReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -8372,7 +8373,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Readonly`].
+    /// [`Scope::AddonCurrentMessageReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -9460,7 +9461,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "gmail/v1/users/{userId}/messages/{id}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AddonCurrentMessageReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -9645,7 +9647,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Readonly`].
+    /// [`Scope::AddonCurrentMessageReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10760,7 +10762,7 @@ where
     }
 }
 
-/// Lists the messages in the user's mailbox.
+/// Lists the messages in the user's mailbox. For example usage, see [List Gmail messages](https://developers.google.com/workspace/gmail/api/guides/list-messages).
 ///
 /// A builder for the *messages.list* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -11029,7 +11031,7 @@ where
         self._max_results = Some(new_value);
         self
     }
-    /// Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have. To learn more, see [Manage labels on messages and threads](https://developers.google.com/gmail/api/guides/labels#manage_labels_on_messages_threads).
+    /// Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have. To learn more, see [Manage labels on messages and threads](https://developers.google.com/workspace/gmail/api/guides/labels#manage_labels_on_messages_threads).
     ///
     /// Append the given value to the *label ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -11474,7 +11476,7 @@ where
     }
 }
 
-/// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/gmail/api/guides/sending).
+/// Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/workspace/gmail/api/guides/sending).
 ///
 /// A builder for the *messages.send* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -12589,7 +12591,7 @@ where
     }
 }
 
-/// Creates and configures a client-side encryption identity that's authorized to send mail from the user account. Google publishes the S/MIME certificate to a shared domain-wide directory so that people within a Google Workspace organization can encrypt and send mail to the identity.
+/// Creates and configures a client-side encryption identity that's authorized to send mail from the user account. Google publishes the S/MIME certificate to a shared domain-wide directory so that people within a Google Workspace organization can encrypt and send mail to the identity. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.identities.create* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -12924,7 +12926,7 @@ where
     }
 }
 
-/// Deletes a client-side encryption identity. The authenticated user can no longer use the identity to send encrypted messages. You cannot restore the identity after you delete it. Instead, use the CreateCseIdentity method to create another identity with the same configuration.
+/// Deletes a client-side encryption identity. The authenticated user can no longer use the identity to send encrypted messages. You cannot restore the identity after you delete it. Instead, use the CreateCseIdentity method to create another identity with the same configuration. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.identities.delete* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -13225,7 +13227,7 @@ where
     }
 }
 
-/// Retrieves a client-side encryption identity configuration.
+/// Retrieves a client-side encryption identity configuration. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.identities.get* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -13539,7 +13541,7 @@ where
     }
 }
 
-/// Lists the client-side encrypted identities for an authenticated user.
+/// Lists the client-side encrypted identities for an authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.identities.list* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -13860,7 +13862,7 @@ where
     }
 }
 
-/// Associates a different key pair with an existing client-side encryption identity. The updated key pair must validate against Google's [S/MIME certificate profiles](https://support.google.com/a/answer/7300887).
+/// Associates a different key pair with an existing client-side encryption identity. The updated key pair must validate against Google's [S/MIME certificate profiles](https://support.google.com/a/answer/7300887). For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.identities.patch* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -14209,7 +14211,7 @@ where
     }
 }
 
-/// Creates and uploads a client-side encryption S/MIME public key certificate chain and private key metadata for the authenticated user.
+/// Creates and uploads a client-side encryption S/MIME public key certificate chain and private key metadata for the authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.keypairs.create* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -14543,7 +14545,7 @@ where
     }
 }
 
-/// Turns off a client-side encryption key pair. The authenticated user can no longer use the key pair to decrypt incoming CSE message texts or sign outgoing CSE mail. To regain access, use the EnableCseKeyPair to turn on the key pair. After 30 days, you can permanently delete the key pair by using the ObliterateCseKeyPair method.
+/// Turns off a client-side encryption key pair. The authenticated user can no longer use the key pair to decrypt incoming CSE message texts or sign outgoing CSE mail. To regain access, use the EnableCseKeyPair to turn on the key pair. After 30 days, you can permanently delete the key pair by using the ObliterateCseKeyPair method. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.keypairs.disable* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -14895,7 +14897,7 @@ where
     }
 }
 
-/// Turns on a client-side encryption key pair that was turned off. The key pair becomes active again for any associated client-side encryption identities.
+/// Turns on a client-side encryption key pair that was turned off. The key pair becomes active again for any associated client-side encryption identities. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.keypairs.enable* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -15247,7 +15249,7 @@ where
     }
 }
 
-/// Retrieves an existing client-side encryption key pair.
+/// Retrieves an existing client-side encryption key pair. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.keypairs.get* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -15558,7 +15560,7 @@ where
     }
 }
 
-/// Lists client-side encryption key pairs for an authenticated user.
+/// Lists client-side encryption key pairs for an authenticated user. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.keypairs.list* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -15878,7 +15880,7 @@ where
     }
 }
 
-/// Deletes a client-side encryption key pair permanently and immediately. You can only permanently delete key pairs that have been turned off for more than 30 days. To turn off a key pair, use the DisableCseKeyPair method. Gmail can't restore or decrypt any messages that were encrypted by an obliterated key. Authenticated users and Google Workspace administrators lose access to reading the encrypted messages.
+/// Deletes a client-side encryption key pair permanently and immediately. You can only permanently delete key pairs that have been turned off for more than 30 days. To turn off a key pair, use the DisableCseKeyPair method. Gmail can't restore or decrypt any messages that were encrypted by an obliterated key. Authenticated users and Google Workspace administrators lose access to reading the encrypted messages. For administrators managing identities and keypairs for users in their organization, requests require authorization with a [service account](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) that has [domain-wide delegation authority](https://developers.google.com/identity/protocols/OAuth2ServiceAccount#delegatingauthority) to impersonate users with the `https://www.googleapis.com/auth/gmail.settings.basic` scope. For users managing their own identities and keypairs, requests require [hardware key encryption](https://support.google.com/a/answer/14153163) turned on and configured.
 ///
 /// A builder for the *settings.cse.keypairs.obliterate* method supported by a *user* resource.
 /// It is not used directly, but through a [`UserMethods`] instance.
@@ -27361,7 +27363,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "gmail/v1/users/{userId}/threads/{id}";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string());
+            self._scopes
+                .insert(Scope::AddonCurrentMessageReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -27543,7 +27546,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Readonly`].
+    /// [`Scope::AddonCurrentMessageReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29304,7 +29307,7 @@ where
 
         let mut url = self.hub._base_url.clone() + "gmail/v1/users/{userId}/stop";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Gmai.as_ref().to_string());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -29448,7 +29451,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Gmai`].
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -29591,7 +29594,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "gmail/v1/users/{userId}/watch";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Gmai.as_ref().to_string());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -29778,7 +29781,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Gmai`].
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.

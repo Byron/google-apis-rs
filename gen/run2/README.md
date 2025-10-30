@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-run2` library allows access to all features of the *Google Cloud Run* service.
 
-This documentation was generated from *Cloud Run* crate version *6.0.0+20240621*, where *20240621* is the exact revision of the *run:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+This documentation was generated from *Cloud Run* crate version *8.0.0+20251024*, where *20251024* is the exact revision of the *run:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 
 Everything else about the *Cloud Run* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/run/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-run2/6.0.0+20240621/google_run2/CloudRun) ...
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-run2/8.0.0+20251024/google_run2/CloudRun) ...
 
 * projects
- * [*locations export image*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationExportImageCall), [*locations export image metadata*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationExportImageMetadataCall), [*locations export metadata*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationExportMetadataCall), [*locations jobs create*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobCreateCall), [*locations jobs delete*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobDeleteCall), [*locations jobs executions cancel*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobExecutionCancelCall), [*locations jobs executions delete*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobExecutionDeleteCall), [*locations jobs executions export status*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobExecutionExportStatuCall), [*locations jobs executions get*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobExecutionGetCall), [*locations jobs executions list*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobExecutionListCall), [*locations jobs executions tasks get*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobExecutionTaskGetCall), [*locations jobs executions tasks list*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobExecutionTaskListCall), [*locations jobs get*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobGetCall), [*locations jobs get iam policy*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobGetIamPolicyCall), [*locations jobs list*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobListCall), [*locations jobs patch*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobPatchCall), [*locations jobs run*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobRunCall), [*locations jobs set iam policy*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobSetIamPolicyCall), [*locations jobs test iam permissions*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationJobTestIamPermissionCall), [*locations operations delete*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationOperationListCall), [*locations operations wait*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationOperationWaitCall), [*locations services create*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceCreateCall), [*locations services delete*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceDeleteCall), [*locations services get*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceGetCall), [*locations services get iam policy*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceListCall), [*locations services patch*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServicePatchCall), [*locations services revisions delete*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceRevisionDeleteCall), [*locations services revisions export status*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceRevisionExportStatuCall), [*locations services revisions get*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceRevisionGetCall), [*locations services revisions list*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceRevisionListCall), [*locations services set iam policy*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceSetIamPolicyCall) and [*locations services test iam permissions*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/api::ProjectLocationServiceTestIamPermissionCall)
+ * [*locations builds submit*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationBuildSubmitCall), [*locations export image*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationExportImageCall), [*locations export image metadata*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationExportImageMetadataCall), [*locations export metadata*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationExportMetadataCall), [*locations export project metadata*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationExportProjectMetadataCall), [*locations jobs create*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobCreateCall), [*locations jobs delete*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobDeleteCall), [*locations jobs executions cancel*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobExecutionCancelCall), [*locations jobs executions delete*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobExecutionDeleteCall), [*locations jobs executions export status*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobExecutionExportStatuCall), [*locations jobs executions get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobExecutionGetCall), [*locations jobs executions list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobExecutionListCall), [*locations jobs executions tasks get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobExecutionTaskGetCall), [*locations jobs executions tasks list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobExecutionTaskListCall), [*locations jobs get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobGetCall), [*locations jobs get iam policy*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobGetIamPolicyCall), [*locations jobs list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobListCall), [*locations jobs patch*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobPatchCall), [*locations jobs run*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobRunCall), [*locations jobs set iam policy*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobSetIamPolicyCall), [*locations jobs test iam permissions*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationJobTestIamPermissionCall), [*locations operations delete*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationOperationListCall), [*locations operations wait*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationOperationWaitCall), [*locations services create*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceCreateCall), [*locations services delete*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceDeleteCall), [*locations services get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceGetCall), [*locations services get iam policy*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceGetIamPolicyCall), [*locations services list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceListCall), [*locations services patch*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServicePatchCall), [*locations services revisions delete*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceRevisionDeleteCall), [*locations services revisions export status*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceRevisionExportStatuCall), [*locations services revisions get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceRevisionGetCall), [*locations services revisions list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceRevisionListCall), [*locations services set iam policy*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceSetIamPolicyCall), [*locations services test iam permissions*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationServiceTestIamPermissionCall), [*locations worker pools create*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolCreateCall), [*locations worker pools delete*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolDeleteCall), [*locations worker pools get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolGetCall), [*locations worker pools get iam policy*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolGetIamPolicyCall), [*locations worker pools list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolListCall), [*locations worker pools patch*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolPatchCall), [*locations worker pools revisions delete*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolRevisionDeleteCall), [*locations worker pools revisions get*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolRevisionGetCall), [*locations worker pools revisions list*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolRevisionListCall), [*locations worker pools set iam policy*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolSetIamPolicyCall) and [*locations worker pools test iam permissions*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/api::ProjectLocationWorkerPoolTestIamPermissionCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-run2/6.0.0+20240621/google_run2/CloudRun)**
+* **[Hub](https://docs.rs/google-run2/8.0.0+20251024/google_run2/CloudRun)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::CallBuilder)
-* **[Resources](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::CallBuilder)
+* **[Resources](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Part)**
+    * **[Parts](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::CallBuilder)**
+* **[Activities](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -59,6 +59,10 @@ let r = hub.projects().locations_services_revisions_delete(...).doit().await
 let r = hub.projects().locations_services_create(...).doit().await
 let r = hub.projects().locations_services_delete(...).doit().await
 let r = hub.projects().locations_services_patch(...).doit().await
+let r = hub.projects().locations_worker_pools_revisions_delete(...).doit().await
+let r = hub.projects().locations_worker_pools_create(...).doit().await
+let r = hub.projects().locations_worker_pools_delete(...).doit().await
+let r = hub.projects().locations_worker_pools_patch(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -85,7 +89,7 @@ serde_json = "1"
 extern crate hyper;
 extern crate hyper_rustls;
 extern crate google_run2 as run2;
-use run2::api::GoogleCloudRunV2Service;
+use run2::api::GoogleCloudRunV2WorkerPool;
 use run2::{Result, Error};
 use run2::{CloudRun, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 
@@ -97,9 +101,20 @@ let secret: yup_oauth2::ApplicationSecret = Default::default();
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let connector = hyper_rustls::HttpsConnectorBuilder::new()
+    .with_native_roots()
+    .unwrap()
+    .https_only()
+    .enable_http2()
+    .build();
+
+let executor = hyper_util::rt::TokioExecutor::new();
+let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
     secret,
     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    yup_oauth2::client::CustomHyperClientBuilder::from(
+        hyper_util::client::legacy::Client::builder(executor).build(connector),
+    ),
 ).build().await.unwrap();
 
 let client = hyper_util::client::legacy::Client::builder(
@@ -110,22 +125,23 @@ let client = hyper_util::client::legacy::Client::builder(
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build()
 );
 let mut hub = CloudRun::new(client, auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = GoogleCloudRunV2Service::default();
+let mut req = GoogleCloudRunV2WorkerPool::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().locations_services_patch(req, "name")
+let result = hub.projects().locations_worker_pools_patch(req, "name")
              .validate_only(true)
              .update_mask(FieldMask::new::<&str>(&[]))
-             .allow_missing(false)
+             .force_new_revision(false)
+             .allow_missing(true)
              .doit().await;
 
 match result {
@@ -149,17 +165,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the
-[Hub Delegate](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -169,29 +185,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Delegate) to the
-[Method Builder](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::CallBuilder) before making the final `doit()` call.
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Delegate) to the
+[Method Builder](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::CallBuilder) before making the final `doit()` call.
 Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::RequestValue) and
-[decodable](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
+All structures provided by this library are made to be [encodable](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::RequestValue) and
+[decodable](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::Part) which are identifiable by name, which will be sent to
+Most optionals are are considered [Parts](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-run2/6.0.0+20240621/google_run2/common::RequestValue) are moved
+* [request values](https://docs.rs/google-run2/8.0.0+20251024/google_run2/common::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

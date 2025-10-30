@@ -75,9 +75,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -88,7 +99,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Sheets::new(client, auth);
@@ -143,7 +154,7 @@ impl<'a, C> Sheets<C> {
         Sheets {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://sheets.googleapis.com/".to_string(),
             _root_url: "https://sheets.googleapis.com/".to_string(),
         }
@@ -154,7 +165,7 @@ impl<'a, C> Sheets<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -255,7 +266,7 @@ pub struct AddConditionalFormatRuleRequest {
 
 impl common::Part for AddConditionalFormatRuleRequest {}
 
-/// Adds a data source. After the data source is added successfully, an associated DATA_SOURCE sheet is created and an execution is triggered to refresh the sheet to read data from the data source. The request requires an additional `bigquery.readonly` OAuth scope.
+/// Adds a data source. After the data source is added successfully, an associated DATA_SOURCE sheet is created and an execution is triggered to refresh the sheet to read data from the data source. The request requires an additional `bigquery.readonly` OAuth scope if you are adding a BigQuery data source.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -461,6 +472,34 @@ pub struct AddSlicerResponse {
 
 impl common::Part for AddSlicerResponse {}
 
+/// Adds a new table to the spreadsheet.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AddTableRequest {
+    /// Required. The table to add.
+    pub table: Option<Table>,
+}
+
+impl common::Part for AddTableRequest {}
+
+/// The result of adding a table.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AddTableResponse {
+    /// Output only. The table that was added.
+    pub table: Option<Table>,
+}
+
+impl common::Part for AddTableResponse {}
+
 /// Adds new cells after the last row with data in a sheet, inserting new rows into the sheet if necessary.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -476,6 +515,9 @@ pub struct AppendCellsRequest {
     /// The sheet ID to append the data to.
     #[serde(rename = "sheetId")]
     pub sheet_id: Option<i32>,
+    /// The ID of the table to append data to. The data will be only appended to the table body. This field also takes precedence over the `sheet_id` field.
+    #[serde(rename = "tableId")]
+    pub table_id: Option<String>,
 }
 
 impl common::Part for AppendCellsRequest {}
@@ -568,9 +610,12 @@ impl common::Part for AutoResizeDimensionsRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BandedRange {
-    /// The ID of the banded range.
+    /// The ID of the banded range. If unset, refer to banded_range_reference.
     #[serde(rename = "bandedRangeId")]
     pub banded_range_id: Option<i32>,
+    /// Output only. The reference of the banded range, used to identify the ID that is not supported by the banded_range_id.
+    #[serde(rename = "bandedRangeReference")]
+    pub banded_range_reference: Option<String>,
     /// Properties for column bands. These properties are applied on a column- by-column basis throughout all the columns in the range. At least one of row_properties or column_properties must be specified.
     #[serde(rename = "columnProperties")]
     pub column_properties: Option<BandingProperties>,
@@ -793,6 +838,9 @@ pub struct BasicFilter {
     /// The sort order per column. Later specifications are used when values are equal in the earlier specifications.
     #[serde(rename = "sortSpecs")]
     pub sort_specs: Option<Vec<SortSpec>>,
+    /// The table this filter is backed by, if any. When writing, only one of range or table_id may be set.
+    #[serde(rename = "tableId")]
+    pub table_id: Option<String>,
 }
 
 impl common::Part for BasicFilter {}
@@ -850,7 +898,7 @@ impl common::RequestValue for BatchClearValuesByDataFilterRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BatchClearValuesByDataFilterResponse {
-    /// The ranges that were cleared, in [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell). If the requests are for an unbounded range or a ranger larger than the bounds of the sheet, this is the actual ranges that were cleared, bounded to the sheet’s limits.
+    /// The ranges that were cleared, in [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell). If the requests are for an unbounded range or a ranger larger than the bounds of the sheet, this is the actual ranges that were cleared, bounded to the sheet's limits.
     #[serde(rename = "clearedRanges")]
     pub cleared_ranges: Option<Vec<String>>,
     /// The spreadsheet the updates were applied to.
@@ -872,7 +920,7 @@ impl common::ResponseResult for BatchClearValuesByDataFilterResponse {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BatchClearValuesRequest {
-    /// The ranges to clear, in [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell).
+    /// The ranges to clear, in [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell).
     pub ranges: Option<Vec<String>>,
 }
 
@@ -1326,7 +1374,7 @@ pub struct BubbleChartSpec {
 
 impl common::Part for BubbleChartSpec {}
 
-/// Cancels one or multiple refreshes of data source objects in the spreadsheet by the specified references.
+/// Cancels one or multiple refreshes of data source objects in the spreadsheet by the specified references. The request requires an additional `bigquery.readonly` OAuth scope if you are cancelling a refresh on a BigQuery data source.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1455,6 +1503,9 @@ impl common::Part for CandlestickSeries {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CellData {
+    /// Optional. Runs of chips applied to subsections of the cell. Properties of a run start at a specific index in the text and continue until the next run. When reading, all chipped and non-chipped runs are included. Non-chipped runs will have an empty Chip. When writing, only runs with chips are included. Runs containing chips are of length 1 and are represented in the user-entered text by an “@” placeholder symbol. New runs will overwrite any prior runs. Writing a new user_entered_value will erase previous runs.
+    #[serde(rename = "chipRuns")]
+    pub chip_runs: Option<Vec<ChipRun>>,
     /// Output only. Information about a data source formula on the cell. The field is set if user_entered_value is a formula referencing some DATA_SOURCE sheet, e.g. `=SUM(DataSheet!Column)`.
     #[serde(rename = "dataSourceFormula")]
     pub data_source_formula: Option<DataSourceFormula>,
@@ -1749,6 +1800,41 @@ pub struct ChartSpec {
 
 impl common::Part for ChartSpec {}
 
+/// The Smart Chip.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Chip {
+    /// Properties of a linked person.
+    #[serde(rename = "personProperties")]
+    pub person_properties: Option<PersonProperties>,
+    /// Properties of a rich link.
+    #[serde(rename = "richLinkProperties")]
+    pub rich_link_properties: Option<RichLinkProperties>,
+}
+
+impl common::Part for Chip {}
+
+/// The run of a chip. The chip continues until the start index of the next run.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ChipRun {
+    /// Optional. The chip of this run.
+    pub chip: Option<Chip>,
+    /// Required. The zero-based character index where this run starts, in UTF-16 code units.
+    #[serde(rename = "startIndex")]
+    pub start_index: Option<i32>,
+}
+
+impl common::Part for ChipRun {}
+
 /// Clears the basic filter, if any exists on the sheet.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1831,7 +1917,7 @@ impl common::Part for Color {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ColorStyle {
-    /// RGB color. The [`alpha`](https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/other#Color.FIELDS.alpha) value in the [`Color`](https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/other#color) object isn’t generally supported.
+    /// RGB color. The [`alpha`](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets/other#Color.FIELDS.alpha) value in the [`Color`](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets/other#color) object isn't generally supported.
     #[serde(rename = "rgbColor")]
     pub rgb_color: Option<Color>,
     /// Theme color.
@@ -2334,6 +2420,8 @@ pub struct DataSourceSpec {
     /// A BigQueryDataSourceSpec.
     #[serde(rename = "bigQuery")]
     pub big_query: Option<BigQueryDataSourceSpec>,
+    /// A LookerDatasourceSpec.
+    pub looker: Option<LookerDataSourceSpec>,
     /// The parameters of the data source, used when querying the data source.
     pub parameters: Option<Vec<DataSourceParameter>>,
 }
@@ -2529,7 +2617,7 @@ pub struct DeleteDimensionGroupResponse {
 
 impl common::Part for DeleteDimensionGroupResponse {}
 
-/// Deletes the dimensions from the sheet.
+///  Deletes the dimensions from the sheet.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -2667,6 +2755,21 @@ pub struct DeleteSheetRequest {
 
 impl common::Part for DeleteSheetRequest {}
 
+/// Removes the table with the given ID from the spreadsheet.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DeleteTableRequest {
+    /// The ID of the table to delete.
+    #[serde(rename = "tableId")]
+    pub table_id: Option<String>,
+}
+
+impl common::Part for DeleteTableRequest {}
+
 /// Developer metadata associated with a location or object in a spreadsheet. Developer metadata may be used to associate arbitrary data with various parts of a spreadsheet and will remain associated at those locations as they move around and the spreadsheet is edited. For example, if developer metadata is associated with row 5 and another row is then subsequently inserted above row 5, that original metadata will still be associated with the row it was first associated with (what is now row 6). If the associated object is deleted its metadata is deleted too.
 ///
 /// # Activities
@@ -2745,7 +2848,7 @@ pub struct DeveloperMetadataLookup {
     /// Limits the selected developer metadata to that which has a matching DeveloperMetadata.metadata_value.
     #[serde(rename = "metadataValue")]
     pub metadata_value: Option<String>,
-    /// Limits the selected developer metadata to that which has a matching DeveloperMetadata.visibility. If left unspecified, all developer metadata visibile to the requesting project is considered.
+    /// Limits the selected developer metadata to that which has a matching DeveloperMetadata.visibility. If left unspecified, all developer metadata visible to the requesting project is considered.
     pub visibility: Option<String>,
 }
 
@@ -3074,14 +3177,17 @@ pub struct FilterView {
     /// The ID of the filter view.
     #[serde(rename = "filterViewId")]
     pub filter_view_id: Option<i32>,
-    /// The named range this filter view is backed by, if any. When writing, only one of range or named_range_id may be set.
+    /// The named range this filter view is backed by, if any. When writing, only one of range or named_range_id or table_id may be set.
     #[serde(rename = "namedRangeId")]
     pub named_range_id: Option<String>,
-    /// The range this filter view covers. When writing, only one of range or named_range_id may be set.
+    /// The range this filter view covers. When writing, only one of range or named_range_id or table_id may be set.
     pub range: Option<GridRange>,
     /// The sort order per column. Later specifications are used when values are equal in the earlier specifications.
     #[serde(rename = "sortSpecs")]
     pub sort_specs: Option<Vec<SortSpec>>,
+    /// The table this filter view is backed by, if any. When writing, only one of range or named_range_id or table_id may be set.
+    #[serde(rename = "tableId")]
+    pub table_id: Option<String>,
     /// The name of the filter view.
     pub title: Option<String>,
 }
@@ -3166,6 +3272,9 @@ pub struct GetSpreadsheetByDataFilterRequest {
     /// The DataFilters used to select which ranges to retrieve from the spreadsheet.
     #[serde(rename = "dataFilters")]
     pub data_filters: Option<Vec<DataFilter>>,
+    /// True if tables should be excluded in the banded ranges. False if not set.
+    #[serde(rename = "excludeTablesInBandedRanges")]
+    pub exclude_tables_in_banded_ranges: Option<bool>,
     /// True if grid data should be returned. This parameter is ignored if a field mask was set in the request.
     #[serde(rename = "includeGridData")]
     pub include_grid_data: Option<bool>,
@@ -3388,7 +3497,7 @@ impl common::Part for InsertDimensionRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct InsertRangeRequest {
-    /// The range to insert new cells into.
+    /// The range to insert new cells into. The range is constrained to the current sheet boundaries.
     pub range: Option<GridRange>,
     /// The dimension which will be shifted when inserting cells. If ROWS, existing cells will be shifted down. If COLUMNS, existing cells will be shifted right.
     #[serde(rename = "shiftDimension")]
@@ -3502,6 +3611,25 @@ pub struct Link {
 }
 
 impl common::Part for Link {}
+
+/// The specification of a Looker data source.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct LookerDataSourceSpec {
+    /// Name of a Looker model explore.
+    pub explore: Option<String>,
+    /// A Looker instance URL.
+    #[serde(rename = "instanceUri")]
+    pub instance_uri: Option<String>,
+    /// Name of a Looker model.
+    pub model: Option<String>,
+}
+
+impl common::Part for LookerDataSourceSpec {}
 
 /// Allows you to manually organize the values in a source data column into buckets with names of your choosing. For example, a pivot table that aggregates population by state: +-------+-------------------+ | State | SUM of Population | +-------+-------------------+ | AK | 0.7 | | AL | 4.8 | | AR | 2.9 | ... +-------+-------------------+ could be turned into a pivot table that aggregates population by time zone by providing a list of groups (for example, groupName = 'Central', items = ['AL', 'AR', 'IA', ...]) to a manual group rule. Note that a similar effect could be achieved by adding a time zone column to the source data and adjusting the pivot table. +-----------+-------------------+ | Time Zone | SUM of Population | +-----------+-------------------+ | Central | 106.3 | | Eastern | 151.9 | | Mountain | 17.4 | ... +-----------+-------------------+
 ///
@@ -3631,7 +3759,7 @@ impl common::Part for NamedRange {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NumberFormat {
-    /// Pattern string used for formatting. If not set, a default pattern based on the user’s locale will be used if necessary for the given type. See the [Date and Number Formats guide](https://developers.google.com/sheets/api/guides/formats) for more information about the supported patterns.
+    /// Pattern string used for formatting. If not set, a default pattern based on the user's locale will be used if necessary for the given type. See the [Date and Number Formats guide](https://developers.google.com/workspace/sheets/api/guides/formats) for more information about the supported patterns.
     pub pattern: Option<String>,
     /// The type of the number format. When writing, this field must be set.
     #[serde(rename = "type")]
@@ -3743,6 +3871,23 @@ pub struct PasteDataRequest {
 }
 
 impl common::Part for PasteDataRequest {}
+
+/// Properties specific to a linked person.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PersonProperties {
+    /// Optional. The display format of the person chip. If not set, the default display format is used.
+    #[serde(rename = "displayFormat")]
+    pub display_format: Option<String>,
+    /// Required. The email address linked to this person. This field is always present.
+    pub email: Option<String>,
+}
+
+impl common::Part for PersonProperties {}
 
 /// A pie chart.
 ///
@@ -4013,17 +4158,20 @@ pub struct ProtectedRange {
     pub description: Option<String>,
     /// The users and groups with edit access to the protected range. This field is only visible to users with edit access to the protected range and the document. Editors are not supported with warning_only protection.
     pub editors: Option<Editors>,
-    /// The named range this protected range is backed by, if any. When writing, only one of range or named_range_id may be set.
+    /// The named range this protected range is backed by, if any. When writing, only one of range or named_range_id or table_id may be set.
     #[serde(rename = "namedRangeId")]
     pub named_range_id: Option<String>,
     /// The ID of the protected range. This field is read-only.
     #[serde(rename = "protectedRangeId")]
     pub protected_range_id: Option<i32>,
-    /// The range that is being protected. The range may be fully unbounded, in which case this is considered a protected sheet. When writing, only one of range or named_range_id may be set.
+    /// The range that is being protected. The range may be fully unbounded, in which case this is considered a protected sheet. When writing, only one of range or named_range_id or table_id may be set.
     pub range: Option<GridRange>,
     /// True if the user who requested this protected range can edit the protected area. This field is read-only.
     #[serde(rename = "requestingUserCanEdit")]
     pub requesting_user_can_edit: Option<bool>,
+    /// The table this protected range is backed by, if any. When writing, only one of range or named_range_id or table_id may be set.
+    #[serde(rename = "tableId")]
+    pub table_id: Option<String>,
     /// The list of unprotected ranges within a protected sheet. Unprotected ranges are only supported on protected sheets.
     #[serde(rename = "unprotectedRanges")]
     pub unprotected_ranges: Option<Vec<GridRange>>,
@@ -4082,7 +4230,7 @@ pub struct RefreshDataSourceObjectExecutionStatus {
 
 impl common::Part for RefreshDataSourceObjectExecutionStatus {}
 
-/// Refreshes one or multiple data source objects in the spreadsheet by the specified references. The request requires an additional `bigquery.readonly` OAuth scope. If there are multiple refresh requests referencing the same data source objects in one batch, only the last refresh request is processed, and all those requests will have the same response accordingly.
+/// Refreshes one or multiple data source objects in the spreadsheet by the specified references. The request requires an additional `bigquery.readonly` OAuth scope if you are refreshing a BigQuery data source. If there are multiple refresh requests referencing the same data source objects in one batch, only the last refresh request is processed, and all those requests will have the same response accordingly.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -4174,6 +4322,9 @@ pub struct Request {
     /// Adds a slicer.
     #[serde(rename = "addSlicer")]
     pub add_slicer: Option<AddSlicerRequest>,
+    /// Adds a table.
+    #[serde(rename = "addTable")]
+    pub add_table: Option<AddTableRequest>,
     /// Appends cells after the last row with data in a sheet.
     #[serde(rename = "appendCells")]
     pub append_cells: Option<AppendCellsRequest>,
@@ -4240,6 +4391,9 @@ pub struct Request {
     /// Deletes a sheet.
     #[serde(rename = "deleteSheet")]
     pub delete_sheet: Option<DeleteSheetRequest>,
+    /// A request for deleting a table.
+    #[serde(rename = "deleteTable")]
+    pub delete_table: Option<DeleteTableRequest>,
     /// Duplicates a filter view.
     #[serde(rename = "duplicateFilterView")]
     pub duplicate_filter_view: Option<DuplicateFilterViewRequest>,
@@ -4342,6 +4496,9 @@ pub struct Request {
     /// Updates the spreadsheet's properties.
     #[serde(rename = "updateSpreadsheetProperties")]
     pub update_spreadsheet_properties: Option<UpdateSpreadsheetPropertiesRequest>,
+    /// Updates a table.
+    #[serde(rename = "updateTable")]
+    pub update_table: Option<UpdateTableRequest>,
 }
 
 impl common::Part for Request {}
@@ -4381,6 +4538,9 @@ pub struct Response {
     /// A reply from adding a slicer.
     #[serde(rename = "addSlicer")]
     pub add_slicer: Option<AddSlicerResponse>,
+    /// A reply from adding a table.
+    #[serde(rename = "addTable")]
+    pub add_table: Option<AddTableResponse>,
     /// A reply from cancelling data source object refreshes.
     #[serde(rename = "cancelDataSourceRefresh")]
     pub cancel_data_source_refresh: Option<CancelDataSourceRefreshResponse>,
@@ -4429,6 +4589,23 @@ pub struct Response {
 }
 
 impl common::Part for Response {}
+
+/// Properties of a link to a Google resource (such as a file in Drive, a YouTube video, a Maps address, or a Calendar event). Only Drive files can be written as chips. All other rich link types are read only. URIs cannot exceed 2000 bytes when writing. NOTE: Writing Drive file chips requires at least one of the `drive.file`, `drive.readonly`, or `drive` OAuth scopes.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RichLinkProperties {
+    /// Output only. The [MIME type](https://developers.google.com/drive/api/v3/mime-types) of the link, if there's one (for example, when it's a file in Drive).
+    #[serde(rename = "mimeType")]
+    pub mime_type: Option<String>,
+    /// Required. The URI to the link. This is always present.
+    pub uri: Option<String>,
+}
+
+impl common::Part for RichLinkProperties {}
 
 /// Data about each cell in a row.
 ///
@@ -4540,6 +4717,9 @@ impl common::Part for SetBasicFilterRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SetDataValidationRequest {
+    /// Optional. If true, the data validation rule will be applied to the filtered rows as well.
+    #[serde(rename = "filteredRowsIncluded")]
+    pub filtered_rows_included: Option<bool>,
     /// The range the data validation rule should apply to.
     pub range: Option<GridRange>,
     /// The data validation rule to set on each cell in the range, or empty to clear the data validation in the range.
@@ -4590,6 +4770,8 @@ pub struct Sheet {
     pub row_groups: Option<Vec<DimensionGroup>>,
     /// The slicers on this sheet.
     pub slicers: Option<Vec<Slicer>>,
+    /// The tables on this sheet.
+    pub tables: Option<Vec<Table>>,
 }
 
 impl common::Part for Sheet {}
@@ -4833,7 +5015,7 @@ pub struct SpreadsheetProperties {
     /// The default format of all cells in the spreadsheet. CellData.effectiveFormat will not be set if the cell's format is equal to this default format. This field is read-only.
     #[serde(rename = "defaultFormat")]
     pub default_format: Option<CellFormat>,
-    /// Whether to allow external URL access for image and import functions. Read only when true. When false, you can set to true.
+    /// Whether to allow external URL access for image and import functions. Read only when true. When false, you can set to true. This value will be bypassed and always return true if the admin has enabled the [allowlisting feature](https://support.google.com/a?p=url_allowlist).
     #[serde(rename = "importFunctionsExternalUrlAccessAllowed")]
     pub import_functions_external_url_access_allowed: Option<bool>,
     /// Determines whether and how circular references are resolved with iterative calculation. Absence of this field means that circular references result in calculation errors.
@@ -4870,6 +5052,93 @@ pub struct SpreadsheetTheme {
 }
 
 impl common::Part for SpreadsheetTheme {}
+
+/// A table.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Table {
+    /// The table column properties.
+    #[serde(rename = "columnProperties")]
+    pub column_properties: Option<Vec<TableColumnProperties>>,
+    /// The table name. This is unique to all tables in the same spreadsheet.
+    pub name: Option<String>,
+    /// The table range.
+    pub range: Option<GridRange>,
+    /// The table rows properties.
+    #[serde(rename = "rowsProperties")]
+    pub rows_properties: Option<TableRowsProperties>,
+    /// The id of the table.
+    #[serde(rename = "tableId")]
+    pub table_id: Option<String>,
+}
+
+impl common::Part for Table {}
+
+/// A data validation rule for a column in a table.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TableColumnDataValidationRule {
+    /// The condition that data in the cell must match. Valid only if the [BooleanCondition.type] is ONE_OF_LIST.
+    pub condition: Option<BooleanCondition>,
+}
+
+impl common::Part for TableColumnDataValidationRule {}
+
+/// The table column.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TableColumnProperties {
+    /// The 0-based column index. This index is relative to its position in the table and is not necessarily the same as the column index in the sheet.
+    #[serde(rename = "columnIndex")]
+    pub column_index: Option<i32>,
+    /// The column name.
+    #[serde(rename = "columnName")]
+    pub column_name: Option<String>,
+    /// The column type.
+    #[serde(rename = "columnType")]
+    pub column_type: Option<String>,
+    /// The column data validation rule. Only set for dropdown column type.
+    #[serde(rename = "dataValidationRule")]
+    pub data_validation_rule: Option<TableColumnDataValidationRule>,
+}
+
+impl common::Part for TableColumnProperties {}
+
+/// The table row properties.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TableRowsProperties {
+    /// The first color that is alternating. If this field is set, the first banded row is filled with the specified color. Otherwise, the first banded row is filled with a default color.
+    #[serde(rename = "firstBandColorStyle")]
+    pub first_band_color_style: Option<ColorStyle>,
+    /// The color of the last row. If this field is not set a footer is not added, the last row is filled with either first_band_color_style or second_band_color_style, depending on the color of the previous row. If updating an existing table without a footer to have a footer, the range will be expanded by 1 row. If updating an existing table with a footer and removing a footer, the range will be shrunk by 1 row.
+    #[serde(rename = "footerColorStyle")]
+    pub footer_color_style: Option<ColorStyle>,
+    /// The color of the header row. If this field is set, the header row is filled with the specified color. Otherwise, the header row is filled with a default color.
+    #[serde(rename = "headerColorStyle")]
+    pub header_color_style: Option<ColorStyle>,
+    /// The second color that is alternating. If this field is set, the second banded row is filled with the specified color. Otherwise, the second banded row is filled with a default color.
+    #[serde(rename = "secondBandColorStyle")]
+    pub second_band_color_style: Option<ColorStyle>,
+}
+
+impl common::Part for TableRowsProperties {}
 
 /// The format of a run of text in a cell. Absent values indicate that the field isn't specified.
 ///
@@ -4997,13 +5266,13 @@ impl common::Part for ThemeColorPair {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct TimeOfDay {
-    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value "24:00:00" for scenarios like business closing time.
+    /// Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value "24:00:00" for scenarios like business closing time.
     pub hours: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
+    /// Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.
     pub minutes: Option<i32>,
-    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
+    /// Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.
     pub nanos: Option<i32>,
-    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.
+    /// Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.
     pub seconds: Option<i32>,
 }
 
@@ -5265,7 +5534,7 @@ pub struct UpdateConditionalFormatRuleResponse {
 
 impl common::Part for UpdateConditionalFormatRuleResponse {}
 
-/// Updates a data source. After the data source is updated successfully, an execution is triggered to refresh the associated DATA_SOURCE sheet to read data from the updated data source. The request requires an additional `bigquery.readonly` OAuth scope.
+/// Updates a data source. After the data source is updated successfully, an execution is triggered to refresh the associated DATA_SOURCE sheet to read data from the updated data source. The request requires an additional `bigquery.readonly` OAuth scope if you are updating a BigQuery data source.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -5527,6 +5796,22 @@ pub struct UpdateSpreadsheetPropertiesRequest {
 
 impl common::Part for UpdateSpreadsheetPropertiesRequest {}
 
+/// Updates a table in the spreadsheet.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct UpdateTableRequest {
+    /// Required. The fields that should be updated. At least one field must be specified. The root `table` is implied and should not be specified. A single `"*"` can be used as short-hand for listing every field.
+    pub fields: Option<common::FieldMask>,
+    /// Required. The table to update.
+    pub table: Option<Table>,
+}
+
+impl common::Part for UpdateTableRequest {}
+
 /// The response when updating a range of values by a data filter in a spreadsheet.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -5547,7 +5832,7 @@ pub struct UpdateValuesByDataFilterResponse {
     /// The values of the cells in the range matched by the dataFilter after all updates were applied. This is only included if the request's `includeValuesInResponse` field was `true`.
     #[serde(rename = "updatedData")]
     pub updated_data: Option<ValueRange>,
-    /// The range (in [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell)) that updates were applied to.
+    /// The range (in [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell)) that updates were applied to.
     #[serde(rename = "updatedRange")]
     pub updated_range: Option<String>,
     /// The number of rows where at least one cell in the row was updated.
@@ -5608,7 +5893,7 @@ pub struct ValueRange {
     /// The major dimension of the values. For output, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then requesting `range=A1:B2,majorDimension=ROWS` will return `[[1,2],[3,4]]`, whereas requesting `range=A1:B2,majorDimension=COLUMNS` will return `[[1,3],[2,4]]`. For input, with `range=A1:B2,majorDimension=ROWS` then `[[1,2],[3,4]]` will set `A1=1,B1=2,A2=3,B2=4`. With `range=A1:B2,majorDimension=COLUMNS` then `[[1,2],[3,4]]` will set `A1=1,B1=3,A2=2,B2=4`. When writing, if this field is not set, it defaults to ROWS.
     #[serde(rename = "majorDimension")]
     pub major_dimension: Option<String>,
-    /// The range the values cover, in [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell). For output, this range indicates the entire requested range, even though the values will exclude trailing rows and columns. When appending values, this field represents the range to search for a table, after which values will be appended.
+    /// The range the values cover, in [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell). For output, this range indicates the entire requested range, even though the values will exclude trailing rows and columns. When appending values, this field represents the range to search for a table, after which values will be appended.
     pub range: Option<String>,
     /// The data that was read or to be written. This is an array of arrays, the outer array representing all the data and each inner array representing a major dimension. Each item in the inner array corresponds with one cell. For output, empty trailing rows and columns will not be included. For input, supported value types are: bool, string, and double. Null values will be skipped. To set a cell to an empty value, set the string value to an empty string.
     pub values: Option<Vec<Vec<serde_json::Value>>>,
@@ -5755,9 +6040,20 @@ impl common::Part for WaterfallChartSpec {}
 /// use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -5768,7 +6064,7 @@ impl common::Part for WaterfallChartSpec {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Sheets::new(client, auth);
@@ -5862,13 +6158,13 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Appends values to a spreadsheet. The input range is used to search for existing data and find a “table” within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](https://developers.google.com/sheets/api/guides/values#appending_values) and [sample code](https://developers.google.com/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to.
+    /// Appends values to a spreadsheet. The input range is used to search for existing data and find a "table" within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](https://developers.google.com/workspace/sheets/api/guides/values#appending_values) and [sample code](https://developers.google.com/workspace/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    /// * `range` - The [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table.
+    /// * `range` - The [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table.
     pub fn values_append(
         &self,
         request: ValueRange,
@@ -6035,7 +6331,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    /// * `range` - The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the values to clear.
+    /// * `range` - The [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the values to clear.
     pub fn values_clear(
         &self,
         request: ClearValuesRequest,
@@ -6060,7 +6356,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// # Arguments
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
-    /// * `range` - The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the range to retrieve values from.
+    /// * `range` - The [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the range to retrieve values from.
     pub fn values_get(&self, spreadsheet_id: &str, range: &str) -> SpreadsheetValueGetCall<'a, C> {
         SpreadsheetValueGetCall {
             hub: self.hub,
@@ -6083,7 +6379,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    /// * `range` - The [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the values to update.
+    /// * `range` - The [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the values to update.
     pub fn values_update(
         &self,
         request: ValueRange,
@@ -6147,7 +6443,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges.
+    /// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/workspace/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges.
     ///
     /// # Arguments
     ///
@@ -6158,6 +6454,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
             _spreadsheet_id: spreadsheet_id.to_string(),
             _ranges: Default::default(),
             _include_grid_data: Default::default(),
+            _exclude_tables_in_banded_ranges: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6166,7 +6463,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters returns the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids is not returned. You can include grid data one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want.
+    /// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters returns the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids is not returned. You can include grid data one of 2 ways: * Specify a [field mask](https://developers.google.com/workspace/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want.
     ///
     /// # Arguments
     ///
@@ -6209,9 +6506,20 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6222,7 +6530,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -6513,9 +6821,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6526,7 +6845,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -6844,9 +7163,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6857,7 +7187,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -7169,7 +7499,7 @@ where
     }
 }
 
-/// Appends values to a spreadsheet. The input range is used to search for existing data and find a “table” within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](https://developers.google.com/sheets/api/guides/values#appending_values) and [sample code](https://developers.google.com/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to.
+/// Appends values to a spreadsheet. The input range is used to search for existing data and find a "table" within that range. Values will be appended to the next row of the table, starting with the first column of the table. See the [guide](https://developers.google.com/workspace/sheets/api/guides/values#appending_values) and [sample code](https://developers.google.com/workspace/sheets/api/samples/writing#append_values) for specific details of how tables are detected and data is appended. The caller must specify the spreadsheet ID, range, and a valueInputOption. The `valueInputOption` only controls how the input data will be added to the sheet (column-wise or row-wise), it does not influence what cell the data starts being written to.
 ///
 /// A builder for the *values.append* method supported by a *spreadsheet* resource.
 /// It is not used directly, but through a [`SpreadsheetMethods`] instance.
@@ -7187,9 +7517,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7200,7 +7541,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -7447,7 +7788,7 @@ where
         self._spreadsheet_id = new_value.to_string();
         self
     }
-    /// The [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table.
+    /// The [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of a range to search for a logical table of data. Values are appended after the last row of the table.
     ///
     /// Sets the *range* path property to the given value.
     ///
@@ -7604,9 +7945,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7617,7 +7969,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -7930,9 +8282,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7943,7 +8306,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -8267,9 +8630,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8280,7 +8654,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -8490,7 +8864,7 @@ where
         self._value_render_option = Some(new_value.to_string());
         self
     }
-    /// The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the range to retrieve values from.
+    /// The [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the range to retrieve values from.
     ///
     /// Append the given value to the *ranges* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -8618,9 +8992,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8631,7 +9016,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -8949,9 +9334,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8962,7 +9358,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -9275,9 +9671,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9288,7 +9695,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -9613,9 +10020,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9626,7 +10044,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -9837,7 +10255,7 @@ where
         self._spreadsheet_id = new_value.to_string();
         self
     }
-    /// The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the values to clear.
+    /// The [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the values to clear.
     ///
     /// Sets the *range* path property to the given value.
     ///
@@ -9949,9 +10367,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9962,7 +10391,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -10161,7 +10590,7 @@ where
         self._spreadsheet_id = new_value.to_string();
         self
     }
-    /// The [A1 notation or R1C1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the range to retrieve values from.
+    /// The [A1 notation or R1C1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the range to retrieve values from.
     ///
     /// Sets the *range* path property to the given value.
     ///
@@ -10295,9 +10724,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10308,7 +10748,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -10548,7 +10988,7 @@ where
         self._spreadsheet_id = new_value.to_string();
         self
     }
-    /// The [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell) of the values to update.
+    /// The [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell) of the values to update.
     ///
     /// Sets the *range* path property to the given value.
     ///
@@ -10698,9 +11138,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10711,7 +11162,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -11025,9 +11476,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11038,7 +11500,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -11308,7 +11770,7 @@ where
     }
 }
 
-/// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](https://developers.google.com/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges.
+/// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. By default, data within grids is not returned. You can include grid data in one of 2 ways: * Specify a [field mask](https://developers.google.com/workspace/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData URL parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want. To retrieve only subsets of spreadsheet data, use the ranges URL parameter. Ranges are specified using [A1 notation](https://developers.google.com/workspace/sheets/api/guides/concepts#cell). You can define a single cell (for example, `A1`) or multiple cells (for example, `A1:D5`). You can also get cells from other sheets within the same spreadsheet (for example, `Sheet2!A1:C4`) or retrieve multiple ranges at once (for example, `?ranges=A1:D5&ranges=Sheet2!A1:C4`). Limiting the range returns only the portions of the spreadsheet that intersect the requested ranges.
 ///
 /// A builder for the *get* method supported by a *spreadsheet* resource.
 /// It is not used directly, but through a [`SpreadsheetMethods`] instance.
@@ -11325,9 +11787,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11338,7 +11811,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);
@@ -11348,6 +11821,7 @@ where
 /// let result = hub.spreadsheets().get("spreadsheetId")
 ///              .add_ranges("et")
 ///              .include_grid_data(false)
+///              .exclude_tables_in_banded_ranges(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11359,6 +11833,7 @@ where
     _spreadsheet_id: String,
     _ranges: Vec<String>,
     _include_grid_data: Option<bool>,
+    _exclude_tables_in_banded_ranges: Option<bool>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -11385,14 +11860,22 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "spreadsheetId", "ranges", "includeGridData"].iter() {
+        for &field in [
+            "alt",
+            "spreadsheetId",
+            "ranges",
+            "includeGridData",
+            "excludeTablesInBandedRanges",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         params.push("spreadsheetId", self._spreadsheet_id);
         if !self._ranges.is_empty() {
             for f in self._ranges.iter() {
@@ -11401,6 +11884,9 @@ where
         }
         if let Some(value) = self._include_grid_data.as_ref() {
             params.push("includeGridData", value.to_string());
+        }
+        if let Some(value) = self._exclude_tables_in_banded_ranges.as_ref() {
+            params.push("excludeTablesInBandedRanges", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -11536,6 +12022,13 @@ where
         self._include_grid_data = Some(new_value);
         self
     }
+    /// True if tables should be excluded in the banded ranges. False if not set.
+    ///
+    /// Sets the *exclude tables in banded ranges* query property to the given value.
+    pub fn exclude_tables_in_banded_ranges(mut self, new_value: bool) -> SpreadsheetGetCall<'a, C> {
+        self._exclude_tables_in_banded_ranges = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     ///
@@ -11621,7 +12114,7 @@ where
     }
 }
 
-/// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters returns the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids is not returned. You can include grid data one of 2 ways: * Specify a [field mask](https://developers.google.com/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want.
+/// Returns the spreadsheet at the given ID. The caller must specify the spreadsheet ID. This method differs from GetSpreadsheet in that it allows selecting which subsets of spreadsheet data to return by specifying a dataFilters parameter. Multiple DataFilters can be specified. Specifying one or more data filters returns the portions of the spreadsheet that intersect ranges matched by any of the filters. By default, data within grids is not returned. You can include grid data one of 2 ways: * Specify a [field mask](https://developers.google.com/workspace/sheets/api/guides/field-masks) listing your desired fields using the `fields` URL parameter in HTTP * Set the includeGridData parameter to true. If a field mask is set, the `includeGridData` parameter is ignored For large spreadsheets, as a best practice, retrieve only the specific spreadsheet fields that you want.
 ///
 /// A builder for the *getByDataFilter* method supported by a *spreadsheet* resource.
 /// It is not used directly, but through a [`SpreadsheetMethods`] instance.
@@ -11639,9 +12132,20 @@ where
 /// # use sheets4::{Sheets, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11652,7 +12156,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Sheets::new(client, auth);

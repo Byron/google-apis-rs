@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Eventarc* crate version *6.0.0+20240618*, where *20240618* is the exact revision of the *eventarc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Eventarc* crate version *8.0.0+20251024*, where *20251024* is the exact revision of the *eventarc:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Eventarc* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/eventarc).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Eventarc) ...
 //!
 //! * projects
-//!  * [*locations channel connections create*](api::ProjectLocationChannelConnectionCreateCall), [*locations channel connections delete*](api::ProjectLocationChannelConnectionDeleteCall), [*locations channel connections get*](api::ProjectLocationChannelConnectionGetCall), [*locations channel connections get iam policy*](api::ProjectLocationChannelConnectionGetIamPolicyCall), [*locations channel connections list*](api::ProjectLocationChannelConnectionListCall), [*locations channel connections set iam policy*](api::ProjectLocationChannelConnectionSetIamPolicyCall), [*locations channel connections test iam permissions*](api::ProjectLocationChannelConnectionTestIamPermissionCall), [*locations channels create*](api::ProjectLocationChannelCreateCall), [*locations channels delete*](api::ProjectLocationChannelDeleteCall), [*locations channels get*](api::ProjectLocationChannelGetCall), [*locations channels get iam policy*](api::ProjectLocationChannelGetIamPolicyCall), [*locations channels list*](api::ProjectLocationChannelListCall), [*locations channels patch*](api::ProjectLocationChannelPatchCall), [*locations channels set iam policy*](api::ProjectLocationChannelSetIamPolicyCall), [*locations channels test iam permissions*](api::ProjectLocationChannelTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations get google channel config*](api::ProjectLocationGetGoogleChannelConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations providers get*](api::ProjectLocationProviderGetCall), [*locations providers list*](api::ProjectLocationProviderListCall), [*locations triggers create*](api::ProjectLocationTriggerCreateCall), [*locations triggers delete*](api::ProjectLocationTriggerDeleteCall), [*locations triggers get*](api::ProjectLocationTriggerGetCall), [*locations triggers get iam policy*](api::ProjectLocationTriggerGetIamPolicyCall), [*locations triggers list*](api::ProjectLocationTriggerListCall), [*locations triggers patch*](api::ProjectLocationTriggerPatchCall), [*locations triggers set iam policy*](api::ProjectLocationTriggerSetIamPolicyCall), [*locations triggers test iam permissions*](api::ProjectLocationTriggerTestIamPermissionCall) and [*locations update google channel config*](api::ProjectLocationUpdateGoogleChannelConfigCall)
+//!  * [*locations channel connections create*](api::ProjectLocationChannelConnectionCreateCall), [*locations channel connections delete*](api::ProjectLocationChannelConnectionDeleteCall), [*locations channel connections get*](api::ProjectLocationChannelConnectionGetCall), [*locations channel connections get iam policy*](api::ProjectLocationChannelConnectionGetIamPolicyCall), [*locations channel connections list*](api::ProjectLocationChannelConnectionListCall), [*locations channel connections set iam policy*](api::ProjectLocationChannelConnectionSetIamPolicyCall), [*locations channel connections test iam permissions*](api::ProjectLocationChannelConnectionTestIamPermissionCall), [*locations channels create*](api::ProjectLocationChannelCreateCall), [*locations channels delete*](api::ProjectLocationChannelDeleteCall), [*locations channels get*](api::ProjectLocationChannelGetCall), [*locations channels get iam policy*](api::ProjectLocationChannelGetIamPolicyCall), [*locations channels list*](api::ProjectLocationChannelListCall), [*locations channels patch*](api::ProjectLocationChannelPatchCall), [*locations channels set iam policy*](api::ProjectLocationChannelSetIamPolicyCall), [*locations channels test iam permissions*](api::ProjectLocationChannelTestIamPermissionCall), [*locations enrollments create*](api::ProjectLocationEnrollmentCreateCall), [*locations enrollments delete*](api::ProjectLocationEnrollmentDeleteCall), [*locations enrollments get*](api::ProjectLocationEnrollmentGetCall), [*locations enrollments get iam policy*](api::ProjectLocationEnrollmentGetIamPolicyCall), [*locations enrollments list*](api::ProjectLocationEnrollmentListCall), [*locations enrollments patch*](api::ProjectLocationEnrollmentPatchCall), [*locations enrollments set iam policy*](api::ProjectLocationEnrollmentSetIamPolicyCall), [*locations enrollments test iam permissions*](api::ProjectLocationEnrollmentTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations get google channel config*](api::ProjectLocationGetGoogleChannelConfigCall), [*locations google api sources create*](api::ProjectLocationGoogleApiSourceCreateCall), [*locations google api sources delete*](api::ProjectLocationGoogleApiSourceDeleteCall), [*locations google api sources get*](api::ProjectLocationGoogleApiSourceGetCall), [*locations google api sources get iam policy*](api::ProjectLocationGoogleApiSourceGetIamPolicyCall), [*locations google api sources list*](api::ProjectLocationGoogleApiSourceListCall), [*locations google api sources patch*](api::ProjectLocationGoogleApiSourcePatchCall), [*locations google api sources set iam policy*](api::ProjectLocationGoogleApiSourceSetIamPolicyCall), [*locations google api sources test iam permissions*](api::ProjectLocationGoogleApiSourceTestIamPermissionCall), [*locations kafka sources get iam policy*](api::ProjectLocationKafkaSourceGetIamPolicyCall), [*locations kafka sources set iam policy*](api::ProjectLocationKafkaSourceSetIamPolicyCall), [*locations kafka sources test iam permissions*](api::ProjectLocationKafkaSourceTestIamPermissionCall), [*locations list*](api::ProjectLocationListCall), [*locations message buses create*](api::ProjectLocationMessageBusCreateCall), [*locations message buses delete*](api::ProjectLocationMessageBusDeleteCall), [*locations message buses get*](api::ProjectLocationMessageBusGetCall), [*locations message buses get iam policy*](api::ProjectLocationMessageBusGetIamPolicyCall), [*locations message buses list*](api::ProjectLocationMessageBusListCall), [*locations message buses list enrollments*](api::ProjectLocationMessageBusListEnrollmentCall), [*locations message buses patch*](api::ProjectLocationMessageBusPatchCall), [*locations message buses set iam policy*](api::ProjectLocationMessageBusSetIamPolicyCall), [*locations message buses test iam permissions*](api::ProjectLocationMessageBusTestIamPermissionCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations pipelines create*](api::ProjectLocationPipelineCreateCall), [*locations pipelines delete*](api::ProjectLocationPipelineDeleteCall), [*locations pipelines get*](api::ProjectLocationPipelineGetCall), [*locations pipelines get iam policy*](api::ProjectLocationPipelineGetIamPolicyCall), [*locations pipelines list*](api::ProjectLocationPipelineListCall), [*locations pipelines patch*](api::ProjectLocationPipelinePatchCall), [*locations pipelines set iam policy*](api::ProjectLocationPipelineSetIamPolicyCall), [*locations pipelines test iam permissions*](api::ProjectLocationPipelineTestIamPermissionCall), [*locations providers get*](api::ProjectLocationProviderGetCall), [*locations providers list*](api::ProjectLocationProviderListCall), [*locations triggers create*](api::ProjectLocationTriggerCreateCall), [*locations triggers delete*](api::ProjectLocationTriggerDeleteCall), [*locations triggers get*](api::ProjectLocationTriggerGetCall), [*locations triggers get iam policy*](api::ProjectLocationTriggerGetIamPolicyCall), [*locations triggers list*](api::ProjectLocationTriggerListCall), [*locations triggers patch*](api::ProjectLocationTriggerPatchCall), [*locations triggers set iam policy*](api::ProjectLocationTriggerSetIamPolicyCall), [*locations triggers test iam permissions*](api::ProjectLocationTriggerTestIamPermissionCall) and [*locations update google channel config*](api::ProjectLocationUpdateGoogleChannelConfigCall)
 //!
 //!
 //!
@@ -52,7 +52,19 @@
 //! let r = hub.projects().locations_channels_create(...).doit().await
 //! let r = hub.projects().locations_channels_delete(...).doit().await
 //! let r = hub.projects().locations_channels_patch(...).doit().await
+//! let r = hub.projects().locations_enrollments_create(...).doit().await
+//! let r = hub.projects().locations_enrollments_delete(...).doit().await
+//! let r = hub.projects().locations_enrollments_patch(...).doit().await
+//! let r = hub.projects().locations_google_api_sources_create(...).doit().await
+//! let r = hub.projects().locations_google_api_sources_delete(...).doit().await
+//! let r = hub.projects().locations_google_api_sources_patch(...).doit().await
+//! let r = hub.projects().locations_message_buses_create(...).doit().await
+//! let r = hub.projects().locations_message_buses_delete(...).doit().await
+//! let r = hub.projects().locations_message_buses_patch(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_pipelines_create(...).doit().await
+//! let r = hub.projects().locations_pipelines_delete(...).doit().await
+//! let r = hub.projects().locations_pipelines_patch(...).doit().await
 //! let r = hub.projects().locations_triggers_create(...).doit().await
 //! let r = hub.projects().locations_triggers_delete(...).doit().await
 //! let r = hub.projects().locations_triggers_patch(...).doit().await
@@ -82,7 +94,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_eventarc1 as eventarc1;
-//! use eventarc1::api::Trigger;
+//! use eventarc1::api::Enrollment;
 //! use eventarc1::{Result, Error};
 //! # async fn dox() {
 //! use eventarc1::{Eventarc, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -95,9 +107,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -108,19 +131,19 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Eventarc::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Trigger::default();
+//! let mut req = Enrollment::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_triggers_patch(req, "name")
+//! let result = hub.projects().locations_enrollments_patch(req, "name")
 //!              .validate_only(true)
 //!              .update_mask(FieldMask::new::<&str>(&[]))
 //!              .allow_missing(true)

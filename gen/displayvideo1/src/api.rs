@@ -74,9 +74,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -87,7 +98,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -139,7 +150,7 @@ impl<'a, C> DisplayVideo<C> {
         DisplayVideo {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://displayvideo.googleapis.com/".to_string(),
             _root_url: "https://displayvideo.googleapis.com/".to_string(),
         }
@@ -156,9 +167,6 @@ impl<'a, C> DisplayVideo<C> {
     }
     pub fn custom_lists(&'a self) -> CustomListMethods<'a, C> {
         CustomListMethods { hub: self }
-    }
-    pub fn first_and_third_party_audiences(&'a self) -> FirstAndThirdPartyAudienceMethods<'a, C> {
-        FirstAndThirdPartyAudienceMethods { hub: self }
     }
     pub fn floodlight_groups(&'a self) -> FloodlightGroupMethods<'a, C> {
         FloodlightGroupMethods { hub: self }
@@ -192,7 +200,7 @@ impl<'a, C> DisplayVideo<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -263,7 +271,7 @@ pub struct ActiveViewVideoViewabilityMetricConfig {
 
 impl common::Part for ActiveViewVideoViewabilityMetricConfig {}
 
-/// Details of Adloox settings.
+/// Details of Scope3 (previously known as Adloox) brand safety settings.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -271,7 +279,7 @@ impl common::Part for ActiveViewVideoViewabilityMetricConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Adloox {
-    /// Adloox's brand safety settings.
+    /// Scope3 categories to exclude.
     #[serde(rename = "excludedAdlooxCategories")]
     pub excluded_adloox_categories: Option<Vec<String>>,
 }
@@ -293,6 +301,7 @@ impl common::Part for Adloox {}
 /// * [campaigns delete advertisers](AdvertiserCampaignDeleteCall) (none)
 /// * [campaigns get advertisers](AdvertiserCampaignGetCall) (none)
 /// * [campaigns list advertisers](AdvertiserCampaignListCall) (none)
+/// * [campaigns list assigned targeting options advertisers](AdvertiserCampaignListAssignedTargetingOptionCall) (none)
 /// * [campaigns patch advertisers](AdvertiserCampaignPatchCall) (none)
 /// * [channels sites bulk edit advertisers](AdvertiserChannelSiteBulkEditCall) (none)
 /// * [channels sites create advertisers](AdvertiserChannelSiteCreateCall) (none)
@@ -308,6 +317,8 @@ impl common::Part for Adloox {}
 /// * [creatives get advertisers](AdvertiserCreativeGetCall) (none)
 /// * [creatives list advertisers](AdvertiserCreativeListCall) (none)
 /// * [creatives patch advertisers](AdvertiserCreativePatchCall) (none)
+/// * [insertion orders targeting types assigned targeting options create advertisers](AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall) (none)
+/// * [insertion orders targeting types assigned targeting options delete advertisers](AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall) (none)
 /// * [insertion orders targeting types assigned targeting options get advertisers](AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall) (none)
 /// * [insertion orders targeting types assigned targeting options list advertisers](AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall) (none)
 /// * [insertion orders bulk list insertion order assigned targeting options advertisers](AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall) (none)
@@ -315,6 +326,7 @@ impl common::Part for Adloox {}
 /// * [insertion orders delete advertisers](AdvertiserInsertionOrderDeleteCall) (none)
 /// * [insertion orders get advertisers](AdvertiserInsertionOrderGetCall) (none)
 /// * [insertion orders list advertisers](AdvertiserInsertionOrderListCall) (none)
+/// * [insertion orders list assigned targeting options advertisers](AdvertiserInsertionOrderListAssignedTargetingOptionCall) (none)
 /// * [insertion orders patch advertisers](AdvertiserInsertionOrderPatchCall) (none)
 /// * [invoices list advertisers](AdvertiserInvoiceListCall) (none)
 /// * [invoices lookup invoice currency advertisers](AdvertiserInvoiceLookupInvoiceCurrencyCall) (none)
@@ -377,6 +389,9 @@ pub struct Advertiser {
     #[serde(rename = "advertiserId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub advertiser_id: Option<i64>,
+    /// Optional. Whether this advertiser contains line items that serve European Union political ads. If this field is set to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING`, then the following will happen: * Any new line items created under this advertiser will be assigned `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` if not otherwise specified. * Any existing line items under this advertiser that do not have a set value be updated to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` within a day.
+    #[serde(rename = "containsEuPoliticalAds")]
+    pub contains_eu_political_ads: Option<String>,
     /// Required. Creative related settings of the advertiser.
     #[serde(rename = "creativeConfig")]
     pub creative_config: Option<AdvertiserCreativeConfig>,
@@ -645,9 +660,9 @@ impl common::Part for Asset {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AssetAssociation {
-    /// The associated asset.
+    /// Optional. The associated asset.
     pub asset: Option<Asset>,
-    /// The role of this asset for the creative.
+    /// Optional. The role of this asset for the creative.
     pub role: Option<String>,
 }
 
@@ -713,6 +728,7 @@ impl common::ResponseResult for AssignedLocation {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [campaigns targeting types assigned targeting options get advertisers](AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall) (response)
+/// * [insertion orders targeting types assigned targeting options create advertisers](AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall) (request|response)
 /// * [insertion orders targeting types assigned targeting options get advertisers](AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall) (response)
 /// * [line items targeting types assigned targeting options create advertisers](AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall) (request|response)
 /// * [line items targeting types assigned targeting options get advertisers](AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall) (response)
@@ -915,23 +931,16 @@ impl common::Part for AssignedUserRole {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AudienceGroupAssignedTargetingOptionDetails {
-    /// The first and third party audience ids and recencies of the excluded first and third party audience group. Used for negative targeting. The COMPLEMENT of the UNION of this group and other excluded audience groups is used as an INTERSECTION to any positive audience targeting. All items are logically ‘OR’ of each other.
-    #[serde(rename = "excludedFirstAndThirdPartyAudienceGroup")]
-    pub excluded_first_and_third_party_audience_group: Option<FirstAndThirdPartyAudienceGroup>,
-    /// The Google audience ids of the excluded Google audience group. Used for negative targeting. The COMPLEMENT of the UNION of this group and other excluded audience groups is used as an INTERSECTION to any positive audience targeting. Only contains Affinity, In-market and Installed-apps type Google audiences. All items are logically ‘OR’ of each other.
+    /// Optional. The Google audience ids of the excluded Google audience group. Used for negative targeting. The COMPLEMENT of the UNION of this group and other excluded audience groups is used as an INTERSECTION to any positive audience targeting. Only contains Affinity, In-market and Installed-apps type Google audiences. All items are logically ‘OR’ of each other.
     #[serde(rename = "excludedGoogleAudienceGroup")]
     pub excluded_google_audience_group: Option<GoogleAudienceGroup>,
-    /// The combined audience ids of the included combined audience group. Contains combined audience ids only.
+    /// Optional. The combined audience ids of the included combined audience group. Contains combined audience ids only.
     #[serde(rename = "includedCombinedAudienceGroup")]
     pub included_combined_audience_group: Option<CombinedAudienceGroup>,
-    /// The custom list ids of the included custom list group. Contains custom list ids only.
+    /// Optional. The custom list ids of the included custom list group. Contains custom list ids only.
     #[serde(rename = "includedCustomListGroup")]
     pub included_custom_list_group: Option<CustomListGroup>,
-    /// The first and third party audience ids and recencies of included first and third party audience groups. Each first and third party audience group contains first and third party audience ids only. The relation between each first and third party audience group is INTERSECTION, and the result is UNION'ed with other audience groups. Repeated groups with same settings will be ignored.
-    #[serde(rename = "includedFirstAndThirdPartyAudienceGroups")]
-    pub included_first_and_third_party_audience_groups:
-        Option<Vec<FirstAndThirdPartyAudienceGroup>>,
-    /// The Google audience ids of the included Google audience group. Contains Google audience ids only.
+    /// Optional. The Google audience ids of the included Google audience group. Contains Google audience ids only.
     #[serde(rename = "includedGoogleAudienceGroup")]
     pub included_google_audience_group: Option<GoogleAudienceGroup>,
 }
@@ -979,10 +988,10 @@ impl common::Part for AudioContentTypeTargetingOptionDetails {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AudioVideoOffset {
-    /// The offset in percentage of the audio or video duration.
+    /// Optional. The offset in percentage of the audio or video duration.
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub percentage: Option<i64>,
-    /// The offset in seconds from the start of the audio or video.
+    /// Optional. The offset in seconds from the start of the audio or video.
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub seconds: Option<i64>,
 }
@@ -1168,10 +1177,10 @@ impl common::Part for BudgetSummary {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BulkEditAdvertiserAssignedTargetingOptionsRequest {
-    /// The assigned targeting options to create in batch, specified as a list of `CreateAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`
+    /// The assigned targeting options to create in batch, specified as a list of `CreateAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`
     #[serde(rename = "createRequests")]
     pub create_requests: Option<Vec<CreateAssignedTargetingOptionsRequest>>,
-    /// The assigned targeting options to delete in batch, specified as a list of `DeleteAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`
+    /// The assigned targeting options to delete in batch, specified as a list of `DeleteAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`
     #[serde(rename = "deleteRequests")]
     pub delete_requests: Option<Vec<DeleteAssignedTargetingOptionsRequest>>,
 }
@@ -1533,6 +1542,7 @@ impl common::ResponseResult for BulkListAdvertiserAssignedTargetingOptionsRespon
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [campaigns bulk list campaign assigned targeting options advertisers](AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall) (response)
+/// * [campaigns list assigned targeting options advertisers](AdvertiserCampaignListAssignedTargetingOptionCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1555,6 +1565,7 @@ impl common::ResponseResult for BulkListCampaignAssignedTargetingOptionsResponse
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 ///
 /// * [insertion orders bulk list insertion order assigned targeting options advertisers](AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall) (response)
+/// * [insertion orders list assigned targeting options advertisers](AdvertiserInsertionOrderListAssignedTargetingOptionCall) (response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -1691,7 +1702,7 @@ pub struct Campaign {
     /// Required. Controls whether or not the insertion orders under this campaign can spend their budgets and bid on inventory. * Accepted values are `ENTITY_STATUS_ACTIVE`, `ENTITY_STATUS_ARCHIVED`, and `ENTITY_STATUS_PAUSED`. * For CreateCampaign method, `ENTITY_STATUS_ARCHIVED` is not allowed.
     #[serde(rename = "entityStatus")]
     pub entity_status: Option<String>,
-    /// Required. The frequency cap setting of the campaign.
+    /// Required. The frequency cap setting of the campaign. *Warning*: On **February 28, 2025**, frequency cap time periods greater than 30 days will no longer be accepted. [Read more about this announced change](https://developers.google.com/display-video/api/deprecations#features.lifetime_frequency_cap)
     #[serde(rename = "frequencyCap")]
     pub frequency_cap: Option<FrequencyCap>,
     /// Output only. The resource name of the campaign.
@@ -1965,15 +1976,15 @@ impl common::Part for CmHybridConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CmTrackingAd {
-    /// The ad ID of the campaign manager 360 tracking Ad.
+    /// Optional. The ad ID of the campaign manager 360 tracking Ad.
     #[serde(rename = "cmAdId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub cm_ad_id: Option<i64>,
-    /// The creative ID of the campaign manager 360 tracking Ad.
+    /// Optional. The creative ID of the campaign manager 360 tracking Ad.
     #[serde(rename = "cmCreativeId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub cm_creative_id: Option<i64>,
-    /// The placement ID of the campaign manager 360 tracking Ad.
+    /// Optional. The placement ID of the campaign manager 360 tracking Ad.
     #[serde(rename = "cmPlacementId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub cm_placement_id: Option<i64>,
@@ -2016,7 +2027,7 @@ impl common::ResponseResult for CombinedAudience {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CombinedAudienceGroup {
-    /// Required. All combined audience targeting settings in combined audience group. Repeated settings with same id will be ignored. The number of combined audience settings should be no more than five, error will be thrown otherwise.
+    /// Required. All combined audience targeting settings in combined audience group. Repeated settings with the same id will be ignored. The number of combined audience settings should be no more than five, error will be thrown otherwise.
     pub settings: Option<Vec<CombinedAudienceTargetingSetting>>,
 }
 
@@ -2037,71 +2048,6 @@ pub struct CombinedAudienceTargetingSetting {
 }
 
 impl common::Part for CombinedAudienceTargetingSetting {}
-
-/// User consent status.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct Consent {
-    /// Represents consent for ad personalization.
-    #[serde(rename = "adPersonalization")]
-    pub ad_personalization: Option<String>,
-    /// Represents consent for ad user data.
-    #[serde(rename = "adUserData")]
-    pub ad_user_data: Option<String>,
-}
-
-impl common::Part for Consent {}
-
-/// Contact information defining a Customer Match audience member.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct ContactInfo {
-    /// Country code of the member. Must also be set with the following fields: * hashed_first_name * hashed_last_name * zip_codes
-    #[serde(rename = "countryCode")]
-    pub country_code: Option<String>,
-    /// A list of SHA256 hashed email of the member. Before hashing, remove all whitespace and make sure the string is all lowercase.
-    #[serde(rename = "hashedEmails")]
-    pub hashed_emails: Option<Vec<String>>,
-    /// SHA256 hashed first name of the member. Before hashing, remove all whitespace and make sure the string is all lowercase. Must also be set with the following fields: * country_code * hashed_last_name * zip_codes
-    #[serde(rename = "hashedFirstName")]
-    pub hashed_first_name: Option<String>,
-    /// SHA256 hashed last name of the member. Before hashing, remove all whitespace and make sure the string is all lowercase. Must also be set with the following fields: * country_code * hashed_first_name * zip_codes
-    #[serde(rename = "hashedLastName")]
-    pub hashed_last_name: Option<String>,
-    /// A list of SHA256 hashed phone numbers of the member. Before hashing, all phone numbers must be formatted using the [E.164 format](https://developers.google.com//en.wikipedia.org/wiki/E.164) and include the country calling code.
-    #[serde(rename = "hashedPhoneNumbers")]
-    pub hashed_phone_numbers: Option<Vec<String>>,
-    /// A list of zip codes of the member. Must also be set with the following fields: * country_code * hashed_first_name * hashed_last_name
-    #[serde(rename = "zipCodes")]
-    pub zip_codes: Option<Vec<String>>,
-}
-
-impl common::Part for ContactInfo {}
-
-/// Wrapper message for a list of contact information defining Customer Match audience members.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct ContactInfoList {
-    /// Input only. The consent setting for the users in contact_infos. Leaving this field unset indicates that consent is not specified. If ad_user_data or ad_personalization fields are set to `CONSENT_STATUS_DENIED`, the request will return an error.
-    pub consent: Option<Consent>,
-    /// A list of ContactInfo objects defining Customer Match audience members. The size of members after splitting the contact_infos mustn't be greater than 500,000.
-    #[serde(rename = "contactInfos")]
-    pub contact_infos: Option<Vec<ContactInfo>>,
-}
-
-impl common::Part for ContactInfoList {}
 
 /// Details for content duration assigned targeting option. This will be populated in the content_duration_details field when targeting_type is `TARGETING_TYPE_CONTENT_DURATION`. Explicitly targeting all options is not supported. Remove all content duration targeting options to achieve this effect.
 ///
@@ -2284,7 +2230,7 @@ impl common::Part for ContentStreamTypeTargetingOptionDetails {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ConversionCountingConfig {
-    /// The Floodlight activity configs used to track conversions. The number of conversions counted is the sum of all of the conversions counted by all of the Floodlight activity IDs specified in this field.
+    /// The Floodlight activity configs used to track conversions. The number of conversions counted is the sum of all of the conversions counted by all of the Floodlight activity IDs specified in this field. This field can't be updated if a custom bidding algorithm is assigned to the line item. If you set this field and assign a custom bidding algorithm in the same request, the floodlight activities must match the ones used by the custom bidding algorithm.
     #[serde(rename = "floodlightActivityConfigs")]
     pub floodlight_activity_configs: Option<Vec<TrackingFloodlightActivityConfig>>,
     /// The percentage of post-view conversions to count, in millis (1/1000 of a percent). Must be between 0 and 100000 inclusive. For example, to track 50% of the post-click conversions, set a value of 50000.
@@ -2415,14 +2361,14 @@ impl common::RequestValue for CreateSdfDownloadTaskRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Creative {
-    /// Additional dimensions. Applicable when creative_type is one of: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_EXPANDABLE` * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_LIGHTBOX` * `CREATIVE_TYPE_PUBLISHER_HOSTED` If this field is specified, width_pixels and height_pixels are both required and must be greater than or equal to 0.
+    /// Optional. Additional dimensions. Applicable when creative_type is one of: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_EXPANDABLE` * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_LIGHTBOX` * `CREATIVE_TYPE_PUBLISHER_HOSTED` If this field is specified, width_pixels and height_pixels are both required and must be greater than or equal to 0.
     #[serde(rename = "additionalDimensions")]
     pub additional_dimensions: Option<Vec<Dimensions>>,
     /// Output only. The unique ID of the advertiser the creative belongs to.
     #[serde(rename = "advertiserId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub advertiser_id: Option<i64>,
-    /// Third-party HTML tracking tag to be appended to the creative tag.
+    /// Optional. Third-party HTML tracking tag to be appended to the creative tag.
     #[serde(rename = "appendedTag")]
     pub appended_tag: Option<String>,
     /// Required. Assets associated to this creative.
@@ -2431,14 +2377,14 @@ pub struct Creative {
     #[serde(rename = "cmPlacementId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub cm_placement_id: Option<i64>,
-    /// The Campaign Manager 360 tracking ad associated with the creative. Optional for the following creative_type when created by an advertiser that uses both Campaign Manager 360 and third-party ad serving: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` Output only for other cases.
+    /// Optional. The Campaign Manager 360 tracking ad associated with the creative. Optional for the following creative_type when created by an advertiser that uses both Campaign Manager 360 and third-party ad serving: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` Output only for other cases.
     #[serde(rename = "cmTrackingAd")]
     pub cm_tracking_ad: Option<CmTrackingAd>,
-    /// The IDs of companion creatives for a video creative. You can assign existing display creatives (with image or HTML5 assets) to serve surrounding the publisher's video player. Companions display around the video player while the video is playing and remain after the video has completed. Creatives contain additional dimensions can not be companion creatives. This field is only supported for following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO`
+    /// Optional. The IDs of companion creatives for a video creative. You can assign existing display creatives (with image or HTML5 assets) to serve surrounding the publisher's video player. Companions display around the video player while the video is playing and remain after the video has completed. Creatives contain additional dimensions can not be companion creatives. This field is only supported for the following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO`
     #[serde(rename = "companionCreativeIds")]
     #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
     pub companion_creative_ids: Option<Vec<i64>>,
-    /// Counter events for a rich media creative. Counters track the number of times that a user interacts with any part of a rich media creative in a specified way (mouse-overs, mouse-outs, clicks, taps, data loading, keyboard entries, etc.). Any event that can be captured in the creative can be recorded as a counter. Leave it empty or unset for creatives containing image assets only.
+    /// Optional. Counter events for a rich media creative. Counters track the number of times that a user interacts with any part of a rich media creative in a specified way (mouse-overs, mouse-outs, clicks, taps, data loading, keyboard entries, etc.). Any event that can be captured in the creative can be recorded as a counter. Leave it empty or unset for creatives containing image assets only.
     #[serde(rename = "counterEvents")]
     pub counter_events: Option<Vec<CounterEvent>>,
     /// Output only. The timestamp when the creative was created. Assigned by the system.
@@ -2479,13 +2425,13 @@ pub struct Creative {
     /// Output only. Indicates the third-party VAST tag creative requires HTML5 Video support. Output only and only valid for third-party VAST tag creatives. Third-party VAST tag creatives are creatives with following hosting_source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_VIDEO`
     #[serde(rename = "html5Video")]
     pub html5_video: Option<bool>,
-    /// Indicates whether Integral Ad Science (IAS) campaign monitoring is enabled. To enable this for the creative, make sure the Advertiser.creative_config.ias_client_id has been set to your IAS client ID.
+    /// Optional. Indicates whether Integral Ad Science (IAS) campaign monitoring is enabled. To enable this for the creative, make sure the Advertiser.creative_config.ias_client_id has been set to your IAS client ID.
     #[serde(rename = "iasCampaignMonitoring")]
     pub ias_campaign_monitoring: Option<bool>,
-    /// ID information used to link this creative to an external system. Must be UTF-8 encoded with a length of no more than 10,000 characters.
+    /// Optional. ID information used to link this creative to an external system. Must be UTF-8 encoded with a length of no more than 10,000 characters.
     #[serde(rename = "integrationCode")]
     pub integration_code: Option<String>,
-    /// JavaScript measurement URL from supported third-party verification providers (ComScore, DoubleVerify, IAS, Moat). HTML script tags are not supported. This field is only writeable in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`
+    /// Optional. JavaScript measurement URL from supported third-party verification providers (ComScore, DoubleVerify, IAS, Moat). HTML script tags are not supported. This field is only writeable in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`
     #[serde(rename = "jsTrackerUrl")]
     pub js_tracker_url: Option<String>,
     /// Output only. The IDs of the line items this creative is associated with. To associate a creative to a line item, use LineItem.creative_ids instead.
@@ -2501,15 +2447,15 @@ pub struct Creative {
     pub mp3_audio: Option<bool>,
     /// Output only. The resource name of the creative.
     pub name: Option<String>,
-    /// User notes for this creative. Must be UTF-8 encoded with a length of no more than 20,000 characters.
+    /// Optional. User notes for this creative. Must be UTF-8 encoded with a length of no more than 20,000 characters.
     pub notes: Option<String>,
-    /// Specifies the OBA icon for a video creative. This field is only supported in following creative_type: * `CREATIVE_TYPE_VIDEO`
+    /// Optional. Specifies the OBA icon for a video creative. This field is only supported in the following creative_type: * `CREATIVE_TYPE_VIDEO`
     #[serde(rename = "obaIcon")]
     pub oba_icon: Option<ObaIcon>,
     /// Output only. Indicates the third-party audio creative supports OGG. Output only and only valid for third-party audio creatives. Third-party audio creatives are creatives with following hosting_source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_AUDIO`
     #[serde(rename = "oggAudio")]
     pub ogg_audio: Option<bool>,
-    /// Amount of time to play the video before counting a view. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`
+    /// Optional. Amount of time to play the video before counting a view. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`
     #[serde(rename = "progressOffset")]
     pub progress_offset: Option<AudioVideoOffset>,
     /// Optional. Indicates that the creative relies on HTML5 to render properly. Optional and only valid for third-party tag creatives. Third-party tag creatives are creatives with following hosting_source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_EXPANDABLE`
@@ -2524,24 +2470,24 @@ pub struct Creative {
     /// Output only. The current status of the creative review process.
     #[serde(rename = "reviewStatus")]
     pub review_status: Option<ReviewStatusInfo>,
-    /// Amount of time to play the video before the skip button appears. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`
+    /// Optional. Amount of time to play the video before the skip button appears. This field is required when skippable is true. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`
     #[serde(rename = "skipOffset")]
     pub skip_offset: Option<AudioVideoOffset>,
-    /// Whether the user can choose to skip a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`
+    /// Optional. Whether the user can choose to skip a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`
     pub skippable: Option<bool>,
     /// Optional. The original third-party tag used for the creative. Required and only valid for third-party tag creatives. Third-party tag creatives are creatives with following hosting_source: * `HOSTING_SOURCE_THIRD_PARTY` combined with following creative_type: * `CREATIVE_TYPE_STANDARD` * `CREATIVE_TYPE_EXPANDABLE`
     #[serde(rename = "thirdPartyTag")]
     pub third_party_tag: Option<String>,
-    /// Tracking URLs from third parties to track interactions with a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO`
+    /// Optional. Tracking URLs from third parties to track interactions with a video creative. This field is only supported for the following creative_type: * `CREATIVE_TYPE_AUDIO` * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO`
     #[serde(rename = "thirdPartyUrls")]
     pub third_party_urls: Option<Vec<ThirdPartyUrl>>,
-    /// Timer custom events for a rich media creative. Timers track the time during which a user views and interacts with a specified part of a rich media creative. A creative can have multiple timer events, each timed independently. Leave it empty or unset for creatives containing image assets only.
+    /// Optional. Timer custom events for a rich media creative. Timers track the time during which a user views and interacts with a specified part of a rich media creative. A creative can have multiple timer events, each timed independently. Leave it empty or unset for creatives containing image assets only.
     #[serde(rename = "timerEvents")]
     pub timer_events: Option<Vec<TimerEvent>>,
-    /// Tracking URLs for analytics providers or third-party ad technology vendors. The URLs must start with https (except on inventory that doesn't require SSL compliance). If using macros in your URL, use only macros supported by Display & Video 360. Standard URLs only, no IMG or SCRIPT tags. This field is only writeable in following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`
+    /// Optional. Tracking URLs for analytics providers or third-party ad technology vendors. The URLs must start with `https:` (except on inventory that doesn't require SSL compliance). If using macros in your URL, use only macros supported by Display & Video 360. Standard URLs only, no IMG or SCRIPT tags. This field is only writeable in the following creative_type: * `CREATIVE_TYPE_NATIVE` * `CREATIVE_TYPE_NATIVE_SITE_SQUARE` * `CREATIVE_TYPE_NATIVE_VIDEO`
     #[serde(rename = "trackerUrls")]
     pub tracker_urls: Option<Vec<String>>,
-    /// Output only. Audio/Video transcodes. Display & Video 360 transcodes the main asset into a number of alternative versions that use different file formats or have different properties (resolution, audio bit rate, and video bit rate), each designed for specific video players or bandwidths. These transcodes give a publisher's system more options to choose from for each impression on your video and ensures that the appropriate file serves based on the viewer’s connection and screen size. This field is only supported in following creative_type: * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO` * `CREATIVE_TYPE_AUDIO`
+    /// Output only. Audio/Video transcodes. Display & Video 360 transcodes the main asset into a number of alternative versions that use different file formats or have different properties (resolution, audio bit rate, and video bit rate), each designed for specific video players or bandwidths. These transcodes give a publisher's system more options to choose from for each impression on your video and ensures that the appropriate file serves based on the viewer’s connection and screen size. This field is only supported in the following creative_type: * `CREATIVE_TYPE_VIDEO` * `CREATIVE_TYPE_NATIVE_VIDEO` * `CREATIVE_TYPE_AUDIO`
     pub transcodes: Option<Vec<Transcode>>,
     /// Optional. An optional creative identifier provided by a registry that is unique across all platforms. Universal Ad ID is part of the VAST 4.0 standard. It can be modified after the creative is created. This field is only supported for the following creative_type: * `CREATIVE_TYPE_VIDEO`
     #[serde(rename = "universalAdId")]
@@ -2750,7 +2696,7 @@ impl common::ResponseResult for CustomList {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CustomListGroup {
-    /// Required. All custom list targeting settings in custom list group. Repeated settings with same id will be ignored.
+    /// Required. All custom list targeting settings in custom list group. Repeated settings with the same id will be ignored.
     pub settings: Option<Vec<CustomListTargetingSetting>>,
 }
 
@@ -3115,58 +3061,6 @@ pub struct DoubleVerifyVideoViewability {
 
 impl common::Part for DoubleVerifyVideoViewability {}
 
-/// Request message for FirstAndThirdPartyAudienceService.EditCustomerMatchMembers.
-///
-/// # Activities
-///
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-///
-/// * [edit customer match members first and third party audiences](FirstAndThirdPartyAudienceEditCustomerMatchMemberCall) (request)
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct EditCustomerMatchMembersRequest {
-    /// Input only. A list of contact information to define the members to be added.
-    #[serde(rename = "addedContactInfoList")]
-    pub added_contact_info_list: Option<ContactInfoList>,
-    /// Input only. A list of mobile device IDs to define the members to be added.
-    #[serde(rename = "addedMobileDeviceIdList")]
-    pub added_mobile_device_id_list: Option<MobileDeviceIdList>,
-    /// Required. The ID of the owner advertiser of the updated Customer Match FirstAndThirdPartyAudience.
-    #[serde(rename = "advertiserId")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub advertiser_id: Option<i64>,
-    /// Input only. A list of contact information to define the members to be removed.
-    #[serde(rename = "removedContactInfoList")]
-    pub removed_contact_info_list: Option<ContactInfoList>,
-    /// Input only. A list of mobile device IDs to define the members to be removed.
-    #[serde(rename = "removedMobileDeviceIdList")]
-    pub removed_mobile_device_id_list: Option<MobileDeviceIdList>,
-}
-
-impl common::RequestValue for EditCustomerMatchMembersRequest {}
-
-/// The response of FirstAndThirdPartyAudienceService.EditCustomerMatchMembers.
-///
-/// # Activities
-///
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-///
-/// * [edit customer match members first and third party audiences](FirstAndThirdPartyAudienceEditCustomerMatchMemberCall) (response)
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct EditCustomerMatchMembersResponse {
-    /// Required. The ID of the updated Customer Match FirstAndThirdPartyAudience.
-    #[serde(rename = "firstAndThirdPartyAudienceId")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub first_and_third_party_audience_id: Option<i64>,
-}
-
-impl common::ResponseResult for EditCustomerMatchMembersResponse {}
-
 /// Request message for GuaranteedOrderService.EditGuaranteedOrderReadAccessors.
 ///
 /// # Activities
@@ -3277,6 +3171,7 @@ impl common::Part for EditInventorySourceReadWriteAccessorsRequestAdvertisersUpd
 /// * [campaigns delete advertisers](AdvertiserCampaignDeleteCall) (response)
 /// * [channels sites delete advertisers](AdvertiserChannelSiteDeleteCall) (response)
 /// * [creatives delete advertisers](AdvertiserCreativeDeleteCall) (response)
+/// * [insertion orders targeting types assigned targeting options delete advertisers](AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall) (response)
 /// * [insertion orders delete advertisers](AdvertiserInsertionOrderDeleteCall) (response)
 /// * [line items targeting types assigned targeting options delete advertisers](AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall) (response)
 /// * [line items delete advertisers](AdvertiserLineItemDeleteCall) (response)
@@ -3421,9 +3316,9 @@ impl common::Part for ExchangeTargetingOptionDetails {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ExitEvent {
-    /// The name of the click tag of the exit event. The name must be unique within one creative. Leave it empty or unset for creatives containing image assets only.
+    /// Optional. The name of the click tag of the exit event. The name must be unique within one creative. Leave it empty or unset for creatives containing image assets only.
     pub name: Option<String>,
-    /// The name used to identify this event in reports. Leave it empty or unset for creatives containing image assets only.
+    /// Optional. The name used to identify this event in reports. Leave it empty or unset for creatives containing image assets only.
     #[serde(rename = "reportingName")]
     pub reporting_name: Option<String>,
     /// Required. The type of the exit event.
@@ -3434,121 +3329,6 @@ pub struct ExitEvent {
 }
 
 impl common::Part for ExitEvent {}
-
-/// Describes a first or third party audience list used for targeting. First party audiences are created via usage of client data. Third party audiences are provided by Third Party data providers and can only be licensed to customers.
-///
-/// # Activities
-///
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-///
-/// * [create first and third party audiences](FirstAndThirdPartyAudienceCreateCall) (request|response)
-/// * [edit customer match members first and third party audiences](FirstAndThirdPartyAudienceEditCustomerMatchMemberCall) (none)
-/// * [get first and third party audiences](FirstAndThirdPartyAudienceGetCall) (response)
-/// * [list first and third party audiences](FirstAndThirdPartyAudienceListCall) (none)
-/// * [patch first and third party audiences](FirstAndThirdPartyAudiencePatchCall) (request|response)
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct FirstAndThirdPartyAudience {
-    /// Output only. The estimated audience size for the Display network in the past month. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only returned in GET request.
-    #[serde(rename = "activeDisplayAudienceSize")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub active_display_audience_size: Option<i64>,
-    /// The app_id matches with the type of the mobile_device_ids being uploaded. Only applicable to audience_type `CUSTOMER_MATCH_DEVICE_ID`
-    #[serde(rename = "appId")]
-    pub app_id: Option<String>,
-    /// Output only. The source of the audience.
-    #[serde(rename = "audienceSource")]
-    pub audience_source: Option<String>,
-    /// The type of the audience.
-    #[serde(rename = "audienceType")]
-    pub audience_type: Option<String>,
-    /// Input only. A list of contact information to define the initial audience members. Only applicable to audience_type `CUSTOMER_MATCH_CONTACT_INFO`
-    #[serde(rename = "contactInfoList")]
-    pub contact_info_list: Option<ContactInfoList>,
-    /// The user-provided description of the audience. Only applicable to first party audiences.
-    pub description: Option<String>,
-    /// Output only. The estimated audience size for the Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only returned in GET request.
-    #[serde(rename = "displayAudienceSize")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub display_audience_size: Option<i64>,
-    /// Output only. The estimated desktop audience size in Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.
-    #[serde(rename = "displayDesktopAudienceSize")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub display_desktop_audience_size: Option<i64>,
-    /// Output only. The estimated mobile app audience size in Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.
-    #[serde(rename = "displayMobileAppAudienceSize")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub display_mobile_app_audience_size: Option<i64>,
-    /// Output only. The estimated mobile web audience size in Display network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.
-    #[serde(rename = "displayMobileWebAudienceSize")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub display_mobile_web_audience_size: Option<i64>,
-    /// The display name of the first and third party audience.
-    #[serde(rename = "displayName")]
-    pub display_name: Option<String>,
-    /// Output only. The unique ID of the first and third party audience. Assigned by the system.
-    #[serde(rename = "firstAndThirdPartyAudienceId")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub first_and_third_party_audience_id: Option<i64>,
-    /// Whether the audience is a first or third party audience.
-    #[serde(rename = "firstAndThirdPartyAudienceType")]
-    pub first_and_third_party_audience_type: Option<String>,
-    /// Output only. The estimated audience size for Gmail network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.
-    #[serde(rename = "gmailAudienceSize")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub gmail_audience_size: Option<i64>,
-    /// The duration in days that an entry remains in the audience after the qualifying event. If the audience has no expiration, set the value of this field to 10000. Otherwise, the set value must be greater than 0 and less than or equal to 540. Only applicable to first party audiences. This field is required if one of the following audience_type is used: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`
-    #[serde(rename = "membershipDurationDays")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub membership_duration_days: Option<i64>,
-    /// Input only. A list of mobile device IDs to define the initial audience members. Only applicable to audience_type `CUSTOMER_MATCH_DEVICE_ID`
-    #[serde(rename = "mobileDeviceIdList")]
-    pub mobile_device_id_list: Option<MobileDeviceIdList>,
-    /// Output only. The resource name of the first and third party audience.
-    pub name: Option<String>,
-    /// Output only. The estimated audience size for YouTube network. If the size is less than 1000, the number will be hidden and 0 will be returned due to privacy reasons. Otherwise, the number will be rounded off to two significant digits. Only applicable to first party audiences. Only returned in GET request.
-    #[serde(rename = "youtubeAudienceSize")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub youtube_audience_size: Option<i64>,
-}
-
-impl common::RequestValue for FirstAndThirdPartyAudience {}
-impl common::Resource for FirstAndThirdPartyAudience {}
-impl common::ResponseResult for FirstAndThirdPartyAudience {}
-
-/// Details of first and third party audience group. All first and third party audience targeting settings are logically ‘OR’ of each other.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct FirstAndThirdPartyAudienceGroup {
-    /// Required. All first and third party audience targeting settings in first and third party audience group. Repeated settings with same id are not allowed.
-    pub settings: Option<Vec<FirstAndThirdPartyAudienceTargetingSetting>>,
-}
-
-impl common::Part for FirstAndThirdPartyAudienceGroup {}
-
-/// Details of first and third party audience targeting setting.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct FirstAndThirdPartyAudienceTargetingSetting {
-    /// Required. First and third party audience id of the first and third party audience targeting setting. This id is first_and_third_party_audience_id.
-    #[serde(rename = "firstAndThirdPartyAudienceId")]
-    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
-    pub first_and_third_party_audience_id: Option<i64>,
-    /// The recency of the first and third party audience targeting setting. Only applicable to first party audiences, otherwise will be ignored. For more info, refer to https://support.google.com/displayvideo/answer/2949947#recency When unspecified, no recency limit will be used.
-    pub recency: Option<String>,
-}
-
-impl common::Part for FirstAndThirdPartyAudienceTargetingSetting {}
 
 /// A strategy that uses a fixed bidding price.
 ///
@@ -3620,7 +3400,7 @@ pub struct FrequencyCap {
     /// The time unit in which the frequency cap will be applied. Required when unlimited is `false`.
     #[serde(rename = "timeUnit")]
     pub time_unit: Option<String>,
-    /// The number of time_unit the frequency cap will last. Required when unlimited is `false`. The following restrictions apply based on the value of time_unit: * `TIME_UNIT_LIFETIME` - this field is output only and will default to 1 * `TIME_UNIT_MONTHS` - must be between 1 and 2 * `TIME_UNIT_WEEKS` - must be between 1 and 4 * `TIME_UNIT_DAYS` - must be between 1 and 6 * `TIME_UNIT_HOURS` - must be between 1 and 23 * `TIME_UNIT_MINUTES` - must be between 1 and 59
+    /// The number of time_unit the frequency cap will last. Required when unlimited is `false`. The following restrictions apply based on the value of time_unit: * `TIME_UNIT_MONTHS` - must be 1 * `TIME_UNIT_WEEKS` - must be between 1 and 4 * `TIME_UNIT_DAYS` - must be between 1 and 6 * `TIME_UNIT_HOURS` - must be between 1 and 23 * `TIME_UNIT_MINUTES` - must be between 1 and 59
     #[serde(rename = "timeUnitCount")]
     pub time_unit_count: Option<i32>,
     /// Whether unlimited frequency capping is applied. When this field is set to `true`, the remaining frequency cap fields are not applicable.
@@ -3672,6 +3452,9 @@ impl common::Part for GenderTargetingOptionDetails {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GenerateDefaultLineItemRequest {
+    /// Whether this line item will serve European Union political ads. If contains_eu_political_ads has been set to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` in the parent advertiser, then this field will be assigned `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` if not otherwise specified. This field can then be updated using the UI, API, or Structured Data Files. This field must be assigned when creating a new line item. Otherwise, **the `advertisers.lineItems.create` request will fail**.
+    #[serde(rename = "containsEuPoliticalAds")]
+    pub contains_eu_political_ads: Option<String>,
     /// Required. The display name of the line item. Must be UTF-8 encoded with a maximum size of 240 bytes.
     #[serde(rename = "displayName")]
     pub display_name: Option<String>,
@@ -3783,7 +3566,7 @@ impl common::ResponseResult for GoogleAudience {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GoogleAudienceGroup {
-    /// Required. All Google audience targeting settings in Google audience group. Repeated settings with same id will be ignored.
+    /// Required. All Google audience targeting settings in Google audience group. Repeated settings with the same id will be ignored.
     pub settings: Option<Vec<GoogleAudienceTargetingSetting>>,
 }
 
@@ -4000,7 +3783,7 @@ pub struct InsertionOrder {
     #[serde(rename = "advertiserId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub advertiser_id: Option<i64>,
-    /// The bidding strategy of the insertion order. By default, fixed_bid is set.
+    /// Optional. The bidding strategy of the insertion order. By default, fixed_bid is set.
     #[serde(rename = "bidStrategy")]
     pub bid_strategy: Option<BiddingStrategy>,
     /// Immutable. The billable outcome of the insertion order. Outcome based buying is deprecated. `BILLABLE_OUTCOME_PAY_PER_IMPRESSION` is the only valid value.
@@ -4025,17 +3808,17 @@ pub struct InsertionOrder {
     #[serde(rename = "insertionOrderId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub insertion_order_id: Option<i64>,
-    /// The type of insertion order. If this field is unspecified in creation, the value defaults to `RTB`.
+    /// Optional. The type of insertion order. If this field is unspecified in creation, the value defaults to `RTB`.
     #[serde(rename = "insertionOrderType")]
     pub insertion_order_type: Option<String>,
-    /// Additional integration details of the insertion order.
+    /// Optional. Additional integration details of the insertion order.
     #[serde(rename = "integrationDetails")]
     pub integration_details: Option<IntegrationDetails>,
     /// Output only. The resource name of the insertion order.
     pub name: Option<String>,
-    /// Required. The budget spending speed setting of the insertion order.
+    /// Required. The budget spending speed setting of the insertion order. pacing_type `PACING_TYPE_ASAP` is not compatible with pacing_period `PACING_PERIOD_FLIGHT`.
     pub pacing: Option<Pacing>,
-    /// The partner costs associated with the insertion order. If absent or empty in CreateInsertionOrder method, the newly created insertion order will inherit partner costs from the partner settings.
+    /// Optional. The partner costs associated with the insertion order. If absent or empty in CreateInsertionOrder method, the newly created insertion order will inherit partner costs from the partner settings.
     #[serde(rename = "partnerCosts")]
     pub partner_costs: Option<Vec<PartnerCost>>,
     /// Required. Performance goal of the insertion order.
@@ -4060,7 +3843,7 @@ impl common::ResponseResult for InsertionOrder {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct InsertionOrderBudget {
-    /// The type of automation used to manage bid and budget for the insertion order. If this field is unspecified in creation, the value defaults to `INSERTION_ORDER_AUTOMATION_TYPE_NONE`.
+    /// Optional. The type of automation used to manage bid and budget for the insertion order. If this field is unspecified in creation, the value defaults to `INSERTION_ORDER_AUTOMATION_TYPE_NONE`.
     #[serde(rename = "automationType")]
     pub automation_type: Option<String>,
     /// Required. The list of budget segments. Use a budget segment to specify a specific budget for a given period of time an insertion order is running.
@@ -4085,14 +3868,14 @@ pub struct InsertionOrderBudgetSegment {
     #[serde(rename = "budgetAmountMicros")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub budget_amount_micros: Option<i64>,
-    /// The budget_id of the campaign budget that this insertion order budget segment is a part of.
+    /// Optional. The budget_id of the campaign budget that this insertion order budget segment is a part of.
     #[serde(rename = "campaignBudgetId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub campaign_budget_id: Option<i64>,
     /// Required. The start and end date settings of the budget segment. They are resolved relative to the parent advertiser's time zone. * When creating a new budget segment, both `start_date` and `end_date` must be in the future. * An existing budget segment with a `start_date` in the past has a mutable `end_date` but an immutable `start_date`. * `end_date` must be the `start_date` or later, both before the year 2037.
     #[serde(rename = "dateRange")]
     pub date_range: Option<DateRange>,
-    /// The budget segment description. It can be used to enter Purchase Order information for each budget segment and have that information printed on the invoices. Must be UTF-8 encoded.
+    /// Optional. The budget segment description. It can be used to enter Purchase Order information for each budget segment and have that information printed on the invoices. Must be UTF-8 encoded.
     pub description: Option<String>,
 }
 
@@ -4106,7 +3889,7 @@ impl common::Part for InsertionOrderBudgetSegment {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct IntegralAdScience {
-    /// The custom segment ID provided by Integral Ad Science. The ID must be between `1000001` and `1999999`, inclusive.
+    /// The custom segment ID provided by Integral Ad Science. The ID must be between `1000001` and `1999999` or `3000001` and `3999999`, inclusive.
     #[serde(rename = "customSegmentId")]
     #[serde_as(as = "Option<Vec<serde_with::DisplayFromStr>>")]
     pub custom_segment_id: Option<Vec<i64>>,
@@ -4594,6 +4377,9 @@ pub struct LineItem {
     #[serde(rename = "campaignId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub campaign_id: Option<i64>,
+    /// Whether this line item will serve European Union political ads. If contains_eu_political_ads has been set to `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` in the parent advertiser, then this field will be assigned `DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING` if not otherwise specified. This field can then be updated using the UI, API, or Structured Data Files. This field must be assigned when creating a new line item. Otherwise, **the `advertisers.lineItems.create` request will fail**.
+    #[serde(rename = "containsEuPoliticalAds")]
+    pub contains_eu_political_ads: Option<String>,
     /// The conversion tracking setting of the line item.
     #[serde(rename = "conversionCounting")]
     pub conversion_counting: Option<ConversionCountingConfig>,
@@ -4967,28 +4753,6 @@ pub struct ListCustomListsResponse {
 }
 
 impl common::ResponseResult for ListCustomListsResponse {}
-
-/// There is no detailed description.
-///
-/// # Activities
-///
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-///
-/// * [list first and third party audiences](FirstAndThirdPartyAudienceListCall) (response)
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct ListFirstAndThirdPartyAudiencesResponse {
-    /// The list of first and third party audiences. Audience size properties will not be included. This list will be absent if empty.
-    #[serde(rename = "firstAndThirdPartyAudiences")]
-    pub first_and_third_party_audiences: Option<Vec<FirstAndThirdPartyAudience>>,
-    /// A token to retrieve the next page of results. Pass this value in the page_token field in the subsequent call to `ListFirstAndThirdPartyAudiences` method to retrieve the next page of results.
-    #[serde(rename = "nextPageToken")]
-    pub next_page_token: Option<String>,
-}
-
-impl common::ResponseResult for ListFirstAndThirdPartyAudiencesResponse {}
 
 /// There is no detailed description.
 ///
@@ -5506,7 +5270,7 @@ impl common::ResponseResult for ManualTrigger {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MaximizeSpendBidStrategy {
-    /// The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`.
+    /// The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`. Assigning a custom bidding algorithm that uses floodlight activities not identified in floodlightActivityConfigs will return an error.
     #[serde(rename = "customBiddingAlgorithmId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub custom_bidding_algorithm_id: Option<i64>,
@@ -5563,23 +5327,6 @@ pub struct MobileApp {
 }
 
 impl common::Part for MobileApp {}
-
-/// Wrapper message for a list of mobile device IDs defining Customer Match audience members.
-///
-/// This type is not used in any activity, and only used as *part* of another schema.
-///
-#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
-#[serde_with::serde_as]
-#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
-pub struct MobileDeviceIdList {
-    /// Input only. The consent setting for the users in mobile_device_ids. Leaving this field unset indicates that consent is not specified. If ad_user_data or ad_personalization fields are set to `CONSENT_STATUS_DENIED`, the request will return an error.
-    pub consent: Option<Consent>,
-    /// A list of mobile device IDs defining Customer Match audience members. The size of mobile_device_ids mustn't be greater than 500,000.
-    #[serde(rename = "mobileDeviceIds")]
-    pub mobile_device_ids: Option<Vec<String>>,
-}
-
-impl common::Part for MobileDeviceIdList {}
 
 /// Represents an amount of money with its currency type.
 ///
@@ -5716,25 +5463,25 @@ impl common::Part for NegativeKeywordListAssignedTargetingOptionDetails {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ObaIcon {
-    /// Required. The click tracking URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com
+    /// Required. The click tracking URL of the OBA icon. Only URLs of the following domains are allowed: * `https://info.evidon.com` * `https://l.betrad.com`
     #[serde(rename = "clickTrackingUrl")]
     pub click_tracking_url: Option<String>,
-    /// The dimensions of the OBA icon.
+    /// Optional. The dimensions of the OBA icon.
     pub dimensions: Option<Dimensions>,
-    /// Required. The landing page URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com
+    /// Required. The landing page URL of the OBA icon. Only URLs of the following domains are allowed: * `https://info.evidon.com` * `https://l.betrad.com`
     #[serde(rename = "landingPageUrl")]
     pub landing_page_url: Option<String>,
-    /// The position of the OBA icon on the creative.
+    /// Optional. The position of the OBA icon on the creative.
     pub position: Option<String>,
-    /// The program of the OBA icon. For example: “AdChoices”.
+    /// Optional. The program of the OBA icon. For example: “AdChoices”.
     pub program: Option<String>,
-    /// The MIME type of the OBA icon resource.
+    /// Optional. The MIME type of the OBA icon resource.
     #[serde(rename = "resourceMimeType")]
     pub resource_mime_type: Option<String>,
-    /// The URL of the OBA icon resource.
+    /// Optional. The URL of the OBA icon resource.
     #[serde(rename = "resourceUrl")]
     pub resource_url: Option<String>,
-    /// Required. The view tracking URL of the OBA icon. Only URLs of the following domains are allowed: * https://info.evidon.com * https://l.betrad.com
+    /// Required. The view tracking URL of the OBA icon. Only URLs of the following domains are allowed: * `https://info.evidon.com` * `https://l.betrad.com`
     #[serde(rename = "viewTrackingUrl")]
     pub view_tracking_url: Option<String>,
 }
@@ -5889,7 +5636,7 @@ pub struct Pacing {
     /// Required. The time period in which the pacing budget will be spent. When automatic budget allocation is enabled at the insertion order via automationType, this field is output only and defaults to `PACING_PERIOD_FLIGHT`.
     #[serde(rename = "pacingPeriod")]
     pub pacing_period: Option<String>,
-    /// Required. The type of pacing that defines how the budget amount will be spent across the pacing_period.
+    /// Required. The type of pacing that defines how the budget amount will be spent across the pacing_period. `PACING_TYPE_ASAP` is not compatible with pacing_period `PACING_PERIOD_FLIGHT` for insertion orders.
     #[serde(rename = "pacingType")]
     pub pacing_type: Option<String>,
 }
@@ -6140,7 +5887,7 @@ impl common::Part for PerformanceGoal {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct PerformanceGoalBidStrategy {
-    /// The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`.
+    /// The ID of the Custom Bidding Algorithm used by this strategy. Only applicable when performance_goal_type is set to `BIDDING_STRATEGY_PERFORMANCE_GOAL_TYPE_CUSTOM_ALGO`. Assigning a custom bidding algorithm that uses floodlight activities not identified in floodlightActivityConfigs will return an error.
     #[serde(rename = "customBiddingAlgorithmId")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub custom_bidding_algorithm_id: Option<i64>,
@@ -6797,10 +6544,10 @@ impl common::Part for ThirdPartyOnlyConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ThirdPartyUrl {
-    /// The type of interaction needs to be tracked by the tracking URL
+    /// Optional. The type of interaction needs to be tracked by the tracking URL
     #[serde(rename = "type")]
     pub type_: Option<String>,
-    /// Tracking URL used to track the interaction. Provide a URL with optional path or query string, beginning with `https:`. For example, https://www.example.com/path
+    /// Optional. Tracking URL used to track the interaction. Provide a URL with optional path or query string, beginning with `https:`. For example, `https://www.example.com/path`
     pub url: Option<String>,
 }
 
@@ -6814,7 +6561,7 @@ impl common::Part for ThirdPartyUrl {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ThirdPartyVerifierAssignedTargetingOptionDetails {
-    /// Third party brand verifier -- Adloox.
+    /// Third party brand verifier -- Scope3 (previously known as Adloox).
     pub adloox: Option<Adloox>,
     /// Third party brand verifier -- DoubleVerify.
     #[serde(rename = "doubleVerify")]
@@ -6891,33 +6638,33 @@ impl common::Part for TrackingFloodlightActivityConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Transcode {
-    /// The bit rate for the audio stream of the transcoded video, or the bit rate for the transcoded audio, in kilobits per second.
+    /// Optional. The bit rate for the audio stream of the transcoded video, or the bit rate for the transcoded audio, in kilobits per second.
     #[serde(rename = "audioBitRateKbps")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub audio_bit_rate_kbps: Option<i64>,
-    /// The sample rate for the audio stream of the transcoded video, or the sample rate for the transcoded audio, in hertz.
+    /// Optional. The sample rate for the audio stream of the transcoded video, or the sample rate for the transcoded audio, in hertz.
     #[serde(rename = "audioSampleRateHz")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub audio_sample_rate_hz: Option<i64>,
-    /// The transcoding bit rate of the transcoded video, in kilobits per second.
+    /// Optional. The transcoding bit rate of the transcoded video, in kilobits per second.
     #[serde(rename = "bitRateKbps")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub bit_rate_kbps: Option<i64>,
-    /// The dimensions of the transcoded video.
+    /// Optional. The dimensions of the transcoded video.
     pub dimensions: Option<Dimensions>,
-    /// The size of the transcoded file, in bytes.
+    /// Optional. The size of the transcoded file, in bytes.
     #[serde(rename = "fileSizeBytes")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub file_size_bytes: Option<i64>,
-    /// The frame rate of the transcoded video, in frames per second.
+    /// Optional. The frame rate of the transcoded video, in frames per second.
     #[serde(rename = "frameRate")]
     pub frame_rate: Option<f32>,
-    /// The MIME type of the transcoded file.
+    /// Optional. The MIME type of the transcoded file.
     #[serde(rename = "mimeType")]
     pub mime_type: Option<String>,
-    /// The name of the transcoded file.
+    /// Optional. The name of the transcoded file.
     pub name: Option<String>,
-    /// Indicates if the transcoding was successful.
+    /// Optional. Indicates if the transcoding was successful.
     pub transcoded: Option<bool>,
 }
 
@@ -6931,9 +6678,9 @@ impl common::Part for Transcode {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct UniversalAdId {
-    /// The unique creative identifier.
+    /// Optional. The unique creative identifier.
     pub id: Option<String>,
-    /// The registry provides unique creative identifiers.
+    /// Optional. The registry provides unique creative identifiers.
     pub registry: Option<String>,
 }
 
@@ -7112,9 +6859,20 @@ impl common::Part for ViewabilityTargetingOptionDetails {}
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -7125,12 +6883,12 @@ impl common::Part for ViewabilityTargetingOptionDetails {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `assets_upload(...)`, `audit(...)`, `bulk_edit_advertiser_assigned_targeting_options(...)`, `bulk_list_advertiser_assigned_targeting_options(...)`, `campaigns_bulk_list_campaign_assigned_targeting_options(...)`, `campaigns_create(...)`, `campaigns_delete(...)`, `campaigns_get(...)`, `campaigns_list(...)`, `campaigns_patch(...)`, `campaigns_targeting_types_assigned_targeting_options_get(...)`, `campaigns_targeting_types_assigned_targeting_options_list(...)`, `channels_create(...)`, `channels_get(...)`, `channels_list(...)`, `channels_patch(...)`, `channels_sites_bulk_edit(...)`, `channels_sites_create(...)`, `channels_sites_delete(...)`, `channels_sites_list(...)`, `channels_sites_replace(...)`, `create(...)`, `creatives_create(...)`, `creatives_delete(...)`, `creatives_get(...)`, `creatives_list(...)`, `creatives_patch(...)`, `delete(...)`, `get(...)`, `insertion_orders_bulk_list_insertion_order_assigned_targeting_options(...)`, `insertion_orders_create(...)`, `insertion_orders_delete(...)`, `insertion_orders_get(...)`, `insertion_orders_list(...)`, `insertion_orders_patch(...)`, `insertion_orders_targeting_types_assigned_targeting_options_get(...)`, `insertion_orders_targeting_types_assigned_targeting_options_list(...)`, `invoices_list(...)`, `invoices_lookup_invoice_currency(...)`, `line_items_bulk_edit_line_item_assigned_targeting_options(...)`, `line_items_bulk_list_line_item_assigned_targeting_options(...)`, `line_items_create(...)`, `line_items_delete(...)`, `line_items_generate_default(...)`, `line_items_get(...)`, `line_items_list(...)`, `line_items_patch(...)`, `line_items_targeting_types_assigned_targeting_options_create(...)`, `line_items_targeting_types_assigned_targeting_options_delete(...)`, `line_items_targeting_types_assigned_targeting_options_get(...)`, `line_items_targeting_types_assigned_targeting_options_list(...)`, `list(...)`, `location_lists_assigned_locations_bulk_edit(...)`, `location_lists_assigned_locations_create(...)`, `location_lists_assigned_locations_delete(...)`, `location_lists_assigned_locations_list(...)`, `location_lists_create(...)`, `location_lists_get(...)`, `location_lists_list(...)`, `location_lists_patch(...)`, `manual_triggers_activate(...)`, `manual_triggers_create(...)`, `manual_triggers_deactivate(...)`, `manual_triggers_get(...)`, `manual_triggers_list(...)`, `manual_triggers_patch(...)`, `negative_keyword_lists_create(...)`, `negative_keyword_lists_delete(...)`, `negative_keyword_lists_get(...)`, `negative_keyword_lists_list(...)`, `negative_keyword_lists_negative_keywords_bulk_edit(...)`, `negative_keyword_lists_negative_keywords_create(...)`, `negative_keyword_lists_negative_keywords_delete(...)`, `negative_keyword_lists_negative_keywords_list(...)`, `negative_keyword_lists_negative_keywords_replace(...)`, `negative_keyword_lists_patch(...)`, `patch(...)`, `targeting_types_assigned_targeting_options_create(...)`, `targeting_types_assigned_targeting_options_delete(...)`, `targeting_types_assigned_targeting_options_get(...)` and `targeting_types_assigned_targeting_options_list(...)`
+/// // like `assets_upload(...)`, `audit(...)`, `bulk_edit_advertiser_assigned_targeting_options(...)`, `bulk_list_advertiser_assigned_targeting_options(...)`, `campaigns_bulk_list_campaign_assigned_targeting_options(...)`, `campaigns_create(...)`, `campaigns_delete(...)`, `campaigns_get(...)`, `campaigns_list(...)`, `campaigns_list_assigned_targeting_options(...)`, `campaigns_patch(...)`, `campaigns_targeting_types_assigned_targeting_options_get(...)`, `campaigns_targeting_types_assigned_targeting_options_list(...)`, `channels_create(...)`, `channels_get(...)`, `channels_list(...)`, `channels_patch(...)`, `channels_sites_bulk_edit(...)`, `channels_sites_create(...)`, `channels_sites_delete(...)`, `channels_sites_list(...)`, `channels_sites_replace(...)`, `create(...)`, `creatives_create(...)`, `creatives_delete(...)`, `creatives_get(...)`, `creatives_list(...)`, `creatives_patch(...)`, `delete(...)`, `get(...)`, `insertion_orders_bulk_list_insertion_order_assigned_targeting_options(...)`, `insertion_orders_create(...)`, `insertion_orders_delete(...)`, `insertion_orders_get(...)`, `insertion_orders_list(...)`, `insertion_orders_list_assigned_targeting_options(...)`, `insertion_orders_patch(...)`, `insertion_orders_targeting_types_assigned_targeting_options_create(...)`, `insertion_orders_targeting_types_assigned_targeting_options_delete(...)`, `insertion_orders_targeting_types_assigned_targeting_options_get(...)`, `insertion_orders_targeting_types_assigned_targeting_options_list(...)`, `invoices_list(...)`, `invoices_lookup_invoice_currency(...)`, `line_items_bulk_edit_line_item_assigned_targeting_options(...)`, `line_items_bulk_list_line_item_assigned_targeting_options(...)`, `line_items_create(...)`, `line_items_delete(...)`, `line_items_generate_default(...)`, `line_items_get(...)`, `line_items_list(...)`, `line_items_patch(...)`, `line_items_targeting_types_assigned_targeting_options_create(...)`, `line_items_targeting_types_assigned_targeting_options_delete(...)`, `line_items_targeting_types_assigned_targeting_options_get(...)`, `line_items_targeting_types_assigned_targeting_options_list(...)`, `list(...)`, `location_lists_assigned_locations_bulk_edit(...)`, `location_lists_assigned_locations_create(...)`, `location_lists_assigned_locations_delete(...)`, `location_lists_assigned_locations_list(...)`, `location_lists_create(...)`, `location_lists_get(...)`, `location_lists_list(...)`, `location_lists_patch(...)`, `manual_triggers_activate(...)`, `manual_triggers_create(...)`, `manual_triggers_deactivate(...)`, `manual_triggers_get(...)`, `manual_triggers_list(...)`, `manual_triggers_patch(...)`, `negative_keyword_lists_create(...)`, `negative_keyword_lists_delete(...)`, `negative_keyword_lists_get(...)`, `negative_keyword_lists_list(...)`, `negative_keyword_lists_negative_keywords_bulk_edit(...)`, `negative_keyword_lists_negative_keywords_create(...)`, `negative_keyword_lists_negative_keywords_delete(...)`, `negative_keyword_lists_negative_keywords_list(...)`, `negative_keyword_lists_negative_keywords_replace(...)`, `negative_keyword_lists_patch(...)`, `patch(...)`, `targeting_types_assigned_targeting_options_create(...)`, `targeting_types_assigned_targeting_options_delete(...)`, `targeting_types_assigned_targeting_options_get(...)` and `targeting_types_assigned_targeting_options_list(...)`
 /// // to build up your call.
 /// let rb = hub.advertisers();
 /// # }
@@ -7334,6 +7092,33 @@ impl<'a, C> AdvertiserMethods<'a, C> {
         AdvertiserCampaignListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id,
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists assigned targeting options of a campaign across targeting types.
+    ///
+    /// # Arguments
+    ///
+    /// * `advertiserId` - Required. The ID of the advertiser the campaign belongs to.
+    /// * `campaignId` - Required. The ID of the campaign to list assigned targeting options for.
+    pub fn campaigns_list_assigned_targeting_options(
+        &self,
+        advertiser_id: i64,
+        campaign_id: i64,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        AdvertiserCampaignListAssignedTargetingOptionCall {
+            hub: self.hub,
+            _advertiser_id: advertiser_id,
+            _campaign_id: campaign_id,
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
@@ -7722,6 +7507,64 @@ impl<'a, C> AdvertiserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Assigns a targeting option to an insertion order. Returns the assigned targeting option if successful. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `advertiserId` - Required. The ID of the advertiser the insertion order belongs to.
+    /// * `insertionOrderId` - Required. The ID of the insertion order the assigned targeting option will belong to.
+    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+    pub fn insertion_orders_targeting_types_assigned_targeting_options_create(
+        &self,
+        request: AssignedTargetingOption,
+        advertiser_id: i64,
+        insertion_order_id: i64,
+        targeting_type: &str,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+        AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall {
+            hub: self.hub,
+            _request: request,
+            _advertiser_id: advertiser_id,
+            _insertion_order_id: insertion_order_id,
+            _targeting_type: targeting_type.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an assigned targeting option from an insertion order. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+    ///
+    /// # Arguments
+    ///
+    /// * `advertiserId` - Required. The ID of the advertiser the insertion order belongs to.
+    /// * `insertionOrderId` - Required. The ID of the insertion order the assigned targeting option belongs to.
+    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+    /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
+    pub fn insertion_orders_targeting_types_assigned_targeting_options_delete(
+        &self,
+        advertiser_id: i64,
+        insertion_order_id: i64,
+        targeting_type: &str,
+        assigned_targeting_option_id: &str,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+        AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall {
+            hub: self.hub,
+            _advertiser_id: advertiser_id,
+            _insertion_order_id: insertion_order_id,
+            _targeting_type: targeting_type.to_string(),
+            _assigned_targeting_option_id: assigned_targeting_option_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a single targeting option assigned to an insertion order.
     ///
     /// # Arguments
@@ -7901,6 +7744,33 @@ impl<'a, C> AdvertiserMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists assigned targeting options of an insertion order across targeting types.
+    ///
+    /// # Arguments
+    ///
+    /// * `advertiserId` - Required. The ID of the advertiser the insertion order belongs to.
+    /// * `insertionOrderId` - Required. The ID of the insertion order to list assigned targeting options for.
+    pub fn insertion_orders_list_assigned_targeting_options(
+        &self,
+        advertiser_id: i64,
+        insertion_order_id: i64,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        AdvertiserInsertionOrderListAssignedTargetingOptionCall {
+            hub: self.hub,
+            _advertiser_id: advertiser_id,
+            _insertion_order_id: insertion_order_id,
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates an existing insertion order. Returns the updated insertion order if successful.
     ///
     /// # Arguments
@@ -8034,7 +7904,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option belongs to.
-    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
+    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this line item that identifies the assigned targeting option being requested.
     pub fn line_items_targeting_types_assigned_targeting_options_get(
         &self,
@@ -8063,7 +7933,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item to list assigned targeting options for.
-    /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
+    /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
     pub fn line_items_targeting_types_assigned_targeting_options_list(
         &self,
         advertiser_id: i64,
@@ -8883,7 +8753,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser.
-    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`
+    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`
     pub fn targeting_types_assigned_targeting_options_create(
         &self,
         request: AssignedTargetingOption,
@@ -8908,7 +8778,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser.
-    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`
+    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`
     /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
     pub fn targeting_types_assigned_targeting_options_delete(
         &self,
@@ -8934,7 +8804,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser.
-    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`
+    /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this advertiser that identifies the assigned targeting option being requested.
     pub fn targeting_types_assigned_targeting_options_get(
         &self,
@@ -8960,7 +8830,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser.
-    /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`
+    /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`
     pub fn targeting_types_assigned_targeting_options_list(
         &self,
         advertiser_id: i64,
@@ -9150,9 +9020,20 @@ impl<'a, C> AdvertiserMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -9163,7 +9044,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -9237,9 +9118,20 @@ impl<'a, C> CombinedAudienceMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -9250,7 +9142,7 @@ impl<'a, C> CombinedAudienceMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -9272,7 +9164,7 @@ impl<'a, C> common::MethodsBuilder for CustomBiddingAlgorithmMethods<'a, C> {}
 impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new custom bidding script. Returns the newly created script if successful.
+    /// Creates a new custom bidding script. Returns the newly created script if successful. Requests creating a custom bidding script under an algorithm assigned to a line item will return an error.
     ///
     /// # Arguments
     ///
@@ -9404,7 +9296,7 @@ impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful.
+    /// Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful. Requests updating a custom bidding algorithm assigned to a line item will return an error.
     ///
     /// # Arguments
     ///
@@ -9465,9 +9357,20 @@ impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -9478,7 +9381,7 @@ impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -9534,165 +9437,6 @@ impl<'a, C> CustomListMethods<'a, C> {
     }
 }
 
-/// A builder providing access to all methods supported on *firstAndThirdPartyAudience* resources.
-/// It is not used directly, but through the [`DisplayVideo`] hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate google_displayvideo1 as displayvideo1;
-///
-/// # async fn dox() {
-/// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-///     secret,
-///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// ).build().await.unwrap();
-///
-/// let client = hyper_util::client::legacy::Client::builder(
-///     hyper_util::rt::TokioExecutor::new()
-/// )
-/// .build(
-///     hyper_rustls::HttpsConnectorBuilder::new()
-///         .with_native_roots()
-///         .unwrap()
-///         .https_or_http()
-///         .enable_http1()
-///         .build()
-/// );
-/// let mut hub = DisplayVideo::new(client, auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `edit_customer_match_members(...)`, `get(...)`, `list(...)` and `patch(...)`
-/// // to build up your call.
-/// let rb = hub.first_and_third_party_audiences();
-/// # }
-/// ```
-pub struct FirstAndThirdPartyAudienceMethods<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a DisplayVideo<C>,
-}
-
-impl<'a, C> common::MethodsBuilder for FirstAndThirdPartyAudienceMethods<'a, C> {}
-
-impl<'a, C> FirstAndThirdPartyAudienceMethods<'a, C> {
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Creates a FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn create(
-        &self,
-        request: FirstAndThirdPartyAudience,
-    ) -> FirstAndThirdPartyAudienceCreateCall<'a, C> {
-        FirstAndThirdPartyAudienceCreateCall {
-            hub: self.hub,
-            _request: request,
-            _advertiser_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates the member list of a Customer Match audience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `firstAndThirdPartyAudienceId` - Required. The ID of the Customer Match FirstAndThirdPartyAudience whose members will be edited.
-    pub fn edit_customer_match_members(
-        &self,
-        request: EditCustomerMatchMembersRequest,
-        first_and_third_party_audience_id: i64,
-    ) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C> {
-        FirstAndThirdPartyAudienceEditCustomerMatchMemberCall {
-            hub: self.hub,
-            _request: request,
-            _first_and_third_party_audience_id: first_and_third_party_audience_id,
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Gets a first and third party audience.
-    ///
-    /// # Arguments
-    ///
-    /// * `firstAndThirdPartyAudienceId` - Required. The ID of the first and third party audience to fetch.
-    pub fn get(
-        &self,
-        first_and_third_party_audience_id: i64,
-    ) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
-        FirstAndThirdPartyAudienceGetCall {
-            hub: self.hub,
-            _first_and_third_party_audience_id: first_and_third_party_audience_id,
-            _partner_id: Default::default(),
-            _advertiser_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists first and third party audiences. The order is defined by the order_by parameter.
-    pub fn list(&self) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        FirstAndThirdPartyAudienceListCall {
-            hub: self.hub,
-            _partner_id: Default::default(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _order_by: Default::default(),
-            _filter: Default::default(),
-            _advertiser_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Updates an existing FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`
-    ///
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `firstAndThirdPartyAudienceId` - Output only. The unique ID of the first and third party audience. Assigned by the system.
-    pub fn patch(
-        &self,
-        request: FirstAndThirdPartyAudience,
-        first_and_third_party_audience_id: i64,
-    ) -> FirstAndThirdPartyAudiencePatchCall<'a, C> {
-        FirstAndThirdPartyAudiencePatchCall {
-            hub: self.hub,
-            _request: request,
-            _first_and_third_party_audience_id: first_and_third_party_audience_id,
-            _update_mask: Default::default(),
-            _advertiser_id: Default::default(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
 /// A builder providing access to all methods supported on *floodlightGroup* resources.
 /// It is not used directly, but through the [`DisplayVideo`] hub.
 ///
@@ -9709,9 +9453,20 @@ impl<'a, C> FirstAndThirdPartyAudienceMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -9722,7 +9477,7 @@ impl<'a, C> FirstAndThirdPartyAudienceMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -9802,9 +9557,20 @@ impl<'a, C> FloodlightGroupMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -9815,7 +9581,7 @@ impl<'a, C> FloodlightGroupMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -9889,9 +9655,20 @@ impl<'a, C> GoogleAudienceMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -9902,7 +9679,7 @@ impl<'a, C> GoogleAudienceMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -10044,9 +9821,20 @@ impl<'a, C> GuaranteedOrderMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -10057,7 +9845,7 @@ impl<'a, C> GuaranteedOrderMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -10294,9 +10082,20 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -10307,7 +10106,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -10448,9 +10247,20 @@ impl<'a, C> InventorySourceMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -10461,7 +10271,7 @@ impl<'a, C> InventorySourceMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -10538,9 +10348,20 @@ impl<'a, C> MediaMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -10551,7 +10372,7 @@ impl<'a, C> MediaMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -10977,9 +10798,20 @@ impl<'a, C> PartnerMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -10990,7 +10822,7 @@ impl<'a, C> PartnerMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -11029,7 +10861,7 @@ impl<'a, C> SdfdownloadtaskMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with sdfdownloadtask.operations.get. Any errors can be found in the error.message. Note that error.details is expected to be empty.
+    /// Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with `sdfdownloadtasks.operations.get`. Any errors can be found in the error.message. Note that error.details is expected to be empty.
     ///
     /// # Arguments
     ///
@@ -11064,9 +10896,20 @@ impl<'a, C> SdfdownloadtaskMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -11077,7 +10920,7 @@ impl<'a, C> SdfdownloadtaskMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -11186,9 +11029,20 @@ impl<'a, C> TargetingTypeMethods<'a, C> {
 /// use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -11199,7 +11053,7 @@ impl<'a, C> TargetingTypeMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DisplayVideo::new(client, auth);
@@ -11353,9 +11207,20 @@ impl<'a, C> UserMethods<'a, C> {
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11366,7 +11231,7 @@ impl<'a, C> UserMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -11732,9 +11597,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11745,7 +11621,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -12104,9 +11980,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12117,7 +12004,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -12520,9 +12407,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12533,7 +12431,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -12920,9 +12818,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12933,7 +12842,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -13242,9 +13151,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13255,7 +13175,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -13546,9 +13466,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13559,7 +13490,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -13850,9 +13781,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13863,7 +13805,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -14176,6 +14118,412 @@ where
     }
 }
 
+/// Lists assigned targeting options of a campaign across targeting types.
+///
+/// A builder for the *campaigns.listAssignedTargetingOptions* method supported by a *advertiser* resource.
+/// It is not used directly, but through a [`AdvertiserMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_displayvideo1 as displayvideo1;
+/// # async fn dox() {
+/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DisplayVideo::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.advertisers().campaigns_list_assigned_targeting_options(-31, -93)
+///              .page_token("duo")
+///              .page_size(-34)
+///              .order_by("et")
+///              .filter("voluptua.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AdvertiserCampaignListAssignedTargetingOptionCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DisplayVideo<C>,
+    _advertiser_id: i64,
+    _campaign_id: i64,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {}
+
+impl<'a, C> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        BulkListCampaignAssignedTargetingOptionsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "displayvideo.advertisers.campaigns.listAssignedTargetingOptions",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "advertiserId",
+            "campaignId",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("campaignId", self._campaign_id.to_string());
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone()
+            + "v1/advertisers/{+advertiserId}/campaigns/{+campaignId}:listAssignedTargetingOptions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DisplayVideo.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+advertiserId}", "advertiserId"),
+            ("{+campaignId}", "campaignId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["campaignId", "advertiserId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The ID of the advertiser the campaign belongs to.
+    ///
+    /// Sets the *advertiser id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn advertiser_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._advertiser_id = new_value;
+        self
+    }
+    /// Required. The ID of the campaign to list assigned targeting options for.
+    ///
+    /// Sets the *campaign id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn campaign_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._campaign_id = new_value;
+        self
+    }
+    /// A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListCampaignAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is `5000`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `targetingType desc`.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Allows filtering by assigned targeting option fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the `OR` logical operator. * A restriction has the form of `{field} {operator} {value}`. * All fields must use the `EQUALS (=)` operator. Supported fields: * `targetingType` * `inheritance` Examples: * `AssignedTargetingOption` resources of targeting type `TARGETING_TYPE_LANGUAGE` or `TARGETING_TYPE_GENDER`: `targetingType="TARGETING_TYPE_LANGUAGE" OR targetingType="TARGETING_TYPE_GENDER"` * `AssignedTargetingOption` resources with inheritance status of `NOT_INHERITED` or `INHERITED_FROM_PARTNER`: `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](https://developers.google.com/display-video/api/guides/how-tos/filters) guide for more information.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DisplayVideo`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AdvertiserCampaignListAssignedTargetingOptionCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Updates an existing campaign. Returns the updated campaign if successful.
 ///
 /// A builder for the *campaigns.patch* method supported by a *advertiser* resource.
@@ -14194,9 +14542,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14207,7 +14566,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -14219,7 +14578,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().campaigns_patch(req, -31, -93)
+/// let result = hub.advertisers().campaigns_patch(req, -2, -96)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -14550,9 +14909,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14563,7 +14933,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -14575,7 +14945,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_bulk_edit(req, -20, -34)
+/// let result = hub.advertisers().channels_sites_bulk_edit(req, -92, -49)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14894,9 +15264,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14907,7 +15288,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -14919,8 +15300,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_create(req, -22, -28)
-///              .partner_id(-2)
+/// let result = hub.advertisers().channels_sites_create(req, -18, -22)
+///              .partner_id(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15246,9 +15627,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15259,15 +15651,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_delete(-96, -92, "urlOrAppId")
-///              .partner_id(-18)
+/// let result = hub.advertisers().channels_sites_delete(-15, -99, "urlOrAppId")
+///              .partner_id(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15583,9 +15975,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15596,19 +15999,19 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_list(-22, -95)
-///              .partner_id(-15)
-///              .page_token("dolor")
-///              .page_size(-20)
-///              .order_by("vero")
-///              .filter("vero")
+/// let result = hub.advertisers().channels_sites_list(-76, -88)
+///              .partner_id(-65)
+///              .page_token("vero")
+///              .page_size(-44)
+///              .order_by("Lorem")
+///              .filter("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15959,9 +16362,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15972,7 +16386,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -15984,7 +16398,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_sites_replace(req, -88, -65)
+/// let result = hub.advertisers().channels_sites_replace(req, -61, -100)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16303,9 +16717,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16316,7 +16741,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -16328,8 +16753,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_create(req, -76)
-///              .partner_id(-44)
+/// let result = hub.advertisers().channels_create(req, -23)
+///              .partner_id(-59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16637,9 +17062,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16650,15 +17086,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_get(-6, -29)
-///              .partner_id(-61)
+/// let result = hub.advertisers().channels_get(-46, -28)
+///              .partner_id(-72)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16953,9 +17389,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16966,19 +17413,19 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_list(-100)
-///              .partner_id(-23)
-///              .page_token("takimata")
-///              .page_size(-46)
-///              .order_by("voluptua.")
-///              .filter("et")
+/// let result = hub.advertisers().channels_list(-31)
+///              .partner_id(-96)
+///              .page_token("amet.")
+///              .page_size(-30)
+///              .order_by("takimata")
+///              .filter("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17310,9 +17757,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17323,7 +17781,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -17335,9 +17793,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().channels_patch(req, -31, -96)
+/// let result = hub.advertisers().channels_patch(req, -62, -74)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .partner_id(-2)
+///              .partner_id(-23)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17686,9 +18144,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17699,7 +18168,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -17711,7 +18180,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_create(req, -30)
+/// let result = hub.advertisers().creatives_create(req, -78)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18008,9 +18477,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18021,14 +18501,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_delete(-9, -19)
+/// let result = hub.advertisers().creatives_delete(-34, -34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18312,9 +18792,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18325,14 +18816,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_get(-62, -74)
+/// let result = hub.advertisers().creatives_get(-34, -78)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18616,9 +19107,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18629,18 +19131,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_list(-23)
-///              .page_token("voluptua.")
-///              .page_size(-34)
-///              .order_by("dolore")
-///              .filter("dolore")
+/// let result = hub.advertisers().creatives_list(-2)
+///              .page_token("ea")
+///              .page_size(-95)
+///              .order_by("Lorem")
+///              .filter("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18960,9 +19462,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18973,7 +19486,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -18985,7 +19498,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().creatives_patch(req, -78, -2)
+/// let result = hub.advertisers().creatives_patch(req, -11, -7)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -19298,6 +19811,776 @@ where
     }
 }
 
+/// Assigns a targeting option to an insertion order. Returns the assigned targeting option if successful. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+///
+/// A builder for the *insertionOrders.targetingTypes.assignedTargetingOptions.create* method supported by a *advertiser* resource.
+/// It is not used directly, but through a [`AdvertiserMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_displayvideo1 as displayvideo1;
+/// use displayvideo1::api::AssignedTargetingOption;
+/// # async fn dox() {
+/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DisplayVideo::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AssignedTargetingOption::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_create(req, -27, -43, "targetingType")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DisplayVideo<C>,
+    _request: AssignedTargetingOption,
+    _advertiser_id: i64,
+    _insertion_order_id: i64,
+    _targeting_type: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+{
+}
+
+impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, AssignedTargetingOption)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo { id: "displayvideo.advertisers.insertionOrders.targetingTypes.assignedTargetingOptions.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "advertiserId", "insertionOrderId", "targetingType"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("insertionOrderId", self._insertion_order_id.to_string());
+        params.push("targetingType", self._targeting_type);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/advertisers/{+advertiserId}/insertionOrders/{+insertionOrderId}/targetingTypes/{+targetingType}/assignedTargetingOptions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DisplayVideo.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+advertiserId}", "advertiserId"),
+            ("{+insertionOrderId}", "insertionOrderId"),
+            ("{+targetingType}", "targetingType"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["targetingType", "insertionOrderId", "advertiserId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: AssignedTargetingOption,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The ID of the advertiser the insertion order belongs to.
+    ///
+    /// Sets the *advertiser id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn advertiser_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+        self._advertiser_id = new_value;
+        self
+    }
+    /// Required. The ID of the insertion order the assigned targeting option will belong to.
+    ///
+    /// Sets the *insertion order id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn insertion_order_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+        self._insertion_order_id = new_value;
+        self
+    }
+    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+    ///
+    /// Sets the *targeting type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn targeting_type(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+        self._targeting_type = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DisplayVideo`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Deletes an assigned targeting option from an insertion order. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+///
+/// A builder for the *insertionOrders.targetingTypes.assignedTargetingOptions.delete* method supported by a *advertiser* resource.
+/// It is not used directly, but through a [`AdvertiserMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_displayvideo1 as displayvideo1;
+/// # async fn dox() {
+/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DisplayVideo::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_delete(-35, -39, "targetingType", "assignedTargetingOptionId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DisplayVideo<C>,
+    _advertiser_id: i64,
+    _insertion_order_id: i64,
+    _targeting_type: String,
+    _assigned_targeting_option_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+{
+}
+
+impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Empty)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo { id: "displayvideo.advertisers.insertionOrders.targetingTypes.assignedTargetingOptions.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in [
+            "alt",
+            "advertiserId",
+            "insertionOrderId",
+            "targetingType",
+            "assignedTargetingOptionId",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("insertionOrderId", self._insertion_order_id.to_string());
+        params.push("targetingType", self._targeting_type);
+        params.push(
+            "assignedTargetingOptionId",
+            self._assigned_targeting_option_id,
+        );
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/advertisers/{+advertiserId}/insertionOrders/{+insertionOrderId}/targetingTypes/{+targetingType}/assignedTargetingOptions/{+assignedTargetingOptionId}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DisplayVideo.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+advertiserId}", "advertiserId"),
+            ("{+insertionOrderId}", "insertionOrderId"),
+            ("{+targetingType}", "targetingType"),
+            ("{+assignedTargetingOptionId}", "assignedTargetingOptionId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = [
+                "assignedTargetingOptionId",
+                "targetingType",
+                "insertionOrderId",
+                "advertiserId",
+            ];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The ID of the advertiser the insertion order belongs to.
+    ///
+    /// Sets the *advertiser id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn advertiser_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+        self._advertiser_id = new_value;
+        self
+    }
+    /// Required. The ID of the insertion order the assigned targeting option belongs to.
+    ///
+    /// Sets the *insertion order id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn insertion_order_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+        self._insertion_order_id = new_value;
+        self
+    }
+    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_VIEWABILITY`
+    ///
+    /// Sets the *targeting type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn targeting_type(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+        self._targeting_type = new_value.to_string();
+        self
+    }
+    /// Required. The ID of the assigned targeting option to delete.
+    ///
+    /// Sets the *assigned targeting option id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn assigned_targeting_option_id(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+        self._assigned_targeting_option_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DisplayVideo`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets a single targeting option assigned to an insertion order.
 ///
 /// A builder for the *insertionOrders.targetingTypes.assignedTargetingOptions.get* method supported by a *advertiser* resource.
@@ -19315,9 +20598,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19328,14 +20622,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_get(-17, -95, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_get(-18, -8, "targetingType", "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19685,9 +20979,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19698,18 +21003,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_list(-11, -7, "targetingType")
-///              .page_token("sed")
-///              .page_size(-98)
-///              .order_by("et")
-///              .filter("tempor")
+/// let result = hub.advertisers().insertion_orders_targeting_types_assigned_targeting_options_list(-30, -29, "targetingType")
+///              .page_token("dolores")
+///              .page_size(-68)
+///              .order_by("sed")
+///              .filter("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20099,9 +21404,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20112,18 +21428,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_bulk_list_insertion_order_assigned_targeting_options(-32, -5)
-///              .page_token("et")
-///              .page_size(-8)
-///              .order_by("Lorem")
-///              .filter("est")
+/// let result = hub.advertisers().insertion_orders_bulk_list_insertion_order_assigned_targeting_options(-85, -94)
+///              .page_token("sed")
+///              .page_size(-61)
+///              .order_by("nonumy")
+///              .filter("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20497,9 +21813,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20510,7 +21837,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -20522,7 +21849,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_create(req, -30)
+/// let result = hub.advertisers().insertion_orders_create(req, -45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20822,9 +22149,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20835,14 +22173,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_delete(-29, -19)
+/// let result = hub.advertisers().insertion_orders_delete(-32, -69)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21129,9 +22467,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21142,14 +22491,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_get(-69, -68)
+/// let result = hub.advertisers().insertion_orders_get(-95, -31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -21433,9 +22782,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21446,18 +22806,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_list(-93)
-///              .page_token("no")
-///              .page_size(-85)
-///              .order_by("elitr")
-///              .filter("sed")
+/// let result = hub.advertisers().insertion_orders_list(-82)
+///              .page_token("amet")
+///              .page_size(-57)
+///              .order_by("et")
+///              .filter("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21759,6 +23119,413 @@ where
     }
 }
 
+/// Lists assigned targeting options of an insertion order across targeting types.
+///
+/// A builder for the *insertionOrders.listAssignedTargetingOptions* method supported by a *advertiser* resource.
+/// It is not used directly, but through a [`AdvertiserMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_displayvideo1 as displayvideo1;
+/// # async fn dox() {
+/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DisplayVideo::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.advertisers().insertion_orders_list_assigned_targeting_options(-96, -46)
+///              .page_token("Stet")
+///              .page_size(-7)
+///              .order_by("aliquyam")
+///              .filter("elitr")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DisplayVideo<C>,
+    _advertiser_id: i64,
+    _insertion_order_id: i64,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {}
+
+impl<'a, C> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(
+        mut self,
+    ) -> common::Result<(
+        common::Response,
+        BulkListInsertionOrderAssignedTargetingOptionsResponse,
+    )> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "displayvideo.advertisers.insertionOrders.listAssignedTargetingOptions",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in [
+            "alt",
+            "advertiserId",
+            "insertionOrderId",
+            "pageToken",
+            "pageSize",
+            "orderBy",
+            "filter",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("advertiserId", self._advertiser_id.to_string());
+        params.push("insertionOrderId", self._insertion_order_id.to_string());
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+        if let Some(value) = self._filter.as_ref() {
+            params.push("filter", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/advertisers/{+advertiserId}/insertionOrders/{+insertionOrderId}:listAssignedTargetingOptions";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::DisplayVideo.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [
+            ("{+advertiserId}", "advertiserId"),
+            ("{+insertionOrderId}", "insertionOrderId"),
+        ]
+        .iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["insertionOrderId", "advertiserId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The ID of the advertiser the insertion order belongs to.
+    ///
+    /// Sets the *advertiser id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn advertiser_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._advertiser_id = new_value;
+        self
+    }
+    /// Required. The ID of the insertion order to list assigned targeting options for.
+    ///
+    /// Sets the *insertion order id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn insertion_order_id(
+        mut self,
+        new_value: i64,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._insertion_order_id = new_value;
+        self
+    }
+    /// A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListInsertionOrderAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is `5000`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(
+        mut self,
+        new_value: i32,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `targetingType desc`.
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Allows filtering by assigned targeting option fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * All fields must use the `EQUALS (=)` operator. Supported fields: * `targetingType` * `inheritance` Examples: * `AssignedTargetingOption` resources of targeting type `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` or `TARGETING_TYPE_CHANNEL`: `targetingType="TARGETING_TYPE_PROXIMITY_LOCATION_LIST" OR targetingType="TARGETING_TYPE_CHANNEL"` * `AssignedTargetingOption` resources with inheritance status of `NOT_INHERITED` or `INHERITED_FROM_PARTNER`: `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](https://developers.google.com/display-video/api/guides/how-tos/filters) guide for more information.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(
+        mut self,
+        new_value: &str,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::DisplayVideo`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> AdvertiserInsertionOrderListAssignedTargetingOptionCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Updates an existing insertion order. Returns the updated insertion order if successful.
 ///
 /// A builder for the *insertionOrders.patch* method supported by a *advertiser* resource.
@@ -21777,9 +23544,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21790,7 +23568,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -21802,7 +23580,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().insertion_orders_patch(req, -61, -91)
+/// let result = hub.advertisers().insertion_orders_patch(req, -20, -42)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -22138,9 +23916,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22151,18 +23940,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().invoices_list(-77)
-///              .page_token("sadipscing")
-///              .page_size(-32)
-///              .loi_sapin_invoice_type("dolores")
-///              .issue_month("sadipscing")
+/// let result = hub.advertisers().invoices_list(-57)
+///              .page_token("sit")
+///              .page_size(-93)
+///              .loi_sapin_invoice_type("eos")
+///              .issue_month("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22481,9 +24270,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22494,15 +24294,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().invoices_lookup_invoice_currency(-31)
-///              .invoice_month("aliquyam")
+/// let result = hub.advertisers().invoices_lookup_invoice_currency(-17)
+///              .invoice_month("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22796,9 +24596,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22809,7 +24620,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -22821,7 +24632,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_create(req, -47, -57, "targetingType")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_create(req, -19, -25, "targetingType")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23175,9 +24986,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23188,14 +25010,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_delete(-10, -96, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_delete(-10, -74, "targetingType", "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23547,9 +25369,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23560,14 +25393,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_get(-7, -82, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_get(-40, -51, "targetingType", "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23779,7 +25612,7 @@ where
         self._line_item_id = new_value;
         self
     }
-    /// Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
+    /// Required. Identifies the type of this assigned targeting option. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
     ///
     /// Sets the *targeting type* path property to the given value.
     ///
@@ -23919,9 +25752,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23932,18 +25776,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_list(-42, -57, "targetingType")
-///              .page_token("sed")
-///              .page_size(-75)
-///              .order_by("Lorem")
-///              .filter("ea")
+/// let result = hub.advertisers().line_items_targeting_types_assigned_targeting_options_list(-31, -69, "targetingType")
+///              .page_token("accusam")
+///              .page_size(-10)
+///              .order_by("takimata")
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24168,7 +26012,7 @@ where
         self._line_item_id = new_value;
         self
     }
-    /// Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
+    /// Required. Identifies the type of assigned targeting options to list. Supported targeting types include: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_APP` * `TARGETING_TYPE_APP_CATEGORY` * `TARGETING_TYPE_AUDIENCE_GROUP` * `TARGETING_TYPE_AUDIO_CONTENT_TYPE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_BROWSER` * `TARGETING_TYPE_BUSINESS_CHAIN` * `TARGETING_TYPE_CARRIER_AND_ISP` * `TARGETING_TYPE_CATEGORY` * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_CONTENT_DURATION` * `TARGETING_TYPE_CONTENT_GENRE` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_STREAM_TYPE` * `TARGETING_TYPE_DAY_AND_TIME` * `TARGETING_TYPE_DEVICE_MAKE_MODEL` * `TARGETING_TYPE_DEVICE_TYPE` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_NATIVE_CONTENT_POSITION` * `TARGETING_TYPE_NEGATIVE_KEYWORD_LIST` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_OPERATING_SYSTEM` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_POI` * `TARGETING_TYPE_PROXIMITY_LOCATION_LIST` * `TARGETING_TYPE_REGIONAL_LOCATION_LIST` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_URL` * `TARGETING_TYPE_USER_REWARDED_CONTENT` * `TARGETING_TYPE_VIDEO_PLAYER_SIZE` * `TARGETING_TYPE_VIEWABILITY` * `TARGETING_TYPE_INVENTORY_MODE` * `TARGETING_TYPE_YOUTUBE_CHANNEL` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items) * `TARGETING_TYPE_YOUTUBE_VIDEO` (only for `LINE_ITEM_TYPE_YOUTUBE_AND_PARTNERS_VIDEO_SEQUENCE` line items)
     ///
     /// Sets the *targeting type* path property to the given value.
     ///
@@ -24336,9 +26180,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24349,7 +26204,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -24361,7 +26216,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_bulk_edit_line_item_assigned_targeting_options(req, -15, -19)
+/// let result = hub.advertisers().line_items_bulk_edit_line_item_assigned_targeting_options(req, -22, -77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -24704,9 +26559,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24717,18 +26583,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_bulk_list_line_item_assigned_targeting_options(-25, -68)
-///              .page_token("sea")
-///              .page_size(-74)
-///              .order_by("At")
-///              .filter("dolore")
+/// let result = hub.advertisers().line_items_bulk_list_line_item_assigned_targeting_options(-4, -22)
+///              .page_token("sit")
+///              .page_size(-81)
+///              .order_by("sea")
+///              .filter("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25104,9 +26970,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25117,7 +26994,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -25129,7 +27006,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_create(req, -40)
+/// let result = hub.advertisers().line_items_create(req, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25426,9 +27303,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25439,14 +27327,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_delete(-51, -23)
+/// let result = hub.advertisers().line_items_delete(-12, -21)
 ///              .doit().await;
 /// # }
 /// ```
@@ -25731,9 +27619,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25744,7 +27643,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -25756,7 +27655,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_generate_default(req, -47)
+/// let result = hub.advertisers().line_items_generate_default(req, -60)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26057,9 +27956,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26070,14 +27980,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_get(-31, -69)
+/// let result = hub.advertisers().line_items_get(-96, -98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -26361,9 +28271,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26374,18 +28295,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_list(-81)
-///              .page_token("accusam")
-///              .page_size(-10)
-///              .order_by("takimata")
-///              .filter("Lorem")
+/// let result = hub.advertisers().line_items_list(-32)
+///              .page_token("eos")
+///              .page_size(-77)
+///              .order_by("dolores")
+///              .filter("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26705,9 +28626,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26718,7 +28650,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -26730,7 +28662,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().line_items_patch(req, -22, -77)
+/// let result = hub.advertisers().line_items_patch(req, -62, -4)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -27061,9 +28993,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27074,7 +29017,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -27086,7 +29029,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_bulk_edit(req, -4, -22)
+/// let result = hub.advertisers().location_lists_assigned_locations_bulk_edit(req, -32, -61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27422,9 +29365,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27435,7 +29389,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -27447,7 +29401,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_create(req, -48, -81)
+/// let result = hub.advertisers().location_lists_assigned_locations_create(req, -2, -50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27781,9 +29735,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27794,14 +29759,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_delete(-10, -41, -22)
+/// let result = hub.advertisers().location_lists_assigned_locations_delete(-56, -73, -62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28123,9 +30088,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28136,18 +30112,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_assigned_locations_list(-12, -21)
-///              .page_token("sea")
-///              .page_size(-96)
+/// let result = hub.advertisers().location_lists_assigned_locations_list(-45, -27)
+///              .page_token("sit")
+///              .page_size(-20)
 ///              .order_by("sit")
-///              .filter("aliquyam")
+///              .filter("magna")
 ///              .doit().await;
 /// # }
 /// ```
@@ -28516,9 +30492,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28529,7 +30516,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -28541,7 +30528,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_create(req, -25)
+/// let result = hub.advertisers().location_lists_create(req, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -28838,9 +30825,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28851,14 +30849,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_get(-77, -19)
+/// let result = hub.advertisers().location_lists_get(-66, -4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -29142,9 +31140,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29155,18 +31164,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_list(-46)
-///              .page_token("gubergren")
-///              .page_size(-4)
-///              .order_by("aliquyam")
-///              .filter("no")
+/// let result = hub.advertisers().location_lists_list(-6)
+///              .page_token("justo")
+///              .page_size(-52)
+///              .order_by("no")
+///              .filter("nonumy")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29486,9 +31495,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29499,7 +31519,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -29511,7 +31531,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().location_lists_patch(req, -2, -50)
+/// let result = hub.advertisers().location_lists_patch(req, -43, -13)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -29842,9 +31862,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29855,7 +31886,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -29867,7 +31898,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_activate(req, -56, -73)
+/// let result = hub.advertisers().manual_triggers_activate(req, -101, -58)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30186,9 +32217,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30199,7 +32241,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -30211,7 +32253,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_create(req, -62)
+/// let result = hub.advertisers().manual_triggers_create(req, -91)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30509,9 +32551,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30522,7 +32575,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -30534,7 +32587,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_deactivate(req, -45, -27)
+/// let result = hub.advertisers().manual_triggers_deactivate(req, -66, -39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30852,9 +32905,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30865,14 +32929,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_get(-53, -20)
+/// let result = hub.advertisers().manual_triggers_get(-34, -25)
 ///              .doit().await;
 /// # }
 /// ```
@@ -31156,9 +33220,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31169,18 +33244,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_list(-53)
-///              .page_token("magna")
-///              .page_size(-22)
-///              .order_by("rebum.")
-///              .filter("dolor")
+/// let result = hub.advertisers().manual_triggers_list(-52)
+///              .page_token("dolore")
+///              .page_size(-97)
+///              .order_by("ut")
+///              .filter("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -31500,9 +33575,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31513,7 +33599,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -31525,7 +33611,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().manual_triggers_patch(req, -6, -71)
+/// let result = hub.advertisers().manual_triggers_patch(req, -53, -76)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -31856,9 +33942,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31869,7 +33966,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -31881,7 +33978,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_bulk_edit(req, -52, -11)
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_bulk_edit(req, -20, -45)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32225,9 +34322,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32238,7 +34346,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -32250,7 +34358,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_create(req, -91, -43)
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_create(req, -87, -16)
 ///              .doit().await;
 /// # }
 /// ```
@@ -32586,9 +34694,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32599,14 +34718,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_delete(-13, -101, "keywordValue")
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_delete(-70, -63, "keywordValue")
 ///              .doit().await;
 /// # }
 /// ```
@@ -32931,9 +35050,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32944,18 +35074,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_list(-91, -66)
-///              .page_token("tempor")
-///              .page_size(-34)
-///              .order_by("eos")
-///              .filter("amet.")
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_list(-39, -10)
+///              .page_token("et")
+///              .page_size(-56)
+///              .order_by("magna")
+///              .filter("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -33326,9 +35456,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33339,7 +35480,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -33351,7 +35492,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_replace(req, -84, -97)
+/// let result = hub.advertisers().negative_keyword_lists_negative_keywords_replace(req, -66, -27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33692,9 +35833,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33705,7 +35857,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -33717,7 +35869,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_create(req, -37)
+/// let result = hub.advertisers().negative_keyword_lists_create(req, -88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34021,9 +36173,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34034,14 +36197,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_delete(-27, -53)
+/// let result = hub.advertisers().negative_keyword_lists_delete(-14, -15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34334,9 +36497,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34347,14 +36521,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_get(-76, -20)
+/// let result = hub.advertisers().negative_keyword_lists_get(-82, -37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34644,9 +36818,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34657,15 +36842,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_list(-45)
-///              .page_token("ut")
+/// let result = hub.advertisers().negative_keyword_lists_list(-3)
+///              .page_token("vero")
 ///              .page_size(-16)
 ///              .doit().await;
 /// # }
@@ -34958,9 +37143,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34971,7 +37167,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -34983,7 +37179,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().negative_keyword_lists_patch(req, -70, -63)
+/// let result = hub.advertisers().negative_keyword_lists_patch(req, -19, -96)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -35326,9 +37522,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35339,7 +37546,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -35351,7 +37558,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_create(req, -95, "targetingType")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_create(req, -19, "targetingType")
 ///              .doit().await;
 /// # }
 /// ```
@@ -35562,7 +37769,7 @@ where
         self._advertiser_id = new_value;
         self
     }
-    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`
+    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`
     ///
     /// Sets the *targeting type* path property to the given value.
     ///
@@ -35689,9 +37896,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35702,14 +37920,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_delete(-10, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_delete(-38, "targetingType", "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -35899,7 +38117,7 @@ where
         self._advertiser_id = new_value;
         self
     }
-    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`
+    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_INVENTORY_MODE`
     ///
     /// Sets the *targeting type* path property to the given value.
     ///
@@ -36039,9 +38257,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -36052,14 +38281,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_get(-33, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_get(-82, "targetingType", "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -36246,7 +38475,7 @@ where
         self._advertiser_id = new_value;
         self
     }
-    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`
+    /// Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`
     ///
     /// Sets the *targeting type* path property to the given value.
     ///
@@ -36384,9 +38613,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -36397,18 +38637,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().targeting_types_assigned_targeting_options_list(-27, "targetingType")
-///              .page_token("clita")
-///              .page_size(-15)
-///              .order_by("aliquyam")
-///              .filter("ut")
+/// let result = hub.advertisers().targeting_types_assigned_targeting_options_list(-91, "targetingType")
+///              .page_token("sanctus")
+///              .page_size(-23)
+///              .order_by("tempor")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -36613,7 +38853,7 @@ where
         self._advertiser_id = new_value;
         self
     }
-    /// Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`
+    /// Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD` * `TARGETING_TYPE_CONTENT_THEME_EXCLUSION`
     ///
     /// Sets the *targeting type* path property to the given value.
     ///
@@ -36778,9 +39018,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -36791,14 +39042,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().audit(-3)
+/// let result = hub.advertisers().audit(-7)
 ///              .read_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -37077,9 +39328,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -37090,7 +39352,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -37102,7 +39364,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().bulk_edit_advertiser_assigned_targeting_options(req, -26)
+/// let result = hub.advertisers().bulk_edit_advertiser_assigned_targeting_options(req, -9)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37423,9 +39685,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -37436,18 +39709,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().bulk_list_advertiser_assigned_targeting_options(-16)
-///              .page_token("dolores")
-///              .page_size(-96)
-///              .order_by("dolores")
-///              .filter("sed")
+/// let result = hub.advertisers().bulk_list_advertiser_assigned_targeting_options(-99)
+///              .page_token("diam")
+///              .page_size(-77)
+///              .order_by("erat")
+///              .filter("justo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -37800,9 +40073,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -37813,7 +40097,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -38101,9 +40385,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -38114,14 +40409,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().delete(-38)
+/// let result = hub.advertisers().delete(-5)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38387,9 +40682,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -38400,14 +40706,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().get(-64)
+/// let result = hub.advertisers().get(-73)
 ///              .doit().await;
 /// # }
 /// ```
@@ -38670,9 +40976,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -38683,7 +41000,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -38691,11 +41008,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.advertisers().list()
-///              .partner_id(-99)
-///              .page_token("aliquyam")
-///              .page_size(-83)
-///              .order_by("diam")
-///              .filter("nonumy")
+///              .partner_id(-19)
+///              .page_token("consetetur")
+///              .page_size(-11)
+///              .order_by("justo")
+///              .filter("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -38888,7 +41205,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Field by which to sort the list. Acceptable values are: * `displayName` (default) * `entityStatus` * `updateTime` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
+    /// Field by which to sort the list. Acceptable values are: * `advertiserId` (default) * `displayName` * `entityStatus` * `updateTime` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> AdvertiserListCall<'a, C> {
@@ -39005,9 +41322,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -39018,7 +41346,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -39030,7 +41358,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.advertisers().patch(req, -18)
+/// let result = hub.advertisers().patch(req, -42)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -39339,9 +41667,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -39352,16 +41691,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.combined_audiences().get(-8)
-///              .partner_id(-23)
-///              .advertiser_id(-39)
+/// let result = hub.combined_audiences().get(-10)
+///              .partner_id(-50)
+///              .advertiser_id(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39649,9 +41988,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -39662,7 +42012,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -39670,12 +42020,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.combined_audiences().list()
-///              .partner_id(-43)
-///              .page_token("est")
-///              .page_size(-9)
-///              .order_by("dolor")
-///              .filter("diam")
-///              .advertiser_id(-77)
+///              .partner_id(-62)
+///              .page_token("ipsum")
+///              .page_size(-61)
+///              .order_by("sit")
+///              .filter("kasd")
+///              .advertiser_id(-47)
 ///              .doit().await;
 /// # }
 /// ```
@@ -39981,7 +42331,7 @@ where
     }
 }
 
-/// Creates a new custom bidding script. Returns the newly created script if successful.
+/// Creates a new custom bidding script. Returns the newly created script if successful. Requests creating a custom bidding script under an algorithm assigned to a line item will return an error.
 ///
 /// A builder for the *scripts.create* method supported by a *customBiddingAlgorithm* resource.
 /// It is not used directly, but through a [`CustomBiddingAlgorithmMethods`] instance.
@@ -39999,9 +42349,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -40012,7 +42373,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -40024,9 +42385,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().scripts_create(req, -81)
-///              .partner_id(-71)
-///              .advertiser_id(-5)
+/// let result = hub.custom_bidding_algorithms().scripts_create(req, -56)
+///              .partner_id(-21)
+///              .advertiser_id(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40367,9 +42728,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -40380,16 +42752,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().scripts_get(-73, -19)
-///              .partner_id(-96)
-///              .advertiser_id(-11)
+/// let result = hub.custom_bidding_algorithms().scripts_get(-1, -80)
+///              .partner_id(-91)
+///              .advertiser_id(-10)
 ///              .doit().await;
 /// # }
 /// ```
@@ -40714,9 +43086,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -40727,19 +43110,19 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().scripts_list(-21)
-///              .partner_id(-45)
-///              .page_token("diam")
-///              .page_size(-10)
-///              .order_by("ipsum")
-///              .advertiser_id(-15)
+/// let result = hub.custom_bidding_algorithms().scripts_list(-100)
+///              .partner_id(-63)
+///              .page_token("justo")
+///              .page_size(-17)
+///              .order_by("At")
+///              .advertiser_id(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -41082,9 +43465,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -41095,7 +43489,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -41386,9 +43780,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -41399,16 +43804,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().get(-62)
-///              .partner_id(-5)
-///              .advertiser_id(-61)
+/// let result = hub.custom_bidding_algorithms().get(-14)
+///              .partner_id(-76)
+///              .advertiser_id(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -41712,9 +44117,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -41725,7 +44141,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -41733,12 +44149,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.custom_bidding_algorithms().list()
-///              .partner_id(-98)
-///              .page_token("kasd")
-///              .page_size(-47)
-///              .order_by("Lorem")
-///              .filter("justo")
-///              .advertiser_id(-88)
+///              .partner_id(-91)
+///              .page_token("erat")
+///              .page_size(-31)
+///              .order_by("dolores")
+///              .filter("ipsum")
+///              .advertiser_id(-28)
 ///              .doit().await;
 /// # }
 /// ```
@@ -42044,7 +44460,7 @@ where
     }
 }
 
-/// Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful.
+/// Updates an existing custom bidding algorithm. Returns the updated custom bidding algorithm if successful. Requests updating a custom bidding algorithm assigned to a line item will return an error.
 ///
 /// A builder for the *patch* method supported by a *customBiddingAlgorithm* resource.
 /// It is not used directly, but through a [`CustomBiddingAlgorithmMethods`] instance.
@@ -42062,9 +44478,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -42075,7 +44502,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -42087,7 +44514,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().patch(req, -1)
+/// let result = hub.custom_bidding_algorithms().patch(req, -25)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
@@ -42411,9 +44838,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -42424,16 +44862,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_bidding_algorithms().upload_script(-80)
-///              .partner_id(-91)
-///              .advertiser_id(-10)
+/// let result = hub.custom_bidding_algorithms().upload_script(-70)
+///              .partner_id(-94)
+///              .advertiser_id(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -42740,9 +45178,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -42753,15 +45202,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.custom_lists().get(-100)
-///              .advertiser_id(-63)
+/// let result = hub.custom_lists().get(-72)
+///              .advertiser_id(-14)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43035,9 +45484,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -43048,7 +45508,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -43056,11 +45516,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.custom_lists().list()
-///              .page_token("justo")
-///              .page_size(-17)
-///              .order_by("At")
-///              .filter("erat")
-///              .advertiser_id(-14)
+///              .page_token("sit")
+///              .page_size(-59)
+///              .order_by("erat")
+///              .filter("diam")
+///              .advertiser_id(-41)
 ///              .doit().await;
 /// # }
 /// ```
@@ -43352,1722 +45812,6 @@ where
     }
 }
 
-/// Creates a FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`
-///
-/// A builder for the *create* method supported by a *firstAndThirdPartyAudience* resource.
-/// It is not used directly, but through a [`FirstAndThirdPartyAudienceMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_displayvideo1 as displayvideo1;
-/// use displayvideo1::api::FirstAndThirdPartyAudience;
-/// # async fn dox() {
-/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = DisplayVideo::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = FirstAndThirdPartyAudience::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().create(req)
-///              .advertiser_id(-76)
-///              .doit().await;
-/// # }
-/// ```
-pub struct FirstAndThirdPartyAudienceCreateCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a DisplayVideo<C>,
-    _request: FirstAndThirdPartyAudience,
-    _advertiser_id: Option<i64>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for FirstAndThirdPartyAudienceCreateCall<'a, C> {}
-
-impl<'a, C> FirstAndThirdPartyAudienceCreateCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, FirstAndThirdPartyAudience)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "displayvideo.firstAndThirdPartyAudiences.create",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "advertiserId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        if let Some(value) = self._advertiser_id.as_ref() {
-            params.push("advertiserId", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/firstAndThirdPartyAudiences";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::DisplayVideo.as_ref().to_string());
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: FirstAndThirdPartyAudience,
-    ) -> FirstAndThirdPartyAudienceCreateCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The ID of the advertiser under whom the FirstAndThirdPartyAudience will be created.
-    ///
-    /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: i64) -> FirstAndThirdPartyAudienceCreateCall<'a, C> {
-        self._advertiser_id = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> FirstAndThirdPartyAudienceCreateCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudienceCreateCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::DisplayVideo`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FirstAndThirdPartyAudienceCreateCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FirstAndThirdPartyAudienceCreateCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> FirstAndThirdPartyAudienceCreateCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Updates the member list of a Customer Match audience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`
-///
-/// A builder for the *editCustomerMatchMembers* method supported by a *firstAndThirdPartyAudience* resource.
-/// It is not used directly, but through a [`FirstAndThirdPartyAudienceMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_displayvideo1 as displayvideo1;
-/// use displayvideo1::api::EditCustomerMatchMembersRequest;
-/// # async fn dox() {
-/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = DisplayVideo::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = EditCustomerMatchMembersRequest::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().edit_customer_match_members(req, -88)
-///              .doit().await;
-/// # }
-/// ```
-pub struct FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a DisplayVideo<C>,
-    _request: EditCustomerMatchMembersRequest,
-    _first_and_third_party_audience_id: i64,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C> {}
-
-impl<'a, C> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(
-        mut self,
-    ) -> common::Result<(common::Response, EditCustomerMatchMembersResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "displayvideo.firstAndThirdPartyAudiences.editCustomerMatchMembers",
-            http_method: hyper::Method::POST,
-        });
-
-        for &field in ["alt", "firstAndThirdPartyAudienceId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push(
-            "firstAndThirdPartyAudienceId",
-            self._first_and_third_party_audience_id.to_string(),
-        );
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/firstAndThirdPartyAudiences/{+firstAndThirdPartyAudienceId}:editCustomerMatchMembers";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::DisplayVideo.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [(
-            "{+firstAndThirdPartyAudienceId}",
-            "firstAndThirdPartyAudienceId",
-        )]
-        .iter()
-        {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["firstAndThirdPartyAudienceId"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: EditCustomerMatchMembersRequest,
-    ) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The ID of the Customer Match FirstAndThirdPartyAudience whose members will be edited.
-    ///
-    /// Sets the *first and third party audience id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn first_and_third_party_audience_id(
-        mut self,
-        new_value: i64,
-    ) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C> {
-        self._first_and_third_party_audience_id = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(
-        mut self,
-        name: T,
-        value: T,
-    ) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::DisplayVideo`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(
-        mut self,
-        scope: St,
-    ) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(
-        mut self,
-        scopes: I,
-    ) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> FirstAndThirdPartyAudienceEditCustomerMatchMemberCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Gets a first and third party audience.
-///
-/// A builder for the *get* method supported by a *firstAndThirdPartyAudience* resource.
-/// It is not used directly, but through a [`FirstAndThirdPartyAudienceMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_displayvideo1 as displayvideo1;
-/// # async fn dox() {
-/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = DisplayVideo::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().get(-91)
-///              .partner_id(-81)
-///              .advertiser_id(-31)
-///              .doit().await;
-/// # }
-/// ```
-pub struct FirstAndThirdPartyAudienceGetCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a DisplayVideo<C>,
-    _first_and_third_party_audience_id: i64,
-    _partner_id: Option<i64>,
-    _advertiser_id: Option<i64>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for FirstAndThirdPartyAudienceGetCall<'a, C> {}
-
-impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, FirstAndThirdPartyAudience)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "displayvideo.firstAndThirdPartyAudiences.get",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in [
-            "alt",
-            "firstAndThirdPartyAudienceId",
-            "partnerId",
-            "advertiserId",
-        ]
-        .iter()
-        {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
-        params.push(
-            "firstAndThirdPartyAudienceId",
-            self._first_and_third_party_audience_id.to_string(),
-        );
-        if let Some(value) = self._partner_id.as_ref() {
-            params.push("partnerId", value.to_string());
-        }
-        if let Some(value) = self._advertiser_id.as_ref() {
-            params.push("advertiserId", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone()
-            + "v1/firstAndThirdPartyAudiences/{+firstAndThirdPartyAudienceId}";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::DisplayVideo.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [(
-            "{+firstAndThirdPartyAudienceId}",
-            "firstAndThirdPartyAudienceId",
-        )]
-        .iter()
-        {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["firstAndThirdPartyAudienceId"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// Required. The ID of the first and third party audience to fetch.
-    ///
-    /// Sets the *first and third party audience id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn first_and_third_party_audience_id(
-        mut self,
-        new_value: i64,
-    ) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
-        self._first_and_third_party_audience_id = new_value;
-        self
-    }
-    /// The ID of the partner that has access to the fetched first and third party audience.
-    ///
-    /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: i64) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
-        self._partner_id = Some(new_value);
-        self
-    }
-    /// The ID of the advertiser that has access to the fetched first and third party audience.
-    ///
-    /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: i64) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
-        self._advertiser_id = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudienceGetCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::DisplayVideo`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FirstAndThirdPartyAudienceGetCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FirstAndThirdPartyAudienceGetCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Lists first and third party audiences. The order is defined by the order_by parameter.
-///
-/// A builder for the *list* method supported by a *firstAndThirdPartyAudience* resource.
-/// It is not used directly, but through a [`FirstAndThirdPartyAudienceMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_displayvideo1 as displayvideo1;
-/// # async fn dox() {
-/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = DisplayVideo::new(client, auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().list()
-///              .partner_id(-19)
-///              .page_token("ipsum")
-///              .page_size(-28)
-///              .order_by("eos")
-///              .filter("duo")
-///              .advertiser_id(-94)
-///              .doit().await;
-/// # }
-/// ```
-pub struct FirstAndThirdPartyAudienceListCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a DisplayVideo<C>,
-    _partner_id: Option<i64>,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _order_by: Option<String>,
-    _filter: Option<String>,
-    _advertiser_id: Option<i64>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for FirstAndThirdPartyAudienceListCall<'a, C> {}
-
-impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(
-        mut self,
-    ) -> common::Result<(common::Response, ListFirstAndThirdPartyAudiencesResponse)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "displayvideo.firstAndThirdPartyAudiences.list",
-            http_method: hyper::Method::GET,
-        });
-
-        for &field in [
-            "alt",
-            "partnerId",
-            "pageToken",
-            "pageSize",
-            "orderBy",
-            "filter",
-            "advertiserId",
-        ]
-        .iter()
-        {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(8 + self._additional_params.len());
-        if let Some(value) = self._partner_id.as_ref() {
-            params.push("partnerId", value.to_string());
-        }
-        if let Some(value) = self._page_token.as_ref() {
-            params.push("pageToken", value);
-        }
-        if let Some(value) = self._page_size.as_ref() {
-            params.push("pageSize", value.to_string());
-        }
-        if let Some(value) = self._order_by.as_ref() {
-            params.push("orderBy", value);
-        }
-        if let Some(value) = self._filter.as_ref() {
-            params.push("filter", value);
-        }
-        if let Some(value) = self._advertiser_id.as_ref() {
-            params.push("advertiserId", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/firstAndThirdPartyAudiences";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::DisplayVideo.as_ref().to_string());
-        }
-
-        let url = params.parse_with_url(&url);
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::GET)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_LENGTH, 0_u64)
-                    .body(common::to_body::<String>(None));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    /// The ID of the partner that has access to the fetched first and third party audiences.
-    ///
-    /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: i64) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._partner_id = Some(new_value);
-        self
-    }
-    /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListFirstAndThirdPartyAudiences` method. If not specified, the first page of results will be returned.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Requested page size. Must be between `1` and `200`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// Field by which to sort the list. Acceptable values are: * `firstAndThirdPartyAudienceId` (default) * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
-    ///
-    /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._order_by = Some(new_value.to_string());
-        self
-    }
-    /// Allows filtering by first and third party audience fields. Supported syntax: * Filter expressions for first and third party audiences can only contain at most one restriction. * A restriction has the form of `{field} {operator} {value}`. * All fields must use the `HAS (:)` operator. Supported fields: * `displayName` Examples: * All first and third party audiences for which the display name contains “Google”: `displayName:"Google"`. The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](https://developers.google.com/display-video/api/guides/how-tos/filters) guide for more information.
-    ///
-    /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._filter = Some(new_value.to_string());
-        self
-    }
-    /// The ID of the advertiser that has access to the fetched first and third party audiences.
-    ///
-    /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: i64) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._advertiser_id = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudienceListCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::DisplayVideo`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FirstAndThirdPartyAudienceListCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FirstAndThirdPartyAudienceListCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> FirstAndThirdPartyAudienceListCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
-/// Updates an existing FirstAndThirdPartyAudience. Only supported for the following audience_type: * `CUSTOMER_MATCH_CONTACT_INFO` * `CUSTOMER_MATCH_DEVICE_ID`
-///
-/// A builder for the *patch* method supported by a *firstAndThirdPartyAudience* resource.
-/// It is not used directly, but through a [`FirstAndThirdPartyAudienceMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_displayvideo1 as displayvideo1;
-/// use displayvideo1::api::FirstAndThirdPartyAudience;
-/// # async fn dox() {
-/// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
-///
-/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
-/// #     secret,
-/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// # ).build().await.unwrap();
-///
-/// # let client = hyper_util::client::legacy::Client::builder(
-/// #     hyper_util::rt::TokioExecutor::new()
-/// # )
-/// # .build(
-/// #     hyper_rustls::HttpsConnectorBuilder::new()
-/// #         .with_native_roots()
-/// #         .unwrap()
-/// #         .https_or_http()
-/// #         .enable_http1()
-/// #         .build()
-/// # );
-/// # let mut hub = DisplayVideo::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = FirstAndThirdPartyAudience::default();
-///
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.first_and_third_party_audiences().patch(req, -46)
-///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .advertiser_id(-72)
-///              .doit().await;
-/// # }
-/// ```
-pub struct FirstAndThirdPartyAudiencePatchCall<'a, C>
-where
-    C: 'a,
-{
-    hub: &'a DisplayVideo<C>,
-    _request: FirstAndThirdPartyAudience,
-    _first_and_third_party_audience_id: i64,
-    _update_mask: Option<common::FieldMask>,
-    _advertiser_id: Option<i64>,
-    _delegate: Option<&'a mut dyn common::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>,
-}
-
-impl<'a, C> common::CallBuilder for FirstAndThirdPartyAudiencePatchCall<'a, C> {}
-
-impl<'a, C> FirstAndThirdPartyAudiencePatchCall<'a, C>
-where
-    C: common::Connector,
-{
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> common::Result<(common::Response, FirstAndThirdPartyAudience)> {
-        use std::borrow::Cow;
-        use std::io::{Read, Seek};
-
-        use common::{url::Params, ToParts};
-        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
-
-        let mut dd = common::DefaultDelegate;
-        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(common::MethodInfo {
-            id: "displayvideo.firstAndThirdPartyAudiences.patch",
-            http_method: hyper::Method::PATCH,
-        });
-
-        for &field in [
-            "alt",
-            "firstAndThirdPartyAudienceId",
-            "updateMask",
-            "advertiserId",
-        ]
-        .iter()
-        {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(common::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
-        params.push(
-            "firstAndThirdPartyAudienceId",
-            self._first_and_third_party_audience_id.to_string(),
-        );
-        if let Some(value) = self._update_mask.as_ref() {
-            params.push("updateMask", value.to_string());
-        }
-        if let Some(value) = self._advertiser_id.as_ref() {
-            params.push("advertiserId", value.to_string());
-        }
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone()
-            + "v1/firstAndThirdPartyAudiences/{+firstAndThirdPartyAudienceId}";
-        if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::DisplayVideo.as_ref().to_string());
-        }
-
-        #[allow(clippy::single_element_loop)]
-        for &(find_this, param_name) in [(
-            "{+firstAndThirdPartyAudienceId}",
-            "firstAndThirdPartyAudienceId",
-        )]
-        .iter()
-        {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["firstAndThirdPartyAudienceId"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader = {
-            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
-            common::remove_json_null_values(&mut value);
-            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
-            serde_json::to_writer(&mut dst, &value).unwrap();
-            dst
-        };
-        let request_size = request_value_reader
-            .seek(std::io::SeekFrom::End(0))
-            .unwrap();
-        request_value_reader
-            .seek(std::io::SeekFrom::Start(0))
-            .unwrap();
-
-        loop {
-            let token = match self
-                .hub
-                .auth
-                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
-                .await
-            {
-                Ok(token) => token,
-                Err(e) => match dlg.token(e) {
-                    Ok(token) => token,
-                    Err(e) => {
-                        dlg.finished(false);
-                        return Err(common::Error::MissingToken(e));
-                    }
-                },
-            };
-            request_value_reader
-                .seek(std::io::SeekFrom::Start(0))
-                .unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::PATCH)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-                let request = req_builder
-                    .header(CONTENT_TYPE, json_mime_type.to_string())
-                    .header(CONTENT_LENGTH, request_size as u64)
-                    .body(common::to_body(
-                        request_value_reader.get_ref().clone().into(),
-                    ));
-
-                client.request(request.unwrap()).await
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let common::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(common::Error::HttpError(err));
-                }
-                Ok(res) => {
-                    let (mut parts, body) = res.into_parts();
-                    let mut body = common::Body::new(body);
-                    if !parts.status.is_success() {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let error = serde_json::from_str(&common::to_string(&bytes));
-                        let response = common::to_response(parts, bytes.into());
-
-                        if let common::Retry::After(d) =
-                            dlg.http_failure(&response, error.as_ref().ok())
-                        {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return Err(match error {
-                            Ok(value) => common::Error::BadRequest(value),
-                            _ => common::Error::Failure(response),
-                        });
-                    }
-                    let response = {
-                        let bytes = common::to_bytes(body).await.unwrap_or_default();
-                        let encoded = common::to_string(&bytes);
-                        match serde_json::from_str(&encoded) {
-                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
-                            Err(error) => {
-                                dlg.response_json_decode_error(&encoded, &error);
-                                return Err(common::Error::JsonDecodeError(
-                                    encoded.to_string(),
-                                    error,
-                                ));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(response);
-                }
-            }
-        }
-    }
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(
-        mut self,
-        new_value: FirstAndThirdPartyAudience,
-    ) -> FirstAndThirdPartyAudiencePatchCall<'a, C> {
-        self._request = new_value;
-        self
-    }
-    /// Output only. The unique ID of the first and third party audience. Assigned by the system.
-    ///
-    /// Sets the *first and third party audience id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn first_and_third_party_audience_id(
-        mut self,
-        new_value: i64,
-    ) -> FirstAndThirdPartyAudiencePatchCall<'a, C> {
-        self._first_and_third_party_audience_id = new_value;
-        self
-    }
-    /// Required. The mask to control which fields to update. Updates are only supported for the following fields: * `displayName` * `description` * `membershipDurationDays`
-    ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(
-        mut self,
-        new_value: common::FieldMask,
-    ) -> FirstAndThirdPartyAudiencePatchCall<'a, C> {
-        self._update_mask = Some(new_value);
-        self
-    }
-    /// Required. The ID of the owner advertiser of the updated FirstAndThirdPartyAudience.
-    ///
-    /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: i64) -> FirstAndThirdPartyAudiencePatchCall<'a, C> {
-        self._advertiser_id = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    ///
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(
-        mut self,
-        new_value: &'a mut dyn common::Delegate,
-    ) -> FirstAndThirdPartyAudiencePatchCall<'a, C> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudiencePatchCall<'a, C>
-    where
-        T: AsRef<str>,
-    {
-        self._additional_params
-            .insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::DisplayVideo`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> FirstAndThirdPartyAudiencePatchCall<'a, C>
-    where
-        St: AsRef<str>,
-    {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> FirstAndThirdPartyAudiencePatchCall<'a, C>
-    where
-        I: IntoIterator<Item = St>,
-        St: AsRef<str>,
-    {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> FirstAndThirdPartyAudiencePatchCall<'a, C> {
-        self._scopes.clear();
-        self
-    }
-}
-
 /// Gets a Floodlight group.
 ///
 /// A builder for the *get* method supported by a *floodlightGroup* resource.
@@ -45085,9 +45829,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -45098,15 +45853,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_groups().get(-14)
-///              .partner_id(-1)
+/// let result = hub.floodlight_groups().get(-6)
+///              .partner_id(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -45384,9 +46139,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -45397,7 +46163,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -45409,9 +46175,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.floodlight_groups().patch(req, -48)
+/// let result = hub.floodlight_groups().patch(req, -92)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .partner_id(-59)
+///              .partner_id(-92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -45730,9 +46496,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -45743,16 +46520,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.google_audiences().get(-31)
-///              .partner_id(-42)
-///              .advertiser_id(-41)
+/// let result = hub.google_audiences().get(-93)
+///              .partner_id(-18)
+///              .advertiser_id(-17)
 ///              .doit().await;
 /// # }
 /// ```
@@ -46040,9 +46817,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -46053,7 +46841,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -46061,12 +46849,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.google_audiences().list()
-///              .partner_id(-6)
-///              .page_token("At")
-///              .page_size(-92)
-///              .order_by("diam")
-///              .filter("sed")
-///              .advertiser_id(-18)
+///              .partner_id(-84)
+///              .page_token("ipsum")
+///              .page_size(-67)
+///              .order_by("At")
+///              .filter("sit")
+///              .advertiser_id(-98)
 ///              .doit().await;
 /// # }
 /// ```
@@ -46388,9 +47176,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -46401,7 +47200,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -46414,8 +47213,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().create(req)
-///              .partner_id(-17)
-///              .advertiser_id(-84)
+///              .partner_id(-101)
+///              .advertiser_id(-15)
 ///              .doit().await;
 /// # }
 /// ```
@@ -46714,9 +47513,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -46727,7 +47537,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -47055,9 +47865,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -47068,7 +47889,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -47076,8 +47897,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().get("guaranteedOrderId")
-///              .partner_id(-27)
-///              .advertiser_id(-53)
+///              .partner_id(-32)
+///              .advertiser_id(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -47365,9 +48186,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -47378,7 +48210,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -47386,12 +48218,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().list()
-///              .partner_id(-98)
-///              .page_token("Lorem")
-///              .page_size(-15)
-///              .order_by("duo")
-///              .filter("elitr")
-///              .advertiser_id(-32)
+///              .partner_id(-87)
+///              .page_token("et")
+///              .page_size(-51)
+///              .order_by("rebum.")
+///              .filter("et")
+///              .advertiser_id(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -47715,9 +48547,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -47728,7 +48571,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -47742,8 +48585,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.guaranteed_orders().patch(req, "guaranteedOrderId")
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .partner_id(-87)
-///              .advertiser_id(-18)
+///              .partner_id(-82)
+///              .advertiser_id(-13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -48082,9 +48925,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -48095,7 +48949,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -48107,7 +48961,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_bulk_edit(req, -51)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_bulk_edit(req, -101)
 ///              .doit().await;
 /// # }
 /// ```
@@ -48430,9 +49284,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -48443,7 +49308,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -48455,9 +49320,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_create(req, -66)
-///              .partner_id(-35)
-///              .advertiser_id(-30)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_create(req, -48)
+///              .partner_id(-63)
+///              .advertiser_id(-39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -48804,9 +49669,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -48817,16 +49693,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_delete(-65, -82)
-///              .partner_id(-13)
-///              .advertiser_id(-101)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_delete(-54, -97)
+///              .partner_id(-3)
+///              .advertiser_id(-16)
 ///              .doit().await;
 /// # }
 /// ```
@@ -49167,9 +50043,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -49180,20 +50067,20 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().assigned_inventory_sources_list(-48)
-///              .partner_id(-63)
-///              .page_token("tempor")
-///              .page_size(-54)
-///              .order_by("amet")
-///              .filter("sit")
-///              .advertiser_id(-16)
+/// let result = hub.inventory_source_groups().assigned_inventory_sources_list(-60)
+///              .partner_id(-100)
+///              .page_token("ipsum")
+///              .page_size(-24)
+///              .order_by("elitr")
+///              .filter("eirmod")
+///              .advertiser_id(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -49576,9 +50463,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -49589,7 +50487,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -49602,8 +50500,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_source_groups().create(req)
-///              .partner_id(-60)
-///              .advertiser_id(-100)
+///              .partner_id(-95)
+///              .advertiser_id(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -49904,9 +50802,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -49917,16 +50826,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().delete(-5)
-///              .partner_id(-24)
-///              .advertiser_id(-94)
+/// let result = hub.inventory_source_groups().delete(-54)
+///              .partner_id(-46)
+///              .advertiser_id(-22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -50223,9 +51132,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -50236,16 +51156,16 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().get(-90)
-///              .partner_id(-4)
-///              .advertiser_id(-95)
+/// let result = hub.inventory_source_groups().get(-48)
+///              .partner_id(-51)
+///              .advertiser_id(-41)
 ///              .doit().await;
 /// # }
 /// ```
@@ -50542,9 +51462,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -50555,7 +51486,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -50563,12 +51494,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_source_groups().list()
-///              .partner_id(-4)
-///              .page_token("dolor")
-///              .page_size(-46)
-///              .order_by("et")
-///              .filter("sit")
-///              .advertiser_id(-51)
+///              .partner_id(-79)
+///              .page_token("ipsum")
+///              .page_size(-38)
+///              .order_by("Stet")
+///              .filter("voluptua.")
+///              .advertiser_id(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -50892,9 +51823,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -50905,7 +51847,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -50917,10 +51859,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_source_groups().patch(req, -41)
+/// let result = hub.inventory_source_groups().patch(req, -92)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .partner_id(-79)
-///              .advertiser_id(-100)
+///              .partner_id(-47)
+///              .advertiser_id(-77)
 ///              .doit().await;
 /// # }
 /// ```
@@ -51274,9 +52216,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -51287,7 +52240,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -51300,8 +52253,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_sources().create(req)
-///              .partner_id(-38)
-///              .advertiser_id(-15)
+///              .partner_id(-90)
+///              .advertiser_id(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -51600,9 +52553,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -51613,7 +52577,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -51625,7 +52589,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_sources().edit_inventory_source_read_write_accessors(req, -78)
+/// let result = hub.inventory_sources().edit_inventory_source_read_write_accessors(req, -20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -51941,9 +52905,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -51954,15 +52929,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_sources().get(-77)
-///              .partner_id(-92)
+/// let result = hub.inventory_sources().get(-35)
+///              .partner_id(-1)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52239,9 +53214,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -52252,7 +53238,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -52260,12 +53246,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory_sources().list()
-///              .partner_id(-47)
-///              .page_token("At")
-///              .page_size(-90)
-///              .order_by("erat")
-///              .filter("duo")
-///              .advertiser_id(-35)
+///              .partner_id(-81)
+///              .page_token("sit")
+///              .page_size(-73)
+///              .order_by("et")
+///              .filter("nonumy")
+///              .advertiser_id(-73)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52589,9 +53575,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -52602,7 +53599,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -52614,10 +53611,10 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.inventory_sources().patch(req, -1)
+/// let result = hub.inventory_sources().patch(req, -37)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .partner_id(-81)
-///              .advertiser_id(-48)
+///              .partner_id(-78)
+///              .advertiser_id(-46)
 ///              .doit().await;
 /// # }
 /// ```
@@ -52960,9 +53957,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -52973,7 +53981,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -53259,9 +54267,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -53272,7 +54291,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -53636,9 +54655,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -53649,7 +54679,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -53661,7 +54691,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_bulk_edit(req, -91, -73)
+/// let result = hub.partners().channels_sites_bulk_edit(req, -35, -32)
 ///              .doit().await;
 /// # }
 /// ```
@@ -53977,9 +55007,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -53990,7 +55031,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -54002,8 +55043,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_create(req, -37, -78)
-///              .advertiser_id(-46)
+/// let result = hub.partners().channels_sites_create(req, -5, -62)
+///              .advertiser_id(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -54326,9 +55367,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -54339,15 +55391,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_delete(-99, -47, "urlOrAppId")
-///              .advertiser_id(-32)
+/// let result = hub.partners().channels_sites_delete(-10, -20, "urlOrAppId")
+///              .advertiser_id(-65)
 ///              .doit().await;
 /// # }
 /// ```
@@ -54663,9 +55715,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -54676,19 +55739,19 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_list(-5, -62)
-///              .page_token("invidunt")
-///              .page_size(-10)
-///              .order_by("duo")
-///              .filter("sea")
-///              .advertiser_id(-65)
+/// let result = hub.partners().channels_sites_list(-95, -11)
+///              .page_token("tempor")
+///              .page_size(-55)
+///              .order_by("sea")
+///              .filter("sit")
+///              .advertiser_id(-2)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55036,9 +56099,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -55049,7 +56123,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -55061,7 +56135,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_sites_replace(req, -95, -11)
+/// let result = hub.partners().channels_sites_replace(req, -55, -27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55377,9 +56451,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -55390,7 +56475,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -55402,8 +56487,8 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_create(req, -39)
-///              .advertiser_id(-55)
+/// let result = hub.partners().channels_create(req, -26)
+///              .advertiser_id(-59)
 ///              .doit().await;
 /// # }
 /// ```
@@ -55711,9 +56796,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -55724,15 +56820,15 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_get(-60, -98)
-///              .advertiser_id(-2)
+/// let result = hub.partners().channels_get(-12, -74)
+///              .advertiser_id(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -56023,9 +57119,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -56036,19 +57143,19 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_list(-55)
-///              .page_token("At")
-///              .page_size(-26)
-///              .order_by("takimata")
-///              .filter("gubergren")
-///              .advertiser_id(-74)
+/// let result = hub.partners().channels_list(-33)
+///              .page_token("sit")
+///              .page_size(-12)
+///              .order_by("elitr")
+///              .filter("ipsum")
+///              .advertiser_id(-13)
 ///              .doit().await;
 /// # }
 /// ```
@@ -56380,9 +57487,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -56393,7 +57511,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -56405,9 +57523,9 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().channels_patch(req, -88, -33)
+/// let result = hub.partners().channels_patch(req, -34, -51)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .advertiser_id(-98)
+///              .advertiser_id(-97)
 ///              .doit().await;
 /// # }
 /// ```
@@ -56749,9 +57867,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -56762,7 +57891,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -56774,7 +57903,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_create(req, -12, "targetingType")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_create(req, -50, "targetingType")
 ///              .doit().await;
 /// # }
 /// ```
@@ -57108,9 +58237,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -57121,14 +58261,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_delete(-50, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_delete(-19, "targetingType", "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -57453,9 +58593,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -57466,14 +58617,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_get(-51, "targetingType", "assignedTargetingOptionId")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_get(-23, "targetingType", "assignedTargetingOptionId")
 ///              .doit().await;
 /// # }
 /// ```
@@ -57798,9 +58949,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -57811,18 +58973,18 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().targeting_types_assigned_targeting_options_list(-101, "targetingType")
-///              .page_token("consetetur")
-///              .page_size(-15)
-///              .order_by("accusam")
-///              .filter("consetetur")
+/// let result = hub.partners().targeting_types_assigned_targeting_options_list(-43, "targetingType")
+///              .page_token("sea")
+///              .page_size(-25)
+///              .order_by("dolore")
+///              .filter("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -58194,9 +59356,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -58207,7 +59380,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -58219,7 +59392,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().bulk_edit_partner_assigned_targeting_options(req, -9)
+/// let result = hub.partners().bulk_edit_partner_assigned_targeting_options(req, -44)
 ///              .doit().await;
 /// # }
 /// ```
@@ -58538,9 +59711,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -58551,14 +59735,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.partners().get(-43)
+/// let result = hub.partners().get(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -58821,9 +60005,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -58834,7 +60029,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -58842,10 +60037,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.partners().list()
-///              .page_token("nonumy")
-///              .page_size(-60)
-///              .order_by("eos")
-///              .filter("dolore")
+///              .page_token("labore")
+///              .page_size(-74)
+///              .order_by("eirmod")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -59131,9 +60326,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -59144,7 +60350,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -59400,7 +60606,7 @@ where
     }
 }
 
-/// Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with sdfdownloadtask.operations.get. Any errors can be found in the error.message. Note that error.details is expected to be empty.
+/// Creates an SDF Download Task. Returns an Operation. An SDF Download Task is a long-running, asynchronous operation. The metadata type of this operation is SdfDownloadTaskMetadata. If the request is successful, the response type of the operation is SdfDownloadTask. The response will not include the download files, which must be retrieved with media.download. The state of operation can be retrieved with `sdfdownloadtasks.operations.get`. Any errors can be found in the error.message. Note that error.details is expected to be empty.
 ///
 /// A builder for the *create* method supported by a *sdfdownloadtask* resource.
 /// It is not used directly, but through a [`SdfdownloadtaskMethods`] instance.
@@ -59418,9 +60624,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -59431,7 +60648,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -59722,9 +60939,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -59735,7 +60963,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -59743,7 +60971,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.targeting_types().targeting_options_get("targetingType", "targetingOptionId")
-///              .advertiser_id(-36)
+///              .advertiser_id(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -60041,9 +61269,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -60054,7 +61293,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -60062,11 +61301,11 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.targeting_types().targeting_options_list("targetingType")
-///              .page_token("eirmod")
-///              .page_size(-43)
-///              .order_by("At")
-///              .filter("Stet")
-///              .advertiser_id(-3)
+///              .page_token("dolor")
+///              .page_size(-97)
+///              .order_by("magna")
+///              .filter("magna")
+///              .advertiser_id(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -60404,9 +61643,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -60417,7 +61667,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -60736,9 +61986,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -60749,7 +62010,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -60761,7 +62022,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().bulk_edit_assigned_user_roles(req, -6)
+/// let result = hub.users().bulk_edit_assigned_user_roles(req, -22)
 ///              .doit().await;
 /// # }
 /// ```
@@ -61064,9 +62325,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -61077,7 +62349,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -61362,9 +62634,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -61375,14 +62658,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().delete(-54)
+/// let result = hub.users().delete(-49)
 ///              .doit().await;
 /// # }
 /// ```
@@ -61645,9 +62928,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -61658,14 +62952,14 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().get(-97)
+/// let result = hub.users().get(-81)
 ///              .doit().await;
 /// # }
 /// ```
@@ -61928,9 +63222,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -61941,7 +63246,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -61949,9 +63254,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().list()
-///              .page_token("magna")
-///              .page_size(-83)
-///              .order_by("invidunt")
+///              .page_token("dolore")
+///              .page_size(-76)
+///              .order_by("ea")
 ///              .filter("et")
 ///              .doit().await;
 /// # }
@@ -62239,9 +63544,20 @@ where
 /// # use displayvideo1::{DisplayVideo, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -62252,7 +63568,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DisplayVideo::new(client, auth);
@@ -62264,7 +63580,7 @@ where
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().patch(req, -22)
+/// let result = hub.users().patch(req, -52)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }

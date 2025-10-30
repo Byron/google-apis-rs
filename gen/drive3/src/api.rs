@@ -94,9 +94,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -107,7 +118,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -167,7 +178,7 @@ impl<'a, C> DriveHub<C> {
         DriveHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -175,6 +186,9 @@ impl<'a, C> DriveHub<C> {
 
     pub fn about(&'a self) -> AboutMethods<'a, C> {
         AboutMethods { hub: self }
+    }
+    pub fn accessproposals(&'a self) -> AccessproposalMethods<'a, C> {
+        AccessproposalMethods { hub: self }
     }
     pub fn apps(&'a self) -> AppMethods<'a, C> {
         AppMethods { hub: self }
@@ -194,6 +208,9 @@ impl<'a, C> DriveHub<C> {
     pub fn files(&'a self) -> FileMethods<'a, C> {
         FileMethods { hub: self }
     }
+    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+        OperationMethods { hub: self }
+    }
     pub fn permissions(&'a self) -> PermissionMethods<'a, C> {
         PermissionMethods { hub: self }
     }
@@ -208,7 +225,7 @@ impl<'a, C> DriveHub<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -289,6 +306,60 @@ pub struct About {
 }
 
 impl common::ResponseResult for About {}
+
+/// Manage outstanding access proposals on a file.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [get accessproposals](AccessproposalGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessProposal {
+    /// The creation time.
+    #[serde(rename = "createTime")]
+    pub create_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The file ID that the proposal for access is on.
+    #[serde(rename = "fileId")]
+    pub file_id: Option<String>,
+    /// The ID of the access proposal.
+    #[serde(rename = "proposalId")]
+    pub proposal_id: Option<String>,
+    /// The email address of the user that will receive permissions, if accepted.
+    #[serde(rename = "recipientEmailAddress")]
+    pub recipient_email_address: Option<String>,
+    /// The message that the requester added to the proposal.
+    #[serde(rename = "requestMessage")]
+    pub request_message: Option<String>,
+    /// The email address of the requesting user.
+    #[serde(rename = "requesterEmailAddress")]
+    pub requester_email_address: Option<String>,
+    /// A wrapper for the role and view of an access proposal. For more information, see [Roles and permissions](https://developers.google.com/workspace/drive/api/guides/ref-roles).
+    #[serde(rename = "rolesAndViews")]
+    pub roles_and_views: Option<Vec<AccessProposalRoleAndView>>,
+}
+
+impl common::Resource for AccessProposal {}
+impl common::ResponseResult for AccessProposal {}
+
+/// A wrapper for the role and view of an access proposal. For more information, see [Roles and permissions](https://developers.google.com/workspace/drive/api/guides/ref-roles).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AccessProposalRoleAndView {
+    /// The role that was proposed by the requester. The supported values are: * `writer` * `commenter` * `reader`
+    pub role: Option<String>,
+    /// Indicates the view for this access proposal. Only populated for proposals that belong to a view. Only `published` is supported.
+    pub view: Option<String>,
+}
+
+impl common::Part for AccessProposalRoleAndView {}
 
 /// The `apps` resource provides a list of apps that a user has installed, with information about each app’s supported MIME types, file extensions, and other details. Some resource methods (such as `apps.get`) require an `appId`. Use the `apps.list` method to retrieve the ID for an installed application.
 ///
@@ -551,8 +622,11 @@ impl common::ResponseResult for Channel {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Comment {
-    /// A region of the document represented as a JSON string. For details on defining anchor properties, refer to [Manage comments and replies](https://developers.google.com/drive/api/v3/manage-comments).
+    /// A region of the document represented as a JSON string. For details on defining anchor properties, refer to [Manage comments and replies](https://developers.google.com/workspace/drive/api/v3/manage-comments).
     pub anchor: Option<String>,
+    /// Output only. The email of the user who is assigned to this comment, if none is assigned this will be unset.
+    #[serde(rename = "assigneeEmailAddress")]
+    pub assignee_email_address: Option<String>,
     /// Output only. The author of the comment. The author's email address and permission ID will not be populated.
     pub author: Option<User>,
     /// The plain text content of the comment. This field is used for setting the content, while `htmlContent` should be displayed.
@@ -569,6 +643,9 @@ pub struct Comment {
     pub id: Option<String>,
     /// Output only. Identifies what kind of resource this is. Value: the fixed string `"drive#comment"`.
     pub kind: Option<String>,
+    /// Output only. The emails of the users who were mentioned in this comment, if none were mentioned this will be an empty list.
+    #[serde(rename = "mentionedEmailAddresses")]
+    pub mentioned_email_addresses: Option<Vec<String>>,
     /// The last time the comment or any of its replies was modified (RFC 3339 date-time).
     #[serde(rename = "modifiedTime")]
     pub modified_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -624,7 +701,7 @@ pub struct ContentRestriction {
     pub read_only: Option<bool>,
     /// Reason for why the content of the file is restricted. This is only mutable on requests that also set `readOnly=true`.
     pub reason: Option<String>,
-    /// Output only. The user who set the content restriction. Only populated if `readOnly` is true.
+    /// Output only. The user who set the content restriction. Only populated if `readOnly=true`.
     #[serde(rename = "restrictingUser")]
     pub restricting_user: Option<User>,
     /// The time at which the content restriction was set (formatted RFC 3339 timestamp). Only populated if readOnly is true.
@@ -639,6 +716,42 @@ pub struct ContentRestriction {
 }
 
 impl common::Part for ContentRestriction {}
+
+/// A restriction for copy and download of the file.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DownloadRestriction {
+    /// Whether download and copy is restricted for readers.
+    #[serde(rename = "restrictedForReaders")]
+    pub restricted_for_readers: Option<bool>,
+    /// Whether download and copy is restricted for writers. If `true`, download is also restricted for readers.
+    #[serde(rename = "restrictedForWriters")]
+    pub restricted_for_writers: Option<bool>,
+}
+
+impl common::Part for DownloadRestriction {}
+
+/// Download restrictions applied to the file.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DownloadRestrictionsMetadata {
+    /// Output only. The effective download restriction applied to this file. This considers all restriction settings and DLP rules.
+    #[serde(rename = "effectiveDownloadRestrictionWithContext")]
+    pub effective_download_restriction_with_context: Option<DownloadRestriction>,
+    /// The download restriction of the file applied directly by the owner or organizer. This doesn't take into account shared drive settings or DLP rules.
+    #[serde(rename = "itemDownloadRestriction")]
+    pub item_download_restriction: Option<DownloadRestriction>,
+}
+
+impl common::Part for DownloadRestrictionsMetadata {}
 
 /// Representation of a shared drive. Some resource methods (such as `drives.update`) require a `driveId`. Use the `drives.list` method to retrieve the ID for a shared drive.
 ///
@@ -727,6 +840,7 @@ impl common::ResponseResult for DriveList {}
 /// * [copy files](FileCopyCall) (request|response)
 /// * [create files](FileCreateCall) (request|response)
 /// * [delete files](FileDeleteCall) (none)
+/// * [download files](FileDownloadCall) (none)
 /// * [empty trash files](FileEmptyTrashCall) (none)
 /// * [export files](FileExportCall) (none)
 /// * [generate ids files](FileGenerateIdCall) (none)
@@ -744,7 +858,7 @@ pub struct File {
     /// Entries with null values are cleared in update and copy requests. These properties can only be retrieved using an authenticated request. An authenticated request uses an access token obtained with a OAuth 2 client ID. You cannot use an API key to retrieve private properties.
     #[serde(rename = "appProperties")]
     pub app_properties: Option<HashMap<String, String>>,
-    /// Output only. Capabilities the current user has on this file. Each capability corresponds to a fine-grained action that a user may take.
+    /// Output only. Capabilities the current user has on this file. Each capability corresponds to a fine-grained action that a user may take. For more information, see [Understand file capabilities](https://developers.google.com/workspace/drive/api/guides/manage-sharing#capabilities).
     pub capabilities: Option<FileCapabilities>,
     /// Additional information about the content of the file. These fields are never populated in responses.
     #[serde(rename = "contentHints")]
@@ -752,7 +866,7 @@ pub struct File {
     /// Restrictions for accessing the content of the file. Only populated if such a restriction exists.
     #[serde(rename = "contentRestrictions")]
     pub content_restrictions: Option<Vec<ContentRestriction>>,
-    /// Whether the options to copy, print, or download this file, should be disabled for readers and commenters.
+    /// Whether the options to copy, print, or download this file should be disabled for readers and commenters.
     #[serde(rename = "copyRequiresWriterPermission")]
     pub copy_requires_writer_permission: Option<bool>,
     /// The time at which the file was created (RFC 3339 date-time).
@@ -760,6 +874,9 @@ pub struct File {
     pub created_time: Option<chrono::DateTime<chrono::offset::Utc>>,
     /// A short description of the file.
     pub description: Option<String>,
+    /// Download restrictions applied on the file.
+    #[serde(rename = "downloadRestrictions")]
+    pub download_restrictions: Option<DownloadRestrictionsMetadata>,
     /// Output only. ID of the shared drive the file resides in. Only populated for items in shared drives.
     #[serde(rename = "driveId")]
     pub drive_id: Option<String>,
@@ -772,16 +889,16 @@ pub struct File {
     /// Output only. The final component of `fullFileExtension`. This is only available for files with binary content in Google Drive.
     #[serde(rename = "fileExtension")]
     pub file_extension: Option<String>,
-    /// The color for a folder or a shortcut to a folder as an RGB hex string. The supported colors are published in the `folderColorPalette` field of the About resource. If an unsupported color is specified, the closest color in the palette is used instead.
+    /// The color for a folder or a shortcut to a folder as an RGB hex string. The supported colors are published in the `folderColorPalette` field of the [`about`](https://developers.google.com/workspace/drive/api/reference/rest/v3/about) resource. If an unsupported color is specified, the closest color in the palette is used instead.
     #[serde(rename = "folderColorRgb")]
     pub folder_color_rgb: Option<String>,
-    /// Output only. The full file extension extracted from the `name` field. May contain multiple concatenated extensions, such as "tar.gz". This is only available for files with binary content in Google Drive. This is automatically updated when the `name` field changes, however it is not cleared if the new name does not contain a valid extension.
+    /// Output only. The full file extension extracted from the `name` field. May contain multiple concatenated extensions, such as "tar.gz". This is only available for files with binary content in Google Drive. This is automatically updated when the `name` field changes, however it's not cleared if the new name doesn't contain a valid extension.
     #[serde(rename = "fullFileExtension")]
     pub full_file_extension: Option<String>,
     /// Output only. Whether there are permissions directly on this file. This field is only populated for items in shared drives.
     #[serde(rename = "hasAugmentedPermissions")]
     pub has_augmented_permissions: Option<bool>,
-    /// Output only. Whether this file has a thumbnail. This does not indicate whether the requesting app has access to the thumbnail. To check access, look for the presence of the thumbnailLink field.
+    /// Output only. Whether this file has a thumbnail. This doesn't indicate whether the requesting app has access to the thumbnail. To check access, look for the presence of the thumbnailLink field.
     #[serde(rename = "hasThumbnail")]
     pub has_thumbnail: Option<bool>,
     /// Output only. The ID of the file's head revision. This is currently only available for files with binary content in Google Drive.
@@ -795,6 +912,9 @@ pub struct File {
     /// Output only. Additional metadata about image media, if available.
     #[serde(rename = "imageMediaMetadata")]
     pub image_media_metadata: Option<FileImageMediaMetadata>,
+    /// Whether this file has inherited permissions disabled. Inherited permissions are enabled by default.
+    #[serde(rename = "inheritedPermissionsDisabled")]
+    pub inherited_permissions_disabled: Option<bool>,
     /// Output only. Whether the file was created or opened by the requesting app.
     #[serde(rename = "isAppAuthorized")]
     pub is_app_authorized: Option<bool>,
@@ -803,7 +923,7 @@ pub struct File {
     /// Output only. An overview of the labels on the file.
     #[serde(rename = "labelInfo")]
     pub label_info: Option<FileLabelInfo>,
-    /// Output only. The last user to modify the file.
+    /// Output only. The last user to modify the file. This field is only populated when the last modification was performed by a signed-in user.
     #[serde(rename = "lastModifyingUser")]
     pub last_modifying_user: Option<User>,
     /// Contains details about the link URLs that clients are using to refer to this item.
@@ -812,7 +932,7 @@ pub struct File {
     /// Output only. The MD5 checksum for the content of the file. This is only applicable to files with binary content in Google Drive.
     #[serde(rename = "md5Checksum")]
     pub md5_checksum: Option<String>,
-    /// The MIME type of the file. Google Drive attempts to automatically detect an appropriate value from uploaded content, if no value is provided. The value cannot be changed unless a new revision is uploaded. If a file is created with a Google Doc MIME type, the uploaded content is imported, if possible. The supported import formats are published in the About resource.
+    /// The MIME type of the file. Google Drive attempts to automatically detect an appropriate value from uploaded content, if no value is provided. The value cannot be changed unless a new revision is uploaded. If a file is created with a Google Doc MIME type, the uploaded content is imported, if possible. The supported import formats are published in the [`about`](https://developers.google.com/workspace/drive/api/reference/rest/v3/about) resource.
     #[serde(rename = "mimeType")]
     pub mime_type: Option<String>,
     /// Output only. Whether the file has been modified by this user.
@@ -824,7 +944,7 @@ pub struct File {
     /// he last time the file was modified by anyone (RFC 3339 date-time). Note that setting modifiedTime will also update modifiedByMeTime for the user.
     #[serde(rename = "modifiedTime")]
     pub modified_time: Option<chrono::DateTime<chrono::offset::Utc>>,
-    /// The name of the file. This is not necessarily unique within a folder. Note that for immutable items such as the top level folders of shared drives, My Drive root folder, and Application Data folder the name is constant.
+    /// The name of the file. This isn't necessarily unique within a folder. Note that for immutable items such as the top-level folders of shared drives, the My Drive root folder, and the Application Data folder, the name is constant.
     pub name: Option<String>,
     /// The original filename of the uploaded content if available, or else the original value of the `name` field. This is only available for files with binary content in Google Drive.
     #[serde(rename = "originalFilename")]
@@ -834,7 +954,7 @@ pub struct File {
     pub owned_by_me: Option<bool>,
     /// Output only. The owner of this file. Only certain legacy files may have more than one owner. This field isn't populated for items in shared drives.
     pub owners: Option<Vec<User>>,
-    /// The IDs of the parent folders which contain the file. If not specified as part of a create request, the file is placed directly in the user's My Drive folder. If not specified as part of a copy request, the file inherits any discoverable parents of the source file. Update requests must use the `addParents` and `removeParents` parameters to modify the parents list.
+    /// The ID of the parent folder containing the file. A file can only have one parent folder; specifying multiple parents isn't supported. If not specified as part of a create request, the file is placed directly in the user's My Drive folder. If not specified as part of a copy request, the file inherits any discoverable parent of the source file. Update requests must use the `addParents` and `removeParents` parameters to modify the parents list.
     pub parents: Option<Vec<String>>,
     /// Output only. List of permission IDs for users with access to this file.
     #[serde(rename = "permissionIds")]
@@ -851,10 +971,10 @@ pub struct File {
     /// Output only. A key needed to access the item via a shared link.
     #[serde(rename = "resourceKey")]
     pub resource_key: Option<String>,
-    /// Output only. The SHA1 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.
+    /// Output only. The SHA1 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it's not populated for Docs Editors or shortcut files.
     #[serde(rename = "sha1Checksum")]
     pub sha1_checksum: Option<String>,
-    /// Output only. The SHA256 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.
+    /// Output only. The SHA256 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it's not populated for Docs Editors or shortcut files.
     #[serde(rename = "sha256Checksum")]
     pub sha256_checksum: Option<String>,
     /// Output only. Whether the file has been shared. Not populated for items in shared drives.
@@ -865,20 +985,20 @@ pub struct File {
     /// Output only. The user who shared the file with the requesting user, if applicable.
     #[serde(rename = "sharingUser")]
     pub sharing_user: Option<User>,
-    /// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to `application/vnd.google-apps.shortcut`.
+    /// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to `application/vnd.google-apps.shortcut`. Can only be set on `files.create` requests.
     #[serde(rename = "shortcutDetails")]
     pub shortcut_details: Option<FileShortcutDetails>,
-    /// Output only. Size in bytes of blobs and first party editor files. Won't be populated for files that have no size, like shortcuts and folders.
+    /// Output only. Size in bytes of blobs and Google Workspace editor files. Won't be populated for files that have no size, like shortcuts and folders.
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub size: Option<i64>,
-    /// Output only. The list of spaces which contain the file. The currently supported values are 'drive', 'appDataFolder' and 'photos'.
+    /// Output only. The list of spaces which contain the file. The currently supported values are `drive`, `appDataFolder`, and `photos`.
     pub spaces: Option<Vec<String>>,
     /// Whether the user has starred the file.
     pub starred: Option<bool>,
     /// Deprecated: Output only. Use `driveId` instead.
     #[serde(rename = "teamDriveId")]
     pub team_drive_id: Option<String>,
-    /// Output only. A short-lived link to the file's thumbnail, if available. Typically lasts on the order of hours. Only populated when the requesting app can access the file's content. If the file isn't shared publicly, the URL returned in `Files.thumbnailLink` must be fetched using a credentialed request.
+    /// Output only. A short-lived link to the file's thumbnail, if available. Typically lasts on the order of hours. Not intended for direct usage on web applications due to [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) policies. Consider using a proxy server. Only populated when the requesting app can access the file's content. If the file isn't shared publicly, the URL returned in `files.thumbnailLink` must be fetched using a credentialed request.
     #[serde(rename = "thumbnailLink")]
     pub thumbnail_link: Option<String>,
     /// Output only. The thumbnail version for use in thumbnail cache invalidation.
@@ -935,9 +1055,9 @@ impl common::ResponseResult for File {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FileList {
-    /// The list of files. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    /// The list of files. If `nextPageToken` is populated, then this list may be incomplete and an additional page of results should be fetched.
     pub files: Option<Vec<File>>,
-    /// Whether the search process was incomplete. If true, then some search results might be missing, since all documents were not searched. This can occur when searching multiple drives with the 'allDrives' corpora, but all corpora couldn't be searched. When this happens, it's suggested that clients narrow their query by choosing a different corpus such as 'user' or 'drive'.
+    /// Whether the search process was incomplete. If true, then some search results might be missing, since all documents were not searched. This can occur when searching multiple drives with the `allDrives` corpora, but all corpora couldn't be searched. When this happens, it's suggested that clients narrow their query by choosing a different corpus such as `user` or `drive`.
     #[serde(rename = "incompleteSearch")]
     pub incomplete_search: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string `"drive#fileList"`.
@@ -1034,7 +1154,7 @@ pub struct LabelFieldModification {
     /// The ID of the field to be modified.
     #[serde(rename = "fieldId")]
     pub field_id: Option<String>,
-    /// This is always drive#labelFieldModification.
+    /// This is always `"drive#labelFieldModification"`.
     pub kind: Option<String>,
     /// Replaces the value of a dateString Field with these new values. The string must be in the RFC 3339 full-date format: YYYY-MM-DD.
     #[serde(rename = "setDateValues")]
@@ -1049,7 +1169,7 @@ pub struct LabelFieldModification {
     /// Sets the value of a `text` field.
     #[serde(rename = "setTextValues")]
     pub set_text_values: Option<Vec<String>>,
-    /// Replaces a `user` field with these new values. The values must be valid email addresses.
+    /// Replaces a `user` field with these new values. The values must be a valid email addresses.
     #[serde(rename = "setUserValues")]
     pub set_user_values: Option<Vec<String>>,
     /// Unsets the values for this field.
@@ -1071,7 +1191,7 @@ impl common::Part for LabelFieldModification {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct LabelList {
-    /// This is always drive#labelList
+    /// This is always `"drive#labelList"`.
     pub kind: Option<String>,
     /// The list of labels.
     pub labels: Option<Vec<Label>>,
@@ -1082,7 +1202,7 @@ pub struct LabelList {
 
 impl common::ResponseResult for LabelList {}
 
-/// A modification to a label on a file. A LabelModification can be used to apply a label to a file, update an existing label on a file, or remove a label from a file.
+/// A modification to a label on a file. A `LabelModification` can be used to apply a label to a file, update an existing label on a file, or remove a label from a file.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1093,7 +1213,7 @@ pub struct LabelModification {
     /// The list of modifications to this label's fields.
     #[serde(rename = "fieldModifications")]
     pub field_modifications: Option<Vec<LabelFieldModification>>,
-    /// This is always drive#labelModification.
+    /// This is always `"drive#labelModification"`.
     pub kind: Option<String>,
     /// The ID of the label to modify.
     #[serde(rename = "labelId")]
@@ -1104,6 +1224,28 @@ pub struct LabelModification {
 }
 
 impl common::Part for LabelModification {}
+
+/// The response to an access proposal list request.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [list accessproposals](AccessproposalListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ListAccessProposalsResponse {
+    /// The list of access proposals. This field is only populated in Drive API v3.
+    #[serde(rename = "accessProposals")]
+    pub access_proposals: Option<Vec<AccessProposal>>,
+    /// The continuation token for the next page of results. This will be absent if the end of the results list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results.
+    #[serde(rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl common::ResponseResult for ListAccessProposalsResponse {}
 
 /// A request to modify the set of labels on a file. This request may contain many modifications that will either all succeed or all fail atomically.
 ///
@@ -1117,7 +1259,7 @@ impl common::Part for LabelModification {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ModifyLabelsRequest {
-    /// This is always drive#modifyLabelsRequest.
+    /// This is always `"drive#modifyLabelsRequest"`.
     pub kind: Option<String>,
     /// The list of modifications to apply to the labels on the file.
     #[serde(rename = "labelModifications")]
@@ -1126,7 +1268,7 @@ pub struct ModifyLabelsRequest {
 
 impl common::RequestValue for ModifyLabelsRequest {}
 
-/// Response to a ModifyLabels request. This contains only those labels which were added or updated by the request.
+/// Response to a `ModifyLabels` request. This contains only those labels which were added or updated by the request.
 ///
 /// # Activities
 ///
@@ -1138,7 +1280,7 @@ impl common::RequestValue for ModifyLabelsRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ModifyLabelsResponse {
-    /// This is always drive#modifyLabelsResponse
+    /// This is always `"drive#modifyLabelsResponse"`.
     pub kind: Option<String>,
     /// The list of labels which were added or updated by the request.
     #[serde(rename = "modifiedLabels")]
@@ -1147,7 +1289,35 @@ pub struct ModifyLabelsResponse {
 
 impl common::ResponseResult for ModifyLabelsResponse {}
 
-/// A permission for a file. A permission grants a user, group, domain, or the world access to a file or a folder hierarchy. Some resource methods (such as `permissions.update`) require a `permissionId`. Use the `permissions.list` method to retrieve the ID for a file, folder, or shared drive.
+/// This resource represents a long-running operation that is the result of a network API call.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [download files](FileDownloadCall) (response)
+/// * [get operations](OperationGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Operation {
+    /// If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available.
+    pub done: Option<bool>,
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, serde_json::Value>>,
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
+    pub name: Option<String>,
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, serde_json::Value>>,
+}
+
+impl common::Resource for Operation {}
+impl common::ResponseResult for Operation {}
+
+/// A permission for a file. A permission grants a user, group, domain, or the world access to a file or a folder hierarchy. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing). By default, permission requests only return a subset of fields. Permission `kind`, `ID`, `type`, and `role` are always returned. To retrieve specific fields, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter). Some resource methods (such as `permissions.update`) require a `permissionId`. Use the `permissions.list` method to retrieve the ID for a file, folder, or shared drive.
 ///
 /// # Activities
 ///
@@ -1166,9 +1336,9 @@ pub struct Permission {
     /// Whether the permission allows the file to be discovered through search. This is only applicable for permissions of type `domain` or `anyone`.
     #[serde(rename = "allowFileDiscovery")]
     pub allow_file_discovery: Option<bool>,
-    /// Output only. Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.
+    /// Output only. Whether the account associated with this permission has been deleted. This field only pertains to permissions of type `user` or `group`.
     pub deleted: Option<bool>,
-    /// Output only. The "pretty" name of the value of the permission. The following is a list of examples for each type of permission: * `user` - User's full name, as defined for their Google account, such as "Joe Smith." * `group` - Name of the Google Group, such as "The Company Administrators." * `domain` - String domain name, such as "thecompany.com." * `anyone` - No `displayName` is present.
+    /// Output only. The "pretty" name of the value of the permission. The following is a list of examples for each type of permission: * `user` - User's full name, as defined for their Google Account, such as "Dana A." * `group` - Name of the Google Group, such as "The Company Administrators." * `domain` - String domain name, such as "cymbalgroup.com." * `anyone` - No `displayName` is present.
     #[serde(rename = "displayName")]
     pub display_name: Option<String>,
     /// The domain to which this permission refers.
@@ -1179,28 +1349,31 @@ pub struct Permission {
     /// The time at which this permission will expire (RFC 3339 date-time). Expiration times have the following restrictions: - They can only be set on user and group permissions - The time must be in the future - The time cannot be more than a year in the future
     #[serde(rename = "expirationTime")]
     pub expiration_time: Option<chrono::DateTime<chrono::offset::Utc>>,
-    /// Output only. The ID of this permission. This is a unique identifier for the grantee, and is published in User resources as `permissionId`. IDs should be treated as opaque values.
+    /// Output only. The ID of this permission. This is a unique identifier for the grantee, and is published in the [User resource](https://developers.google.com/workspace/drive/api/reference/rest/v3/User) as `permissionId`. IDs should be treated as opaque values.
     pub id: Option<String>,
+    /// When `true`, only organizers, owners, and users with permissions added directly on the item can access it.
+    #[serde(rename = "inheritedPermissionsDisabled")]
+    pub inherited_permissions_disabled: Option<bool>,
     /// Output only. Identifies what kind of resource this is. Value: the fixed string `"drive#permission"`.
     pub kind: Option<String>,
-    /// Whether the account associated with this permission is a pending owner. Only populated for `user` type permissions for files that are not in a shared drive.
+    /// Whether the account associated with this permission is a pending owner. Only populated for permissions of type `user` for files that aren't in a shared drive.
     #[serde(rename = "pendingOwner")]
     pub pending_owner: Option<bool>,
-    /// Output only. Details of whether the permissions on this shared drive item are inherited or directly on this item. This is an output-only field which is present only for shared drive items.
+    /// Output only. Details of whether the permissions on this item are inherited or are directly on this item.
     #[serde(rename = "permissionDetails")]
     pub permission_details: Option<Vec<PermissionPermissionDetails>>,
     /// Output only. A link to the user's profile photo, if available.
     #[serde(rename = "photoLink")]
     pub photo_link: Option<String>,
-    /// The role granted by this permission. While new values may be supported in the future, the following are currently allowed: * `owner` * `organizer` * `fileOrganizer` * `writer` * `commenter` * `reader`
+    /// The role granted by this permission. Supported values include: * `owner` * `organizer` * `fileOrganizer` * `writer` * `commenter` * `reader` For more information, see [Roles and permissions](https://developers.google.com/workspace/drive/api/guides/ref-roles).
     pub role: Option<String>,
     /// Output only. Deprecated: Output only. Use `permissionDetails` instead.
     #[serde(rename = "teamDrivePermissionDetails")]
     pub team_drive_permission_details: Option<Vec<PermissionTeamDrivePermissionDetails>>,
-    /// The type of the grantee. Valid values are: * `user` * `group` * `domain` * `anyone` When creating a permission, if `type` is `user` or `group`, you must provide an `emailAddress` for the user or group. When `type` is `domain`, you must provide a `domain`. There isn't extra information required for an `anyone` type.
+    /// The type of the grantee. Supported values include: * `user` * `group` * `domain` * `anyone` When creating a permission, if `type` is `user` or `group`, you must provide an `emailAddress` for the user or group. If `type` is `domain`, you must provide a `domain`. If `type` is `anyone`, no extra information is required.
     #[serde(rename = "type")]
     pub type_: Option<String>,
-    /// Indicates the view for this permission. Only populated for permissions that belong to a view. 'published' is the only supported value.
+    /// Indicates the view for this permission. Only populated for permissions that belong to a view. The only supported values are `published` and `metadata`: * `published`: The permission's role is `publishedReader`. * `metadata`: The item is only visible to the `metadata` view because the item has limited access and the scope has at least read access to the parent. The `metadata` view is only supported on folders. For more information, see [Views](https://developers.google.com/workspace/drive/api/guides/ref-roles#views).
     pub view: Option<String>,
 }
 
@@ -1225,7 +1398,7 @@ pub struct PermissionList {
     /// The page token for the next page of permissions. This field will be absent if the end of the permissions list has been reached. If the token is rejected for any reason, it should be discarded, and pagination should be restarted from the first page of results. The page token is typically valid for several hours. However, if new items are added or removed, your expected results might differ.
     #[serde(rename = "nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The list of permissions. If nextPageToken is populated, then this list may be incomplete and an additional page of results should be fetched.
+    /// The list of permissions. If `nextPageToken` is populated, then this list may be incomplete and an additional page of results should be fetched.
     pub permissions: Option<Vec<Permission>>,
 }
 
@@ -1247,6 +1420,9 @@ impl common::ResponseResult for PermissionList {}
 pub struct Reply {
     /// The action the reply performed to the parent comment. Valid values are: * `resolve` * `reopen`
     pub action: Option<String>,
+    /// Output only. The email of the user who is assigned to this reply, if none is assigned this will be unset.
+    #[serde(rename = "assigneeEmailAddress")]
+    pub assignee_email_address: Option<String>,
     /// Output only. The author of the reply. The author's email address and permission ID will not be populated.
     pub author: Option<User>,
     /// The plain text content of the reply. This field is used for setting the content, while `htmlContent` should be displayed. This is required on creates if no `action` is specified.
@@ -1263,6 +1439,9 @@ pub struct Reply {
     pub id: Option<String>,
     /// Output only. Identifies what kind of resource this is. Value: the fixed string `"drive#reply"`.
     pub kind: Option<String>,
+    /// Output only. The emails of the users who were mentioned in this reply, if none were mentioned this will be an empty list.
+    #[serde(rename = "mentionedEmailAddresses")]
+    pub mentioned_email_addresses: Option<Vec<String>>,
     /// The last time the reply was modified (RFC 3339 date-time).
     #[serde(rename = "modifiedTime")]
     pub modified_time: Option<chrono::DateTime<chrono::offset::Utc>>,
@@ -1294,6 +1473,31 @@ pub struct ReplyList {
 
 impl common::ResponseResult for ReplyList {}
 
+/// Request message for resolving an AccessProposal on a file.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [resolve accessproposals](AccessproposalResolveCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ResolveAccessProposalRequest {
+    /// Required. The action to take on the access proposal.
+    pub action: Option<String>,
+    /// Optional. The roles that the approver has allowed, if any. For more information, see [Roles and permissions](https://developers.google.com/workspace/drive/api/guides/ref-roles). Note: This field is required for the `ACCEPT` action.
+    pub role: Option<Vec<String>>,
+    /// Optional. Whether to send an email to the requester when the access proposal is denied or accepted.
+    #[serde(rename = "sendNotification")]
+    pub send_notification: Option<bool>,
+    /// Optional. Indicates the view for this access proposal. This should only be set when the proposal belongs to a view. Only `published` is supported.
+    pub view: Option<String>,
+}
+
+impl common::RequestValue for ResolveAccessProposalRequest {}
+
 /// The metadata for a revision to a file. Some resource methods (such as `revisions.update`) require a `revisionId`. Use the `revisions.list` method to retrieve the ID for a revision.
 ///
 /// # Activities
@@ -1319,7 +1523,7 @@ pub struct Revision {
     pub keep_forever: Option<bool>,
     /// Output only. Identifies what kind of resource this is. Value: the fixed string `"drive#revision"`.
     pub kind: Option<String>,
-    /// Output only. The last user to modify this revision.
+    /// Output only. The last user to modify this revision. This field is only populated when the last modification was performed by a signed-in user.
     #[serde(rename = "lastModifyingUser")]
     pub last_modifying_user: Option<User>,
     /// Output only. The MD5 checksum of the revision's content. This is only applicable to files with binary content in Drive.
@@ -1339,7 +1543,7 @@ pub struct Revision {
     pub publish_auto: Option<bool>,
     /// Whether this revision is published. This is only applicable to Docs Editors files.
     pub published: Option<bool>,
-    /// Output only. A link to the published revision. This is only populated for Google Sites files.
+    /// Output only. A link to the published revision. This is only populated for Docs Editors files.
     #[serde(rename = "publishedLink")]
     pub published_link: Option<String>,
     /// Whether this revision is published outside the domain. This is only applicable to Docs Editors files.
@@ -1397,6 +1601,24 @@ pub struct StartPageToken {
 }
 
 impl common::ResponseResult for StartPageToken {}
+
+/// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Status {
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details. There is a common set of message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, serde_json::Value>>>,
+    /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+}
+
+impl common::Part for Status {}
 
 /// Deprecated: use the drive collection instead.
 ///
@@ -1484,7 +1706,7 @@ pub struct User {
     /// Output only. The email address of the user. This may not be present in certain contexts if the user has not made their email address visible to the requester.
     #[serde(rename = "emailAddress")]
     pub email_address: Option<String>,
-    /// Output only. Identifies what kind of resource this is. Value: the fixed string `"drive#user"`.
+    /// Output only. Identifies what kind of resource this is. Value: the fixed string `drive#user`.
     pub kind: Option<String>,
     /// Output only. Whether this user is the requesting user.
     pub me: Option<bool>,
@@ -1625,6 +1847,9 @@ pub struct DriveCapabilities {
     /// Output only. Whether the current user can change the `domainUsersOnly` restriction of this shared drive.
     #[serde(rename = "canChangeDomainUsersOnlyRestriction")]
     pub can_change_domain_users_only_restriction: Option<bool>,
+    /// Output only. Whether the current user can change organizer-applied download restrictions of this shared drive.
+    #[serde(rename = "canChangeDownloadRestriction")]
+    pub can_change_download_restriction: Option<bool>,
     /// Output only. Whether the current user can change the background of this shared drive.
     #[serde(rename = "canChangeDriveBackground")]
     pub can_change_drive_background: Option<bool>,
@@ -1698,6 +1923,9 @@ pub struct DriveRestrictions {
     /// Whether access to this shared drive and items inside this shared drive is restricted to users of the domain to which this shared drive belongs. This restriction may be overridden by other sharing policies controlled outside of this shared drive.
     #[serde(rename = "domainUsersOnly")]
     pub domain_users_only: Option<bool>,
+    /// Download restrictions applied by shared drive managers.
+    #[serde(rename = "downloadRestriction")]
+    pub download_restriction: Option<DownloadRestriction>,
     /// Whether access to items inside this shared drive is restricted to its members.
     #[serde(rename = "driveMembersOnly")]
     pub drive_members_only: Option<bool>,
@@ -1709,7 +1937,7 @@ pub struct DriveRestrictions {
 impl common::NestedType for DriveRestrictions {}
 impl common::Part for DriveRestrictions {}
 
-/// Output only. Capabilities the current user has on this file. Each capability corresponds to a fine-grained action that a user may take.
+/// Output only. Capabilities the current user has on this file. Each capability corresponds to a fine-grained action that a user may take. For more information, see [Understand file capabilities](https://developers.google.com/workspace/drive/api/guides/manage-sharing#capabilities).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1720,10 +1948,10 @@ pub struct FileCapabilities {
     /// Output only. Whether the current user is the pending owner of the file. Not populated for shared drive files.
     #[serde(rename = "canAcceptOwnership")]
     pub can_accept_ownership: Option<bool>,
-    /// Output only. Whether the current user can add children to this folder. This is always false when the item is not a folder.
+    /// Output only. Whether the current user can add children to this folder. This is always `false` when the item isn't a folder.
     #[serde(rename = "canAddChildren")]
     pub can_add_children: Option<bool>,
-    /// Output only. Whether the current user can add a folder from another drive (different shared drive or My Drive) to this folder. This is false when the item is not a folder. Only populated for items in shared drives.
+    /// Output only. Whether the current user can add a folder from another drive (different shared drive or My Drive) to this folder. This is `false` when the item isn't a folder. Only populated for items in shared drives.
     #[serde(rename = "canAddFolderFromAnotherDrive")]
     pub can_add_folder_from_another_drive: Option<bool>,
     /// Output only. Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.
@@ -1732,7 +1960,10 @@ pub struct FileCapabilities {
     /// Output only. Whether the current user can change the `copyRequiresWriterPermission` restriction of this file.
     #[serde(rename = "canChangeCopyRequiresWriterPermission")]
     pub can_change_copy_requires_writer_permission: Option<bool>,
-    /// Output only. Whether the current user can change the securityUpdateEnabled field on link share metadata.
+    /// Output only. Whether the current user can change the owner or organizer-applied download restrictions of the file.
+    #[serde(rename = "canChangeItemDownloadRestriction")]
+    pub can_change_item_download_restriction: Option<bool>,
+    /// Output only. Whether the current user can change the `securityUpdateEnabled` field on link share metadata.
     #[serde(rename = "canChangeSecurityUpdateEnabled")]
     pub can_change_security_update_enabled: Option<bool>,
     /// Deprecated: Output only.
@@ -1741,28 +1972,34 @@ pub struct FileCapabilities {
     /// Output only. Whether the current user can comment on this file.
     #[serde(rename = "canComment")]
     pub can_comment: Option<bool>,
-    /// Output only. Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.
+    /// Output only. Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item if it's not a folder.
     #[serde(rename = "canCopy")]
     pub can_copy: Option<bool>,
     /// Output only. Whether the current user can delete this file.
     #[serde(rename = "canDelete")]
     pub can_delete: Option<bool>,
-    /// Output only. Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
+    /// Output only. Whether the current user can delete children of this folder. This is `false` when the item isn't a folder. Only populated for items in shared drives.
     #[serde(rename = "canDeleteChildren")]
     pub can_delete_children: Option<bool>,
+    /// Whether a user can disable inherited permissions.
+    #[serde(rename = "canDisableInheritedPermissions")]
+    pub can_disable_inherited_permissions: Option<bool>,
     /// Output only. Whether the current user can download this file.
     #[serde(rename = "canDownload")]
     pub can_download: Option<bool>,
     /// Output only. Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see `canChangeCopyRequiresWriterPermission` or `canModifyContent`.
     #[serde(rename = "canEdit")]
     pub can_edit: Option<bool>,
-    /// Output only. Whether the current user can list the children of this folder. This is always false when the item is not a folder.
+    /// Whether a user can re-enable inherited permissions.
+    #[serde(rename = "canEnableInheritedPermissions")]
+    pub can_enable_inherited_permissions: Option<bool>,
+    /// Output only. Whether the current user can list the children of this folder. This is always `false` when the item isn't a folder.
     #[serde(rename = "canListChildren")]
     pub can_list_children: Option<bool>,
     /// Output only. Whether the current user can modify the content of this file.
     #[serde(rename = "canModifyContent")]
     pub can_modify_content: Option<bool>,
-    /// Deprecated: Output only. Use one of `canModifyEditorContentRestriction`, `canModifyOwnerContentRestriction` or `canRemoveContentRestriction`.
+    /// Deprecated: Output only. Use one of `canModifyEditorContentRestriction`, `canModifyOwnerContentRestriction`, or `canRemoveContentRestriction`.
     #[serde(rename = "canModifyContentRestriction")]
     pub can_modify_content_restriction: Option<bool>,
     /// Output only. Whether the current user can add or modify content restrictions on the file which are editor restricted.
@@ -1774,13 +2011,13 @@ pub struct FileCapabilities {
     /// Output only. Whether the current user can add or modify content restrictions which are owner restricted.
     #[serde(rename = "canModifyOwnerContentRestriction")]
     pub can_modify_owner_content_restriction: Option<bool>,
-    /// Output only. Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.
+    /// Output only. Whether the current user can move children of this folder outside of the shared drive. This is `false` when the item isn't a folder. Only populated for items in shared drives.
     #[serde(rename = "canMoveChildrenOutOfDrive")]
     pub can_move_children_out_of_drive: Option<bool>,
     /// Deprecated: Output only. Use `canMoveChildrenOutOfDrive` instead.
     #[serde(rename = "canMoveChildrenOutOfTeamDrive")]
     pub can_move_children_out_of_team_drive: Option<bool>,
-    /// Output only. Whether the current user can move children of this folder within this drive. This is false when the item is not a folder. Note that a request to move the child may still fail depending on the current user's access to the child and to the destination folder.
+    /// Output only. Whether the current user can move children of this folder within this drive. This is `false` when the item isn't a folder. Note that a request to move the child may still fail depending on the current user's access to the child and to the destination folder.
     #[serde(rename = "canMoveChildrenWithinDrive")]
     pub can_move_children_within_drive: Option<bool>,
     /// Deprecated: Output only. Use `canMoveChildrenWithinDrive` instead.
@@ -1789,13 +2026,13 @@ pub struct FileCapabilities {
     /// Deprecated: Output only. Use `canMoveItemOutOfDrive` instead.
     #[serde(rename = "canMoveItemIntoTeamDrive")]
     pub can_move_item_into_team_drive: Option<bool>,
-    /// Output only. Whether the current user can move this item outside of this drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that is being added.
+    /// Output only. Whether the current user can move this item outside of this drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that's being added.
     #[serde(rename = "canMoveItemOutOfDrive")]
     pub can_move_item_out_of_drive: Option<bool>,
     /// Deprecated: Output only. Use `canMoveItemOutOfDrive` instead.
     #[serde(rename = "canMoveItemOutOfTeamDrive")]
     pub can_move_item_out_of_team_drive: Option<bool>,
-    /// Output only. Whether the current user can move this item within this drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added and the parent that is being removed.
+    /// Output only. Whether the current user can move this item within this drive. Note that a request to change the parent of the item may still fail depending on the new parent that's being added and the parent that is being removed.
     #[serde(rename = "canMoveItemWithinDrive")]
     pub can_move_item_within_drive: Option<bool>,
     /// Deprecated: Output only. Use `canMoveItemWithinDrive` instead.
@@ -1810,16 +2047,16 @@ pub struct FileCapabilities {
     /// Output only. Whether the current user can read the labels on the file.
     #[serde(rename = "canReadLabels")]
     pub can_read_labels: Option<bool>,
-    /// Output only. Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.
+    /// Output only. Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item if it's not a folder, can be read.
     #[serde(rename = "canReadRevisions")]
     pub can_read_revisions: Option<bool>,
     /// Deprecated: Output only. Use `canReadDrive` instead.
     #[serde(rename = "canReadTeamDrive")]
     pub can_read_team_drive: Option<bool>,
-    /// Output only. Whether the current user can remove children from this folder. This is always false when the item is not a folder. For a folder in a shared drive, use `canDeleteChildren` or `canTrashChildren` instead.
+    /// Output only. Whether the current user can remove children from this folder. This is always `false` when the item isn't a folder. For a folder in a shared drive, use `canDeleteChildren` or `canTrashChildren` instead.
     #[serde(rename = "canRemoveChildren")]
     pub can_remove_children: Option<bool>,
-    /// Output only. Whether there is a content restriction on the file that can be removed by the current user.
+    /// Output only. Whether there's a content restriction on the file that can be removed by the current user.
     #[serde(rename = "canRemoveContentRestriction")]
     pub can_remove_content_restriction: Option<bool>,
     /// Output only. Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.
@@ -1834,7 +2071,7 @@ pub struct FileCapabilities {
     /// Output only. Whether the current user can move this file to trash.
     #[serde(rename = "canTrash")]
     pub can_trash: Option<bool>,
-    /// Output only. Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.
+    /// Output only. Whether the current user can trash children of this folder. This is `false` when the item isn't a folder. Only populated for items in shared drives.
     #[serde(rename = "canTrashChildren")]
     pub can_trash_children: Option<bool>,
     /// Output only. Whether the current user can restore this file from trash.
@@ -1853,7 +2090,7 @@ impl common::Part for FileCapabilities {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FileContentHints {
-    /// Text to be indexed for the file to improve fullText queries. This is limited to 128KB in length and may contain HTML elements.
+    /// Text to be indexed for the file to improve fullText queries. This is limited to 128 KB in length and may contain HTML elements.
     #[serde(rename = "indexableText")]
     pub indexable_text: Option<String>,
     /// A thumbnail for the file. This will only be used if Google Drive cannot generate a standard thumbnail.
@@ -1871,7 +2108,7 @@ impl common::Part for FileContentHints {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FileContentHintsThumbnail {
-    /// The thumbnail data encoded with URL-safe Base64 (RFC 4648 section 5).
+    /// The thumbnail data encoded with URL-safe Base64 ([RFC 4648 section 5](https://datatracker.ietf.org/doc/html/rfc4648#section-5)).
     #[serde_as(as = "Option<common::serde::urlsafe_base64::Wrapper>")]
     pub image: Option<Vec<u8>>,
     /// The MIME type of the thumbnail.
@@ -2003,7 +2240,7 @@ pub struct FileLinkShareMetadata {
 impl common::NestedType for FileLinkShareMetadata {}
 impl common::Part for FileLinkShareMetadata {}
 
-/// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to `application/vnd.google-apps.shortcut`.
+/// Shortcut file details. Only populated for shortcut files, which have the mimeType field set to `application/vnd.google-apps.shortcut`. Can only be set on `files.create` requests.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -2011,13 +2248,13 @@ impl common::Part for FileLinkShareMetadata {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct FileShortcutDetails {
-    /// The ID of the file that this shortcut points to.
+    /// The ID of the file that this shortcut points to. Can only be set on `files.create` requests.
     #[serde(rename = "targetId")]
     pub target_id: Option<String>,
     /// Output only. The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target's MIME type, captured when the shortcut is created.
     #[serde(rename = "targetMimeType")]
     pub target_mime_type: Option<String>,
-    /// Output only. The ResourceKey for the target file.
+    /// Output only. The `resourceKey` for the target file.
     #[serde(rename = "targetResourceKey")]
     pub target_resource_key: Option<String>,
 }
@@ -2046,7 +2283,7 @@ pub struct FileVideoMediaMetadata {
 impl common::NestedType for FileVideoMediaMetadata {}
 impl common::Part for FileVideoMediaMetadata {}
 
-/// Output only. Details of whether the permissions on this shared drive item are inherited or directly on this item. This is an output-only field which is present only for shared drive items.
+/// Output only. Details of whether the permissions on this item are inherited or are directly on this item.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -2056,13 +2293,13 @@ impl common::Part for FileVideoMediaMetadata {}
 pub struct PermissionPermissionDetails {
     /// Output only. Whether this permission is inherited. This field is always populated. This is an output-only field.
     pub inherited: Option<bool>,
-    /// Output only. The ID of the item from which this permission is inherited. This is an output-only field.
+    /// Output only. The ID of the item from which this permission is inherited. This is only populated for items in shared drives.
     #[serde(rename = "inheritedFrom")]
     pub inherited_from: Option<String>,
-    /// Output only. The permission type for this user. While new values may be added in future, the following are currently possible: * `file` * `member`
+    /// Output only. The permission type for this user. Supported values include: * `file` * `member`
     #[serde(rename = "permissionType")]
     pub permission_type: Option<String>,
-    /// Output only. The primary role for this user. While new values may be added in the future, the following are currently possible: * `organizer` * `fileOrganizer` * `writer` * `commenter` * `reader`
+    /// Output only. The primary role for this user. Supported values include: * `owner` * `organizer` * `fileOrganizer` * `writer` * `commenter` * `reader` For more information, see [Roles and permissions](https://developers.google.com/workspace/drive/api/guides/ref-roles).
     pub role: Option<String>,
 }
 
@@ -2132,6 +2369,9 @@ pub struct TeamDriveCapabilities {
     /// Whether the current user can change the `domainUsersOnly` restriction of this Team Drive.
     #[serde(rename = "canChangeDomainUsersOnlyRestriction")]
     pub can_change_domain_users_only_restriction: Option<bool>,
+    /// Whether the current user can change organizer-applied download restrictions of this shared drive.
+    #[serde(rename = "canChangeDownloadRestriction")]
+    pub can_change_download_restriction: Option<bool>,
     /// Whether the current user can change the `sharingFoldersRequiresOrganizerPermission` restriction of this Team Drive.
     #[serde(rename = "canChangeSharingFoldersRequiresOrganizerPermissionRestriction")]
     pub can_change_sharing_folders_requires_organizer_permission_restriction: Option<bool>,
@@ -2208,6 +2448,9 @@ pub struct TeamDriveRestrictions {
     /// Whether access to this Team Drive and items inside this Team Drive is restricted to users of the domain to which this Team Drive belongs. This restriction may be overridden by other sharing policies controlled outside of this Team Drive.
     #[serde(rename = "domainUsersOnly")]
     pub domain_users_only: Option<bool>,
+    /// Download restrictions applied by shared drive managers.
+    #[serde(rename = "downloadRestriction")]
+    pub download_restriction: Option<DownloadRestriction>,
     /// If true, only users with the organizer role can share folders. If false, users with either the organizer role or the file organizer role can share folders.
     #[serde(rename = "sharingFoldersRequiresOrganizerPermission")]
     pub sharing_folders_requires_organizer_permission: Option<bool>,
@@ -2239,9 +2482,20 @@ impl common::Part for TeamDriveRestrictions {}
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2252,7 +2506,7 @@ impl common::Part for TeamDriveRestrictions {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -2274,10 +2528,135 @@ impl<'a, C> common::MethodsBuilder for AboutMethods<'a, C> {}
 impl<'a, C> AboutMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about the user, the user's Drive, and system capabilities.
+    /// Gets information about the user, the user's Drive, and system capabilities. For more information, see [Return user info](https://developers.google.com/workspace/drive/api/guides/user-info). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
     pub fn get(&self) -> AboutGetCall<'a, C> {
         AboutGetCall {
             hub: self.hub,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+/// A builder providing access to all methods supported on *accessproposal* resources.
+/// It is not used directly, but through the [`DriveHub`] hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_drive3 as drive3;
+///
+/// # async fn dox() {
+/// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http2()
+///         .build()
+/// );
+/// let mut hub = DriveHub::new(client, auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`, `list(...)` and `resolve(...)`
+/// // to build up your call.
+/// let rb = hub.accessproposals();
+/// # }
+/// ```
+pub struct AccessproposalMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DriveHub<C>,
+}
+
+impl<'a, C> common::MethodsBuilder for AccessproposalMethods<'a, C> {}
+
+impl<'a, C> AccessproposalMethods<'a, C> {
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves an access proposal by ID. For more information, see [Manage pending access proposals](https://developers.google.com/workspace/drive/api/guides/pending-access).
+    ///
+    /// # Arguments
+    ///
+    /// * `fileId` - Required. The ID of the item the request is on.
+    /// * `proposalId` - Required. The ID of the access proposal to resolve.
+    pub fn get(&self, file_id: &str, proposal_id: &str) -> AccessproposalGetCall<'a, C> {
+        AccessproposalGetCall {
+            hub: self.hub,
+            _file_id: file_id.to_string(),
+            _proposal_id: proposal_id.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List the access proposals on a file. For more information, see [Manage pending access proposals](https://developers.google.com/workspace/drive/api/guides/pending-access). Note: Only approvers are able to list access proposals on a file. If the user isn't an approver, a 403 error is returned.
+    ///
+    /// # Arguments
+    ///
+    /// * `fileId` - Required. The ID of the item the request is on.
+    pub fn list(&self, file_id: &str) -> AccessproposalListCall<'a, C> {
+        AccessproposalListCall {
+            hub: self.hub,
+            _file_id: file_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Approves or denies an access proposal. For more information, see [Manage pending access proposals](https://developers.google.com/workspace/drive/api/guides/pending-access).
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `fileId` - Required. The ID of the item the request is on.
+    /// * `proposalId` - Required. The ID of the access proposal to resolve.
+    pub fn resolve(
+        &self,
+        request: ResolveAccessProposalRequest,
+        file_id: &str,
+        proposal_id: &str,
+    ) -> AccessproposalResolveCall<'a, C> {
+        AccessproposalResolveCall {
+            hub: self.hub,
+            _request: request,
+            _file_id: file_id.to_string(),
+            _proposal_id: proposal_id.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2301,9 +2680,20 @@ impl<'a, C> AboutMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2314,7 +2704,7 @@ impl<'a, C> AboutMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -2336,7 +2726,7 @@ impl<'a, C> common::MethodsBuilder for AppMethods<'a, C> {}
 impl<'a, C> AppMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a specific app.
+    /// Gets a specific app. For more information, see [Return user info](https://developers.google.com/workspace/drive/api/guides/user-info).
     ///
     /// # Arguments
     ///
@@ -2353,7 +2743,7 @@ impl<'a, C> AppMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a user's installed apps.
+    /// Lists a user's installed apps. For more information, see [Return user info](https://developers.google.com/workspace/drive/api/guides/user-info).
     pub fn list(&self) -> AppListCall<'a, C> {
         AppListCall {
             hub: self.hub,
@@ -2383,9 +2773,20 @@ impl<'a, C> AppMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2396,7 +2797,7 @@ impl<'a, C> AppMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -2418,7 +2819,7 @@ impl<'a, C> common::MethodsBuilder for ChangeMethods<'a, C> {}
 impl<'a, C> ChangeMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the starting pageToken for listing future changes.
+    /// Gets the starting pageToken for listing future changes. For more information, see [Retrieve changes](https://developers.google.com/workspace/drive/api/guides/manage-changes).
     pub fn get_start_page_token(&self) -> ChangeGetStartPageTokenCall<'a, C> {
         ChangeGetStartPageTokenCall {
             hub: self.hub,
@@ -2434,7 +2835,7 @@ impl<'a, C> ChangeMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the changes for a user or shared drive.
+    /// Lists the changes for a user or shared drive. For more information, see [Retrieve changes](https://developers.google.com/workspace/drive/api/guides/manage-changes).
     ///
     /// # Arguments
     ///
@@ -2464,7 +2865,7 @@ impl<'a, C> ChangeMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Subscribes to changes for a user.
+    /// Subscribes to changes for a user. For more information, see [Notifications for resource changes](https://developers.google.com/workspace/drive/api/guides/push).
     ///
     /// # Arguments
     ///
@@ -2511,9 +2912,20 @@ impl<'a, C> ChangeMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2524,7 +2936,7 @@ impl<'a, C> ChangeMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -2546,7 +2958,7 @@ impl<'a, C> common::MethodsBuilder for ChannelMethods<'a, C> {}
 impl<'a, C> ChannelMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Stops watching resources through this channel.
+    /// Stops watching resources through this channel. For more information, see [Notifications for resource changes](https://developers.google.com/workspace/drive/api/guides/push).
     ///
     /// # Arguments
     ///
@@ -2578,9 +2990,20 @@ impl<'a, C> ChannelMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2591,7 +3014,7 @@ impl<'a, C> ChannelMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -2613,7 +3036,7 @@ impl<'a, C> common::MethodsBuilder for CommentMethods<'a, C> {}
 impl<'a, C> CommentMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a comment on a file.
+    /// Creates a comment on a file. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
     ///
     /// # Arguments
     ///
@@ -2632,7 +3055,7 @@ impl<'a, C> CommentMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a comment.
+    /// Deletes a comment. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments).
     ///
     /// # Arguments
     ///
@@ -2651,7 +3074,7 @@ impl<'a, C> CommentMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a comment by ID.
+    /// Gets a comment by ID. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
     ///
     /// # Arguments
     ///
@@ -2671,7 +3094,7 @@ impl<'a, C> CommentMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's comments.
+    /// Lists a file's comments. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
     ///
     /// # Arguments
     ///
@@ -2692,7 +3115,7 @@ impl<'a, C> CommentMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a comment with patch semantics.
+    /// Updates a comment with patch semantics. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
     ///
     /// # Arguments
     ///
@@ -2733,9 +3156,20 @@ impl<'a, C> CommentMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2746,7 +3180,7 @@ impl<'a, C> CommentMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -2768,7 +3202,7 @@ impl<'a, C> common::MethodsBuilder for DriveMethods<'a, C> {}
 impl<'a, C> DriveMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a shared drive.
+    /// Creates a shared drive. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
     ///
     /// # Arguments
     ///
@@ -2787,7 +3221,7 @@ impl<'a, C> DriveMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes a shared drive for which the user is an `organizer`. The shared drive cannot contain any untrashed items.
+    /// Permanently deletes a shared drive for which the user is an `organizer`. The shared drive cannot contain any untrashed items. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
     ///
     /// # Arguments
     ///
@@ -2806,7 +3240,7 @@ impl<'a, C> DriveMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a shared drive's metadata by ID.
+    /// Gets a shared drive's metadata by ID. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
     ///
     /// # Arguments
     ///
@@ -2824,7 +3258,7 @@ impl<'a, C> DriveMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Hides a shared drive from the default view.
+    /// Hides a shared drive from the default view. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
     ///
     /// # Arguments
     ///
@@ -2841,7 +3275,7 @@ impl<'a, C> DriveMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the user’s shared drives. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for shared drives](https://developers.google.com/drive/api/guides/search-shareddrives) guide.
+    /// Lists the user’s shared drives. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for shared drives](https://developers.google.com/workspace/drive/api/guides/search-shareddrives) guide.
     pub fn list(&self) -> DriveListCall<'a, C> {
         DriveListCall {
             hub: self.hub,
@@ -2857,7 +3291,7 @@ impl<'a, C> DriveMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Restores a shared drive to the default view.
+    /// Restores a shared drive to the default view. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
     ///
     /// # Arguments
     ///
@@ -2874,7 +3308,7 @@ impl<'a, C> DriveMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the metadata for a shared drive.
+    /// Updates the metadata for a shared drive. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
     ///
     /// # Arguments
     ///
@@ -2909,9 +3343,20 @@ impl<'a, C> DriveMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2922,12 +3367,12 @@ impl<'a, C> DriveMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `copy(...)`, `create(...)`, `delete(...)`, `empty_trash(...)`, `export(...)`, `generate_ids(...)`, `get(...)`, `list(...)`, `list_labels(...)`, `modify_labels(...)`, `update(...)` and `watch(...)`
+/// // like `copy(...)`, `create(...)`, `delete(...)`, `download(...)`, `empty_trash(...)`, `export(...)`, `generate_ids(...)`, `get(...)`, `list(...)`, `list_labels(...)`, `modify_labels(...)`, `update(...)` and `watch(...)`
 /// // to build up your call.
 /// let rb = hub.files();
 /// # }
@@ -2944,7 +3389,7 @@ impl<'a, C> common::MethodsBuilder for FileMethods<'a, C> {}
 impl<'a, C> FileMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a copy of a file and applies any requested updates with patch semantics.
+    /// Creates a copy of a file and applies any requested updates with patch semantics. For more information, see [Create and manage files](https://developers.google.com/workspace/drive/api/guides/create-file).
     ///
     /// # Arguments
     ///
@@ -2971,7 +3416,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new file. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](https://developers.google.com/drive/api/guides/manage-uploads). Apps creating shortcuts with `files.create` must specify the MIME type `application/vnd.google-apps.shortcut`. Apps should specify a file extension in the `name` property when inserting files with the API. For example, an operation to insert a JPEG file should specify something like `"name": "cat.jpg"` in the metadata. Subsequent `GET` requests include the read-only `fileExtension` property populated with the extension originally specified in the `title` property. When a Google Drive user requests to download a file, or when the file is downloaded through the sync client, Drive builds a full filename (with extension) based on the title. In cases where the extension is missing, Drive attempts to determine the extension based on the file’s MIME type.
+    /// Creates a file. For more information, see [Create and manage files](https://developers.google.com/workspace/drive/api/guides/create-file). This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:* `*/*` (Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information, see [Google Workspace and Google Drive supported MIME types](https://developers.google.com/workspace/drive/api/guides/mime-types).) For more information on uploading files, see [Upload file data](https://developers.google.com/workspace/drive/api/guides/manage-uploads). Apps creating shortcuts with the `create` method must specify the MIME type `application/vnd.google-apps.shortcut`. Apps should specify a file extension in the `name` property when inserting files with the API. For example, an operation to insert a JPEG file should specify something like `"name": "cat.jpg"` in the metadata. Subsequent `GET` requests include the read-only `fileExtension` property populated with the extension originally specified in the `name` property. When a Google Drive user requests to download a file, or when the file is downloaded through the sync client, Drive builds a full filename (with extension) based on the name. In cases where the extension is missing, Drive attempts to determine the extension based on the file’s MIME type.
     ///
     /// # Arguments
     ///
@@ -2997,7 +3442,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes a file owned by the user without moving it to the trash. If the file belongs to a shared drive, the user must be an `organizer` on the parent folder. If the target is a folder, all descendants owned by the user are also deleted.
+    /// Permanently deletes a file owned by the user without moving it to the trash. For more information, see [Trash or delete files and folders](https://developers.google.com/workspace/drive/api/guides/delete). If the file belongs to a shared drive, the user must be an `organizer` on the parent folder. If the target is a folder, all descendants owned by the user are also deleted.
     ///
     /// # Arguments
     ///
@@ -3017,7 +3462,26 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes all of the user's trashed files.
+    /// Downloads the content of a file. For more information, see [Download and export files](https://developers.google.com/workspace/drive/api/guides/manage-downloads). Operations are valid for 24 hours from the time of creation.
+    ///
+    /// # Arguments
+    ///
+    /// * `fileId` - Required. The ID of the file to download.
+    pub fn download(&self, file_id: &str) -> FileDownloadCall<'a, C> {
+        FileDownloadCall {
+            hub: self.hub,
+            _file_id: file_id.to_string(),
+            _revision_id: Default::default(),
+            _mime_type: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Permanently deletes all of the user's trashed files. For more information, see [Trash or delete files and folders](https://developers.google.com/workspace/drive/api/guides/delete).
     pub fn empty_trash(&self) -> FileEmptyTrashCall<'a, C> {
         FileEmptyTrashCall {
             hub: self.hub,
@@ -3031,12 +3495,12 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Exports a Google Workspace document to the requested MIME type and returns exported byte content. Note that the exported content is limited to 10MB.
+    /// Exports a Google Workspace document to the requested MIME type and returns exported byte content. For more information, see [Download and export files](https://developers.google.com/workspace/drive/api/guides/manage-downloads). Note that the exported content is limited to 10 MB.
     ///
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    /// * `mimeType` - Required. The MIME type of the format requested for this export.
+    /// * `mimeType` - Required. The MIME type of the format requested for this export. For a list of supported MIME types, see [Export MIME types for Google Workspace documents](https://developers.google.com/workspace/drive/api/guides/ref-export-formats).
     pub fn export(&self, file_id: &str, mime_type: &str) -> FileExportCall<'a, C> {
         FileExportCall {
             hub: self.hub,
@@ -3050,7 +3514,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates a set of file IDs which can be provided in create or copy requests.
+    /// Generates a set of file IDs which can be provided in create or copy requests. For more information, see [Create and manage files](https://developers.google.com/workspace/drive/api/guides/create-file).
     pub fn generate_ids(&self) -> FileGenerateIdCall<'a, C> {
         FileGenerateIdCall {
             hub: self.hub,
@@ -3065,7 +3529,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a file’s metadata or content by ID. If you provide the URL parameter `alt=media`, then the response includes the file contents in the response body. Downloading content with `alt=media` only works if the file is stored in Drive. To download Google Docs, Sheets, and Slides use [`files.export`](https://developers.google.com/drive/api/reference/rest/v3/files/export) instead. For more information, see [Download & export files](https://developers.google.com/drive/api/guides/manage-downloads).
+    /// Gets a file’s metadata or content by ID. For more information, see [Search for files and folders](https://developers.google.com/workspace/drive/api/guides/search-files). If you provide the URL parameter `alt=media`, then the response includes the file contents in the response body. Downloading content with `alt=media` only works if the file is stored in Drive. To download Google Docs, Sheets, and Slides use [`files.export`](https://developers.google.com/workspace/drive/api/reference/rest/v3/files/export) instead. For more information, see [Download and export files](https://developers.google.com/workspace/drive/api/guides/manage-downloads).
     ///
     /// # Arguments
     ///
@@ -3087,7 +3551,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the user’s files. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for files & folders](https://developers.google.com/drive/api/guides/search-files) guide. *Note:* This method returns *all* files by default, including trashed files. If you don’t want trashed files to appear in the list, use the `trashed=false` query parameter to remove trashed files from the results.
+    /// Lists the user’s files. For more information, see [Search for files and folders](https://developers.google.com/workspace/drive/api/guides/search-files). This method accepts the `q` parameter, which is a search query combining one or more search terms. This method returns *all* files by default, including trashed files. If you don’t want trashed files to appear in the list, use the `trashed=false` query parameter to remove trashed files from the results.
     pub fn list(&self) -> FileListCall<'a, C> {
         FileListCall {
             hub: self.hub,
@@ -3114,7 +3578,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the labels on a file.
+    /// Lists the labels on a file. For more information, see [List labels on a file](https://developers.google.com/workspace/drive/api/guides/list-labels).
     ///
     /// # Arguments
     ///
@@ -3133,7 +3597,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Modifies the set of labels applied to a file. Returns a list of the labels that were added or modified.
+    /// Modifies the set of labels applied to a file. For more information, see [Set a label field on a file](https://developers.google.com/workspace/drive/api/guides/set-label). Returns a list of the labels that were added or modified.
     ///
     /// # Arguments
     ///
@@ -3156,7 +3620,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a file’s metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as `modifiedDate`. This method supports patch semantics. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](https://developers.google.com/drive/api/guides/manage-uploads).
+    /// Updates a file’s metadata, content, or both. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as `modifiedDate`. This method supports patch semantics. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:* `*/*` (Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information, see [Google Workspace and Google Drive supported MIME types](https://developers.google.com/workspace/drive/api/guides/mime-types).) For more information on uploading files, see [Upload file data](https://developers.google.com/workspace/drive/api/guides/manage-uploads).
     ///
     /// # Arguments
     ///
@@ -3185,7 +3649,7 @@ impl<'a, C> FileMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Subscribes to changes to a file.
+    /// Subscribes to changes to a file. For more information, see [Notifications for resource changes](https://developers.google.com/workspace/drive/api/guides/push).
     ///
     /// # Arguments
     ///
@@ -3201,6 +3665,84 @@ impl<'a, C> FileMethods<'a, C> {
             _include_permissions_for_view: Default::default(),
             _include_labels: Default::default(),
             _acknowledge_abuse: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+/// A builder providing access to all methods supported on *operation* resources.
+/// It is not used directly, but through the [`DriveHub`] hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_drive3 as drive3;
+///
+/// # async fn dox() {
+/// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+///     secret,
+///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
+/// ).build().await.unwrap();
+///
+/// let client = hyper_util::client::legacy::Client::builder(
+///     hyper_util::rt::TokioExecutor::new()
+/// )
+/// .build(
+///     hyper_rustls::HttpsConnectorBuilder::new()
+///         .with_native_roots()
+///         .unwrap()
+///         .https_or_http()
+///         .enable_http2()
+///         .build()
+/// );
+/// let mut hub = DriveHub::new(client, auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`
+/// // to build up your call.
+/// let rb = hub.operations();
+/// # }
+/// ```
+pub struct OperationMethods<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DriveHub<C>,
+}
+
+impl<'a, C> common::MethodsBuilder for OperationMethods<'a, C> {}
+
+impl<'a, C> OperationMethods<'a, C> {
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource.
+    pub fn get(&self, name: &str) -> OperationGetCall<'a, C> {
+        OperationGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3224,9 +3766,20 @@ impl<'a, C> FileMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3237,7 +3790,7 @@ impl<'a, C> FileMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -3259,7 +3812,7 @@ impl<'a, C> common::MethodsBuilder for PermissionMethods<'a, C> {}
 impl<'a, C> PermissionMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a permission for a file or shared drive. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied.
+    /// Creates a permission for a file or shared drive. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing). **Warning:** Concurrent permissions operations on the same file aren't supported; only the last update is applied.
     ///
     /// # Arguments
     ///
@@ -3277,6 +3830,7 @@ impl<'a, C> PermissionMethods<'a, C> {
             _send_notification_email: Default::default(),
             _move_to_new_owners_root: Default::default(),
             _enforce_single_parent: Default::default(),
+            _enforce_expansive_access: Default::default(),
             _email_message: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -3286,7 +3840,7 @@ impl<'a, C> PermissionMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a permission. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied.
+    /// Deletes a permission. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing). **Warning:** Concurrent permissions operations on the same file aren't supported; only the last update is applied.
     ///
     /// # Arguments
     ///
@@ -3300,6 +3854,7 @@ impl<'a, C> PermissionMethods<'a, C> {
             _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
+            _enforce_expansive_access: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3308,7 +3863,7 @@ impl<'a, C> PermissionMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a permission by ID.
+    /// Gets a permission by ID. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing).
     ///
     /// # Arguments
     ///
@@ -3330,7 +3885,7 @@ impl<'a, C> PermissionMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's or shared drive's permissions.
+    /// Lists a file's or shared drive's permissions. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing).
     ///
     /// # Arguments
     ///
@@ -3353,7 +3908,7 @@ impl<'a, C> PermissionMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a permission with patch semantics. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied.
+    /// Updates a permission with patch semantics. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing). **Warning:** Concurrent permissions operations on the same file aren't supported; only the last update is applied.
     ///
     /// # Arguments
     ///
@@ -3376,6 +3931,7 @@ impl<'a, C> PermissionMethods<'a, C> {
             _supports_team_drives: Default::default(),
             _supports_all_drives: Default::default(),
             _remove_expiration: Default::default(),
+            _enforce_expansive_access: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3399,9 +3955,20 @@ impl<'a, C> PermissionMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3412,7 +3979,7 @@ impl<'a, C> PermissionMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -3574,9 +4141,20 @@ impl<'a, C> ReplyMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3587,7 +4165,7 @@ impl<'a, C> ReplyMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -3609,7 +4187,7 @@ impl<'a, C> common::MethodsBuilder for RevisionMethods<'a, C> {}
 impl<'a, C> RevisionMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Permanently deletes a file version. You can only delete revisions for files with binary content in Google Drive, like images or videos. Revisions for other files, like Google Docs or Sheets, and the last remaining file version can't be deleted.
+    /// Permanently deletes a file version. You can only delete revisions for files with binary content in Google Drive, like images or videos. Revisions for other files, like Google Docs or Sheets, and the last remaining file version can't be deleted. For more information, see [Manage file revisions](https://developers.google.com/drive/api/guides/manage-revisions).
     ///
     /// # Arguments
     ///
@@ -3628,7 +4206,7 @@ impl<'a, C> RevisionMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a revision's metadata or content by ID.
+    /// Gets a revision's metadata or content by ID. For more information, see [Manage file revisions](https://developers.google.com/workspace/drive/api/guides/manage-revisions).
     ///
     /// # Arguments
     ///
@@ -3648,7 +4226,7 @@ impl<'a, C> RevisionMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists a file's revisions.
+    /// Lists a file's revisions. For more information, see [Manage file revisions](https://developers.google.com/workspace/drive/api/guides/manage-revisions).
     ///
     /// # Arguments
     ///
@@ -3667,7 +4245,7 @@ impl<'a, C> RevisionMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a revision with patch semantics.
+    /// Updates a revision with patch semantics. For more information, see [Manage file revisions](https://developers.google.com/workspace/drive/api/guides/manage-revisions).
     ///
     /// # Arguments
     ///
@@ -3708,9 +4286,20 @@ impl<'a, C> RevisionMethods<'a, C> {
 /// use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3721,7 +4310,7 @@ impl<'a, C> RevisionMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = DriveHub::new(client, auth);
@@ -3836,7 +4425,7 @@ impl<'a, C> TeamdriveMethods<'a, C> {
 // CallBuilders   ###
 // #################
 
-/// Gets information about the user, the user's Drive, and system capabilities.
+/// Gets information about the user, the user's Drive, and system capabilities. For more information, see [Return user info](https://developers.google.com/workspace/drive/api/guides/user-info). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
 ///
 /// A builder for the *get* method supported by a *about* resource.
 /// It is not used directly, but through a [`AboutMethods`] instance.
@@ -3853,9 +4442,20 @@ impl<'a, C> TeamdriveMethods<'a, C> {
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3866,7 +4466,7 @@ impl<'a, C> TeamdriveMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -4098,7 +4698,976 @@ where
     }
 }
 
-/// Gets a specific app.
+/// Retrieves an access proposal by ID. For more information, see [Manage pending access proposals](https://developers.google.com/workspace/drive/api/guides/pending-access).
+///
+/// A builder for the *get* method supported by a *accessproposal* resource.
+/// It is not used directly, but through a [`AccessproposalMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_drive3 as drive3;
+/// # async fn dox() {
+/// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DriveHub::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accessproposals().get("fileId", "proposalId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AccessproposalGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DriveHub<C>,
+    _file_id: String,
+    _proposal_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for AccessproposalGetCall<'a, C> {}
+
+impl<'a, C> AccessproposalGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, AccessProposal)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "drive.accessproposals.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "fileId", "proposalId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("proposalId", self._proposal_id);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/accessproposals/{proposalId}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::MetadataReadonly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in
+            [("{fileId}", "fileId"), ("{proposalId}", "proposalId")].iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["proposalId", "fileId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The ID of the item the request is on.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> AccessproposalGetCall<'a, C> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// Required. The ID of the access proposal to resolve.
+    ///
+    /// Sets the *proposal id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn proposal_id(mut self, new_value: &str) -> AccessproposalGetCall<'a, C> {
+        self._proposal_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AccessproposalGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> AccessproposalGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> AccessproposalGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccessproposalGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccessproposalGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// List the access proposals on a file. For more information, see [Manage pending access proposals](https://developers.google.com/workspace/drive/api/guides/pending-access). Note: Only approvers are able to list access proposals on a file. If the user isn't an approver, a 403 error is returned.
+///
+/// A builder for the *list* method supported by a *accessproposal* resource.
+/// It is not used directly, but through a [`AccessproposalMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_drive3 as drive3;
+/// # async fn dox() {
+/// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DriveHub::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accessproposals().list("fileId")
+///              .page_token("amet.")
+///              .page_size(-96)
+///              .doit().await;
+/// # }
+/// ```
+pub struct AccessproposalListCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DriveHub<C>,
+    _file_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for AccessproposalListCall<'a, C> {}
+
+impl<'a, C> AccessproposalListCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ListAccessProposalsResponse)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "drive.accessproposals.list",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "fileId", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/accessproposals";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::MetadataReadonly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["fileId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The ID of the item the request is on.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> AccessproposalListCall<'a, C> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// Optional. The continuation token on the list of access requests.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AccessproposalListCall<'a, C> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The number of results per page.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AccessproposalListCall<'a, C> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AccessproposalListCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> AccessproposalListCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MetadataReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> AccessproposalListCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccessproposalListCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccessproposalListCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Approves or denies an access proposal. For more information, see [Manage pending access proposals](https://developers.google.com/workspace/drive/api/guides/pending-access).
+///
+/// A builder for the *resolve* method supported by a *accessproposal* resource.
+/// It is not used directly, but through a [`AccessproposalMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_drive3 as drive3;
+/// use drive3::api::ResolveAccessProposalRequest;
+/// # async fn dox() {
+/// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DriveHub::new(client, auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ResolveAccessProposalRequest::default();
+///
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accessproposals().resolve(req, "fileId", "proposalId")
+///              .doit().await;
+/// # }
+/// ```
+pub struct AccessproposalResolveCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DriveHub<C>,
+    _request: ResolveAccessProposalRequest,
+    _file_id: String,
+    _proposal_id: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for AccessproposalResolveCall<'a, C> {}
+
+impl<'a, C> AccessproposalResolveCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<common::Response> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "drive.accessproposals.resolve",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["fileId", "proposalId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        params.push("proposalId", self._proposal_id);
+
+        params.extend(self._additional_params.iter());
+
+        let mut url =
+            self.hub._base_url.clone() + "files/{fileId}/accessproposals/{proposalId}:resolve";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in
+            [("{fileId}", "fileId"), ("{proposalId}", "proposalId")].iter()
+        {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["proposalId", "fileId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader = {
+            let mut value = serde_json::value::to_value(&self._request).expect("serde to work");
+            common::remove_json_null_values(&mut value);
+            let mut dst = std::io::Cursor::new(Vec::with_capacity(128));
+            serde_json::to_writer(&mut dst, &value).unwrap();
+            dst
+        };
+        let request_size = request_value_reader
+            .seek(std::io::SeekFrom::End(0))
+            .unwrap();
+        request_value_reader
+            .seek(std::io::SeekFrom::Start(0))
+            .unwrap();
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            request_value_reader
+                .seek(std::io::SeekFrom::Start(0))
+                .unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_TYPE, json_mime_type.to_string())
+                    .header(CONTENT_LENGTH, request_size as u64)
+                    .body(common::to_body(
+                        request_value_reader.get_ref().clone().into(),
+                    ));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = common::Response::from_parts(parts, body);
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(
+        mut self,
+        new_value: ResolveAccessProposalRequest,
+    ) -> AccessproposalResolveCall<'a, C> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The ID of the item the request is on.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> AccessproposalResolveCall<'a, C> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// Required. The ID of the access proposal to resolve.
+    ///
+    /// Sets the *proposal id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn proposal_id(mut self, new_value: &str) -> AccessproposalResolveCall<'a, C> {
+        self._proposal_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AccessproposalResolveCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> AccessproposalResolveCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> AccessproposalResolveCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> AccessproposalResolveCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccessproposalResolveCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Gets a specific app. For more information, see [Return user info](https://developers.google.com/workspace/drive/api/guides/user-info).
 ///
 /// A builder for the *get* method supported by a *app* resource.
 /// It is not used directly, but through a [`AppMethods`] instance.
@@ -4115,9 +5684,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4128,7 +5708,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -4380,7 +5960,7 @@ where
     }
 }
 
-/// Lists a user's installed apps.
+/// Lists a user's installed apps. For more information, see [Return user info](https://developers.google.com/workspace/drive/api/guides/user-info).
 ///
 /// A builder for the *list* method supported by a *app* resource.
 /// It is not used directly, but through a [`AppMethods`] instance.
@@ -4397,9 +5977,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4410,7 +6001,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -4419,8 +6010,8 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().list()
 ///              .language_code("et")
-///              .app_filter_mime_types("voluptua.")
-///              .app_filter_extensions("amet.")
+///              .app_filter_mime_types("sadipscing")
+///              .app_filter_extensions("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4684,7 +6275,7 @@ where
     }
 }
 
-/// Gets the starting pageToken for listing future changes.
+/// Gets the starting pageToken for listing future changes. For more information, see [Retrieve changes](https://developers.google.com/workspace/drive/api/guides/manage-changes).
 ///
 /// A builder for the *getStartPageToken* method supported by a *change* resource.
 /// It is not used directly, but through a [`ChangeMethods`] instance.
@@ -4701,9 +6292,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4714,7 +6316,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -4722,10 +6324,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("consetetur")
+///              .team_drive_id("dolor")
 ///              .supports_team_drives(false)
-///              .supports_all_drives(true)
-///              .drive_id("et")
+///              .supports_all_drives(false)
+///              .drive_id("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5005,7 +6607,7 @@ where
     }
 }
 
-/// Lists the changes for a user or shared drive.
+/// Lists the changes for a user or shared drive. For more information, see [Retrieve changes](https://developers.google.com/workspace/drive/api/guides/manage-changes).
 ///
 /// A builder for the *list* method supported by a *change* resource.
 /// It is not used directly, but through a [`ChangeMethods`] instance.
@@ -5022,9 +6624,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5035,7 +6648,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -5043,16 +6656,16 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list("pageToken")
-///              .team_drive_id("sadipscing")
-///              .supports_team_drives(false)
-///              .supports_all_drives(false)
-///              .spaces("vero")
-///              .restrict_to_my_drive(false)
-///              .page_size(-65)
+///              .team_drive_id("vero")
+///              .supports_team_drives(true)
+///              .supports_all_drives(true)
+///              .spaces("ipsum")
+///              .restrict_to_my_drive(true)
+///              .page_size(-46)
 ///              .include_team_drive_items(false)
-///              .include_removed(true)
-///              .include_permissions_for_view("Lorem")
-///              .include_labels("diam")
+///              .include_removed(false)
+///              .include_permissions_for_view("amet.")
+///              .include_labels("sed")
 ///              .include_items_from_all_drives(true)
 ///              .include_corpus_removals(false)
 ///              .drive_id("accusam")
@@ -5453,7 +7066,7 @@ where
     }
 }
 
-/// Subscribes to changes for a user.
+/// Subscribes to changes for a user. For more information, see [Notifications for resource changes](https://developers.google.com/workspace/drive/api/guides/push).
 ///
 /// A builder for the *watch* method supported by a *change* resource.
 /// It is not used directly, but through a [`ChangeMethods`] instance.
@@ -5471,9 +7084,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5484,7 +7108,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -5497,19 +7121,19 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req, "pageToken")
-///              .team_drive_id("consetetur")
+///              .team_drive_id("dolore")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
-///              .spaces("amet.")
+///              .spaces("Lorem")
 ///              .restrict_to_my_drive(true)
-///              .page_size(-74)
-///              .include_team_drive_items(false)
+///              .page_size(-11)
+///              .include_team_drive_items(true)
 ///              .include_removed(false)
-///              .include_permissions_for_view("amet.")
-///              .include_labels("ea")
-///              .include_items_from_all_drives(false)
+///              .include_permissions_for_view("et")
+///              .include_labels("tempor")
+///              .include_items_from_all_drives(true)
 ///              .include_corpus_removals(true)
-///              .drive_id("no")
+///              .drive_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5631,7 +7255,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "changes/watch";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::MeetReadonly.as_ref().to_string());
         }
 
         let url = params.parse_with_url(&url);
@@ -5900,7 +7525,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::MeetReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5937,7 +7562,7 @@ where
     }
 }
 
-/// Stops watching resources through this channel.
+/// Stops watching resources through this channel. For more information, see [Notifications for resource changes](https://developers.google.com/workspace/drive/api/guides/push).
 ///
 /// A builder for the *stop* method supported by a *channel* resource.
 /// It is not used directly, but through a [`ChannelMethods`] instance.
@@ -5955,9 +7580,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5968,7 +7604,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -6029,7 +7665,8 @@ where
 
         let mut url = self.hub._base_url.clone() + "channels/stop";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::MeetReadonly.as_ref().to_string());
         }
 
         let url = params.parse_with_url(&url);
@@ -6184,7 +7821,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::MeetReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6221,7 +7858,7 @@ where
     }
 }
 
-/// Creates a comment on a file.
+/// Creates a comment on a file. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
 ///
 /// A builder for the *create* method supported by a *comment* resource.
 /// It is not used directly, but through a [`CommentMethods`] instance.
@@ -6239,9 +7876,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6252,7 +7900,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -6540,7 +8188,7 @@ where
     }
 }
 
-/// Deletes a comment.
+/// Deletes a comment. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments).
 ///
 /// A builder for the *delete* method supported by a *comment* resource.
 /// It is not used directly, but through a [`CommentMethods`] instance.
@@ -6557,9 +8205,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6570,7 +8229,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -6822,7 +8481,7 @@ where
     }
 }
 
-/// Gets a comment by ID.
+/// Gets a comment by ID. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
 ///
 /// A builder for the *get* method supported by a *comment* resource.
 /// It is not used directly, but through a [`CommentMethods`] instance.
@@ -6839,9 +8498,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6852,7 +8522,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -7131,7 +8801,7 @@ where
     }
 }
 
-/// Lists a file's comments.
+/// Lists a file's comments. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
 ///
 /// A builder for the *list* method supported by a *comment* resource.
 /// It is not used directly, but through a [`CommentMethods`] instance.
@@ -7148,9 +8818,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7161,7 +8842,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -7169,9 +8850,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .start_modified_time("ipsum")
-///              .page_token("et")
-///              .page_size(-8)
+///              .start_modified_time("At")
+///              .page_token("sadipscing")
+///              .page_size(-32)
 ///              .include_deleted(true)
 ///              .doit().await;
 /// # }
@@ -7471,7 +9152,7 @@ where
     }
 }
 
-/// Updates a comment with patch semantics.
+/// Updates a comment with patch semantics. For more information, see [Manage comments and replies](https://developers.google.com/workspace/drive/api/guides/manage-comments). Required: The `fields` parameter must be set. To return the exact fields you need, see [Return specific fields](https://developers.google.com/workspace/drive/api/guides/fields-parameter).
 ///
 /// A builder for the *update* method supported by a *comment* resource.
 /// It is not used directly, but through a [`CommentMethods`] instance.
@@ -7489,9 +9170,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7502,7 +9194,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -7804,7 +9496,7 @@ where
     }
 }
 
-/// Creates a shared drive.
+/// Creates a shared drive. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
 ///
 /// A builder for the *create* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -7822,9 +9514,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7835,7 +9538,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -8114,7 +9817,7 @@ where
     }
 }
 
-/// Permanently deletes a shared drive for which the user is an `organizer`. The shared drive cannot contain any untrashed items.
+/// Permanently deletes a shared drive for which the user is an `organizer`. The shared drive cannot contain any untrashed items. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
 ///
 /// A builder for the *delete* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -8131,9 +9834,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8144,7 +9858,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -8153,7 +9867,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().delete("driveId")
 ///              .use_domain_admin_access(true)
-///              .allow_item_deletion(true)
+///              .allow_item_deletion(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8406,7 +10120,7 @@ where
     }
 }
 
-/// Gets a shared drive's metadata by ID.
+/// Gets a shared drive's metadata by ID. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
 ///
 /// A builder for the *get* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -8423,9 +10137,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8436,7 +10161,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -8444,7 +10169,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().get("driveId")
-///              .use_domain_admin_access(false)
+///              .use_domain_admin_access(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8700,7 +10425,7 @@ where
     }
 }
 
-/// Hides a shared drive from the default view.
+/// Hides a shared drive from the default view. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
 ///
 /// A builder for the *hide* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -8717,9 +10442,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8730,7 +10466,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -8982,7 +10718,7 @@ where
     }
 }
 
-/// Lists the user’s shared drives. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for shared drives](https://developers.google.com/drive/api/guides/search-shareddrives) guide.
+/// Lists the user’s shared drives. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for shared drives](https://developers.google.com/workspace/drive/api/guides/search-shareddrives) guide.
 ///
 /// A builder for the *list* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -8999,9 +10735,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9012,7 +10759,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -9021,9 +10768,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().list()
 ///              .use_domain_admin_access(false)
-///              .q("no")
-///              .page_token("nonumy")
-///              .page_size(-77)
+///              .q("elitr")
+///              .page_token("duo")
+///              .page_size(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9291,7 +11038,7 @@ where
     }
 }
 
-/// Restores a shared drive to the default view.
+/// Restores a shared drive to the default view. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
 ///
 /// A builder for the *unhide* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -9308,9 +11055,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9321,7 +11079,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -9573,7 +11331,7 @@ where
     }
 }
 
-/// Updates the metadata for a shared drive.
+/// Updates the metadata for a shared drive. For more information, see [Manage shared drives](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives).
 ///
 /// A builder for the *update* method supported by a *drive* resource.
 /// It is not used directly, but through a [`DriveMethods`] instance.
@@ -9591,9 +11349,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9604,7 +11373,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -9617,7 +11386,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.drives().update(req, "driveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9904,7 +11673,7 @@ where
     }
 }
 
-/// Creates a copy of a file and applies any requested updates with patch semantics.
+/// Creates a copy of a file and applies any requested updates with patch semantics. For more information, see [Create and manage files](https://developers.google.com/workspace/drive/api/guides/create-file).
 ///
 /// A builder for the *copy* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -9922,9 +11691,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9935,7 +11715,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -9948,14 +11728,14 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().copy(req, "fileId")
-///              .supports_team_drives(false)
+///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .ocr_language("est")
+///              .ocr_language("sea")
 ///              .keep_revision_forever(false)
-///              .include_permissions_for_view("consetetur")
-///              .include_labels("Stet")
-///              .ignore_default_visibility(false)
-///              .enforce_single_parent(false)
+///              .include_permissions_for_view("At")
+///              .include_labels("dolore")
+///              .ignore_default_visibility(true)
+///              .enforce_single_parent(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10052,7 +11832,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/copy";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::PhotoReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -10215,14 +11996,14 @@ where
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
+    /// Whether to set the `keepForever` field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
     pub fn keep_revision_forever(mut self, new_value: bool) -> FileCopyCall<'a, C> {
         self._keep_revision_forever = Some(new_value);
         self
     }
-    /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
+    /// Specifies which additional view's permissions to include in the response. Only `published` is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCopyCall<'a, C> {
@@ -10243,7 +12024,7 @@ where
         self._ignore_default_visibility = Some(new_value);
         self
     }
-    /// Deprecated. Copying files into multiple folders is no longer supported. Use shortcuts instead.
+    /// Deprecated: Copying files into multiple folders is no longer supported. Use shortcuts instead.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a, C> {
@@ -10295,7 +12076,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::PhotoReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10332,7 +12113,7 @@ where
     }
 }
 
-/// Creates a new file. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](https://developers.google.com/drive/api/guides/manage-uploads). Apps creating shortcuts with `files.create` must specify the MIME type `application/vnd.google-apps.shortcut`. Apps should specify a file extension in the `name` property when inserting files with the API. For example, an operation to insert a JPEG file should specify something like `"name": "cat.jpg"` in the metadata. Subsequent `GET` requests include the read-only `fileExtension` property populated with the extension originally specified in the `title` property. When a Google Drive user requests to download a file, or when the file is downloaded through the sync client, Drive builds a full filename (with extension) based on the title. In cases where the extension is missing, Drive attempts to determine the extension based on the file’s MIME type.
+/// Creates a file. For more information, see [Create and manage files](https://developers.google.com/workspace/drive/api/guides/create-file). This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:* `*/*` (Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information, see [Google Workspace and Google Drive supported MIME types](https://developers.google.com/workspace/drive/api/guides/mime-types).) For more information on uploading files, see [Upload file data](https://developers.google.com/workspace/drive/api/guides/manage-uploads). Apps creating shortcuts with the `create` method must specify the MIME type `application/vnd.google-apps.shortcut`. Apps should specify a file extension in the `name` property when inserting files with the API. For example, an operation to insert a JPEG file should specify something like `"name": "cat.jpg"` in the metadata. Subsequent `GET` requests include the read-only `fileExtension` property populated with the extension originally specified in the `name` property. When a Google Drive user requests to download a file, or when the file is downloaded through the sync client, Drive builds a full filename (with extension) based on the name. In cases where the extension is missing, Drive attempts to determine the extension based on the file’s MIME type.
 ///
 /// A builder for the *create* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -10351,9 +12132,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10364,7 +12156,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -10379,13 +12171,13 @@ where
 /// let result = hub.files().create(req)
 ///              .use_content_as_indexable_text(true)
 ///              .supports_team_drives(true)
-///              .supports_all_drives(true)
-///              .ocr_language("sed")
-///              .keep_revision_forever(false)
+///              .supports_all_drives(false)
+///              .ocr_language("accusam")
+///              .keep_revision_forever(true)
 ///              .include_permissions_for_view("Lorem")
-///              .include_labels("ea")
-///              .ignore_default_visibility(true)
-///              .enforce_single_parent(false)
+///              .include_labels("et")
+///              .ignore_default_visibility(false)
+///              .enforce_single_parent(true)
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -10799,14 +12591,14 @@ where
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
+    /// Whether to set the `keepForever` field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
     pub fn keep_revision_forever(mut self, new_value: bool) -> FileCreateCall<'a, C> {
         self._keep_revision_forever = Some(new_value);
         self
     }
-    /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
+    /// Specifies which additional view's permissions to include in the response. Only `published` is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCreateCall<'a, C> {
@@ -10827,7 +12619,7 @@ where
         self._ignore_default_visibility = Some(new_value);
         self
     }
-    /// Deprecated. Creating files in multiple folders is no longer supported.
+    /// Deprecated: Creating files in multiple folders is no longer supported.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FileCreateCall<'a, C> {
@@ -10916,7 +12708,7 @@ where
     }
 }
 
-/// Permanently deletes a file owned by the user without moving it to the trash. If the file belongs to a shared drive, the user must be an `organizer` on the parent folder. If the target is a folder, all descendants owned by the user are also deleted.
+/// Permanently deletes a file owned by the user without moving it to the trash. For more information, see [Trash or delete files and folders](https://developers.google.com/workspace/drive/api/guides/delete). If the file belongs to a shared drive, the user must be an `organizer` on the parent folder. If the target is a folder, all descendants owned by the user are also deleted.
 ///
 /// A builder for the *delete* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -10933,9 +12725,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10946,7 +12749,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -10954,9 +12757,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().delete("fileId")
-///              .supports_team_drives(false)
+///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .enforce_single_parent(true)
+///              .enforce_single_parent(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11138,7 +12941,7 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// Deprecated: If an item is not in a shared drive and its last parent is deleted but the item itself is not, the item will be placed under its owner's root.
+    /// Deprecated: If an item isn't in a shared drive and its last parent is deleted but the item itself isn't, the item will be placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FileDeleteCall<'a, C> {
@@ -11227,7 +13030,324 @@ where
     }
 }
 
-/// Permanently deletes all of the user's trashed files.
+/// Downloads the content of a file. For more information, see [Download and export files](https://developers.google.com/workspace/drive/api/guides/manage-downloads). Operations are valid for 24 hours from the time of creation.
+///
+/// A builder for the *download* method supported by a *file* resource.
+/// It is not used directly, but through a [`FileMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_drive3 as drive3;
+/// # async fn dox() {
+/// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DriveHub::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.files().download("fileId")
+///              .revision_id("aliquyam")
+///              .mime_type("eos")
+///              .doit().await;
+/// # }
+/// ```
+pub struct FileDownloadCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DriveHub<C>,
+    _file_id: String,
+    _revision_id: Option<String>,
+    _mime_type: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for FileDownloadCall<'a, C> {}
+
+impl<'a, C> FileDownloadCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "drive.files.download",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in ["alt", "fileId", "revisionId", "mimeType"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("fileId", self._file_id);
+        if let Some(value) = self._revision_id.as_ref() {
+            params.push("revisionId", value);
+        }
+        if let Some(value) = self._mime_type.as_ref() {
+            params.push("mimeType", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "files/{fileId}/download";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{fileId}", "fileId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["fileId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The ID of the file to download.
+    ///
+    /// Sets the *file id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn file_id(mut self, new_value: &str) -> FileDownloadCall<'a, C> {
+        self._file_id = new_value.to_string();
+        self
+    }
+    /// Optional. The revision ID of the file to download. This field can only be set when downloading blob files, Google Docs, and Google Sheets. Returns `INVALID_ARGUMENT` if downloading a specific revision on the file is unsupported.
+    ///
+    /// Sets the *revision id* query property to the given value.
+    pub fn revision_id(mut self, new_value: &str) -> FileDownloadCall<'a, C> {
+        self._revision_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The MIME type the file should be downloaded as. This field can only be set when downloading Google Workspace documents. For a list of supported MIME types, see [Export MIME types for Google Workspace documents](https://developers.google.com/workspace/drive/api/guides/ref-export-formats). If not set, a Google Workspace document is downloaded with a default MIME type. The default MIME type might change in the future.
+    ///
+    /// Sets the *mime type* query property to the given value.
+    pub fn mime_type(mut self, new_value: &str) -> FileDownloadCall<'a, C> {
+        self._mime_type = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> FileDownloadCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> FileDownloadCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Readonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> FileDownloadCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> FileDownloadCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> FileDownloadCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Permanently deletes all of the user's trashed files. For more information, see [Trash or delete files and folders](https://developers.google.com/workspace/drive/api/guides/delete).
 ///
 /// A builder for the *emptyTrash* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -11244,9 +13364,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11257,7 +13388,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -11265,8 +13396,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().empty_trash()
-///              .enforce_single_parent(true)
-///              .drive_id("erat")
+///              .enforce_single_parent(false)
+///              .drive_id("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11402,7 +13533,7 @@ where
         }
     }
 
-    /// Deprecated: If an item is not in a shared drive and its last parent is deleted but the item itself is not, the item will be placed under its owner's root.
+    /// Deprecated: If an item isn't in a shared drive and its last parent is deleted but the item itself isn't, the item will be placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> FileEmptyTrashCall<'a, C> {
@@ -11501,7 +13632,7 @@ where
     }
 }
 
-/// Exports a Google Workspace document to the requested MIME type and returns exported byte content. Note that the exported content is limited to 10MB.
+/// Exports a Google Workspace document to the requested MIME type and returns exported byte content. For more information, see [Download and export files](https://developers.google.com/workspace/drive/api/guides/manage-downloads). Note that the exported content is limited to 10 MB.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -11521,9 +13652,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11534,7 +13676,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -11693,7 +13835,7 @@ where
         self._file_id = new_value.to_string();
         self
     }
-    /// Required. The MIME type of the format requested for this export.
+    /// Required. The MIME type of the format requested for this export. For a list of supported MIME types, see [Export MIME types for Google Workspace documents](https://developers.google.com/workspace/drive/api/guides/ref-export-formats).
     ///
     /// Sets the *mime type* query property to the given value.
     ///
@@ -11785,7 +13927,7 @@ where
     }
 }
 
-/// Generates a set of file IDs which can be provided in create or copy requests.
+/// Generates a set of file IDs which can be provided in create or copy requests. For more information, see [Create and manage files](https://developers.google.com/workspace/drive/api/guides/create-file).
 ///
 /// A builder for the *generateIds* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -11802,9 +13944,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11815,7 +13968,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -11823,9 +13976,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().generate_ids()
-///              .type_("accusam")
-///              .space("sea")
-///              .count(-59)
+///              .type_("dolor")
+///              .space("aliquyam")
+///              .count(-61)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11979,14 +14132,14 @@ where
         }
     }
 
-    /// The type of items which the IDs can be used for. Supported values are 'files' and 'shortcuts'. Note that 'shortcuts' are only supported in the `drive` 'space'. (Default: 'files')
+    /// The type of items which the IDs can be used for. Supported values are `files` and `shortcuts`. Note that `shortcuts` are only supported in the `drive` `space`. (Default: `files`.) For more information, see [File organization](https://developers.google.com/workspace/drive/api/guides/about-files#file-organization).
     ///
     /// Sets the *type* query property to the given value.
     pub fn type_(mut self, new_value: &str) -> FileGenerateIdCall<'a, C> {
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// The space in which the IDs can be used to create new files. Supported values are 'drive' and 'appDataFolder'. (Default: 'drive')
+    /// The space in which the IDs can be used to create files. Supported values are `drive` and `appDataFolder`. (Default: `drive`.) For more information, see [File organization](https://developers.google.com/workspace/drive/api/guides/about-files#file-organization).
     ///
     /// Sets the *space* query property to the given value.
     pub fn space(mut self, new_value: &str) -> FileGenerateIdCall<'a, C> {
@@ -12085,7 +14238,7 @@ where
     }
 }
 
-/// Gets a file’s metadata or content by ID. If you provide the URL parameter `alt=media`, then the response includes the file contents in the response body. Downloading content with `alt=media` only works if the file is stored in Drive. To download Google Docs, Sheets, and Slides use [`files.export`](https://developers.google.com/drive/api/reference/rest/v3/files/export) instead. For more information, see [Download & export files](https://developers.google.com/drive/api/guides/manage-downloads).
+/// Gets a file’s metadata or content by ID. For more information, see [Search for files and folders](https://developers.google.com/workspace/drive/api/guides/search-files). If you provide the URL parameter `alt=media`, then the response includes the file contents in the response body. Downloading content with `alt=media` only works if the file is stored in Drive. To download Google Docs, Sheets, and Slides use [`files.export`](https://developers.google.com/workspace/drive/api/reference/rest/v3/files/export) instead. For more information, see [Download and export files](https://developers.google.com/workspace/drive/api/guides/manage-downloads).
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -12107,9 +14260,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12120,7 +14284,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -12128,10 +14292,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().get("fileId")
-///              .supports_team_drives(false)
+///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .include_permissions_for_view("erat")
-///              .include_labels("sea")
+///              .include_permissions_for_view("accusam")
+///              .include_labels("gubergren")
 ///              .acknowledge_abuse(true)
 ///              .doit().await;
 /// # }
@@ -12353,7 +14517,7 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
+    /// Specifies which additional view's permissions to include in the response. Only `published` is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> FileGetCall<'a, C> {
@@ -12367,7 +14531,7 @@ where
         self._include_labels = Some(new_value.to_string());
         self
     }
-    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
+    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when the `alt` parameter is set to `media` and the user is the owner of the file or an organizer of the shared drive in which the file resides.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
     pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a, C> {
@@ -12456,7 +14620,7 @@ where
     }
 }
 
-/// Lists the user’s files. This method accepts the `q` parameter, which is a search query combining one or more search terms. For more information, see the [Search for files & folders](https://developers.google.com/drive/api/guides/search-files) guide. *Note:* This method returns *all* files by default, including trashed files. If you don’t want trashed files to appear in the list, use the `trashed=false` query parameter to remove trashed files from the results.
+/// Lists the user’s files. For more information, see [Search for files and folders](https://developers.google.com/workspace/drive/api/guides/search-files). This method accepts the `q` parameter, which is a search query combining one or more search terms. This method returns *all* files by default, including trashed files. If you don’t want trashed files to appear in the list, use the `trashed=false` query parameter to remove trashed files from the results.
 ///
 /// A builder for the *list* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -12473,9 +14637,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12486,7 +14661,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -12494,20 +14669,20 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .team_drive_id("et")
+///              .team_drive_id("At")
 ///              .supports_team_drives(true)
-///              .supports_all_drives(false)
-///              .spaces("sit")
-///              .q("aliquyam")
-///              .page_token("eos")
-///              .page_size(-77)
-///              .order_by("dolores")
-///              .include_team_drive_items(true)
-///              .include_permissions_for_view("gubergren")
-///              .include_labels("dolor")
-///              .include_items_from_all_drives(true)
-///              .drive_id("amet.")
-///              .corpus("ipsum")
+///              .supports_all_drives(true)
+///              .spaces("magna")
+///              .q("et")
+///              .page_token("rebum.")
+///              .page_size(-4)
+///              .order_by("Lorem")
+///              .include_team_drive_items(false)
+///              .include_permissions_for_view("amet.")
+///              .include_labels("no")
+///              .include_items_from_all_drives(false)
+///              .drive_id("sed")
+///              .corpus("kasd")
 ///              .corpora("Lorem")
 ///              .doit().await;
 /// # }
@@ -12751,21 +14926,21 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// A comma-separated list of spaces to query within the corpora. Supported values are 'drive' and 'appDataFolder'.
+    /// A comma-separated list of spaces to query within the corpora. Supported values are `drive` and `appDataFolder`. For more information, see [File organization](https://developers.google.com/workspace/drive/api/guides/about-files#file-organization).
     ///
     /// Sets the *spaces* query property to the given value.
     pub fn spaces(mut self, new_value: &str) -> FileListCall<'a, C> {
         self._spaces = Some(new_value.to_string());
         self
     }
-    /// A query for filtering the file results. See the "Search for files & folders" guide for supported syntax.
+    /// A query for filtering the file results. For supported syntax, see [Search for files and folders](https://developers.google.com/workspace/drive/api/guides/search-files).
     ///
     /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> FileListCall<'a, C> {
         self._q = Some(new_value.to_string());
         self
     }
-    /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
+    /// The token for continuing a previous list request on the next page. This should be set to the value of `nextPageToken` from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, C> {
@@ -12779,7 +14954,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// A comma-separated list of sort keys. Valid keys are 'createdTime', 'folder', 'modifiedByMeTime', 'modifiedTime', 'name', 'name_natural', 'quotaBytesUsed', 'recency', 'sharedWithMeTime', 'starred', and 'viewedByMeTime'. Each key sorts ascending by default, but can be reversed with the 'desc' modifier. Example usage: ?orderBy=folder,modifiedTime desc,name.
+    /// A comma-separated list of sort keys. Valid keys are: * `createdTime`: When the file was created. * `folder`: The folder ID. This field is sorted using alphabetical ordering. * `modifiedByMeTime`: The last time the file was modified by the user. * `modifiedTime`: The last time the file was modified by anyone. * `name`: The name of the file. This field is sorted using alphabetical ordering, so 1, 12, 2, 22. * `name_natural`: The name of the file. This field is sorted using natural sort ordering, so 1, 2, 12, 22. * `quotaBytesUsed`: The number of storage quota bytes used by the file. * `recency`: The most recent timestamp from the file's date-time fields. * `sharedWithMeTime`: When the file was shared with the user, if applicable. * `starred`: Whether the user has starred the file. * `viewedByMeTime`: The last time the file was viewed by the user. Each key sorts ascending by default, but can be reversed with the `desc` modifier. Example usage: `?orderBy=folder,modifiedTime desc,name`.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> FileListCall<'a, C> {
@@ -12793,7 +14968,7 @@ where
         self._include_team_drive_items = Some(new_value);
         self
     }
-    /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
+    /// Specifies which additional view's permissions to include in the response. Only `published` is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> FileListCall<'a, C> {
@@ -12821,14 +14996,14 @@ where
         self._drive_id = Some(new_value.to_string());
         self
     }
-    /// Deprecated: The source of files to list. Use 'corpora' instead.
+    /// Deprecated: The source of files to list. Use `corpora` instead.
     ///
     /// Sets the *corpus* query property to the given value.
     pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, C> {
         self._corpus = Some(new_value.to_string());
         self
     }
-    /// Bodies of items (files/documents) to which the query applies. Supported bodies are 'user', 'domain', 'drive', and 'allDrives'. Prefer 'user' or 'drive' to 'allDrives' for efficiency. By default, corpora is set to 'user'. However, this can change depending on the filter set through the 'q' parameter.
+    /// Bodies of items (files or documents) to which the query applies. Supported bodies are: * `user` * `domain` * `drive` * `allDrives` Prefer `user` or `drive` to `allDrives` for efficiency. By default, corpora is set to `user`. However, this can change depending on the filter set through the `q` parameter. For more information, see [File organization](https://developers.google.com/workspace/drive/api/guides/about-files#file-organization).
     ///
     /// Sets the *corpora* query property to the given value.
     pub fn corpora(mut self, new_value: &str) -> FileListCall<'a, C> {
@@ -12917,7 +15092,7 @@ where
     }
 }
 
-/// Lists the labels on a file.
+/// Lists the labels on a file. For more information, see [List labels on a file](https://developers.google.com/workspace/drive/api/guides/list-labels).
 ///
 /// A builder for the *listLabels* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -12934,9 +15109,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12947,7 +15133,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -12955,8 +15141,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list_labels("fileId")
-///              .page_token("gubergren")
-///              .max_results(-45)
+///              .page_token("nonumy")
+///              .max_results(-66)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13128,7 +15314,7 @@ where
         self._file_id = new_value.to_string();
         self
     }
-    /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
+    /// The token for continuing a previous list request on the next page. This should be set to the value of `nextPageToken` from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> FileListLabelCall<'a, C> {
@@ -13224,7 +15410,7 @@ where
     }
 }
 
-/// Modifies the set of labels applied to a file. Returns a list of the labels that were added or modified.
+/// Modifies the set of labels applied to a file. For more information, see [Set a label field on a file](https://developers.google.com/workspace/drive/api/guides/set-label). Returns a list of the labels that were added or modified.
 ///
 /// A builder for the *modifyLabels* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -13242,9 +15428,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13255,7 +15452,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -13546,7 +15743,7 @@ where
     }
 }
 
-/// Updates a file’s metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as `modifiedDate`. This method supports patch semantics. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:*`*/*` Note: Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see [Upload file data](https://developers.google.com/drive/api/guides/manage-uploads).
+/// Updates a file’s metadata, content, or both. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as `modifiedDate`. This method supports patch semantics. This method supports an */upload* URI and accepts uploaded media with the following characteristics: - *Maximum file size:* 5,120 GB - *Accepted Media MIME types:* `*/*` (Specify a valid MIME type, rather than the literal `*/*` value. The literal `*/*` is only used to indicate that any valid MIME type can be uploaded. For more information, see [Google Workspace and Google Drive supported MIME types](https://developers.google.com/workspace/drive/api/guides/mime-types).) For more information on uploading files, see [Upload file data](https://developers.google.com/workspace/drive/api/guides/manage-uploads).
 ///
 /// A builder for the *update* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -13565,9 +15762,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13578,7 +15786,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -13593,14 +15801,14 @@ where
 /// let result = hub.files().update(req, "fileId")
 ///              .use_content_as_indexable_text(true)
 ///              .supports_team_drives(false)
-///              .supports_all_drives(true)
-///              .remove_parents("dolor")
-///              .ocr_language("Lorem")
-///              .keep_revision_forever(false)
-///              .include_permissions_for_view("amet.")
-///              .include_labels("no")
-///              .enforce_single_parent(false)
-///              .add_parents("sed")
+///              .supports_all_drives(false)
+///              .remove_parents("ut")
+///              .ocr_language("At")
+///              .keep_revision_forever(true)
+///              .include_permissions_for_view("vero")
+///              .include_labels("duo")
+///              .enforce_single_parent(true)
+///              .add_parents("ut")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
@@ -14246,14 +16454,14 @@ where
         self._ocr_language = Some(new_value.to_string());
         self
     }
-    /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
+    /// Whether to set the `keepForever` field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
     pub fn keep_revision_forever(mut self, new_value: bool) -> FileUpdateCall<'a, C> {
         self._keep_revision_forever = Some(new_value);
         self
     }
-    /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
+    /// Specifies which additional view's permissions to include in the response. Only `published` is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> FileUpdateCall<'a, C> {
@@ -14363,7 +16571,7 @@ where
     }
 }
 
-/// Subscribes to changes to a file.
+/// Subscribes to changes to a file. For more information, see [Notifications for resource changes](https://developers.google.com/workspace/drive/api/guides/push).
 ///
 /// A builder for the *watch* method supported by a *file* resource.
 /// It is not used directly, but through a [`FileMethods`] instance.
@@ -14381,9 +16589,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14394,7 +16613,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -14409,9 +16628,9 @@ where
 /// let result = hub.files().watch(req, "fileId")
 ///              .supports_team_drives(false)
 ///              .supports_all_drives(true)
-///              .include_permissions_for_view("nonumy")
-///              .include_labels("rebum.")
-///              .acknowledge_abuse(true)
+///              .include_permissions_for_view("sadipscing")
+///              .include_labels("tempor")
+///              .acknowledge_abuse(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14493,7 +16712,8 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "files/{fileId}/watch";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes
+                .insert(Scope::MeetReadonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -14649,7 +16869,7 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
+    /// Specifies which additional view's permissions to include in the response. Only `published` is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> FileWatchCall<'a, C> {
@@ -14663,7 +16883,7 @@ where
         self._include_labels = Some(new_value.to_string());
         self
     }
-    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
+    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when the `alt` parameter is set to `media` and the user is the owner of the file or an organizer of the shared drive in which the file resides.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
     pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a, C> {
@@ -14715,7 +16935,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::MeetReadonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14752,7 +16972,301 @@ where
     }
 }
 
-/// Creates a permission for a file or shared drive. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied.
+/// Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
+///
+/// A builder for the *get* method supported by a *operation* resource.
+/// It is not used directly, but through a [`OperationMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_drive3 as drive3;
+/// # async fn dox() {
+/// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = DriveHub::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.operations().get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct OperationGetCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a DriveHub<C>,
+    _name: String,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for OperationGetCall<'a, C> {}
+
+impl<'a, C> OperationGetCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, Operation)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "drive.operations.get",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "operations/{name}";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::MeetReadonly.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn common::Delegate) -> OperationGetCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::MeetReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> OperationGetCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> OperationGetCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> OperationGetCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
+/// Creates a permission for a file or shared drive. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing). **Warning:** Concurrent permissions operations on the same file aren't supported; only the last update is applied.
 ///
 /// A builder for the *create* method supported by a *permission* resource.
 /// It is not used directly, but through a [`PermissionMethods`] instance.
@@ -14770,9 +17284,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14783,7 +17308,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -14797,13 +17322,14 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().create(req, "fileId")
 ///              .use_domain_admin_access(true)
-///              .transfer_ownership(false)
+///              .transfer_ownership(true)
 ///              .supports_team_drives(false)
-///              .supports_all_drives(true)
+///              .supports_all_drives(false)
 ///              .send_notification_email(false)
 ///              .move_to_new_owners_root(true)
-///              .enforce_single_parent(false)
-///              .email_message("rebum.")
+///              .enforce_single_parent(true)
+///              .enforce_expansive_access(false)
+///              .email_message("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14821,6 +17347,7 @@ where
     _send_notification_email: Option<bool>,
     _move_to_new_owners_root: Option<bool>,
     _enforce_single_parent: Option<bool>,
+    _enforce_expansive_access: Option<bool>,
     _email_message: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -14858,6 +17385,7 @@ where
             "sendNotificationEmail",
             "moveToNewOwnersRoot",
             "enforceSingleParent",
+            "enforceExpansiveAccess",
             "emailMessage",
         ]
         .iter()
@@ -14868,7 +17396,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(12 + self._additional_params.len());
+        let mut params = Params::with_capacity(13 + self._additional_params.len());
         params.push("fileId", self._file_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
             params.push("useDomainAdminAccess", value.to_string());
@@ -14890,6 +17418,9 @@ where
         }
         if let Some(value) = self._enforce_single_parent.as_ref() {
             params.push("enforceSingleParent", value.to_string());
+        }
+        if let Some(value) = self._enforce_expansive_access.as_ref() {
+            params.push("enforceExpansiveAccess", value.to_string());
         }
         if let Some(value) = self._email_message.as_ref() {
             params.push("emailMessage", value);
@@ -15042,14 +17573,14 @@ where
         self._file_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
+    /// Issue the request as a domain administrator. If set to `true`, and if the following additional conditions are met, the requester is granted access: 1. The file ID parameter refers to a shared drive. 2. The requester is an administrator of the domain to which the shared drive belongs. For more information, see [Manage shared drives as domain administrators](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives#manage-administrators).
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
-    /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect.
+    /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect. For more information, see [Transfer file ownership](https://developers.google.com/workspace/drive/api/guides/transfer-file).
     ///
     /// Sets the *transfer ownership* query property to the given value.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
@@ -15070,14 +17601,14 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// Whether to send a notification email when sharing to users or groups. This defaults to true for users and groups, and is not allowed for other requests. It must not be disabled for ownership transfers.
+    /// Whether to send a notification email when sharing to users or groups. This defaults to `true` for users and groups, and is not allowed for other requests. It must not be disabled for ownership transfers.
     ///
     /// Sets the *send notification email* query property to the given value.
     pub fn send_notification_email(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
         self._send_notification_email = Some(new_value);
         self
     }
-    /// This parameter will only take effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. If set to `true`, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to `false`, parents are not changed.
+    /// This parameter only takes effect if the item isn't in a shared drive and the request is attempting to transfer the ownership of the item. If set to `true`, the item is moved to the new owner's My Drive root folder and all prior parents removed. If set to `false`, parents aren't changed.
     ///
     /// Sets the *move to new owners root* query property to the given value.
     pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
@@ -15089,6 +17620,13 @@ where
     /// Sets the *enforce single parent* query property to the given value.
     pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
         self._enforce_single_parent = Some(new_value);
+        self
+    }
+    /// Whether the request should enforce expansive access rules.
+    ///
+    /// Sets the *enforce expansive access* query property to the given value.
+    pub fn enforce_expansive_access(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+        self._enforce_expansive_access = Some(new_value);
         self
     }
     /// A plain text custom message to include in the notification email.
@@ -15183,7 +17721,7 @@ where
     }
 }
 
-/// Deletes a permission. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied.
+/// Deletes a permission. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing). **Warning:** Concurrent permissions operations on the same file aren't supported; only the last update is applied.
 ///
 /// A builder for the *delete* method supported by a *permission* resource.
 /// It is not used directly, but through a [`PermissionMethods`] instance.
@@ -15200,9 +17738,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15213,7 +17762,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -15223,7 +17772,8 @@ where
 /// let result = hub.permissions().delete("fileId", "permissionId")
 ///              .use_domain_admin_access(false)
 ///              .supports_team_drives(true)
-///              .supports_all_drives(false)
+///              .supports_all_drives(true)
+///              .enforce_expansive_access(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15237,6 +17787,7 @@ where
     _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
+    _enforce_expansive_access: Option<bool>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -15269,6 +17820,7 @@ where
             "useDomainAdminAccess",
             "supportsTeamDrives",
             "supportsAllDrives",
+            "enforceExpansiveAccess",
         ]
         .iter()
         {
@@ -15278,7 +17830,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("fileId", self._file_id);
         params.push("permissionId", self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
@@ -15289,6 +17841,9 @@ where
         }
         if let Some(value) = self._supports_all_drives.as_ref() {
             params.push("supportsAllDrives", value.to_string());
+        }
+        if let Some(value) = self._enforce_expansive_access.as_ref() {
+            params.push("enforceExpansiveAccess", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -15406,7 +17961,7 @@ where
         self._permission_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
+    /// Issue the request as a domain administrator. If set to `true`, and if the following additional conditions are met, the requester is granted access: 1. The file ID parameter refers to a shared drive. 2. The requester is an administrator of the domain to which the shared drive belongs. For more information, see [Manage shared drives as domain administrators](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives#manage-administrators).
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionDeleteCall<'a, C> {
@@ -15425,6 +17980,13 @@ where
     /// Sets the *supports all drives* query property to the given value.
     pub fn supports_all_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, C> {
         self._supports_all_drives = Some(new_value);
+        self
+    }
+    /// Whether the request should enforce expansive access rules.
+    ///
+    /// Sets the *enforce expansive access* query property to the given value.
+    pub fn enforce_expansive_access(mut self, new_value: bool) -> PermissionDeleteCall<'a, C> {
+        self._enforce_expansive_access = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -15512,7 +18074,7 @@ where
     }
 }
 
-/// Gets a permission by ID.
+/// Gets a permission by ID. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing).
 ///
 /// A builder for the *get* method supported by a *permission* resource.
 /// It is not used directly, but through a [`PermissionMethods`] instance.
@@ -15529,9 +18091,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15542,7 +18115,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -15550,8 +18123,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("fileId", "permissionId")
-///              .use_domain_admin_access(true)
-///              .supports_team_drives(true)
+///              .use_domain_admin_access(false)
+///              .supports_team_drives(false)
 ///              .supports_all_drives(false)
 ///              .doit().await;
 /// # }
@@ -15751,7 +18324,7 @@ where
         self._permission_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
+    /// Issue the request as a domain administrator. If set to `true`, and if the following additional conditions are met, the requester is granted access: 1. The file ID parameter refers to a shared drive. 2. The requester is an administrator of the domain to which the shared drive belongs. For more information, see [Manage shared drives as domain administrators](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives#manage-administrators).
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionGetCall<'a, C> {
@@ -15854,7 +18427,7 @@ where
     }
 }
 
-/// Lists a file's or shared drive's permissions.
+/// Lists a file's or shared drive's permissions. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing).
 ///
 /// A builder for the *list* method supported by a *permission* resource.
 /// It is not used directly, but through a [`PermissionMethods`] instance.
@@ -15871,9 +18444,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15884,7 +18468,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -15893,11 +18477,11 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().list("fileId")
 ///              .use_domain_admin_access(false)
-///              .supports_team_drives(false)
+///              .supports_team_drives(true)
 ///              .supports_all_drives(true)
-///              .page_token("clita")
-///              .page_size(-99)
-///              .include_permissions_for_view("aliquyam")
+///              .page_token("sea")
+///              .page_size(-50)
+///              .include_permissions_for_view("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16096,7 +18680,7 @@ where
         self._file_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
+    /// Issue the request as a domain administrator. If set to `true`, and if the following additional conditions are met, the requester is granted access: 1. The file ID parameter refers to a shared drive. 2. The requester is an administrator of the domain to which the shared drive belongs. For more information, see [Manage shared drives as domain administrators](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives#manage-administrators).
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionListCall<'a, C> {
@@ -16117,7 +18701,7 @@ where
         self._supports_all_drives = Some(new_value);
         self
     }
-    /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
+    /// The token for continuing a previous list request on the next page. This should be set to the value of `nextPageToken` from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> PermissionListCall<'a, C> {
@@ -16131,7 +18715,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
+    /// Specifies which additional view's permissions to include in the response. Only `published` is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
     pub fn include_permissions_for_view(mut self, new_value: &str) -> PermissionListCall<'a, C> {
@@ -16223,7 +18807,7 @@ where
     }
 }
 
-/// Updates a permission with patch semantics. **Warning:** Concurrent permissions operations on the same file are not supported; only the last update is applied.
+/// Updates a permission with patch semantics. For more information, see [Share files, folders, and drives](https://developers.google.com/workspace/drive/api/guides/manage-sharing). **Warning:** Concurrent permissions operations on the same file aren't supported; only the last update is applied.
 ///
 /// A builder for the *update* method supported by a *permission* resource.
 /// It is not used directly, but through a [`PermissionMethods`] instance.
@@ -16241,9 +18825,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16254,7 +18849,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -16267,11 +18862,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
-///              .use_domain_admin_access(false)
-///              .transfer_ownership(true)
+///              .use_domain_admin_access(true)
+///              .transfer_ownership(false)
 ///              .supports_team_drives(true)
-///              .supports_all_drives(false)
+///              .supports_all_drives(true)
 ///              .remove_expiration(false)
+///              .enforce_expansive_access(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16288,6 +18884,7 @@ where
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
     _remove_expiration: Option<bool>,
+    _enforce_expansive_access: Option<bool>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -16323,6 +18920,7 @@ where
             "supportsTeamDrives",
             "supportsAllDrives",
             "removeExpiration",
+            "enforceExpansiveAccess",
         ]
         .iter()
         {
@@ -16332,7 +18930,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(10 + self._additional_params.len());
+        let mut params = Params::with_capacity(11 + self._additional_params.len());
         params.push("fileId", self._file_id);
         params.push("permissionId", self._permission_id);
         if let Some(value) = self._use_domain_admin_access.as_ref() {
@@ -16349,6 +18947,9 @@ where
         }
         if let Some(value) = self._remove_expiration.as_ref() {
             params.push("removeExpiration", value.to_string());
+        }
+        if let Some(value) = self._enforce_expansive_access.as_ref() {
+            params.push("enforceExpansiveAccess", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -16510,14 +19111,14 @@ where
         self._permission_id = new_value.to_string();
         self
     }
-    /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
+    /// Issue the request as a domain administrator. If set to `true`, and if the following additional conditions are met, the requester is granted access: 1. The file ID parameter refers to a shared drive. 2. The requester is an administrator of the domain to which the shared drive belongs. For more information, see [Manage shared drives as domain administrators](https://developers.google.com/workspace/drive/api/guides/manage-shareddrives#manage-administrators).
     ///
     /// Sets the *use domain admin access* query property to the given value.
     pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
-    /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect.
+    /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect. For more information, see [Transfer file ownership](https://developers.google.com//workspace/drive/api/guides/transfer-file).
     ///
     /// Sets the *transfer ownership* query property to the given value.
     pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
@@ -16543,6 +19144,13 @@ where
     /// Sets the *remove expiration* query property to the given value.
     pub fn remove_expiration(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
         self._remove_expiration = Some(new_value);
+        self
+    }
+    /// Whether the request should enforce expansive access rules.
+    ///
+    /// Sets the *enforce expansive access* query property to the given value.
+    pub fn enforce_expansive_access(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
+        self._enforce_expansive_access = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -16648,9 +19256,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16661,7 +19280,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -16980,9 +19599,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16993,7 +19623,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -17279,9 +19909,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17292,7 +19933,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -17300,7 +19941,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().get("fileId", "commentId", "replyId")
-///              .include_deleted(true)
+///              .include_deleted(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -17605,9 +20246,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17618,7 +20270,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -17626,8 +20278,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("ipsum")
-///              .page_size(-15)
+///              .page_token("erat")
+///              .page_size(-31)
 ///              .include_deleted(true)
 ///              .doit().await;
 /// # }
@@ -17948,9 +20600,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17961,7 +20624,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -18280,7 +20943,7 @@ where
     }
 }
 
-/// Permanently deletes a file version. You can only delete revisions for files with binary content in Google Drive, like images or videos. Revisions for other files, like Google Docs or Sheets, and the last remaining file version can't be deleted.
+/// Permanently deletes a file version. You can only delete revisions for files with binary content in Google Drive, like images or videos. Revisions for other files, like Google Docs or Sheets, and the last remaining file version can't be deleted. For more information, see [Manage file revisions](https://developers.google.com/drive/api/guides/manage-revisions).
 ///
 /// A builder for the *delete* method supported by a *revision* resource.
 /// It is not used directly, but through a [`RevisionMethods`] instance.
@@ -18297,9 +20960,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18310,7 +20984,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -18565,7 +21239,7 @@ where
     }
 }
 
-/// Gets a revision's metadata or content by ID.
+/// Gets a revision's metadata or content by ID. For more information, see [Manage file revisions](https://developers.google.com/workspace/drive/api/guides/manage-revisions).
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -18587,9 +21261,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18600,7 +21285,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -18608,7 +21293,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().get("fileId", "revisionId")
-///              .acknowledge_abuse(false)
+///              .acknowledge_abuse(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -18804,7 +21489,7 @@ where
         self._revision_id = new_value.to_string();
         self
     }
-    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
+    /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when the `alt` parameter is set to `media` and the user is the owner of the file or an organizer of the shared drive in which the file resides.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
     pub fn acknowledge_abuse(mut self, new_value: bool) -> RevisionGetCall<'a, C> {
@@ -18893,7 +21578,7 @@ where
     }
 }
 
-/// Lists a file's revisions.
+/// Lists a file's revisions. For more information, see [Manage file revisions](https://developers.google.com/workspace/drive/api/guides/manage-revisions).
 ///
 /// A builder for the *list* method supported by a *revision* resource.
 /// It is not used directly, but through a [`RevisionMethods`] instance.
@@ -18910,9 +21595,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18923,7 +21619,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -18931,8 +21627,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
-///              .page_token("nonumy")
-///              .page_size(-10)
+///              .page_token("erat")
+///              .page_size(-42)
 ///              .doit().await;
 /// # }
 /// ```
@@ -19200,7 +21896,7 @@ where
     }
 }
 
-/// Updates a revision with patch semantics.
+/// Updates a revision with patch semantics. For more information, see [Manage file revisions](https://developers.google.com/workspace/drive/api/guides/manage-revisions).
 ///
 /// A builder for the *update* method supported by a *revision* resource.
 /// It is not used directly, but through a [`RevisionMethods`] instance.
@@ -19218,9 +21914,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19231,7 +21938,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -19554,9 +22261,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19567,7 +22285,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -19866,9 +22584,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19879,7 +22608,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -20137,9 +22866,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20150,7 +22890,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -20431,9 +23171,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20444,7 +23195,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -20453,9 +23204,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().list()
 ///              .use_domain_admin_access(false)
-///              .q("invidunt")
-///              .page_token("nonumy")
-///              .page_size(-81)
+///              .q("ipsum")
+///              .page_token("ea")
+///              .page_size(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -20741,9 +23492,20 @@ where
 /// # use drive3::{DriveHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20754,7 +23516,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = DriveHub::new(client, auth);
@@ -20767,7 +23529,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().update(req, "teamDriveId")
-///              .use_domain_admin_access(true)
+///              .use_domain_admin_access(false)
 ///              .doit().await;
 /// # }
 /// ```

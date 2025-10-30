@@ -34,9 +34,20 @@ use tokio::time::sleep;
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -47,7 +58,7 @@ use tokio::time::sleep;
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Webfonts::new(client, auth);
@@ -56,9 +67,10 @@ use tokio::time::sleep;
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.webfonts().list()
 ///              .subset("amet.")
-///              .sort("takimata")
-///              .add_family("amet.")
-///              .add_capability("duo")
+///              .sort("duo")
+///              .add_family("ipsum")
+///              .category("gubergren")
+///              .add_capability("Lorem")
 ///              .doit().await;
 ///
 /// match result {
@@ -96,7 +108,7 @@ impl<'a, C> Webfonts<C> {
         Webfonts {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://webfonts.googleapis.com/".to_string(),
             _root_url: "https://webfonts.googleapis.com/".to_string(),
         }
@@ -107,7 +119,7 @@ impl<'a, C> Webfonts<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -152,6 +164,22 @@ pub struct Axis {
 
 impl common::Part for Axis {}
 
+/// Metadata for a tag.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Tag {
+    /// The name of the tag.
+    pub name: Option<String>,
+    /// The weight of the tag.
+    pub weight: Option<f32>,
+}
+
+impl common::Part for Tag {}
+
 /// Metadata describing a family of fonts.
 ///
 /// # Activities
@@ -184,6 +212,8 @@ pub struct Webfont {
     pub menu: Option<String>,
     /// The scripts supported by the font.
     pub subsets: Option<Vec<String>>,
+    /// The tags that apply to this family.
+    pub tags: Option<Vec<Tag>>,
     /// The available variants for the font.
     pub variants: Option<Vec<String>>,
     /// The font version.
@@ -232,9 +262,20 @@ impl common::ResponseResult for WebfontList {}
 /// use webfonts1::{Webfonts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -245,7 +286,7 @@ impl common::ResponseResult for WebfontList {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Webfonts::new(client, auth);
@@ -274,6 +315,7 @@ impl<'a, C> WebfontMethods<'a, C> {
             _subset: Default::default(),
             _sort: Default::default(),
             _family: Default::default(),
+            _category: Default::default(),
             _capability: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -302,9 +344,20 @@ impl<'a, C> WebfontMethods<'a, C> {
 /// # use webfonts1::{Webfonts, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -315,7 +368,7 @@ impl<'a, C> WebfontMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Webfonts::new(client, auth);
@@ -323,10 +376,11 @@ impl<'a, C> WebfontMethods<'a, C> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.webfonts().list()
-///              .subset("ipsum")
-///              .sort("gubergren")
-///              .add_family("Lorem")
-///              .add_capability("gubergren")
+///              .subset("gubergren")
+///              .sort("eos")
+///              .add_family("dolor")
+///              .category("ea")
+///              .add_capability("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -338,6 +392,7 @@ where
     _subset: Option<String>,
     _sort: Option<String>,
     _family: Vec<String>,
+    _category: Option<String>,
     _capability: Vec<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -364,14 +419,14 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "subset", "sort", "family", "capability"].iter() {
+        for &field in ["alt", "subset", "sort", "family", "category", "capability"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._subset.as_ref() {
             params.push("subset", value);
         }
@@ -382,6 +437,9 @@ where
             for f in self._family.iter() {
                 params.push("family", f);
             }
+        }
+        if let Some(value) = self._category.as_ref() {
+            params.push("category", value);
         }
         if !self._capability.is_empty() {
             for f in self._capability.iter() {
@@ -493,6 +551,13 @@ where
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     pub fn add_family(mut self, new_value: &str) -> WebfontListCall<'a, C> {
         self._family.push(new_value.to_string());
+        self
+    }
+    /// Filters by Webfont.category, if category is found in Webfont.categories. If not set, returns all families.
+    ///
+    /// Sets the *category* query property to the given value.
+    pub fn category(mut self, new_value: &str) -> WebfontListCall<'a, C> {
+        self._category = Some(new_value.to_string());
         self
     }
     /// Controls the font urls in `Webfont.files`, by default, static ttf fonts are sent.

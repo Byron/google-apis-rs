@@ -82,9 +82,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -95,7 +106,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = PhotosLibrary::new(client, auth);
@@ -146,7 +157,7 @@ impl<'a, C> PhotosLibrary<C> {
         PhotosLibrary {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://photoslibrary.googleapis.com/".to_string(),
             _root_url: "https://photoslibrary.googleapis.com/".to_string(),
         }
@@ -163,7 +174,7 @@ impl<'a, C> PhotosLibrary<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -202,7 +213,7 @@ impl<'a, C> PhotosLibrary<C> {
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AddEnrichmentToAlbumRequest {
-    /// Required. The position in the album where the enrichment is to be inserted.
+    /// Required. The position in the app created album where the enrichment is to be inserted.
     #[serde(rename = "albumPosition")]
     pub album_position: Option<AlbumPosition>,
     /// Required. The enrichment to be added.
@@ -301,7 +312,7 @@ pub struct AlbumPosition {
 
 impl common::Part for AlbumPosition {}
 
-/// Request to add media items to an album.
+/// Request to add media items to an app created album.
 ///
 /// # Activities
 ///
@@ -337,7 +348,7 @@ pub struct BatchAddMediaItemsToAlbumResponse {
 
 impl common::ResponseResult for BatchAddMediaItemsToAlbumResponse {}
 
-/// Request to create one or more media items in a user’s Google Photos library. If an `albumid` is specified, the media items are also added to that album. `albumPosition` is optional and can only be specified if an `albumId` is set.
+/// Request to create one or more media items in a user’s Google Photos library. If an `albumid` from an app created album is specified, the media items are also added to that album. `albumPosition` is optional and can only be specified if an `albumId` is set.
 ///
 /// # Activities
 ///
@@ -381,7 +392,7 @@ pub struct BatchCreateMediaItemsResponse {
 
 impl common::ResponseResult for BatchCreateMediaItemsResponse {}
 
-/// Response to retrieve a list of media items.
+/// Response to retrieve a list of app created media items.
 ///
 /// # Activities
 ///
@@ -903,7 +914,7 @@ pub struct MediaTypeFilter {
 
 impl common::Part for MediaTypeFilter {}
 
-/// A new enrichment item to be added to an album, used by the `albums.addEnrichment` call.
+/// A new enrichment item to be added to an app created album, used by the `albums.addEnrichment` call.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -911,13 +922,13 @@ impl common::Part for MediaTypeFilter {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NewEnrichmentItem {
-    /// Location to be added to the album.
+    /// Location to be added to the app created album.
     #[serde(rename = "locationEnrichment")]
     pub location_enrichment: Option<LocationEnrichment>,
-    /// Map to be added to the album.
+    /// Map to be added to the app created album.
     #[serde(rename = "mapEnrichment")]
     pub map_enrichment: Option<MapEnrichment>,
-    /// Text to be added to the album.
+    /// Text to be added to the app created album.
     #[serde(rename = "textEnrichment")]
     pub text_enrichment: Option<TextEnrichment>,
 }
@@ -992,7 +1003,7 @@ pub struct Photo {
 
 impl common::Part for Photo {}
 
-/// Request to search for media items in a user’s library. If the album id is specified, this call will return the list of media items in the album. If neither filters nor album id are specified, this call will return all media items in a user’s Google Photos library. If filters are specified, this call will return all media items in the user’s library that fulfill the filter criteria. Filters and album id must not both be set, as this will result in an invalid request.
+/// Request to search for app created media items in a user’s library. If the album id from an app created album is specified, this call will return the list of media items in the album. If neither filters nor album id are specified, this call will return all app created media items in a user’s Google Photos library. If filters are specified, this call will return all app created media items in the user’s library that fulfill the filter criteria. Filters and album id must not both be set, as this will result in an invalid request.
 ///
 /// # Activities
 ///
@@ -1256,9 +1267,20 @@ impl common::Part for Video {}
 /// use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1269,7 +1291,7 @@ impl common::Part for Video {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = PhotosLibrary::new(client, auth);
@@ -1291,12 +1313,12 @@ impl<'a, C> common::MethodsBuilder for AlbumMethods<'a, C> {}
 impl<'a, C> AlbumMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds an enrichment at a specified position in a defined album.
+    /// Adds an enrichment at a specified position in an app created created album.
     ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `albumId` - Required. Identifier of the album where the enrichment is to be added.
+    /// * `albumId` - Required. Identifier of the app created album where the enrichment is to be added.
     pub fn add_enrichment(
         &self,
         request: AddEnrichmentToAlbumRequest,
@@ -1314,7 +1336,7 @@ impl<'a, C> AlbumMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds one or more media items in a user's Google Photos library to an album. The media items and albums must have been created by the developer via the API. Media items are added to the end of the album. If multiple media items are given, they are added in the order specified in this call. Each album can contain up to 20,000 media items. Only media items that are in the user's library can be added to an album. For albums that are shared, the album must either be owned by the user or the user must have joined the album as a collaborator. Partial success is not supported. The entire request will fail if an invalid media item or album is specified.
+    /// Adds one or more app created media items in a user's Google Photos library to an app created album. The media items and albums must have been created by the developer via the API. Media items are added to the end of the album. If multiple media items are given, they are added in the order specified in this call. Each album can contain up to 20,000 media items. Partial success is not supported. The entire request will fail if an invalid media item or album is specified.
     ///
     /// # Arguments
     ///
@@ -1337,7 +1359,7 @@ impl<'a, C> AlbumMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes one or more media items from a specified album. The media items and the album must have been created by the developer via the API. For albums that are shared, this action is only supported for media items that were added to the album by this user, or for all media items if the album was created by this user. Partial success is not supported. The entire request will fail and no action will be performed on the album if an invalid media item or album is specified.
+    /// Removes one or more app created media items from a specified app created album. The media items and the album must have been created by the developer via the API. Partial success is not supported. The entire request will fail and no action will be performed on the album if an invalid media item or album is specified.
     ///
     /// # Arguments
     ///
@@ -1377,7 +1399,7 @@ impl<'a, C> AlbumMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the album based on the specified `albumId`. The `albumId` must be the ID of an album owned by the user or a shared album that the user has joined.
+    /// Returns the app created album based on the specified `albumId`. The `albumId` must be the ID of an album created by your app.
     ///
     /// # Arguments
     ///
@@ -1394,7 +1416,7 @@ impl<'a, C> AlbumMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all albums shown to a user in the Albums tab of the Google Photos app.
+    /// Lists all albums created by your app.
     pub fn list(&self) -> AlbumListCall<'a, C> {
         AlbumListCall {
             hub: self.hub,
@@ -1409,7 +1431,7 @@ impl<'a, C> AlbumMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the album with the specified `id`. Only the `id`, `title` and `cover_photo_media_item_id` fields of the album are read. The album must have been created by the developer via the API and must be owned by the user.
+    /// Update the app created album with the specified `id`. Only the `id`, `title` and `cover_photo_media_item_id` fields of the album are read. The album must have been created by the developer via the API.
     ///
     /// # Arguments
     ///
@@ -1482,9 +1504,20 @@ impl<'a, C> AlbumMethods<'a, C> {
 /// use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1495,7 +1528,7 @@ impl<'a, C> AlbumMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = PhotosLibrary::new(client, auth);
@@ -1517,7 +1550,7 @@ impl<'a, C> common::MethodsBuilder for MediaItemMethods<'a, C> {}
 impl<'a, C> MediaItemMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates one or more media items in a user's Google Photos library. This is the second step for creating a media item. For details regarding Step 1, uploading the raw bytes to a Google Server, see Uploading media. This call adds the media item to the library. If an album `id` is specified, the call adds the media item to the album too. Each album can contain up to 20,000 media items. By default, the media item will be added to the end of the library or album. If an album `id` and position are both defined, the media item is added to the album at the specified position. If the call contains multiple media items, they're added at the specified position. If you are creating a media item in a shared album where you are not the owner, you are not allowed to position the media item. Doing so will result in a `BAD REQUEST` error.
+    /// Creates one or more media items in a user's Google Photos library. This is the second step for creating a media item. For details regarding Step 1, uploading the raw bytes to a Google Server, see Uploading media. This call adds the media item to the library. If an app created album `id` is specified, the call adds the media item to the album too. Each album can contain up to 20,000 media items. By default, the media item will be added to the end of the library or album. If an album `id` and position are both defined, the media item is added to the album at the specified position. If the call contains multiple media items, they're added at the specified position.
     ///
     /// # Arguments
     ///
@@ -1537,7 +1570,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the list of media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers.
+    /// Returns the list of app created media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers.
     pub fn batch_get(&self) -> MediaItemBatchGetCall<'a, C> {
         MediaItemBatchGetCall {
             hub: self.hub,
@@ -1550,7 +1583,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the media item for the specified media item identifier.
+    /// Returns the app created media item for the specified media item identifier.
     ///
     /// # Arguments
     ///
@@ -1567,7 +1600,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// List all media items from a user's Google Photos library.
+    /// List all media items created by your app from a user's Google Photos library.
     pub fn list(&self) -> MediaItemListCall<'a, C> {
         MediaItemListCall {
             hub: self.hub,
@@ -1581,7 +1614,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the media item with the specified `id`. Only the `id` and `description` fields of the media item are read. The media item must have been created by the developer via the API and must be owned by the user.
+    /// Update the app created media item with the specified `id`. Only the `id` and `description` fields of the media item are read. The media item must have been created by the developer via the API.
     ///
     /// # Arguments
     ///
@@ -1601,7 +1634,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Searches for media items in a user's Google Photos library. If no filters are set, then all media items in the user's library are returned. If an album is set, all media items in the specified album are returned. If filters are specified, media items that match the filters from the user's library are listed. If you set both the album and the filters, the request results in an error.
+    /// Searches for app created media items in a user's Google Photos library. Only media items and ablums created by your app are returned. If no filters are set, then all app created media items in the user's library are returned. If an app created album is set, all media items in the specified album are returned. If filters are specified, app created media items that match the filters from the user's library are listed. If you set both the album and the filters, the request results in an error.
     ///
     /// # Arguments
     ///
@@ -1633,9 +1666,20 @@ impl<'a, C> MediaItemMethods<'a, C> {
 /// use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -1646,7 +1690,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = PhotosLibrary::new(client, auth);
@@ -1668,7 +1712,7 @@ impl<'a, C> common::MethodsBuilder for SharedAlbumMethods<'a, C> {}
 impl<'a, C> SharedAlbumMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns the album based on the specified `shareToken`.
+    /// *Beginning March 31, 2025, this method will no longer work. Some or all of the scopes previously used for this method are being removed. Please see Photos APIs updates for more details.* Returns the album based on the specified `shareToken`.
     ///
     /// # Arguments
     ///
@@ -1737,7 +1781,7 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
 // CallBuilders   ###
 // #################
 
-/// Adds an enrichment at a specified position in a defined album.
+/// Adds an enrichment at a specified position in an app created created album.
 ///
 /// A builder for the *addEnrichment* method supported by a *album* resource.
 /// It is not used directly, but through a [`AlbumMethods`] instance.
@@ -1755,9 +1799,20 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1768,7 +1823,7 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -1969,7 +2024,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Identifier of the album where the enrichment is to be added.
+    /// Required. Identifier of the app created album where the enrichment is to be added.
     ///
     /// Sets the *album id* path property to the given value.
     ///
@@ -2064,7 +2119,7 @@ where
     }
 }
 
-/// Adds one or more media items in a user's Google Photos library to an album. The media items and albums must have been created by the developer via the API. Media items are added to the end of the album. If multiple media items are given, they are added in the order specified in this call. Each album can contain up to 20,000 media items. Only media items that are in the user's library can be added to an album. For albums that are shared, the album must either be owned by the user or the user must have joined the album as a collaborator. Partial success is not supported. The entire request will fail if an invalid media item or album is specified.
+/// Adds one or more app created media items in a user's Google Photos library to an app created album. The media items and albums must have been created by the developer via the API. Media items are added to the end of the album. If multiple media items are given, they are added in the order specified in this call. Each album can contain up to 20,000 media items. Partial success is not supported. The entire request will fail if an invalid media item or album is specified.
 ///
 /// A builder for the *batchAddMediaItems* method supported by a *album* resource.
 /// It is not used directly, but through a [`AlbumMethods`] instance.
@@ -2082,9 +2137,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2095,7 +2161,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -2391,7 +2457,7 @@ where
     }
 }
 
-/// Removes one or more media items from a specified album. The media items and the album must have been created by the developer via the API. For albums that are shared, this action is only supported for media items that were added to the album by this user, or for all media items if the album was created by this user. Partial success is not supported. The entire request will fail and no action will be performed on the album if an invalid media item or album is specified.
+/// Removes one or more app created media items from a specified app created album. The media items and the album must have been created by the developer via the API. Partial success is not supported. The entire request will fail and no action will be performed on the album if an invalid media item or album is specified.
 ///
 /// A builder for the *batchRemoveMediaItems* method supported by a *album* resource.
 /// It is not used directly, but through a [`AlbumMethods`] instance.
@@ -2409,9 +2475,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2422,7 +2499,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -2736,9 +2813,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2749,7 +2837,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -3016,7 +3104,7 @@ where
     }
 }
 
-/// Returns the album based on the specified `albumId`. The `albumId` must be the ID of an album owned by the user or a shared album that the user has joined.
+/// Returns the app created album based on the specified `albumId`. The `albumId` must be the ID of an album created by your app.
 ///
 /// A builder for the *get* method supported by a *album* resource.
 /// It is not used directly, but through a [`AlbumMethods`] instance.
@@ -3033,9 +3121,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3046,7 +3145,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -3298,7 +3397,7 @@ where
     }
 }
 
-/// Lists all albums shown to a user in the Albums tab of the Google Photos app.
+/// Lists all albums created by your app.
 ///
 /// A builder for the *list* method supported by a *album* resource.
 /// It is not used directly, but through a [`AlbumMethods`] instance.
@@ -3315,9 +3414,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3328,7 +3438,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -3595,7 +3705,7 @@ where
     }
 }
 
-/// Update the album with the specified `id`. Only the `id`, `title` and `cover_photo_media_item_id` fields of the album are read. The album must have been created by the developer via the API and must be owned by the user.
+/// Update the app created album with the specified `id`. Only the `id`, `title` and `cover_photo_media_item_id` fields of the album are read. The album must have been created by the developer via the API.
 ///
 /// A builder for the *patch* method supported by a *album* resource.
 /// It is not used directly, but through a [`AlbumMethods`] instance.
@@ -3613,9 +3723,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3626,7 +3747,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -3945,9 +4066,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3958,7 +4090,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -4264,9 +4396,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4277,7 +4420,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -4565,7 +4708,7 @@ where
     }
 }
 
-/// Creates one or more media items in a user's Google Photos library. This is the second step for creating a media item. For details regarding Step 1, uploading the raw bytes to a Google Server, see Uploading media. This call adds the media item to the library. If an album `id` is specified, the call adds the media item to the album too. Each album can contain up to 20,000 media items. By default, the media item will be added to the end of the library or album. If an album `id` and position are both defined, the media item is added to the album at the specified position. If the call contains multiple media items, they're added at the specified position. If you are creating a media item in a shared album where you are not the owner, you are not allowed to position the media item. Doing so will result in a `BAD REQUEST` error.
+/// Creates one or more media items in a user's Google Photos library. This is the second step for creating a media item. For details regarding Step 1, uploading the raw bytes to a Google Server, see Uploading media. This call adds the media item to the library. If an app created album `id` is specified, the call adds the media item to the album too. Each album can contain up to 20,000 media items. By default, the media item will be added to the end of the library or album. If an album `id` and position are both defined, the media item is added to the album at the specified position. If the call contains multiple media items, they're added at the specified position.
 ///
 /// A builder for the *batchCreate* method supported by a *mediaItem* resource.
 /// It is not used directly, but through a [`MediaItemMethods`] instance.
@@ -4583,9 +4726,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4596,7 +4750,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -4871,7 +5025,7 @@ where
     }
 }
 
-/// Returns the list of media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers.
+/// Returns the list of app created media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers.
 ///
 /// A builder for the *batchGet* method supported by a *mediaItem* resource.
 /// It is not used directly, but through a [`MediaItemMethods`] instance.
@@ -4888,9 +5042,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4901,7 +5066,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -5150,7 +5315,7 @@ where
     }
 }
 
-/// Returns the media item for the specified media item identifier.
+/// Returns the app created media item for the specified media item identifier.
 ///
 /// A builder for the *get* method supported by a *mediaItem* resource.
 /// It is not used directly, but through a [`MediaItemMethods`] instance.
@@ -5167,9 +5332,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5180,7 +5356,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -5432,7 +5608,7 @@ where
     }
 }
 
-/// List all media items from a user's Google Photos library.
+/// List all media items created by your app from a user's Google Photos library.
 ///
 /// A builder for the *list* method supported by a *mediaItem* resource.
 /// It is not used directly, but through a [`MediaItemMethods`] instance.
@@ -5449,9 +5625,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5462,7 +5649,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -5717,7 +5904,7 @@ where
     }
 }
 
-/// Update the media item with the specified `id`. Only the `id` and `description` fields of the media item are read. The media item must have been created by the developer via the API and must be owned by the user.
+/// Update the app created media item with the specified `id`. Only the `id` and `description` fields of the media item are read. The media item must have been created by the developer via the API.
 ///
 /// A builder for the *patch* method supported by a *mediaItem* resource.
 /// It is not used directly, but through a [`MediaItemMethods`] instance.
@@ -5735,9 +5922,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5748,7 +5946,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -6052,7 +6250,7 @@ where
     }
 }
 
-/// Searches for media items in a user's Google Photos library. If no filters are set, then all media items in the user's library are returned. If an album is set, all media items in the specified album are returned. If filters are specified, media items that match the filters from the user's library are listed. If you set both the album and the filters, the request results in an error.
+/// Searches for app created media items in a user's Google Photos library. Only media items and ablums created by your app are returned. If no filters are set, then all app created media items in the user's library are returned. If an app created album is set, all media items in the specified album are returned. If filters are specified, app created media items that match the filters from the user's library are listed. If you set both the album and the filters, the request results in an error.
 ///
 /// A builder for the *search* method supported by a *mediaItem* resource.
 /// It is not used directly, but through a [`MediaItemMethods`] instance.
@@ -6070,9 +6268,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6083,7 +6292,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -6145,7 +6354,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "v1/mediaItems:search";
         if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         let url = params.parse_with_url(&url);
@@ -6316,7 +6525,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -6353,7 +6562,7 @@ where
     }
 }
 
-/// Returns the album based on the specified `shareToken`.
+/// *Beginning March 31, 2025, this method will no longer work. Some or all of the scopes previously used for this method are being removed. Please see Photos APIs updates for more details.* Returns the album based on the specified `shareToken`.
 ///
 /// A builder for the *get* method supported by a *sharedAlbum* resource.
 /// It is not used directly, but through a [`SharedAlbumMethods`] instance.
@@ -6370,9 +6579,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6383,7 +6603,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -6656,9 +6876,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6669,7 +6900,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -6957,9 +7188,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6970,7 +7212,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);
@@ -7257,9 +7499,20 @@ where
 /// # use photoslibrary1::{PhotosLibrary, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7270,7 +7523,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = PhotosLibrary::new(client, auth);

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *6.0.0+20240625*, where *20240625* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Android Enterprise* crate version *8.0.0+20251027*, where *20251027* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Android Enterprise* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/work/play/emm-api).
@@ -13,8 +13,10 @@
 //!
 //! * [devices](api::Device)
 //!  * [*force report upload*](api::DeviceForceReportUploadCall), [*get*](api::DeviceGetCall), [*get state*](api::DeviceGetStateCall), [*list*](api::DeviceListCall), [*set state*](api::DeviceSetStateCall) and [*update*](api::DeviceUpdateCall)
+//! * [enrollment tokens](api::EnrollmentToken)
+//!  * [*create*](api::EnrollmentTokenCreateCall)
 //! * [enterprises](api::Enterprise)
-//!  * [*acknowledge notification set*](api::EnterpriseAcknowledgeNotificationSetCall), [*complete signup*](api::EnterpriseCompleteSignupCall), [*create enrollment token*](api::EnterpriseCreateEnrollmentTokenCall), [*create web token*](api::EnterpriseCreateWebTokenCall), [*enroll*](api::EnterpriseEnrollCall), [*generate signup url*](api::EnterpriseGenerateSignupUrlCall), [*get*](api::EnterpriseGetCall), [*get service account*](api::EnterpriseGetServiceAccountCall), [*get store layout*](api::EnterpriseGetStoreLayoutCall), [*list*](api::EnterpriseListCall), [*pull notification set*](api::EnterprisePullNotificationSetCall), [*send test push notification*](api::EnterpriseSendTestPushNotificationCall), [*set account*](api::EnterpriseSetAccountCall), [*set store layout*](api::EnterpriseSetStoreLayoutCall) and [*unenroll*](api::EnterpriseUnenrollCall)
+//!  * [*acknowledge notification set*](api::EnterpriseAcknowledgeNotificationSetCall), [*complete signup*](api::EnterpriseCompleteSignupCall), [*create web token*](api::EnterpriseCreateWebTokenCall), [*enroll*](api::EnterpriseEnrollCall), [*generate enterprise upgrade url*](api::EnterpriseGenerateEnterpriseUpgradeUrlCall), [*generate signup url*](api::EnterpriseGenerateSignupUrlCall), [*get*](api::EnterpriseGetCall), [*get service account*](api::EnterpriseGetServiceAccountCall), [*get store layout*](api::EnterpriseGetStoreLayoutCall), [*list*](api::EnterpriseListCall), [*pull notification set*](api::EnterprisePullNotificationSetCall), [*send test push notification*](api::EnterpriseSendTestPushNotificationCall), [*set account*](api::EnterpriseSetAccountCall), [*set store layout*](api::EnterpriseSetStoreLayoutCall) and [*unenroll*](api::EnterpriseUnenrollCall)
 //! * [entitlements](api::Entitlement)
 //!  * [*delete*](api::EntitlementDeleteCall), [*get*](api::EntitlementGetCall), [*list*](api::EntitlementListCall) and [*update*](api::EntitlementUpdateCall)
 //! * grouplicenses
@@ -79,9 +81,9 @@
 //! ```ignore
 //! let r = hub.enterprises().acknowledge_notification_set(...).doit().await
 //! let r = hub.enterprises().complete_signup(...).doit().await
-//! let r = hub.enterprises().create_enrollment_token(...).doit().await
 //! let r = hub.enterprises().create_web_token(...).doit().await
 //! let r = hub.enterprises().enroll(...).doit().await
+//! let r = hub.enterprises().generate_enterprise_upgrade_url(...).doit().await
 //! let r = hub.enterprises().generate_signup_url(...).doit().await
 //! let r = hub.enterprises().get(...).doit().await
 //! let r = hub.enterprises().get_service_account(...).doit().await
@@ -130,9 +132,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -143,16 +156,16 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = AndroidEnterprise::new(client, auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.enterprises().complete_signup()
-//!              .enterprise_token("no")
-//!              .completion_token("ipsum")
+//! let result = hub.enterprises().generate_enterprise_upgrade_url("enterpriseId")
+//!              .add_allowed_domains("voluptua.")
+//!              .admin_email("At")
 //!              .doit().await;
 //!
 //! match result {

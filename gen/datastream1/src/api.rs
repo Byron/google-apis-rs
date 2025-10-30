@@ -59,9 +59,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -72,7 +83,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Datastream::new(client, auth);
@@ -126,7 +137,7 @@ impl<'a, C> Datastream<C> {
         Datastream {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://datastream.googleapis.com/".to_string(),
             _root_url: "https://datastream.googleapis.com/".to_string(),
         }
@@ -137,7 +148,7 @@ impl<'a, C> Datastream<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -198,6 +209,9 @@ impl common::Part for AvroFileFormat {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BackfillAllStrategy {
+    /// MongoDB data source objects to avoid backfilling
+    #[serde(rename = "mongodbExcludedObjects")]
+    pub mongodb_excluded_objects: Option<MongodbCluster>,
     /// MySQL data source objects to avoid backfilling.
     #[serde(rename = "mysqlExcludedObjects")]
     pub mysql_excluded_objects: Option<MysqlRdbms>,
@@ -207,6 +221,9 @@ pub struct BackfillAllStrategy {
     /// PostgreSQL data source objects to avoid backfilling.
     #[serde(rename = "postgresqlExcludedObjects")]
     pub postgresql_excluded_objects: Option<PostgresqlRdbms>,
+    /// Salesforce data source objects to avoid backfilling
+    #[serde(rename = "salesforceExcludedObjects")]
+    pub salesforce_excluded_objects: Option<SalesforceOrg>,
     /// SQLServer data source objects to avoid backfilling
     #[serde(rename = "sqlServerExcludedObjects")]
     pub sql_server_excluded_objects: Option<SqlServerRdbms>,
@@ -251,6 +268,19 @@ pub struct BackfillNoneStrategy {
 
 impl common::Part for BackfillNoneStrategy {}
 
+/// Message to represent the option where Datastream will enforce encryption without authenticating server identity. Server certificates will be trusted by default.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BasicEncryption {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for BasicEncryption {}
+
 /// BigQuery destination configuration
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -262,6 +292,9 @@ pub struct BigQueryDestinationConfig {
     /// Append only mode
     #[serde(rename = "appendOnly")]
     pub append_only: Option<AppendOnly>,
+    /// Optional. Big Lake Managed Tables (BLMT) configuration.
+    #[serde(rename = "blmtConfig")]
+    pub blmt_config: Option<BlmtConfig>,
     /// The guaranteed data freshness (in seconds) when querying tables created by the stream. Editing this field will only affect new tables created in the future, but existing tables will not be impacted. Lower values mean that queries will return fresher data, but may result in higher cost.
     #[serde(rename = "dataFreshness")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
@@ -290,6 +323,63 @@ pub struct BigQueryProfile {
 }
 
 impl common::Part for BigQueryProfile {}
+
+/// Configuration to use Binary Log Parser CDC technique.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BinaryLogParser {
+    /// Use Oracle directories.
+    #[serde(rename = "logFileDirectories")]
+    pub log_file_directories: Option<LogFileDirectories>,
+    /// Use Oracle ASM.
+    #[serde(rename = "oracleAsmLogFileAccess")]
+    pub oracle_asm_log_file_access: Option<OracleAsmLogFileAccess>,
+}
+
+impl common::Part for BinaryLogParser {}
+
+/// Use Binary log position based replication.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BinaryLogPosition {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for BinaryLogPosition {}
+
+/// The configuration for BLMT.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BlmtConfig {
+    /// Required. The Cloud Storage bucket name.
+    pub bucket: Option<String>,
+    /// Required. The bigquery connection. Format: `{project}.{location}.{name}`
+    #[serde(rename = "connectionName")]
+    pub connection_name: Option<String>,
+    /// Required. The file format.
+    #[serde(rename = "fileFormat")]
+    pub file_format: Option<String>,
+    /// The root path inside the Cloud Storage bucket.
+    #[serde(rename = "rootPath")]
+    pub root_path: Option<String>,
+    /// Required. The table format.
+    #[serde(rename = "tableFormat")]
+    pub table_format: Option<String>,
+}
+
+impl common::Part for BlmtConfig {}
 
 /// The request message for Operations.CancelOperation.
 ///
@@ -360,10 +450,13 @@ pub struct ConnectionProfile {
     pub gcs_profile: Option<GcsProfile>,
     /// Labels.
     pub labels: Option<HashMap<String, String>>,
+    /// MongoDB Connection Profile configuration.
+    #[serde(rename = "mongodbProfile")]
+    pub mongodb_profile: Option<MongodbProfile>,
     /// MySQL ConnectionProfile configuration.
     #[serde(rename = "mysqlProfile")]
     pub mysql_profile: Option<MysqlProfile>,
-    /// Output only. The resource's name.
+    /// Output only. Identifier. The resource's name.
     pub name: Option<String>,
     /// Oracle ConnectionProfile configuration.
     #[serde(rename = "oracleProfile")]
@@ -374,6 +467,15 @@ pub struct ConnectionProfile {
     /// Private connectivity.
     #[serde(rename = "privateConnectivity")]
     pub private_connectivity: Option<PrivateConnectivity>,
+    /// Salesforce Connection Profile configuration.
+    #[serde(rename = "salesforceProfile")]
+    pub salesforce_profile: Option<SalesforceProfile>,
+    /// Output only. Reserved for future use.
+    #[serde(rename = "satisfiesPzi")]
+    pub satisfies_pzi: Option<bool>,
+    /// Output only. Reserved for future use.
+    #[serde(rename = "satisfiesPzs")]
+    pub satisfies_pzs: Option<bool>,
     /// SQLServer Connection Profile configuration.
     #[serde(rename = "sqlServerProfile")]
     pub sql_server_profile: Option<SqlServerProfile>,
@@ -453,6 +555,9 @@ pub struct DiscoverConnectionProfileRequest {
     /// The number of hierarchy levels below the current level to be retrieved.
     #[serde(rename = "hierarchyDepth")]
     pub hierarchy_depth: Option<i32>,
+    /// MongoDB cluster to enrich with child data objects and metadata.
+    #[serde(rename = "mongodbCluster")]
+    pub mongodb_cluster: Option<MongodbCluster>,
     /// MySQL RDBMS to enrich with child data objects and metadata.
     #[serde(rename = "mysqlRdbms")]
     pub mysql_rdbms: Option<MysqlRdbms>,
@@ -462,6 +567,9 @@ pub struct DiscoverConnectionProfileRequest {
     /// PostgreSQL RDBMS to enrich with child data objects and metadata.
     #[serde(rename = "postgresqlRdbms")]
     pub postgresql_rdbms: Option<PostgresqlRdbms>,
+    /// Salesforce organization to enrich with child data objects and metadata.
+    #[serde(rename = "salesforceOrg")]
+    pub salesforce_org: Option<SalesforceOrg>,
     /// SQLServer RDBMS to enrich with child data objects and metadata.
     #[serde(rename = "sqlServerRdbms")]
     pub sql_server_rdbms: Option<SqlServerRdbms>,
@@ -481,6 +589,9 @@ impl common::RequestValue for DiscoverConnectionProfileRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DiscoverConnectionProfileResponse {
+    /// Enriched MongoDB cluster.
+    #[serde(rename = "mongodbCluster")]
+    pub mongodb_cluster: Option<MongodbCluster>,
     /// Enriched MySQL RDBMS object.
     #[serde(rename = "mysqlRdbms")]
     pub mysql_rdbms: Option<MysqlRdbms>,
@@ -490,6 +601,9 @@ pub struct DiscoverConnectionProfileResponse {
     /// Enriched PostgreSQL RDBMS object.
     #[serde(rename = "postgresqlRdbms")]
     pub postgresql_rdbms: Option<PostgresqlRdbms>,
+    /// Enriched Salesforce organization.
+    #[serde(rename = "salesforceOrg")]
+    pub salesforce_org: Option<SalesforceOrg>,
     /// Enriched SQLServer RDBMS object.
     #[serde(rename = "sqlServerRdbms")]
     pub sql_server_rdbms: Option<SqlServerRdbms>,
@@ -528,6 +642,37 @@ pub struct Empty {
 
 impl common::ResponseResult for Empty {}
 
+/// Message to represent the option where Datastream will enforce encryption and authenticate server identity. ca_certificate must be set if user selects this option.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EncryptionAndServerValidation {
+    /// Optional. Input only. PEM-encoded certificate of the CA that signed the source database server's certificate.
+    #[serde(rename = "caCertificate")]
+    pub ca_certificate: Option<String>,
+    /// Optional. The hostname mentioned in the Subject or SAN extension of the server certificate. This field is used for bypassing the hostname validation while verifying server certificate. This is required for scenarios where the host name that datastream connects to is different from the certificate's subject. This specifically happens for private connectivity. It could also happen when the customer provides a public IP in connection profile but the same is not present in the server certificate.
+    #[serde(rename = "serverCertificateHostname")]
+    pub server_certificate_hostname: Option<String>,
+}
+
+impl common::Part for EncryptionAndServerValidation {}
+
+/// Message to represent the option where encryption is not enforced. An empty message right now to allow future extensibility.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EncryptionNotEnforced {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for EncryptionNotEnforced {}
+
 /// Represent a user-facing Error.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -551,6 +696,21 @@ pub struct Error {
 }
 
 impl common::Part for Error {}
+
+/// Represents a filter for included data on a stream object.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EventFilter {
+    /// An SQL-query Where clause selecting which data should be included, not including the "WHERE" keyword. E.g., "t.key1 = 'value1' AND t.key2 = 'value2'".
+    #[serde(rename = "sqlWhereClause")]
+    pub sql_where_clause: Option<String>,
+}
+
+impl common::Part for EventFilter {}
 
 /// Response message for a ‘FetchStaticIps’ response.
 ///
@@ -641,6 +801,35 @@ pub struct GcsProfile {
 
 impl common::Part for GcsProfile {}
 
+/// Use GTID based replication.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Gtid {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for Gtid {}
+
+/// A HostAddress represents a transport end point, which is the combination of an IP address or hostname and a port number.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct HostAddress {
+    /// Required. Hostname for the connection.
+    pub hostname: Option<String>,
+    /// Optional. Port for the connection.
+    pub port: Option<i32>,
+}
+
+impl common::Part for HostAddress {}
+
 /// JSON file format configuration.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -720,6 +909,8 @@ pub struct ListOperationsResponse {
     pub next_page_token: Option<String>,
     /// A list of operations that matches the specified filter in the request.
     pub operations: Option<Vec<Operation>>,
+    /// Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections e.g. when attempting to list all resources across all supported locations.
+    pub unreachable: Option<Vec<String>>,
 }
 
 impl common::ResponseResult for ListOperationsResponse {}
@@ -844,6 +1035,37 @@ pub struct Location {
 
 impl common::ResponseResult for Location {}
 
+/// Configuration to specify the Oracle directories to access the log files.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct LogFileDirectories {
+    /// Required. Oracle directory for archived logs.
+    #[serde(rename = "archivedLogDirectory")]
+    pub archived_log_directory: Option<String>,
+    /// Required. Oracle directory for online logs.
+    #[serde(rename = "onlineLogDirectory")]
+    pub online_log_directory: Option<String>,
+}
+
+impl common::Part for LogFileDirectories {}
+
+/// Configuration to use LogMiner CDC method.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct LogMiner {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for LogMiner {}
+
 /// Request for looking up a specific stream object by its source object identifier.
 ///
 /// # Activities
@@ -875,6 +1097,185 @@ pub struct Merge {
 }
 
 impl common::Part for Merge {}
+
+/// MongoDB change stream position
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbChangeStreamPosition {
+    /// Required. The timestamp to start change stream from.
+    #[serde(rename = "startTime")]
+    pub start_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+}
+
+impl common::Part for MongodbChangeStreamPosition {}
+
+/// MongoDB Cluster structure.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbCluster {
+    /// MongoDB databases in the cluster.
+    pub databases: Option<Vec<MongodbDatabase>>,
+}
+
+impl common::Part for MongodbCluster {}
+
+/// MongoDB Collection.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbCollection {
+    /// Collection name.
+    pub collection: Option<String>,
+    /// Fields in the collection.
+    pub fields: Option<Vec<MongodbField>>,
+}
+
+impl common::Part for MongodbCollection {}
+
+/// MongoDB Database.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbDatabase {
+    /// Collections in the database.
+    pub collections: Option<Vec<MongodbCollection>>,
+    /// Database name.
+    pub database: Option<String>,
+}
+
+impl common::Part for MongodbDatabase {}
+
+/// MongoDB Field.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbField {
+    /// Field name.
+    pub field: Option<String>,
+}
+
+impl common::Part for MongodbField {}
+
+/// MongoDB data source object identifier.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbObjectIdentifier {
+    /// Required. The collection name.
+    pub collection: Option<String>,
+    /// Required. The database name.
+    pub database: Option<String>,
+}
+
+impl common::Part for MongodbObjectIdentifier {}
+
+/// MongoDB profile.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbProfile {
+    /// Required. List of host addresses for a MongoDB cluster. For SRV connection format, this list must contain exactly one DNS host without a port. For Standard connection format, this list must contain all the required hosts in the cluster with their respective ports.
+    #[serde(rename = "hostAddresses")]
+    pub host_addresses: Option<Vec<HostAddress>>,
+    /// Optional. Password for the MongoDB connection. Mutually exclusive with the `secret_manager_stored_password` field.
+    pub password: Option<String>,
+    /// Optional. Name of the replica set. Only needed for self hosted replica set type MongoDB cluster. For SRV connection format, this field must be empty. For Standard connection format, this field must be specified.
+    #[serde(rename = "replicaSet")]
+    pub replica_set: Option<String>,
+    /// Optional. A reference to a Secret Manager resource name storing the SQLServer connection password. Mutually exclusive with the `password` field.
+    #[serde(rename = "secretManagerStoredPassword")]
+    pub secret_manager_stored_password: Option<String>,
+    /// Srv connection format.
+    #[serde(rename = "srvConnectionFormat")]
+    pub srv_connection_format: Option<SrvConnectionFormat>,
+    /// Optional. SSL configuration for the MongoDB connection.
+    #[serde(rename = "sslConfig")]
+    pub ssl_config: Option<MongodbSslConfig>,
+    /// Standard connection format.
+    #[serde(rename = "standardConnectionFormat")]
+    pub standard_connection_format: Option<StandardConnectionFormat>,
+    /// Required. Username for the MongoDB connection.
+    pub username: Option<String>,
+}
+
+impl common::Part for MongodbProfile {}
+
+/// MongoDB source configuration.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbSourceConfig {
+    /// MongoDB collections to exclude from the stream.
+    #[serde(rename = "excludeObjects")]
+    pub exclude_objects: Option<MongodbCluster>,
+    /// MongoDB collections to include in the stream.
+    #[serde(rename = "includeObjects")]
+    pub include_objects: Option<MongodbCluster>,
+    /// Optional. Maximum number of concurrent backfill tasks. The number should be non-negative and less than or equal to 50. If not set (or set to 0), the system's default value is used
+    #[serde(rename = "maxConcurrentBackfillTasks")]
+    pub max_concurrent_backfill_tasks: Option<i32>,
+}
+
+impl common::Part for MongodbSourceConfig {}
+
+/// MongoDB SSL configuration information.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MongodbSslConfig {
+    /// Optional. Input only. PEM-encoded certificate of the CA that signed the source database server's certificate.
+    #[serde(rename = "caCertificate")]
+    pub ca_certificate: Option<String>,
+    /// Output only. Indicates whether the ca_certificate field is set.
+    #[serde(rename = "caCertificateSet")]
+    pub ca_certificate_set: Option<bool>,
+    /// Optional. Input only. PEM-encoded certificate that will be used by the replica to authenticate against the source database server. If this field is used then the 'client_key' and the 'ca_certificate' fields are mandatory.
+    #[serde(rename = "clientCertificate")]
+    pub client_certificate: Option<String>,
+    /// Output only. Indicates whether the client_certificate field is set.
+    #[serde(rename = "clientCertificateSet")]
+    pub client_certificate_set: Option<bool>,
+    /// Optional. Input only. PEM-encoded private key associated with the Client Certificate. If this field is used then the 'client_certificate' and the 'ca_certificate' fields are mandatory.
+    #[serde(rename = "clientKey")]
+    pub client_key: Option<String>,
+    /// Output only. Indicates whether the client_key field is set.
+    #[serde(rename = "clientKeySet")]
+    pub client_key_set: Option<bool>,
+    /// Optional. Input only. A reference to a Secret Manager resource name storing the PEM-encoded private key associated with the Client Certificate. If this field is used then the 'client_certificate' and the 'ca_certificate' fields are mandatory. Mutually exclusive with the `client_key` field.
+    #[serde(rename = "secretManagerStoredClientKey")]
+    pub secret_manager_stored_client_key: Option<String>,
+}
+
+impl common::Part for MongodbSslConfig {}
 
 /// CDC strategy to start replicating from the most recent position in the source.
 ///
@@ -939,6 +1340,21 @@ pub struct MysqlDatabase {
 
 impl common::Part for MysqlDatabase {}
 
+/// MySQL GTID position
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MysqlGtidPosition {
+    /// Required. The gtid set to start replication from.
+    #[serde(rename = "gtidSet")]
+    pub gtid_set: Option<String>,
+}
+
+impl common::Part for MysqlGtidPosition {}
+
 /// MySQL log position
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -983,10 +1399,13 @@ impl common::Part for MysqlObjectIdentifier {}
 pub struct MysqlProfile {
     /// Required. Hostname for the MySQL connection.
     pub hostname: Option<String>,
-    /// Required. Input only. Password for the MySQL connection.
+    /// Optional. Input only. Password for the MySQL connection. Mutually exclusive with the `secret_manager_stored_password` field.
     pub password: Option<String>,
     /// Port for the MySQL connection, default value is 3306.
     pub port: Option<i32>,
+    /// Optional. A reference to a Secret Manager resource name storing the MySQL connection password. Mutually exclusive with the `password` field.
+    #[serde(rename = "secretManagerStoredPassword")]
+    pub secret_manager_stored_password: Option<String>,
     /// SSL configuration for the MySQL connection.
     #[serde(rename = "sslConfig")]
     pub ssl_config: Option<MysqlSslConfig>,
@@ -1019,9 +1438,14 @@ impl common::Part for MysqlRdbms {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MysqlSourceConfig {
+    /// Use Binary log position based replication.
+    #[serde(rename = "binaryLogPosition")]
+    pub binary_log_position: Option<BinaryLogPosition>,
     /// MySQL objects to exclude from the stream.
     #[serde(rename = "excludeObjects")]
     pub exclude_objects: Option<MysqlRdbms>,
+    /// Use GTID based replication.
+    pub gtid: Option<Gtid>,
     /// MySQL objects to retrieve from the source.
     #[serde(rename = "includeObjects")]
     pub include_objects: Option<MysqlRdbms>,
@@ -1049,13 +1473,13 @@ pub struct MysqlSslConfig {
     /// Output only. Indicates whether the ca_certificate field is set.
     #[serde(rename = "caCertificateSet")]
     pub ca_certificate_set: Option<bool>,
-    /// Input only. PEM-encoded certificate that will be used by the replica to authenticate against the source database server. If this field is used then the 'client_key' and the 'ca_certificate' fields are mandatory.
+    /// Optional. Input only. PEM-encoded certificate that will be used by the replica to authenticate against the source database server. If this field is used then the 'client_key' and the 'ca_certificate' fields are mandatory.
     #[serde(rename = "clientCertificate")]
     pub client_certificate: Option<String>,
     /// Output only. Indicates whether the client_certificate field is set.
     #[serde(rename = "clientCertificateSet")]
     pub client_certificate_set: Option<bool>,
-    /// Input only. PEM-encoded private key associated with the Client Certificate. If this field is used then the 'client_certificate' and the 'ca_certificate' fields are mandatory.
+    /// Optional. Input only. PEM-encoded private key associated with the Client Certificate. If this field is used then the 'client_certificate' and the 'ca_certificate' fields are mandatory.
     #[serde(rename = "clientKey")]
     pub client_key: Option<String>,
     /// Output only. Indicates whether the client_key field is set.
@@ -1095,6 +1519,27 @@ pub struct NextAvailableStartPosition {
 
 impl common::Part for NextAvailableStartPosition {}
 
+/// OAuth2 Client Credentials.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Oauth2ClientCredentials {
+    /// Required. Client ID for Salesforce OAuth2 Client Credentials.
+    #[serde(rename = "clientId")]
+    pub client_id: Option<String>,
+    /// Optional. Client secret for Salesforce OAuth2 Client Credentials. Mutually exclusive with the `secret_manager_stored_client_secret` field.
+    #[serde(rename = "clientSecret")]
+    pub client_secret: Option<String>,
+    /// Optional. A reference to a Secret Manager resource name storing the Salesforce OAuth2 client_secret. Mutually exclusive with the `client_secret` field.
+    #[serde(rename = "secretManagerStoredClientSecret")]
+    pub secret_manager_stored_client_secret: Option<String>,
+}
+
+impl common::Part for Oauth2ClientCredentials {}
+
 /// This resource represents a long-running operation that is the result of a network API call.
 ///
 /// # Activities
@@ -1131,6 +1576,51 @@ pub struct Operation {
 }
 
 impl common::ResponseResult for Operation {}
+
+/// Configuration for Oracle Automatic Storage Management (ASM) connection.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct OracleAsmConfig {
+    /// Required. ASM service name for the Oracle ASM connection.
+    #[serde(rename = "asmService")]
+    pub asm_service: Option<String>,
+    /// Optional. Connection string attributes
+    #[serde(rename = "connectionAttributes")]
+    pub connection_attributes: Option<HashMap<String, String>>,
+    /// Required. Hostname for the Oracle ASM connection.
+    pub hostname: Option<String>,
+    /// Optional. SSL configuration for the Oracle connection.
+    #[serde(rename = "oracleSslConfig")]
+    pub oracle_ssl_config: Option<OracleSslConfig>,
+    /// Optional. Password for the Oracle ASM connection. Mutually exclusive with the `secret_manager_stored_password` field.
+    pub password: Option<String>,
+    /// Required. Port for the Oracle ASM connection.
+    pub port: Option<i32>,
+    /// Optional. A reference to a Secret Manager resource name storing the Oracle ASM connection password. Mutually exclusive with the `password` field.
+    #[serde(rename = "secretManagerStoredPassword")]
+    pub secret_manager_stored_password: Option<String>,
+    /// Required. Username for the Oracle ASM connection.
+    pub username: Option<String>,
+}
+
+impl common::Part for OracleAsmConfig {}
+
+/// Configuration to use Oracle ASM to access the log files.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct OracleAsmLogFileAccess {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for OracleAsmLogFileAccess {}
 
 /// Oracle Column.
 ///
@@ -1197,13 +1687,19 @@ pub struct OracleProfile {
     pub database_service: Option<String>,
     /// Required. Hostname for the Oracle connection.
     pub hostname: Option<String>,
+    /// Optional. Configuration for Oracle ASM connection.
+    #[serde(rename = "oracleAsmConfig")]
+    pub oracle_asm_config: Option<OracleAsmConfig>,
     /// Optional. SSL configuration for the Oracle connection.
     #[serde(rename = "oracleSslConfig")]
     pub oracle_ssl_config: Option<OracleSslConfig>,
-    /// Required. Password for the Oracle connection.
+    /// Optional. Password for the Oracle connection. Mutually exclusive with the `secret_manager_stored_password` field.
     pub password: Option<String>,
     /// Port for the Oracle connection, default value is 1521.
     pub port: Option<i32>,
+    /// Optional. A reference to a Secret Manager resource name storing the Oracle connection password. Mutually exclusive with the `password` field.
+    #[serde(rename = "secretManagerStoredPassword")]
+    pub secret_manager_stored_password: Option<String>,
     /// Required. Username for the Oracle connection.
     pub username: Option<String>,
 }
@@ -1265,6 +1761,9 @@ impl common::Part for OracleScnPosition {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct OracleSourceConfig {
+    /// Use Binary Log Parser.
+    #[serde(rename = "binaryLogParser")]
+    pub binary_log_parser: Option<BinaryLogParser>,
     /// Drop large object values.
     #[serde(rename = "dropLargeObjects")]
     pub drop_large_objects: Option<DropLargeObjects>,
@@ -1274,6 +1773,9 @@ pub struct OracleSourceConfig {
     /// Oracle objects to include in the stream.
     #[serde(rename = "includeObjects")]
     pub include_objects: Option<OracleRdbms>,
+    /// Use LogMiner.
+    #[serde(rename = "logMiner")]
+    pub log_miner: Option<LogMiner>,
     /// Maximum number of concurrent backfill tasks. The number should be non-negative. If not set (or set to 0), the system's default value is used.
     #[serde(rename = "maxConcurrentBackfillTasks")]
     pub max_concurrent_backfill_tasks: Option<i32>,
@@ -1301,6 +1803,9 @@ pub struct OracleSslConfig {
     /// Output only. Indicates whether the ca_certificate field has been set for this Connection-Profile.
     #[serde(rename = "caCertificateSet")]
     pub ca_certificate_set: Option<bool>,
+    /// Optional. The distinguished name (DN) mentioned in the server certificate. This corresponds to SSL_SERVER_CERT_DN sqlnet parameter. Refer https://docs.oracle.com/en/database/oracle/oracle-database/19/netrf/local-naming-parameters-in-tns-ora-file.html#GUID-70AB0695-A9AA-4A94-B141-4C605236EEB7 If this field is not provided, the DN matching is not enforced.
+    #[serde(rename = "serverCertificateDistinguishedName")]
+    pub server_certificate_distinguished_name: Option<String>,
 }
 
 impl common::Part for OracleSslConfig {}
@@ -1381,10 +1886,16 @@ pub struct PostgresqlProfile {
     pub database: Option<String>,
     /// Required. Hostname for the PostgreSQL connection.
     pub hostname: Option<String>,
-    /// Required. Password for the PostgreSQL connection.
+    /// Optional. Password for the PostgreSQL connection. Mutually exclusive with the `secret_manager_stored_password` field.
     pub password: Option<String>,
     /// Port for the PostgreSQL connection, default value is 5432.
     pub port: Option<i32>,
+    /// Optional. A reference to a Secret Manager resource name storing the PostgreSQL connection password. Mutually exclusive with the `password` field.
+    #[serde(rename = "secretManagerStoredPassword")]
+    pub secret_manager_stored_password: Option<String>,
+    /// Optional. SSL configuration for the PostgreSQL connection. In case PostgresqlSslConfig is not set, the connection will use the default SSL mode, which is `prefer` (i.e. this mode will only use encryption if enabled from database side, otherwise will use unencrypted communication)
+    #[serde(rename = "sslConfig")]
+    pub ssl_config: Option<PostgresqlSslConfig>,
     /// Required. Username for the PostgreSQL connection.
     pub username: Option<String>,
 }
@@ -1449,6 +1960,24 @@ pub struct PostgresqlSourceConfig {
 
 impl common::Part for PostgresqlSourceConfig {}
 
+/// PostgreSQL SSL configuration information.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PostgresqlSslConfig {
+    /// If this field is set, the communication will be encrypted with TLS encryption and both the server identity and the client identity will be authenticated.
+    #[serde(rename = "serverAndClientVerification")]
+    pub server_and_client_verification: Option<ServerAndClientVerification>,
+    ///  If this field is set, the communication will be encrypted with TLS encryption and the server identity will be authenticated.
+    #[serde(rename = "serverVerification")]
+    pub server_verification: Option<ServerVerification>,
+}
+
+impl common::Part for PostgresqlSslConfig {}
+
 /// PostgreSQL table.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1489,8 +2018,17 @@ pub struct PrivateConnection {
     pub error: Option<Error>,
     /// Labels.
     pub labels: Option<HashMap<String, String>>,
-    /// Output only. The resource's name.
+    /// Output only. Identifier. The resource's name.
     pub name: Option<String>,
+    /// PSC Interface Config.
+    #[serde(rename = "pscInterfaceConfig")]
+    pub psc_interface_config: Option<PscInterfaceConfig>,
+    /// Output only. Reserved for future use.
+    #[serde(rename = "satisfiesPzi")]
+    pub satisfies_pzi: Option<bool>,
+    /// Output only. Reserved for future use.
+    #[serde(rename = "satisfiesPzs")]
+    pub satisfies_pzs: Option<bool>,
     /// Output only. The state of the Private Connection.
     pub state: Option<String>,
     /// Output only. The update time of the resource.
@@ -1519,6 +2057,21 @@ pub struct PrivateConnectivity {
 
 impl common::Part for PrivateConnectivity {}
 
+/// The PSC Interface configuration is used to create PSC Interface between Datastream and the consumer's PSC.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PscInterfaceConfig {
+    /// Required. Fully qualified name of the Network Attachment that Datastream will connect to. Format: `projects/{project}/regions/{region}/networkAttachments/{name}`
+    #[serde(rename = "networkAttachment")]
+    pub network_attachment: Option<String>,
+}
+
+impl common::Part for PscInterfaceConfig {}
+
 /// The route resource is the child of the private connection resource, used for defining a route for a private connection.
 ///
 /// # Activities
@@ -1546,7 +2099,7 @@ pub struct Route {
     pub display_name: Option<String>,
     /// Labels.
     pub labels: Option<HashMap<String, String>>,
-    /// Output only. The resource's name.
+    /// Output only. Identifier. The resource's name.
     pub name: Option<String>,
     /// Output only. The update time of the resource.
     #[serde(rename = "updateTime")]
@@ -1571,9 +2124,160 @@ pub struct RunStreamRequest {
     /// Optional. The CDC strategy of the stream. If not set, the system's default value will be used.
     #[serde(rename = "cdcStrategy")]
     pub cdc_strategy: Option<CdcStrategy>,
+    /// Optional. Update the stream without validating it.
+    pub force: Option<bool>,
 }
 
 impl common::RequestValue for RunStreamRequest {}
+
+/// Salesforce field.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SalesforceField {
+    /// The data type.
+    #[serde(rename = "dataType")]
+    pub data_type: Option<String>,
+    /// Field name.
+    pub name: Option<String>,
+    /// Indicates whether the field can accept nil values.
+    pub nillable: Option<bool>,
+}
+
+impl common::Part for SalesforceField {}
+
+/// Salesforce object.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SalesforceObject {
+    /// Salesforce fields. When unspecified as part of include objects, includes everything, when unspecified as part of exclude objects, excludes nothing.
+    pub fields: Option<Vec<SalesforceField>>,
+    /// Object name.
+    #[serde(rename = "objectName")]
+    pub object_name: Option<String>,
+}
+
+impl common::Part for SalesforceObject {}
+
+/// Salesforce data source object identifier.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SalesforceObjectIdentifier {
+    /// Required. The object name.
+    #[serde(rename = "objectName")]
+    pub object_name: Option<String>,
+}
+
+impl common::Part for SalesforceObjectIdentifier {}
+
+/// Salesforce organization structure.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SalesforceOrg {
+    /// Salesforce objects in the database server.
+    pub objects: Option<Vec<SalesforceObject>>,
+}
+
+impl common::Part for SalesforceOrg {}
+
+/// Salesforce profile
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SalesforceProfile {
+    /// Required. Domain endpoint for the Salesforce connection.
+    pub domain: Option<String>,
+    /// Connected app authentication.
+    #[serde(rename = "oauth2ClientCredentials")]
+    pub oauth2_client_credentials: Option<Oauth2ClientCredentials>,
+    /// User-password authentication.
+    #[serde(rename = "userCredentials")]
+    pub user_credentials: Option<UserCredentials>,
+}
+
+impl common::Part for SalesforceProfile {}
+
+/// Salesforce source configuration
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SalesforceSourceConfig {
+    /// Salesforce objects to exclude from the stream.
+    #[serde(rename = "excludeObjects")]
+    pub exclude_objects: Option<SalesforceOrg>,
+    /// Salesforce objects to retrieve from the source.
+    #[serde(rename = "includeObjects")]
+    pub include_objects: Option<SalesforceOrg>,
+    /// Required. Salesforce objects polling interval. The interval at which new changes will be polled for each object. The duration must be between 5 minutes and 24 hours.
+    #[serde(rename = "pollingInterval")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub polling_interval: Option<chrono::Duration>,
+}
+
+impl common::Part for SalesforceSourceConfig {}
+
+/// Message represents the option where Datastream will enforce the encryption and authenticate the server identity as well as the client identity. ca_certificate, client_certificate and client_key must be set if user selects this option.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ServerAndClientVerification {
+    /// Required. Input only. PEM-encoded server root CA certificate.
+    #[serde(rename = "caCertificate")]
+    pub ca_certificate: Option<String>,
+    /// Required. Input only. PEM-encoded certificate used by the source database to authenticate the client identity (i.e., the Datastream's identity). This certificate is signed by either a root certificate trusted by the server or one or more intermediate certificates (which is stored with the leaf certificate) to link the this certificate to the trusted root certificate.
+    #[serde(rename = "clientCertificate")]
+    pub client_certificate: Option<String>,
+    /// Optional. Input only. PEM-encoded private key associated with the client certificate. This value will be used during the SSL/TLS handshake, allowing the PostgreSQL server to authenticate the client's identity, i.e. identity of the Datastream.
+    #[serde(rename = "clientKey")]
+    pub client_key: Option<String>,
+    /// Optional. The hostname mentioned in the Subject or SAN extension of the server certificate. If this field is not provided, the hostname in the server certificate is not validated.
+    #[serde(rename = "serverCertificateHostname")]
+    pub server_certificate_hostname: Option<String>,
+}
+
+impl common::Part for ServerAndClientVerification {}
+
+/// Message represents the option where Datastream will enforce the encryption and authenticate the server identity. ca_certificate must be set if user selects this option.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ServerVerification {
+    /// Required. Input only. PEM-encoded server root CA certificate.
+    #[serde(rename = "caCertificate")]
+    pub ca_certificate: Option<String>,
+    /// Optional. The hostname mentioned in the Subject or SAN extension of the server certificate. If this field is not provided, the hostname in the server certificate is not validated.
+    #[serde(rename = "serverCertificateHostname")]
+    pub server_certificate_hostname: Option<String>,
+}
+
+impl common::Part for ServerVerification {}
 
 /// A single target dataset to which all data will be streamed.
 ///
@@ -1598,6 +2302,9 @@ impl common::Part for SingleTargetDataset {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SourceConfig {
+    /// MongoDB data source configuration.
+    #[serde(rename = "mongodbSourceConfig")]
+    pub mongodb_source_config: Option<MongodbSourceConfig>,
     /// MySQL data source configuration.
     #[serde(rename = "mysqlSourceConfig")]
     pub mysql_source_config: Option<MysqlSourceConfig>,
@@ -1607,7 +2314,10 @@ pub struct SourceConfig {
     /// PostgreSQL data source configuration.
     #[serde(rename = "postgresqlSourceConfig")]
     pub postgresql_source_config: Option<PostgresqlSourceConfig>,
-    /// Required. Source connection profile resoource. Format: `projects/{project}/locations/{location}/connectionProfiles/{name}`
+    /// Salesforce data source configuration.
+    #[serde(rename = "salesforceSourceConfig")]
+    pub salesforce_source_config: Option<SalesforceSourceConfig>,
+    /// Required. Source connection profile resource. Format: `projects/{project}/locations/{location}/connectionProfiles/{name}`
     #[serde(rename = "sourceConnectionProfile")]
     pub source_connection_profile: Option<String>,
     /// SQLServer data source configuration.
@@ -1628,6 +2338,9 @@ pub struct SourceHierarchyDatasets {
     /// The dataset template to use for dynamic dataset creation.
     #[serde(rename = "datasetTemplate")]
     pub dataset_template: Option<DatasetTemplate>,
+    /// Optional. The project id of the BigQuery dataset. If not specified, the project will be inferred from the stream resource.
+    #[serde(rename = "projectId")]
+    pub project_id: Option<String>,
 }
 
 impl common::Part for SourceHierarchyDatasets {}
@@ -1640,6 +2353,9 @@ impl common::Part for SourceHierarchyDatasets {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SourceObjectIdentifier {
+    /// MongoDB data source object identifier.
+    #[serde(rename = "mongodbIdentifier")]
+    pub mongodb_identifier: Option<MongodbObjectIdentifier>,
     /// Mysql data source object identifier.
     #[serde(rename = "mysqlIdentifier")]
     pub mysql_identifier: Option<MysqlObjectIdentifier>,
@@ -1649,6 +2365,9 @@ pub struct SourceObjectIdentifier {
     /// PostgreSQL data source object identifier.
     #[serde(rename = "postgresqlIdentifier")]
     pub postgresql_identifier: Option<PostgresqlObjectIdentifier>,
+    /// Salesforce data source object identifier.
+    #[serde(rename = "salesforceIdentifier")]
+    pub salesforce_identifier: Option<SalesforceObjectIdentifier>,
     /// SQLServer data source object identifier.
     #[serde(rename = "sqlServerIdentifier")]
     pub sql_server_identifier: Option<SqlServerObjectIdentifier>,
@@ -1664,12 +2383,21 @@ impl common::Part for SourceObjectIdentifier {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SpecificStartPosition {
+    /// MongoDB change stream position to start replicating from.
+    #[serde(rename = "mongodbChangeStreamPosition")]
+    pub mongodb_change_stream_position: Option<MongodbChangeStreamPosition>,
+    /// MySQL GTID set to start replicating from.
+    #[serde(rename = "mysqlGtidPosition")]
+    pub mysql_gtid_position: Option<MysqlGtidPosition>,
     /// MySQL specific log position to start replicating from.
     #[serde(rename = "mysqlLogPosition")]
     pub mysql_log_position: Option<MysqlLogPosition>,
     /// Oracle SCN to start replicating from.
     #[serde(rename = "oracleScnPosition")]
     pub oracle_scn_position: Option<OracleScnPosition>,
+    /// SqlServer LSN to start replicating from.
+    #[serde(rename = "sqlServerLsnPosition")]
+    pub sql_server_lsn_position: Option<SqlServerLsnPosition>,
 }
 
 impl common::Part for SpecificStartPosition {}
@@ -1718,6 +2446,20 @@ pub struct SqlServerColumn {
 
 impl common::Part for SqlServerColumn {}
 
+/// SQL Server LSN position
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SqlServerLsnPosition {
+    /// Required. Log sequence number (LSN) from where Logs will be read
+    pub lsn: Option<String>,
+}
+
+impl common::Part for SqlServerLsnPosition {}
+
 /// SQLServer data source object identifier.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1734,7 +2476,7 @@ pub struct SqlServerObjectIdentifier {
 
 impl common::Part for SqlServerObjectIdentifier {}
 
-/// SQLServer database profile
+/// SQLServer database profile.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1746,10 +2488,16 @@ pub struct SqlServerProfile {
     pub database: Option<String>,
     /// Required. Hostname for the SQLServer connection.
     pub hostname: Option<String>,
-    /// Required. Password for the SQLServer connection.
+    /// Optional. Password for the SQLServer connection. Mutually exclusive with the `secret_manager_stored_password` field.
     pub password: Option<String>,
     /// Port for the SQLServer connection, default value is 1433.
     pub port: Option<i32>,
+    /// Optional. A reference to a Secret Manager resource name storing the SQLServer connection password. Mutually exclusive with the `password` field.
+    #[serde(rename = "secretManagerStoredPassword")]
+    pub secret_manager_stored_password: Option<String>,
+    /// Optional. SSL configuration for the SQLServer connection.
+    #[serde(rename = "sslConfig")]
+    pub ssl_config: Option<SqlServerSslConfig>,
     /// Required. Username for the SQLServer connection.
     pub username: Option<String>,
 }
@@ -1816,6 +2564,27 @@ pub struct SqlServerSourceConfig {
 
 impl common::Part for SqlServerSourceConfig {}
 
+/// SQL Server SSL configuration information.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SqlServerSslConfig {
+    /// If set, Datastream will enforce encryption without authenticating server identity. Server certificates will be trusted by default.
+    #[serde(rename = "basicEncryption")]
+    pub basic_encryption: Option<BasicEncryption>,
+    /// If set, Datastream will enforce encryption and authenticate server identity.
+    #[serde(rename = "encryptionAndServerValidation")]
+    pub encryption_and_server_validation: Option<EncryptionAndServerValidation>,
+    /// If set, Datastream will not enforce encryption. If the DB server mandates encryption, then connection will be encrypted but server identity will not be authenticated.
+    #[serde(rename = "encryptionNotEnforced")]
+    pub encryption_not_enforced: Option<EncryptionNotEnforced>,
+}
+
+impl common::Part for SqlServerSslConfig {}
+
 /// SQLServer table.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1845,6 +2614,34 @@ pub struct SqlServerTransactionLogs {
 
 impl common::Part for SqlServerTransactionLogs {}
 
+/// Srv connection format.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SrvConnectionFormat {
+    _never_set: Option<bool>,
+}
+
+impl common::Part for SrvConnectionFormat {}
+
+/// Standard connection format.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct StandardConnectionFormat {
+    /// Optional. Specifies whether the client connects directly to the host[:port] in the connection URI.
+    #[serde(rename = "directConnection")]
+    pub direct_connection: Option<bool>,
+}
+
+impl common::Part for StandardConnectionFormat {}
+
 /// Request for manually initiating a backfill job for a specific stream object.
 ///
 /// # Activities
@@ -1857,7 +2654,9 @@ impl common::Part for SqlServerTransactionLogs {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct StartBackfillJobRequest {
-    _never_set: Option<bool>,
+    /// Optional. Optional event filter. If not set, or empty, the backfill will be performed on the entire object. This is currently used for partial backfill and only supported for SQL Server sources.
+    #[serde(rename = "eventFilter")]
+    pub event_filter: Option<EventFilter>,
 }
 
 impl common::RequestValue for StartBackfillJobRequest {}
@@ -1985,8 +2784,14 @@ pub struct Stream {
     /// Output only. If the stream was recovered, the time of the last recovery. Note: This field is currently experimental.
     #[serde(rename = "lastRecoveryTime")]
     pub last_recovery_time: Option<chrono::DateTime<chrono::offset::Utc>>,
-    /// Output only. The stream's name.
+    /// Output only. Identifier. The stream's name.
     pub name: Option<String>,
+    /// Output only. Reserved for future use.
+    #[serde(rename = "satisfiesPzi")]
+    pub satisfies_pzi: Option<bool>,
+    /// Output only. Reserved for future use.
+    #[serde(rename = "satisfiesPzs")]
+    pub satisfies_pzs: Option<bool>,
     /// Required. Source connection profile configuration.
     #[serde(rename = "sourceConfig")]
     pub source_config: Option<SourceConfig>,
@@ -2037,7 +2842,7 @@ pub struct StreamObject {
     pub display_name: Option<String>,
     /// Output only. Active errors on the object.
     pub errors: Option<Vec<Error>>,
-    /// Output only. The object resource's name.
+    /// Output only. Identifier. The object resource's name.
     pub name: Option<String>,
     /// The object identifier in the data source.
     #[serde(rename = "sourceObject")]
@@ -2048,6 +2853,31 @@ pub struct StreamObject {
 }
 
 impl common::ResponseResult for StreamObject {}
+
+/// Username-password credentials.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct UserCredentials {
+    /// Optional. Password for the Salesforce connection. Mutually exclusive with the `secret_manager_stored_password` field.
+    pub password: Option<String>,
+    /// Optional. A reference to a Secret Manager resource name storing the Salesforce connection's password. Mutually exclusive with the `password` field.
+    #[serde(rename = "secretManagerStoredPassword")]
+    pub secret_manager_stored_password: Option<String>,
+    /// Optional. A reference to a Secret Manager resource name storing the Salesforce connection's security token. Mutually exclusive with the `security_token` field.
+    #[serde(rename = "secretManagerStoredSecurityToken")]
+    pub secret_manager_stored_security_token: Option<String>,
+    /// Optional. Security token for the Salesforce connection. Mutually exclusive with the `secret_manager_stored_security_token` field.
+    #[serde(rename = "securityToken")]
+    pub security_token: Option<String>,
+    /// Required. Username for the Salesforce connection.
+    pub username: Option<String>,
+}
+
+impl common::Part for UserCredentials {}
 
 /// The VPC Peering configuration is used to create VPC peering between Datastream and the consumer's VPC.
 ///
@@ -2085,9 +2915,20 @@ impl common::Part for VpcPeeringConfig {}
 /// use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2098,7 +2939,7 @@ impl common::Part for VpcPeeringConfig {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Datastream::new(client, auth);
@@ -2240,7 +3081,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Output only. The resource's name.
+    /// * `name` - Output only. Identifier. The resource's name.
     pub fn locations_connection_profiles_patch(
         &self,
         request: ConnectionProfile,
@@ -2262,7 +3103,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
     ///
     /// # Arguments
     ///
@@ -2331,6 +3172,7 @@ impl<'a, C> ProjectMethods<'a, C> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
+            _return_partial_success: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -2447,6 +3289,7 @@ impl<'a, C> ProjectMethods<'a, C> {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
+            _validate_only: Default::default(),
             _request_id: Default::default(),
             _private_connection_id: Default::default(),
             _force: Default::default(),
@@ -2723,7 +3566,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Output only. The stream's name.
+    /// * `name` - Output only. Identifier. The stream's name.
     pub fn locations_streams_patch(
         &self,
         request: Stream,
@@ -2745,7 +3588,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Use this method to start, resume or recover a stream with a non default CDC strategy. NOTE: This feature is currently experimental.
+    /// Use this method to start, resume or recover a stream with a non default CDC strategy.
     ///
     /// # Arguments
     ///
@@ -2819,6 +3662,7 @@ impl<'a, C> ProjectMethods<'a, C> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _extra_location_types: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -2848,9 +3692,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2861,7 +3716,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -3246,9 +4101,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3259,7 +4125,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -3555,9 +4421,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3568,7 +4445,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -3892,9 +4769,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3905,7 +4793,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -4178,9 +5066,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4191,7 +5090,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -4527,9 +5426,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4540,7 +5450,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -4769,7 +5679,7 @@ where
         self._request = new_value;
         self
     }
-    /// Output only. The resource's name.
+    /// Output only. Identifier. The resource's name.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -4904,7 +5814,7 @@ where
     }
 }
 
-/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.
+/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.
 ///
 /// A builder for the *locations.operations.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -4922,9 +5832,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4935,7 +5856,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -5247,9 +6168,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5260,7 +6192,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -5533,9 +6465,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5546,7 +6489,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -5819,9 +6762,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5832,7 +6786,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -5840,9 +6794,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("sed")
-///              .page_size(-20)
-///              .filter("dolore")
+///              .return_partial_success(false)
+///              .page_token("duo")
+///              .page_size(-34)
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5852,6 +6807,7 @@ where
 {
     hub: &'a Datastream<C>,
     _name: String,
+    _return_partial_success: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -5881,15 +6837,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "returnPartialSuccess",
+            "pageToken",
+            "pageSize",
+            "filter",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
+        if let Some(value) = self._return_partial_success.as_ref() {
+            params.push("returnPartialSuccess", value.to_string());
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -6018,6 +6986,16 @@ where
         self._name = new_value.to_string();
         self
     }
+    /// When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the [ListOperationsResponse.unreachable] field. This can only be `true` when reading across collections e.g. when `parent` is set to `"projects/example/locations/-"`. This field is not by default supported and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.
+    ///
+    /// Sets the *return partial success* query property to the given value.
+    pub fn return_partial_success(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationOperationListCall<'a, C> {
+        self._return_partial_success = Some(new_value);
+        self
+    }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
@@ -6142,9 +7120,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6155,7 +7144,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -6168,8 +7157,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_routes_create(req, "parent")
-///              .route_id("voluptua.")
-///              .request_id("amet.")
+///              .route_id("amet.")
+///              .request_id("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6510,9 +7499,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6523,7 +7523,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -6531,7 +7531,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_routes_delete("name")
-///              .request_id("diam")
+///              .request_id("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6824,9 +7824,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6837,7 +7848,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -7117,9 +8128,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7130,7 +8152,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -7138,10 +8160,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_routes_list("parent")
-///              .page_token("et")
-///              .page_size(-95)
-///              .order_by("Stet")
-///              .filter("dolor")
+///              .page_token("sadipscing")
+///              .page_size(-15)
+///              .order_by("dolor")
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7486,9 +8508,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7499,7 +8532,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -7512,8 +8545,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_create(req, "parent")
-///              .request_id("vero")
-///              .private_connection_id("vero")
+///              .validate_only(false)
+///              .request_id("invidunt")
+///              .private_connection_id("Stet")
 ///              .force(false)
 ///              .doit().await;
 /// # }
@@ -7525,6 +8559,7 @@ where
     hub: &'a Datastream<C>,
     _request: PrivateConnection,
     _parent: String,
+    _validate_only: Option<bool>,
     _request_id: Option<String>,
     _private_connection_id: Option<String>,
     _force: Option<bool>,
@@ -7554,15 +8589,27 @@ where
             http_method: hyper::Method::POST,
         });
 
-        for &field in ["alt", "parent", "requestId", "privateConnectionId", "force"].iter() {
+        for &field in [
+            "alt",
+            "parent",
+            "validateOnly",
+            "requestId",
+            "privateConnectionId",
+            "force",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._validate_only.as_ref() {
+            params.push("validateOnly", value.to_string());
+        }
         if let Some(value) = self._request_id.as_ref() {
             params.push("requestId", value);
         }
@@ -7724,6 +8771,16 @@ where
         self._parent = new_value.to_string();
         self
     }
+    /// Optional. When supplied with PSC Interface config, will get/create the tenant project required for the customer to allow list and won't actually create the private connection.
+    ///
+    /// Sets the *validate only* query property to the given value.
+    pub fn validate_only(
+        mut self,
+        new_value: bool,
+    ) -> ProjectLocationPrivateConnectionCreateCall<'a, C> {
+        self._validate_only = Some(new_value);
+        self
+    }
     /// Optional. A request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).
     ///
     /// Sets the *request id* query property to the given value.
@@ -7860,9 +8917,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7873,7 +8941,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -7881,7 +8949,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_delete("name")
-///              .request_id("vero")
+///              .request_id("Lorem")
 ///              .force(true)
 ///              .doit().await;
 /// # }
@@ -8180,9 +9248,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8193,7 +9272,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -8466,9 +9545,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8479,7 +9569,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -8487,10 +9577,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_private_connections_list("parent")
-///              .page_token("no")
-///              .page_size(-100)
-///              .order_by("accusam")
-///              .filter("takimata")
+///              .page_token("takimata")
+///              .page_size(-46)
+///              .order_by("voluptua.")
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8814,9 +9904,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8827,7 +9928,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -9100,9 +10201,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9113,7 +10225,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -9121,8 +10233,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_streams_objects_list("parent")
-///              .page_token("et")
-///              .page_size(-31)
+///              .page_token("amet.")
+///              .page_size(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9411,9 +10523,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9424,7 +10547,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -9737,9 +10860,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9750,7 +10884,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -10076,9 +11210,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10089,7 +11234,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -10415,9 +11560,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10428,7 +11584,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -10441,9 +11597,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_streams_create(req, "parent")
-///              .validate_only(true)
-///              .stream_id("et")
-///              .request_id("accusam")
+///              .validate_only(false)
+///              .stream_id("dolore")
+///              .request_id("dolore")
 ///              .force(false)
 ///              .doit().await;
 /// # }
@@ -10794,9 +11950,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10807,7 +11974,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -10815,7 +11982,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_streams_delete("name")
-///              .request_id("dolore")
+///              .request_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11092,9 +12259,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11105,7 +12283,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -11378,9 +12556,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11391,7 +12580,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -11399,10 +12588,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_streams_list("parent")
-///              .page_token("amet.")
-///              .page_size(-17)
-///              .order_by("sadipscing")
-///              .filter("Lorem")
+///              .page_token("invidunt")
+///              .page_size(-11)
+///              .order_by("est")
+///              .filter("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11722,9 +12911,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11735,7 +12935,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -11748,9 +12948,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_streams_patch(req, "name")
-///              .validate_only(true)
+///              .validate_only(false)
 ///              .update_mask(FieldMask::new::<&str>(&[]))
-///              .request_id("sit")
+///              .request_id("et")
 ///              .force(true)
 ///              .doit().await;
 /// # }
@@ -11961,7 +13161,7 @@ where
         self._request = new_value;
         self
     }
-    /// Output only. The stream's name.
+    /// Output only. Identifier. The stream's name.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12087,7 +13287,7 @@ where
     }
 }
 
-/// Use this method to start, resume or recover a stream with a non default CDC strategy. NOTE: This feature is currently experimental.
+/// Use this method to start, resume or recover a stream with a non default CDC strategy.
 ///
 /// A builder for the *locations.streams.run* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -12105,9 +13305,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12118,7 +13329,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -12427,9 +13638,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12440,7 +13662,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -12737,9 +13959,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12750,7 +13983,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -13023,9 +14256,20 @@ where
 /// # use datastream1::{Datastream, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13036,7 +14280,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Datastream::new(client, auth);
@@ -13047,6 +14291,7 @@ where
 ///              .page_token("sed")
 ///              .page_size(-29)
 ///              .filter("dolores")
+///              .add_extra_location_types("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13059,6 +14304,7 @@ where
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
+    _extra_location_types: Vec<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -13085,14 +14331,23 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "name", "pageToken", "pageSize", "filter"].iter() {
+        for &field in [
+            "alt",
+            "name",
+            "pageToken",
+            "pageSize",
+            "filter",
+            "extraLocationTypes",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("name", self._name);
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -13102,6 +14357,11 @@ where
         }
         if let Some(value) = self._filter.as_ref() {
             params.push("filter", value);
+        }
+        if !self._extra_location_types.is_empty() {
+            for f in self._extra_location_types.iter() {
+                params.push("extraLocationTypes", f);
+            }
         }
 
         params.extend(self._additional_params.iter());
@@ -13241,6 +14501,14 @@ where
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
         self._filter = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Do not use this field. It is unsupported and is ignored unless explicitly documented otherwise. This is primarily for internal usage.
+    ///
+    /// Append the given value to the *extra location types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_extra_location_types(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+        self._extra_location_types.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

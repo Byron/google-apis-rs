@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Certificate Manager* crate version *6.0.0+20240617*, where *20240617* is the exact revision of the *certificatemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Certificate Manager* crate version *8.0.0+20251015*, where *20251015* is the exact revision of the *certificatemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Certificate Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/certificate-manager).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CertificateManager) ...
 //!
 //! * projects
-//!  * [*locations certificate issuance configs create*](api::ProjectLocationCertificateIssuanceConfigCreateCall), [*locations certificate issuance configs delete*](api::ProjectLocationCertificateIssuanceConfigDeleteCall), [*locations certificate issuance configs get*](api::ProjectLocationCertificateIssuanceConfigGetCall), [*locations certificate issuance configs list*](api::ProjectLocationCertificateIssuanceConfigListCall), [*locations certificate maps certificate map entries create*](api::ProjectLocationCertificateMapCertificateMapEntryCreateCall), [*locations certificate maps certificate map entries delete*](api::ProjectLocationCertificateMapCertificateMapEntryDeleteCall), [*locations certificate maps certificate map entries get*](api::ProjectLocationCertificateMapCertificateMapEntryGetCall), [*locations certificate maps certificate map entries list*](api::ProjectLocationCertificateMapCertificateMapEntryListCall), [*locations certificate maps certificate map entries patch*](api::ProjectLocationCertificateMapCertificateMapEntryPatchCall), [*locations certificate maps create*](api::ProjectLocationCertificateMapCreateCall), [*locations certificate maps delete*](api::ProjectLocationCertificateMapDeleteCall), [*locations certificate maps get*](api::ProjectLocationCertificateMapGetCall), [*locations certificate maps list*](api::ProjectLocationCertificateMapListCall), [*locations certificate maps patch*](api::ProjectLocationCertificateMapPatchCall), [*locations certificates create*](api::ProjectLocationCertificateCreateCall), [*locations certificates delete*](api::ProjectLocationCertificateDeleteCall), [*locations certificates get*](api::ProjectLocationCertificateGetCall), [*locations certificates list*](api::ProjectLocationCertificateListCall), [*locations certificates patch*](api::ProjectLocationCertificatePatchCall), [*locations dns authorizations create*](api::ProjectLocationDnsAuthorizationCreateCall), [*locations dns authorizations delete*](api::ProjectLocationDnsAuthorizationDeleteCall), [*locations dns authorizations get*](api::ProjectLocationDnsAuthorizationGetCall), [*locations dns authorizations list*](api::ProjectLocationDnsAuthorizationListCall), [*locations dns authorizations patch*](api::ProjectLocationDnsAuthorizationPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations trust configs create*](api::ProjectLocationTrustConfigCreateCall), [*locations trust configs delete*](api::ProjectLocationTrustConfigDeleteCall), [*locations trust configs get*](api::ProjectLocationTrustConfigGetCall), [*locations trust configs list*](api::ProjectLocationTrustConfigListCall) and [*locations trust configs patch*](api::ProjectLocationTrustConfigPatchCall)
+//!  * [*locations certificate issuance configs create*](api::ProjectLocationCertificateIssuanceConfigCreateCall), [*locations certificate issuance configs delete*](api::ProjectLocationCertificateIssuanceConfigDeleteCall), [*locations certificate issuance configs get*](api::ProjectLocationCertificateIssuanceConfigGetCall), [*locations certificate issuance configs list*](api::ProjectLocationCertificateIssuanceConfigListCall), [*locations certificate issuance configs patch*](api::ProjectLocationCertificateIssuanceConfigPatchCall), [*locations certificate maps certificate map entries create*](api::ProjectLocationCertificateMapCertificateMapEntryCreateCall), [*locations certificate maps certificate map entries delete*](api::ProjectLocationCertificateMapCertificateMapEntryDeleteCall), [*locations certificate maps certificate map entries get*](api::ProjectLocationCertificateMapCertificateMapEntryGetCall), [*locations certificate maps certificate map entries list*](api::ProjectLocationCertificateMapCertificateMapEntryListCall), [*locations certificate maps certificate map entries patch*](api::ProjectLocationCertificateMapCertificateMapEntryPatchCall), [*locations certificate maps create*](api::ProjectLocationCertificateMapCreateCall), [*locations certificate maps delete*](api::ProjectLocationCertificateMapDeleteCall), [*locations certificate maps get*](api::ProjectLocationCertificateMapGetCall), [*locations certificate maps list*](api::ProjectLocationCertificateMapListCall), [*locations certificate maps patch*](api::ProjectLocationCertificateMapPatchCall), [*locations certificates create*](api::ProjectLocationCertificateCreateCall), [*locations certificates delete*](api::ProjectLocationCertificateDeleteCall), [*locations certificates get*](api::ProjectLocationCertificateGetCall), [*locations certificates list*](api::ProjectLocationCertificateListCall), [*locations certificates patch*](api::ProjectLocationCertificatePatchCall), [*locations dns authorizations create*](api::ProjectLocationDnsAuthorizationCreateCall), [*locations dns authorizations delete*](api::ProjectLocationDnsAuthorizationDeleteCall), [*locations dns authorizations get*](api::ProjectLocationDnsAuthorizationGetCall), [*locations dns authorizations list*](api::ProjectLocationDnsAuthorizationListCall), [*locations dns authorizations patch*](api::ProjectLocationDnsAuthorizationPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations trust configs create*](api::ProjectLocationTrustConfigCreateCall), [*locations trust configs delete*](api::ProjectLocationTrustConfigDeleteCall), [*locations trust configs get*](api::ProjectLocationTrustConfigGetCall), [*locations trust configs list*](api::ProjectLocationTrustConfigListCall) and [*locations trust configs patch*](api::ProjectLocationTrustConfigPatchCall)
 //!
 //!
 //!
@@ -49,6 +49,7 @@
 //! ```ignore
 //! let r = hub.projects().locations_certificate_issuance_configs_create(...).doit().await
 //! let r = hub.projects().locations_certificate_issuance_configs_delete(...).doit().await
+//! let r = hub.projects().locations_certificate_issuance_configs_patch(...).doit().await
 //! let r = hub.projects().locations_certificate_maps_certificate_map_entries_create(...).doit().await
 //! let r = hub.projects().locations_certificate_maps_certificate_map_entries_delete(...).doit().await
 //! let r = hub.projects().locations_certificate_maps_certificate_map_entries_patch(...).doit().await
@@ -104,9 +105,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -117,7 +129,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CertificateManager::new(client, auth);

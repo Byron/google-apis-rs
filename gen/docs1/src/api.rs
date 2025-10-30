@@ -62,7 +62,6 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_docs1 as docs1;
-/// use docs1::api::BatchUpdateDocumentRequest;
 /// use docs1::{Result, Error};
 /// # async fn dox() {
 /// use docs1::{Docs, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -75,9 +74,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -88,19 +98,16 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Docs::new(client, auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = BatchUpdateDocumentRequest::default();
-///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.documents().batch_update(req, "documentId")
+/// let result = hub.documents().get("documentId")
+///              .suggestions_view_mode("takimata")
+///              .include_tabs_content(true)
 ///              .doit().await;
 ///
 /// match result {
@@ -138,7 +145,7 @@ impl<'a, C> Docs<C> {
         Docs {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://docs.googleapis.com/".to_string(),
             _root_url: "https://docs.googleapis.com/".to_string(),
         }
@@ -149,7 +156,7 @@ impl<'a, C> Docs<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -290,6 +297,23 @@ pub struct Body {
 }
 
 impl common::Part for Body {}
+
+/// A reference to a bookmark in this document.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BookmarkLink {
+    /// The ID of a bookmark in this document.
+    pub id: Option<String>,
+    /// The ID of the tab containing this bookmark.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
+}
+
+impl common::Part for BookmarkLink {}
 
 /// Describes the bullet of a paragraph.
 ///
@@ -518,7 +542,7 @@ pub struct CreateParagraphBulletsRequest {
 
 impl common::Part for CreateParagraphBulletsRequest {}
 
-/// The crop properties of an image. The crop rectangle is represented using fractional offsets from the original content's 4 edges. - If the offset is in the interval (0, 1), the corresponding edge of crop rectangle is positioned inside of the image's original bounding rectangle. - If the offset is negative or greater than 1, the corresponding edge of crop rectangle is positioned outside of the image's original bounding rectangle. - If all offsets and rotation angle are 0, the image is not cropped.
+/// The crop properties of an image. The crop rectangle is represented using fractional offsets from the original content's 4 edges. - If the offset is in the interval (0, 1), the corresponding edge of crop rectangle is positioned inside of the image's original bounding rectangle. - If the offset is negative or greater than 1, the corresponding edge of crop rectangle is positioned outside of the image's original bounding rectangle. - If all offsets and rotation angles are 0, the image is not cropped.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -596,6 +620,9 @@ pub struct DeleteFooterRequest {
     /// The id of the footer to delete. If this footer is defined on DocumentStyle, the reference to this footer is removed, resulting in no footer of that type for the first section of the document. If this footer is defined on a SectionStyle, the reference to this footer is removed and the footer of that type is now continued from the previous section.
     #[serde(rename = "footerId")]
     pub footer_id: Option<String>,
+    /// The tab that contains the footer to delete. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
 }
 
 impl common::Part for DeleteFooterRequest {}
@@ -611,6 +638,9 @@ pub struct DeleteHeaderRequest {
     /// The id of the header to delete. If this header is defined on DocumentStyle, the reference to this header is removed, resulting in no header of that type for the first section of the document. If this header is defined on a SectionStyle, the reference to this header is removed and the header of that type is now continued from the previous section.
     #[serde(rename = "headerId")]
     pub header_id: Option<String>,
+    /// The tab containing the header to delete. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
 }
 
 impl common::Part for DeleteHeaderRequest {}
@@ -628,6 +658,9 @@ pub struct DeleteNamedRangeRequest {
     /// The ID of the named range to delete.
     #[serde(rename = "namedRangeId")]
     pub named_range_id: Option<String>,
+    /// Optional. The criteria used to specify which tab(s) the range deletion should occur in. When omitted, the range deletion is applied to all tabs. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the range deletion applies to the singular tab. In a document containing multiple tabs: - If provided, the range deletion applies to the specified tabs. - If not provided, the range deletion applies to all tabs.
+    #[serde(rename = "tabsCriteria")]
+    pub tabs_criteria: Option<TabsCriteria>,
 }
 
 impl common::Part for DeleteNamedRangeRequest {}
@@ -657,6 +690,9 @@ pub struct DeletePositionedObjectRequest {
     /// The ID of the positioned object to delete.
     #[serde(rename = "objectId")]
     pub object_id: Option<String>,
+    /// The tab that the positioned object to delete is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
 }
 
 impl common::Part for DeletePositionedObjectRequest {}
@@ -721,46 +757,48 @@ impl common::Part for Dimension {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Document {
-    /// Output only. The main body of the document.
+    /// Output only. The main body of the document. Legacy field: Instead, use Document.tabs.documentTab.body, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     pub body: Option<Body>,
     /// Output only. The ID of the document.
     #[serde(rename = "documentId")]
     pub document_id: Option<String>,
-    /// Output only. The style of the document.
+    /// Output only. The style of the document. Legacy field: Instead, use Document.tabs.documentTab.documentStyle, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     #[serde(rename = "documentStyle")]
     pub document_style: Option<DocumentStyle>,
-    /// Output only. The footers in the document, keyed by footer ID.
+    /// Output only. The footers in the document, keyed by footer ID. Legacy field: Instead, use Document.tabs.documentTab.footers, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     pub footers: Option<HashMap<String, Footer>>,
-    /// Output only. The footnotes in the document, keyed by footnote ID.
+    /// Output only. The footnotes in the document, keyed by footnote ID. Legacy field: Instead, use Document.tabs.documentTab.footnotes, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     pub footnotes: Option<HashMap<String, Footnote>>,
-    /// Output only. The headers in the document, keyed by header ID.
+    /// Output only. The headers in the document, keyed by header ID. Legacy field: Instead, use Document.tabs.documentTab.headers, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     pub headers: Option<HashMap<String, Header>>,
-    /// Output only. The inline objects in the document, keyed by object ID.
+    /// Output only. The inline objects in the document, keyed by object ID. Legacy field: Instead, use Document.tabs.documentTab.inlineObjects, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     #[serde(rename = "inlineObjects")]
     pub inline_objects: Option<HashMap<String, InlineObject>>,
-    /// Output only. The lists in the document, keyed by list ID.
+    /// Output only. The lists in the document, keyed by list ID. Legacy field: Instead, use Document.tabs.documentTab.lists, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     pub lists: Option<HashMap<String, List>>,
-    /// Output only. The named ranges in the document, keyed by name.
+    /// Output only. The named ranges in the document, keyed by name. Legacy field: Instead, use Document.tabs.documentTab.namedRanges, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     #[serde(rename = "namedRanges")]
     pub named_ranges: Option<HashMap<String, NamedRanges>>,
-    /// Output only. The named styles of the document.
+    /// Output only. The named styles of the document. Legacy field: Instead, use Document.tabs.documentTab.namedStyles, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     #[serde(rename = "namedStyles")]
     pub named_styles: Option<NamedStyles>,
-    /// Output only. The positioned objects in the document, keyed by object ID.
+    /// Output only. The positioned objects in the document, keyed by object ID. Legacy field: Instead, use Document.tabs.documentTab.positionedObjects, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     #[serde(rename = "positionedObjects")]
     pub positioned_objects: Option<HashMap<String, PositionedObject>>,
     /// Output only. The revision ID of the document. Can be used in update requests to specify which revision of a document to apply updates to and how the request should behave if the document has been edited since that revision. Only populated if the user has edit access to the document. The revision ID is not a sequential number but an opaque string. The format of the revision ID might change over time. A returned revision ID is only guaranteed to be valid for 24 hours after it has been returned and cannot be shared across users. If the revision ID is unchanged between calls, then the document has not changed. Conversely, a changed ID (for the same document and user) usually means the document has been updated. However, a changed ID can also be due to internal factors such as ID format changes.
     #[serde(rename = "revisionId")]
     pub revision_id: Option<String>,
-    /// Output only. The suggested changes to the style of the document, keyed by suggestion ID.
+    /// Output only. The suggested changes to the style of the document, keyed by suggestion ID. Legacy field: Instead, use Document.tabs.documentTab.suggestedDocumentStyleChanges, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     #[serde(rename = "suggestedDocumentStyleChanges")]
     pub suggested_document_style_changes: Option<HashMap<String, SuggestedDocumentStyle>>,
-    /// Output only. The suggested changes to the named styles of the document, keyed by suggestion ID.
+    /// Output only. The suggested changes to the named styles of the document, keyed by suggestion ID. Legacy field: Instead, use Document.tabs.documentTab.suggestedNamedStylesChanges, which exposes the actual document content from all tabs when the includeTabsContent parameter is set to `true`. If `false` or unset, this field contains information about the first tab in the document.
     #[serde(rename = "suggestedNamedStylesChanges")]
     pub suggested_named_styles_changes: Option<HashMap<String, SuggestedNamedStyles>>,
     /// Output only. The suggestions view mode applied to the document. Note: When editing a document, changes must be based on a document with SUGGESTIONS_INLINE.
     #[serde(rename = "suggestionsViewMode")]
     pub suggestions_view_mode: Option<String>,
+    /// Tabs that are part of a document. Tabs can contain child tabs, a tab nested within another tab. Child tabs are represented by the Tab.childTabs field.
+    pub tabs: Option<Vec<Tab>>,
     /// The title of the document.
     pub title: Option<String>,
 }
@@ -768,6 +806,21 @@ pub struct Document {
 impl common::RequestValue for Document {}
 impl common::Resource for Document {}
 impl common::ResponseResult for Document {}
+
+/// Represents document-level format settings.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DocumentFormat {
+    /// Whether the document has pages or is pageless.
+    #[serde(rename = "documentMode")]
+    pub document_mode: Option<String>,
+}
+
+impl common::Part for DocumentFormat {}
 
 /// The style of the document.
 ///
@@ -779,58 +832,61 @@ impl common::ResponseResult for Document {}
 pub struct DocumentStyle {
     /// The background of the document. Documents cannot have a transparent background color.
     pub background: Option<Background>,
-    /// The ID of the default footer. If not set, there's no default footer. This property is read-only.
+    /// The ID of the default footer. If not set, there's no default footer. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "defaultFooterId")]
     pub default_footer_id: Option<String>,
-    /// The ID of the default header. If not set, there's no default header. This property is read-only.
+    /// The ID of the default header. If not set, there's no default header. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "defaultHeaderId")]
     pub default_header_id: Option<String>,
-    /// The ID of the footer used only for even pages. The value of use_even_page_header_footer determines whether to use the default_footer_id or this value for the footer on even pages. If not set, there's no even page footer. This property is read-only.
+    /// Specifies document-level format settings, such as the document mode (pages vs pageless).
+    #[serde(rename = "documentFormat")]
+    pub document_format: Option<DocumentFormat>,
+    /// The ID of the footer used only for even pages. The value of use_even_page_header_footer determines whether to use the default_footer_id or this value for the footer on even pages. If not set, there's no even page footer. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "evenPageFooterId")]
     pub even_page_footer_id: Option<String>,
-    /// The ID of the header used only for even pages. The value of use_even_page_header_footer determines whether to use the default_header_id or this value for the header on even pages. If not set, there's no even page header. This property is read-only.
+    /// The ID of the header used only for even pages. The value of use_even_page_header_footer determines whether to use the default_header_id or this value for the header on even pages. If not set, there's no even page header. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "evenPageHeaderId")]
     pub even_page_header_id: Option<String>,
-    /// The ID of the footer used only for the first page. If not set then a unique footer for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_footer_id or this value for the footer on the first page. If not set, there's no first page footer. This property is read-only.
+    /// The ID of the footer used only for the first page. If not set then a unique footer for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_footer_id or this value for the footer on the first page. If not set, there's no first page footer. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "firstPageFooterId")]
     pub first_page_footer_id: Option<String>,
-    /// The ID of the header used only for the first page. If not set then a unique header for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_header_id or this value for the header on the first page. If not set, there's no first page header. This property is read-only.
+    /// The ID of the header used only for the first page. If not set then a unique header for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_header_id or this value for the header on the first page. If not set, there's no first page header. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "firstPageHeaderId")]
     pub first_page_header_id: Option<String>,
-    /// Optional. Indicates whether to flip the dimensions of the page_size, which allows changing the page orientation between portrait and landscape.
+    /// Optional. Indicates whether to flip the dimensions of the page_size, which allows changing the page orientation between portrait and landscape. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "flipPageOrientation")]
     pub flip_page_orientation: Option<bool>,
-    /// The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles.
+    /// The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "marginBottom")]
     pub margin_bottom: Option<Dimension>,
-    /// The amount of space between the bottom of the page and the contents of the footer.
+    /// The amount of space between the bottom of the page and the contents of the footer. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "marginFooter")]
     pub margin_footer: Option<Dimension>,
-    /// The amount of space between the top of the page and the contents of the header.
+    /// The amount of space between the top of the page and the contents of the header. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "marginHeader")]
     pub margin_header: Option<Dimension>,
-    /// The left page margin. Updating the left page margin on the document style clears the left page margin on all section styles. It may also cause columns to resize in all sections.
+    /// The left page margin. Updating the left page margin on the document style clears the left page margin on all section styles. It may also cause columns to resize in all sections. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "marginLeft")]
     pub margin_left: Option<Dimension>,
-    /// The right page margin. Updating the right page margin on the document style clears the right page margin on all section styles. It may also cause columns to resize in all sections.
+    /// The right page margin. Updating the right page margin on the document style clears the right page margin on all section styles. It may also cause columns to resize in all sections. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "marginRight")]
     pub margin_right: Option<Dimension>,
-    /// The top page margin. Updating the top page margin on the document style clears the top page margin on all section styles.
+    /// The top page margin. Updating the top page margin on the document style clears the top page margin on all section styles. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "marginTop")]
     pub margin_top: Option<Dimension>,
-    /// The page number from which to start counting the number of pages.
+    /// The page number from which to start counting the number of pages. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "pageNumberStart")]
     pub page_number_start: Option<i32>,
-    /// The size of a page in the document.
+    /// The size of a page in the document. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "pageSize")]
     pub page_size: Option<Size>,
-    /// Indicates whether DocumentStyle margin_header, SectionStyle margin_header and DocumentStyle margin_footer, SectionStyle margin_footer are respected. When false, the default values in the Docs editor for header and footer margin are used. This property is read-only.
+    /// Indicates whether DocumentStyle margin_header, SectionStyle margin_header and DocumentStyle margin_footer, SectionStyle margin_footer are respected. When false, the default values in the Docs editor for header and footer margin is used. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "useCustomHeaderFooterMargins")]
     pub use_custom_header_footer_margins: Option<bool>,
-    /// Indicates whether to use the even page header / footer IDs for the even pages.
+    /// Indicates whether to use the even page header / footer IDs for the even pages. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "useEvenPageHeaderFooter")]
     pub use_even_page_header_footer: Option<bool>,
-    /// Indicates whether to use the first page header / footer IDs for the first page.
+    /// Indicates whether to use the first page header / footer IDs for the first page. If DocumentMode is PAGELESS, this property will not be rendered.
     #[serde(rename = "useFirstPageHeaderFooter")]
     pub use_first_page_header_footer: Option<bool>,
 }
@@ -905,6 +961,49 @@ pub struct DocumentStyleSuggestionState {
 }
 
 impl common::Part for DocumentStyleSuggestionState {}
+
+/// A tab with document contents.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DocumentTab {
+    /// The main body of the document tab.
+    pub body: Option<Body>,
+    /// The style of the document tab.
+    #[serde(rename = "documentStyle")]
+    pub document_style: Option<DocumentStyle>,
+    /// The footers in the document tab, keyed by footer ID.
+    pub footers: Option<HashMap<String, Footer>>,
+    /// The footnotes in the document tab, keyed by footnote ID.
+    pub footnotes: Option<HashMap<String, Footnote>>,
+    /// The headers in the document tab, keyed by header ID.
+    pub headers: Option<HashMap<String, Header>>,
+    /// The inline objects in the document tab, keyed by object ID.
+    #[serde(rename = "inlineObjects")]
+    pub inline_objects: Option<HashMap<String, InlineObject>>,
+    /// The lists in the document tab, keyed by list ID.
+    pub lists: Option<HashMap<String, List>>,
+    /// The named ranges in the document tab, keyed by name.
+    #[serde(rename = "namedRanges")]
+    pub named_ranges: Option<HashMap<String, NamedRanges>>,
+    /// The named styles of the document tab.
+    #[serde(rename = "namedStyles")]
+    pub named_styles: Option<NamedStyles>,
+    /// The positioned objects in the document tab, keyed by object ID.
+    #[serde(rename = "positionedObjects")]
+    pub positioned_objects: Option<HashMap<String, PositionedObject>>,
+    /// The suggested changes to the style of the document tab, keyed by suggestion ID.
+    #[serde(rename = "suggestedDocumentStyleChanges")]
+    pub suggested_document_style_changes: Option<HashMap<String, SuggestedDocumentStyle>>,
+    /// The suggested changes to the named styles of the document tab, keyed by suggestion ID.
+    #[serde(rename = "suggestedNamedStylesChanges")]
+    pub suggested_named_styles_changes: Option<HashMap<String, SuggestedNamedStyles>>,
+}
+
+impl common::Part for DocumentTab {}
 
 /// The properties of an embedded drawing and used to differentiate the object type. An embedded drawing is one that's created and edited within a document. Note that extensive details are not supported.
 ///
@@ -1077,6 +1176,9 @@ pub struct EndOfSegmentLocation {
     /// The ID of the header, footer or footnote the location is in. An empty segment ID signifies the document's body.
     #[serde(rename = "segmentId")]
     pub segment_id: Option<String>,
+    /// The tab that the location is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
 }
 
 impl common::Part for EndOfSegmentLocation {}
@@ -1179,6 +1281,23 @@ pub struct Header {
 }
 
 impl common::Part for Header {}
+
+/// A reference to a heading in this document.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct HeadingLink {
+    /// The ID of a heading in this document.
+    pub id: Option<String>,
+    /// The ID of the tab containing this heading.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
+}
+
+impl common::Part for HeadingLink {}
 
 /// A ParagraphElement representing a horizontal line.
 ///
@@ -1420,6 +1539,26 @@ pub struct InsertPageBreakRequest {
 
 impl common::Part for InsertPageBreakRequest {}
 
+/// Inserts a person mention.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct InsertPersonRequest {
+    /// Inserts the person mention at the end of a header, footer, footnote or the document body.
+    #[serde(rename = "endOfSegmentLocation")]
+    pub end_of_segment_location: Option<EndOfSegmentLocation>,
+    /// Inserts the person mention at a specific index in the document. The person mention must be inserted inside the bounds of an existing Paragraph. For instance, it cannot be inserted at a table's start index (i.e. between the table and its preceding paragraph). People cannot be inserted inside an equation.
+    pub location: Option<Location>,
+    /// The properties of the person mention to insert.
+    #[serde(rename = "personProperties")]
+    pub person_properties: Option<PersonProperties>,
+}
+
+impl common::Part for InsertPersonRequest {}
+
 /// Inserts a section break at the given location. A newline character will be inserted before the section break.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1524,12 +1663,19 @@ impl common::Part for InsertTextRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Link {
-    /// The ID of a bookmark in this document.
+    /// A bookmark in this document. In documents containing a single tab, links to bookmarks within the singular tab continue to return Link.bookmarkId when the includeTabsContent parameter is set to `false` or unset. Otherwise, this field is returned.
+    pub bookmark: Option<BookmarkLink>,
+    /// The ID of a bookmark in this document. Legacy field: Instead, set includeTabsContent to `true` and use Link.bookmark for read and write operations. This field is only returned when includeTabsContent is set to `false` in documents containing a single tab and links to a bookmark within the singular tab. Otherwise, Link.bookmark is returned. If this field is used in a write request, the bookmark is considered to be from the tab ID specified in the request. If a tab ID is not specified in the request, it is considered to be from the first tab in the document.
     #[serde(rename = "bookmarkId")]
     pub bookmark_id: Option<String>,
-    /// The ID of a heading in this document.
+    /// A heading in this document. In documents containing a single tab, links to headings within the singular tab continue to return Link.headingId when the includeTabsContent parameter is set to `false` or unset. Otherwise, this field is returned.
+    pub heading: Option<HeadingLink>,
+    /// The ID of a heading in this document. Legacy field: Instead, set includeTabsContent to `true` and use Link.heading for read and write operations. This field is only returned when includeTabsContent is set to `false` in documents containing a single tab and links to a heading within the singular tab. Otherwise, Link.heading is returned. If this field is used in a write request, the heading is considered to be from the tab ID specified in the request. If a tab ID is not specified in the request, it is considered to be from the first tab in the document.
     #[serde(rename = "headingId")]
     pub heading_id: Option<String>,
+    /// The ID of a tab in this document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
     /// An external URL.
     pub url: Option<String>,
 }
@@ -1633,6 +1779,9 @@ pub struct Location {
     /// The ID of the header, footer or footnote the location is in. An empty segment ID signifies the document's body.
     #[serde(rename = "segmentId")]
     pub segment_id: Option<String>,
+    /// The tab that the location is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
 }
 
 impl common::Part for Location {}
@@ -1773,10 +1922,10 @@ pub struct NestingLevel {
     /// The format string used by bullets at this level of nesting. The glyph format contains one or more placeholders, and these placeholders are replaced with the appropriate values depending on the glyph_type or glyph_symbol. The placeholders follow the pattern `%[nesting_level]`. Furthermore, placeholders can have prefixes and suffixes. Thus, the glyph format follows the pattern `%[nesting_level]`. Note that the prefix and suffix are optional and can be arbitrary strings. For example, the glyph format `%0.` indicates that the rendered glyph will replace the placeholder with the corresponding glyph for nesting level 0 followed by a period as the suffix. So a list with a glyph type of UPPER_ALPHA and glyph format `%0.` at nesting level 0 will result in a list with rendered glyphs `A.` `B.` `C.` The glyph format can contain placeholders for the current nesting level as well as placeholders for parent nesting levels. For example, a list can have a glyph format of `%0.` at nesting level 0 and a glyph format of `%0.%1.` at nesting level 1. Assuming both nesting levels have DECIMAL glyph types, this would result in a list with rendered glyphs `1.` `2.` ` 2.1.` ` 2.2.` `3.` For nesting levels that are ordered, the string that replaces a placeholder in the glyph format for a particular paragraph depends on the paragraph's order within the list.
     #[serde(rename = "glyphFormat")]
     pub glyph_format: Option<String>,
-    /// A custom glyph symbol used by bullets when paragraphs at this level of nesting are unordered. The glyph symbol replaces placeholders within the glyph_format. For example, if the glyph_symbol is the solid circle corresponding to Unicode U+25cf code point and the glyph_format is `%0`, the rendered glyph would be the solid circle.
+    /// A custom glyph symbol used by bullets when paragraphs at this level of nesting is unordered. The glyph symbol replaces placeholders within the glyph_format. For example, if the glyph_symbol is the solid circle corresponding to Unicode U+25cf code point and the glyph_format is `%0`, the rendered glyph would be the solid circle.
     #[serde(rename = "glyphSymbol")]
     pub glyph_symbol: Option<String>,
-    /// The type of glyph used by bullets when paragraphs at this level of nesting are ordered. The glyph type determines the type of glyph used to replace placeholders within the glyph_format when paragraphs at this level of nesting are ordered. For example, if the nesting level is 0, the glyph_format is `%0.` and the glyph type is DECIMAL, then the rendered glyph would replace the placeholder `%0` in the glyph format with a number corresponding to list item's order within the list.
+    /// The type of glyph used by bullets when paragraphs at this level of nesting is ordered. The glyph type determines the type of glyph used to replace placeholders within the glyph_format when paragraphs at this level of nesting are ordered. For example, if the nesting level is 0, the glyph_format is `%0.` and the glyph type is DECIMAL, then the rendered glyph would replace the placeholder `%0` in the glyph format with a number corresponding to the list item's order within the list.
     #[serde(rename = "glyphType")]
     pub glyph_type: Option<String>,
     /// The amount of indentation for the first line of paragraphs at this level of nesting.
@@ -2170,9 +2319,9 @@ impl common::Part for Person {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct PersonProperties {
-    /// Output only. The email address linked to this Person. This field is always present.
+    /// The email address linked to this Person. This field is always present.
     pub email: Option<String>,
-    /// Output only. The name of the person if it's displayed in the link text instead of the person's email address.
+    /// The name of the person if it's displayed in the link text instead of the person's email address.
     pub name: Option<String>,
 }
 
@@ -2317,6 +2466,9 @@ pub struct Range {
     /// The zero-based start index of this range, in UTF-16 code units. In all current uses, a start index must be provided. This field is an Int32Value in order to accommodate future use cases with open-ended ranges.
     #[serde(rename = "startIndex")]
     pub start_index: Option<i32>,
+    /// The tab that contains this range. When omitted, the request applies to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
 }
 
 impl common::Part for Range {}
@@ -2335,6 +2487,9 @@ pub struct ReplaceAllTextRequest {
     /// The text that will replace the matched text.
     #[serde(rename = "replaceText")]
     pub replace_text: Option<String>,
+    /// Optional. The criteria used to specify in which tabs the replacement occurs. When omitted, the replacement applies to all tabs. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the replacement applies to the singular tab. In a document containing multiple tabs: - If provided, the replacement applies to the specified tabs. - If omitted, the replacement applies to all tabs.
+    #[serde(rename = "tabsCriteria")]
+    pub tabs_criteria: Option<TabsCriteria>,
 }
 
 impl common::Part for ReplaceAllTextRequest {}
@@ -2368,6 +2523,9 @@ pub struct ReplaceImageRequest {
     /// The replacement method.
     #[serde(rename = "imageReplaceMethod")]
     pub image_replace_method: Option<String>,
+    /// The tab that the image to be replaced is in. When omitted, the request is applied to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If omitted, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
     /// The URI of the new image. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB, cannot exceed 25 megapixels, and must be in PNG, JPEG, or GIF format. The provided URI can't surpass 2 KB in length. The URI is saved with the image, and exposed through the ImageProperties.source_uri field.
     pub uri: Option<String>,
 }
@@ -2388,6 +2546,9 @@ pub struct ReplaceNamedRangeContentRequest {
     /// The name of the NamedRanges whose content will be replaced. If there are multiple named ranges with the given name, then the content of each one will be replaced. If there are no named ranges with the given name, then the request will be a no-op.
     #[serde(rename = "namedRangeName")]
     pub named_range_name: Option<String>,
+    /// Optional. The criteria used to specify in which tabs the replacement occurs. When omitted, the replacement applies to all tabs. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the replacement applies to the singular tab. In a document containing multiple tabs: - If provided, the replacement applies to the specified tabs. - If omitted, the replacement applies to all tabs.
+    #[serde(rename = "tabsCriteria")]
+    pub tabs_criteria: Option<TabsCriteria>,
     /// Replaces the content of the specified named range(s) with the given text.
     pub text: Option<String>,
 }
@@ -2447,6 +2608,9 @@ pub struct Request {
     /// Inserts a page break at the specified location.
     #[serde(rename = "insertPageBreak")]
     pub insert_page_break: Option<InsertPageBreakRequest>,
+    /// Inserts a person mention.
+    #[serde(rename = "insertPerson")]
+    pub insert_person: Option<InsertPersonRequest>,
     /// Inserts a section break at the specified location.
     #[serde(rename = "insertSectionBreak")]
     pub insert_section_break: Option<InsertSectionBreakRequest>,
@@ -2660,52 +2824,52 @@ pub struct SectionStyle {
     /// The content direction of this section. If unset, the value defaults to LEFT_TO_RIGHT. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "contentDirection")]
     pub content_direction: Option<String>,
-    /// The ID of the default footer. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_footer_id. This property is read-only.
+    /// The ID of the default footer. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_footer_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "defaultFooterId")]
     pub default_footer_id: Option<String>,
-    /// The ID of the default header. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_header_id. This property is read-only.
+    /// The ID of the default header. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's default_header_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "defaultHeaderId")]
     pub default_header_id: Option<String>,
-    /// The ID of the footer used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the footers on even pages in the section. If it is false, the footers on even pages use the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_footer_id. This property is read-only.
+    /// The ID of the footer used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the footers on even pages in the section. If it is false, the footers on even pages use the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_footer_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "evenPageFooterId")]
     pub even_page_footer_id: Option<String>,
-    /// The ID of the header used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the headers on even pages in the section. If it is false, the headers on even pages use the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_header_id. This property is read-only.
+    /// The ID of the header used only for even pages. If the value of DocumentStyle's use_even_page_header_footer is true, this value is used for the headers on even pages in the section. If it is false, the headers on even pages use the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's even_page_header_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "evenPageHeaderId")]
     pub even_page_header_id: Option<String>,
-    /// The ID of the footer used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the footer on the first page of the section. If it's false, the footer on the first page of the section uses the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_footer_id. This property is read-only.
+    /// The ID of the footer used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the footer on the first page of the section. If it's false, the footer on the first page of the section uses the default_footer_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_footer_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "firstPageFooterId")]
     pub first_page_footer_id: Option<String>,
-    /// The ID of the header used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the header on the first page of the section. If it's false, the header on the first page of the section uses the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_header_id. This property is read-only.
+    /// The ID of the header used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the header on the first page of the section. If it's false, the header on the first page of the section uses the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_header_id. If DocumentMode is PAGELESS, this property will not be rendered. This property is read-only.
     #[serde(rename = "firstPageHeaderId")]
     pub first_page_header_id: Option<String>,
-    /// Optional. Indicates whether to flip the dimensions of DocumentStyle's page_size for this section, which allows changing the page orientation between portrait and landscape. If unset, the value inherits from DocumentStyle's flip_page_orientation. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// Optional. Indicates whether to flip the dimensions of DocumentStyle's page_size for this section, which allows changing the page orientation between portrait and landscape. If unset, the value inherits from DocumentStyle's flip_page_orientation. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "flipPageOrientation")]
     pub flip_page_orientation: Option<bool>,
-    /// The bottom page margin of the section. If unset, the value defaults to margin_bottom from DocumentStyle. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// The bottom page margin of the section. If unset, the value defaults to margin_bottom from DocumentStyle. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "marginBottom")]
     pub margin_bottom: Option<Dimension>,
-    /// The footer margin of the section. If unset, the value defaults to margin_footer from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a footer margin is being respected for this section When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// The footer margin of the section. If unset, the value defaults to margin_footer from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a footer margin is being respected for this section If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "marginFooter")]
     pub margin_footer: Option<Dimension>,
-    /// The header margin of the section. If unset, the value defaults to margin_header from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a header margin is being respected for this section. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// The header margin of the section. If unset, the value defaults to margin_header from DocumentStyle. If updated, use_custom_header_footer_margins is set to true on DocumentStyle. The value of use_custom_header_footer_margins on DocumentStyle indicates if a header margin is being respected for this section. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "marginHeader")]
     pub margin_header: Option<Dimension>,
-    /// The left page margin of the section. If unset, the value defaults to margin_left from DocumentStyle. Updating the left margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// The left page margin of the section. If unset, the value defaults to margin_left from DocumentStyle. Updating the left margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "marginLeft")]
     pub margin_left: Option<Dimension>,
-    /// The right page margin of the section. If unset, the value defaults to margin_right from DocumentStyle. Updating the right margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// The right page margin of the section. If unset, the value defaults to margin_right from DocumentStyle. Updating the right margin causes columns in this section to resize. Since the margin affects column width, it's applied before column properties. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "marginRight")]
     pub margin_right: Option<Dimension>,
-    /// The top page margin of the section. If unset, the value defaults to margin_top from DocumentStyle. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// The top page margin of the section. If unset, the value defaults to margin_top from DocumentStyle. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "marginTop")]
     pub margin_top: Option<Dimension>,
-    /// The page number from which to start counting the number of pages for this section. If unset, page numbering continues from the previous section. If the value is unset in the first SectionBreak, refer to DocumentStyle's page_number_start. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// The page number from which to start counting the number of pages for this section. If unset, page numbering continues from the previous section. If the value is unset in the first SectionBreak, refer to DocumentStyle's page_number_start. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "pageNumberStart")]
     pub page_number_start: Option<i32>,
     /// Output only. The type of section.
     #[serde(rename = "sectionType")]
     pub section_type: Option<String>,
-    /// Indicates whether to use the first page header / footer IDs for the first page of the section. If unset, it inherits from DocumentStyle's use_first_page_header_footer for the first section. If the value is unset for subsequent sectors, it should be interpreted as false. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
+    /// Indicates whether to use the first page header / footer IDs for the first page of the section. If unset, it inherits from DocumentStyle's use_first_page_header_footer for the first section. If the value is unset for subsequent sectors, it should be interpreted as false. If DocumentMode is PAGELESS, this property will not be rendered. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.
     #[serde(rename = "useFirstPageHeaderFooter")]
     pub use_first_page_header_footer: Option<bool>,
 }
@@ -2851,6 +3015,9 @@ pub struct SubstringMatchCriteria {
     /// Indicates whether the search should respect case: - `True`: the search is case sensitive. - `False`: the search is case insensitive.
     #[serde(rename = "matchCase")]
     pub match_case: Option<bool>,
+    /// Optional. True if the find value should be treated as a regular expression. Any backslashes in the pattern should be escaped. - `True`: the search text is treated as a regular expressions. - `False`: the search text is treated as a substring for matching.
+    #[serde(rename = "searchByRegex")]
+    pub search_by_regex: Option<bool>,
     /// The text to search for in the document.
     pub text: Option<String>,
 }
@@ -3036,6 +3203,55 @@ pub struct SuggestedTextStyle {
 }
 
 impl common::Part for SuggestedTextStyle {}
+
+/// A tab in a document.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct Tab {
+    /// The child tabs nested within this tab.
+    #[serde(rename = "childTabs")]
+    pub child_tabs: Option<Vec<Tab>>,
+    /// A tab with document contents, like text and images.
+    #[serde(rename = "documentTab")]
+    pub document_tab: Option<DocumentTab>,
+    /// The properties of the tab, like ID and title.
+    #[serde(rename = "tabProperties")]
+    pub tab_properties: Option<TabProperties>,
+}
+
+impl common::Part for Tab {}
+
+/// Properties of a tab.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TabProperties {
+    /// Optional. The emoji icon displayed with the tab. A valid emoji icon is represented by a non-empty Unicode string. Any set of characters that don't represent a single emoji is invalid. If an emoji is invalid, a 400 bad request error is returned. If this value is unset or empty, the tab will display the default tab icon.
+    #[serde(rename = "iconEmoji")]
+    pub icon_emoji: Option<String>,
+    /// The zero-based index of the tab within the parent.
+    pub index: Option<i32>,
+    /// Output only. The depth of the tab within the document. Root-level tabs start at 0.
+    #[serde(rename = "nestingLevel")]
+    pub nesting_level: Option<i32>,
+    /// Optional. The ID of the parent tab. Empty when the current tab is a root-level tab, which means it doesn't have any parents.
+    #[serde(rename = "parentTabId")]
+    pub parent_tab_id: Option<String>,
+    /// Output only. The ID of the tab. This field can't be changed.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
+    /// The user-visible name of the tab.
+    pub title: Option<String>,
+}
+
+impl common::Part for TabProperties {}
 
 /// A tab stop within a paragraph.
 ///
@@ -3391,6 +3607,21 @@ pub struct TableStyle {
 
 impl common::Part for TableStyle {}
 
+/// A criteria that specifies in which tabs a request executes.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TabsCriteria {
+    /// The list of tab IDs in which the request executes.
+    #[serde(rename = "tabIds")]
+    pub tab_ids: Option<Vec<String>>,
+}
+
+impl common::Part for TabsCriteria {}
+
 /// A ParagraphElement that represents a run of text that all has the same styling.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3530,6 +3761,9 @@ pub struct UpdateDocumentStyleRequest {
     pub document_style: Option<DocumentStyle>,
     /// The fields that should be updated. At least one field must be specified. The root `document_style` is implied and should not be specified. A single `"*"` can be used as short-hand for listing every field. For example to update the background, set `fields` to `"background"`.
     pub fields: Option<common::FieldMask>,
+    /// The tab that contains the style to update. When omitted, the request applies to the first tab. In a document containing a single tab: - If provided, must match the singular tab's ID. - If omitted, the request applies to the singular tab. In a document containing multiple tabs: - If provided, the request applies to the specified tab. - If not provided, the request applies to the first tab in the document.
+    #[serde(rename = "tabId")]
+    pub tab_id: Option<String>,
 }
 
 impl common::Part for UpdateDocumentStyleRequest {}
@@ -3715,9 +3949,20 @@ impl common::Part for WriteControl {}
 /// use docs1::{Docs, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -3728,7 +3973,7 @@ impl common::Part for WriteControl {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Docs::new(client, auth);
@@ -3800,6 +4045,7 @@ impl<'a, C> DocumentMethods<'a, C> {
             hub: self.hub,
             _document_id: document_id.to_string(),
             _suggestions_view_mode: Default::default(),
+            _include_tabs_content: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3829,9 +4075,20 @@ impl<'a, C> DocumentMethods<'a, C> {
 /// # use docs1::{Docs, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3842,7 +4099,7 @@ impl<'a, C> DocumentMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Docs::new(client, auth);
@@ -4154,9 +4411,20 @@ where
 /// # use docs1::{Docs, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4167,7 +4435,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Docs::new(client, auth);
@@ -4454,9 +4722,20 @@ where
 /// # use docs1::{Docs, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4467,7 +4746,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Docs::new(client, auth);
@@ -4475,7 +4754,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.documents().get("documentId")
-///              .suggestions_view_mode("At")
+///              .suggestions_view_mode("gubergren")
+///              .include_tabs_content(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4486,6 +4766,7 @@ where
     hub: &'a Docs<C>,
     _document_id: String,
     _suggestions_view_mode: Option<String>,
+    _include_tabs_content: Option<bool>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -4512,17 +4793,27 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "documentId", "suggestionsViewMode"].iter() {
+        for &field in [
+            "alt",
+            "documentId",
+            "suggestionsViewMode",
+            "includeTabsContent",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
         params.push("documentId", self._document_id);
         if let Some(value) = self._suggestions_view_mode.as_ref() {
             params.push("suggestionsViewMode", value);
+        }
+        if let Some(value) = self._include_tabs_content.as_ref() {
+            params.push("includeTabsContent", value.to_string());
         }
 
         params.extend(self._additional_params.iter());
@@ -4648,6 +4939,13 @@ where
     /// Sets the *suggestions view mode* query property to the given value.
     pub fn suggestions_view_mode(mut self, new_value: &str) -> DocumentGetCall<'a, C> {
         self._suggestions_view_mode = Some(new_value.to_string());
+        self
+    }
+    /// Whether to populate the Document.tabs field instead of the text content fields like `body` and `documentStyle` on Document. - When `True`: Document content populates in the Document.tabs field instead of the text content fields in Document. - When `False`: The content of the document's first tab populates the content fields in Document excluding Document.tabs. If a document has only one tab, then that tab is used to populate the document content. Document.tabs will be empty.
+    ///
+    /// Sets the *include tabs content* query property to the given value.
+    pub fn include_tabs_content(mut self, new_value: bool) -> DocumentGetCall<'a, C> {
+        self._include_tabs_content = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong

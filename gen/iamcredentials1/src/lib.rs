@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *IAM Credentials* crate version *6.0.0+20240605*, where *20240605* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *IAM Credentials* crate version *8.0.0+20251022*, where *20251022* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *IAM Credentials* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials).
@@ -11,8 +11,10 @@
 //!
 //! Handle the following *Resources* with ease from the central [hub](IAMCredentials) ...
 //!
+//! * locations
+//!  * [*workforce pools get allowed locations*](api::LocationWorkforcePoolGetAllowedLocationCall)
 //! * projects
-//!  * [*service accounts generate access token*](api::ProjectServiceAccountGenerateAccessTokenCall), [*service accounts generate id token*](api::ProjectServiceAccountGenerateIdTokenCall), [*service accounts sign blob*](api::ProjectServiceAccountSignBlobCall) and [*service accounts sign jwt*](api::ProjectServiceAccountSignJwtCall)
+//!  * [*locations workload identity pools get allowed locations*](api::ProjectLocationWorkloadIdentityPoolGetAllowedLocationCall), [*service accounts generate access token*](api::ProjectServiceAccountGenerateAccessTokenCall), [*service accounts generate id token*](api::ProjectServiceAccountGenerateIdTokenCall), [*service accounts get allowed locations*](api::ProjectServiceAccountGetAllowedLocationCall), [*service accounts sign blob*](api::ProjectServiceAccountSignBlobCall) and [*service accounts sign jwt*](api::ProjectServiceAccountSignJwtCall)
 //!
 //!
 //!
@@ -47,7 +49,7 @@
 //! Or specifically ...
 //!
 //! ```ignore
-//! let r = hub.projects().service_accounts_generate_access_token(...).doit().await
+//! let r = hub.projects().service_accounts_generate_id_token(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -74,7 +76,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_iamcredentials1 as iamcredentials1;
-//! use iamcredentials1::api::GenerateAccessTokenRequest;
+//! use iamcredentials1::api::GenerateIdTokenRequest;
 //! use iamcredentials1::{Result, Error};
 //! # async fn dox() {
 //! use iamcredentials1::{IAMCredentials, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -87,9 +89,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -100,19 +113,19 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = IAMCredentials::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GenerateAccessTokenRequest::default();
+//! let mut req = GenerateIdTokenRequest::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().service_accounts_generate_access_token(req, "name")
+//! let result = hub.projects().service_accounts_generate_id_token(req, "name")
 //!              .doit().await;
 //!
 //! match result {

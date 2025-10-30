@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Filestore* crate version *6.0.0+20240619*, where *20240619* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloud Filestore* crate version *8.0.0+20251015*, where *20251015* is the exact revision of the *file:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Cloud Filestore* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/filestore/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudFilestore) ...
 //!
 //! * projects
-//!  * [*locations backups create*](api::ProjectLocationBackupCreateCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations backups patch*](api::ProjectLocationBackupPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances promote replica*](api::ProjectLocationInstancePromoteReplicaCall), [*locations instances restore*](api::ProjectLocationInstanceRestoreCall), [*locations instances revert*](api::ProjectLocationInstanceRevertCall), [*locations instances shares create*](api::ProjectLocationInstanceShareCreateCall), [*locations instances shares delete*](api::ProjectLocationInstanceShareDeleteCall), [*locations instances shares get*](api::ProjectLocationInstanceShareGetCall), [*locations instances shares list*](api::ProjectLocationInstanceShareListCall), [*locations instances shares patch*](api::ProjectLocationInstanceSharePatchCall), [*locations instances snapshots create*](api::ProjectLocationInstanceSnapshotCreateCall), [*locations instances snapshots delete*](api::ProjectLocationInstanceSnapshotDeleteCall), [*locations instances snapshots get*](api::ProjectLocationInstanceSnapshotGetCall), [*locations instances snapshots list*](api::ProjectLocationInstanceSnapshotListCall), [*locations instances snapshots patch*](api::ProjectLocationInstanceSnapshotPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations backups create*](api::ProjectLocationBackupCreateCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations backups patch*](api::ProjectLocationBackupPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances pause replica*](api::ProjectLocationInstancePauseReplicaCall), [*locations instances promote replica*](api::ProjectLocationInstancePromoteReplicaCall), [*locations instances restore*](api::ProjectLocationInstanceRestoreCall), [*locations instances resume replica*](api::ProjectLocationInstanceResumeReplicaCall), [*locations instances revert*](api::ProjectLocationInstanceRevertCall), [*locations instances shares create*](api::ProjectLocationInstanceShareCreateCall), [*locations instances shares delete*](api::ProjectLocationInstanceShareDeleteCall), [*locations instances shares get*](api::ProjectLocationInstanceShareGetCall), [*locations instances shares list*](api::ProjectLocationInstanceShareListCall), [*locations instances shares patch*](api::ProjectLocationInstanceSharePatchCall), [*locations instances snapshots create*](api::ProjectLocationInstanceSnapshotCreateCall), [*locations instances snapshots delete*](api::ProjectLocationInstanceSnapshotDeleteCall), [*locations instances snapshots get*](api::ProjectLocationInstanceSnapshotGetCall), [*locations instances snapshots list*](api::ProjectLocationInstanceSnapshotListCall), [*locations instances snapshots patch*](api::ProjectLocationInstanceSnapshotPatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //!
 //!
 //!
@@ -59,8 +59,10 @@
 //! let r = hub.projects().locations_instances_create(...).doit().await
 //! let r = hub.projects().locations_instances_delete(...).doit().await
 //! let r = hub.projects().locations_instances_patch(...).doit().await
+//! let r = hub.projects().locations_instances_pause_replica(...).doit().await
 //! let r = hub.projects().locations_instances_promote_replica(...).doit().await
 //! let r = hub.projects().locations_instances_restore(...).doit().await
+//! let r = hub.projects().locations_instances_resume_replica(...).doit().await
 //! let r = hub.projects().locations_instances_revert(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! ```
@@ -102,9 +104,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -115,7 +128,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CloudFilestore::new(client, auth);

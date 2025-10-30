@@ -34,9 +34,20 @@ use tokio::time::sleep;
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -47,7 +58,7 @@ use tokio::time::sleep;
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CustomSearchAPI::new(client, auth);
@@ -55,38 +66,39 @@ use tokio::time::sleep;
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().siterestrict_list()
-///              .start(81)
-///              .sort("vero")
-///              .snippet_length(-76)
-///              .site_search_filter("invidunt")
-///              .site_search("Stet")
-///              .search_type("vero")
-///              .safe("elitr")
-///              .rights("Lorem")
-///              .related_site("diam")
-///              .q("no")
-///              .or_terms("ipsum")
-///              .num(-23)
-///              .lr("takimata")
-///              .low_range("consetetur")
-///              .link_site("voluptua.")
-///              .img_type("et")
-///              .img_size("erat")
-///              .img_dominant_color("consetetur")
-///              .img_color_type("amet.")
-///              .hq("sed")
-///              .hl("takimata")
-///              .high_range("dolores")
-///              .googlehost("gubergren")
-///              .gl("et")
-///              .filter("accusam")
-///              .file_type("voluptua.")
+///              .start(25)
+///              .sort("invidunt")
+///              .snippet_length(-65)
+///              .site_search_filter("vero")
+///              .site_search("elitr")
+///              .search_type("Lorem")
+///              .safe("diam")
+///              .rights("no")
+///              .related_site("ipsum")
+///              .q("accusam")
+///              .or_terms("takimata")
+///              .num(-46)
+///              .lr("voluptua.")
+///              .low_range("et")
+///              .link_site("erat")
+///              .img_type("consetetur")
+///              .img_size("amet.")
+///              .img_dominant_color("sed")
+///              .img_color_type("takimata")
+///              .hq("dolores")
+///              .hl("gubergren")
+///              .high_range("et")
+///              .googlehost("accusam")
+///              .gl("voluptua.")
+///              .filter("dolore")
+///              .file_type("dolore")
 ///              .exclude_terms("dolore")
-///              .exact_terms("dolore")
-///              .date_restrict("dolore")
-///              .cx("voluptua.")
-///              .cr("amet.")
-///              .c2coff("ea")
+///              .exact_terms("voluptua.")
+///              .enable_alternate_search_handler(false)
+///              .date_restrict("Lorem")
+///              .cx("invidunt")
+///              .cr("no")
+///              .c2coff("est")
 ///              .doit().await;
 ///
 /// match result {
@@ -127,7 +139,7 @@ impl<'a, C> CustomSearchAPI<C> {
         CustomSearchAPI {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://customsearch.googleapis.com/".to_string(),
             _root_url: "https://customsearch.googleapis.com/".to_string(),
         }
@@ -138,7 +150,7 @@ impl<'a, C> CustomSearchAPI<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -801,9 +813,20 @@ impl common::Part for SearchUrl {}
 /// use customsearch1::{CustomSearchAPI, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -814,7 +837,7 @@ impl common::Part for SearchUrl {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = CustomSearchAPI::new(client, auth);
@@ -868,6 +891,7 @@ impl<'a, C> CseMethods<'a, C> {
             _file_type: Default::default(),
             _exclude_terms: Default::default(),
             _exact_terms: Default::default(),
+            _enable_alternate_search_handler: Default::default(),
             _date_restrict: Default::default(),
             _cx: Default::default(),
             _cr: Default::default(),
@@ -911,6 +935,7 @@ impl<'a, C> CseMethods<'a, C> {
             _file_type: Default::default(),
             _exclude_terms: Default::default(),
             _exact_terms: Default::default(),
+            _enable_alternate_search_handler: Default::default(),
             _date_restrict: Default::default(),
             _cx: Default::default(),
             _cr: Default::default(),
@@ -942,9 +967,20 @@ impl<'a, C> CseMethods<'a, C> {
 /// # use customsearch1::{CustomSearchAPI, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -955,7 +991,7 @@ impl<'a, C> CseMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CustomSearchAPI::new(client, auth);
@@ -963,38 +999,39 @@ impl<'a, C> CseMethods<'a, C> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().siterestrict_list()
-///              .start(6)
-///              .sort("Lorem")
-///              .snippet_length(-38)
-///              .site_search_filter("no")
-///              .site_search("est")
-///              .search_type("At")
-///              .safe("sed")
-///              .rights("sit")
-///              .related_site("et")
-///              .q("tempor")
-///              .or_terms("aliquyam")
-///              .num(-5)
-///              .lr("et")
-///              .low_range("sanctus")
-///              .link_site("Lorem")
-///              .img_type("est")
+///              .start(74)
+///              .sort("sed")
+///              .snippet_length(-98)
+///              .site_search_filter("et")
+///              .site_search("tempor")
+///              .search_type("aliquyam")
+///              .safe("ipsum")
+///              .rights("et")
+///              .related_site("sanctus")
+///              .q("Lorem")
+///              .or_terms("est")
+///              .num(-30)
+///              .lr("diam")
+///              .low_range("dolores")
+///              .link_site("dolores")
+///              .img_type("et")
 ///              .img_size("sed")
-///              .img_dominant_color("diam")
-///              .img_color_type("dolores")
-///              .hq("dolores")
-///              .hl("et")
-///              .high_range("sed")
-///              .googlehost("no")
-///              .gl("et")
-///              .filter("elitr")
-///              .file_type("sed")
-///              .exclude_terms("no")
-///              .exact_terms("nonumy")
-///              .date_restrict("At")
-///              .cx("sadipscing")
-///              .cr("aliquyam")
-///              .c2coff("dolores")
+///              .img_dominant_color("no")
+///              .img_color_type("et")
+///              .hq("elitr")
+///              .hl("sed")
+///              .high_range("no")
+///              .googlehost("nonumy")
+///              .gl("At")
+///              .filter("sadipscing")
+///              .file_type("aliquyam")
+///              .exclude_terms("dolores")
+///              .exact_terms("sadipscing")
+///              .enable_alternate_search_handler(false)
+///              .date_restrict("amet")
+///              .cx("est")
+///              .cr("et")
+///              .c2coff("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1031,6 +1068,7 @@ where
     _file_type: Option<String>,
     _exclude_terms: Option<String>,
     _exact_terms: Option<String>,
+    _enable_alternate_search_handler: Option<bool>,
     _date_restrict: Option<String>,
     _cx: Option<String>,
     _cr: Option<String>,
@@ -1090,6 +1128,7 @@ where
             "fileType",
             "excludeTerms",
             "exactTerms",
+            "enableAlternateSearchHandler",
             "dateRestrict",
             "cx",
             "cr",
@@ -1103,7 +1142,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(34 + self._additional_params.len());
+        let mut params = Params::with_capacity(35 + self._additional_params.len());
         if let Some(value) = self._start.as_ref() {
             params.push("start", value.to_string());
         }
@@ -1187,6 +1226,9 @@ where
         }
         if let Some(value) = self._exact_terms.as_ref() {
             params.push("exactTerms", value);
+        }
+        if let Some(value) = self._enable_alternate_search_handler.as_ref() {
+            params.push("enableAlternateSearchHandler", value.to_string());
         }
         if let Some(value) = self._date_restrict.as_ref() {
             params.push("dateRestrict", value);
@@ -1481,6 +1523,16 @@ where
         self._exact_terms = Some(new_value.to_string());
         self
     }
+    /// Optional. Enables routing of Programmable Search Engine requests to an alternate search handler.
+    ///
+    /// Sets the *enable alternate search handler* query property to the given value.
+    pub fn enable_alternate_search_handler(
+        mut self,
+        new_value: bool,
+    ) -> CseSiterestrictListCall<'a, C> {
+        self._enable_alternate_search_handler = Some(new_value);
+        self
+    }
     /// Restricts results to URLs based on date. Supported values include: * `d[number]`: requests results from the specified number of past days. * `w[number]`: requests results from the specified number of past weeks. * `m[number]`: requests results from the specified number of past months. * `y[number]`: requests results from the specified number of past years.
     ///
     /// Sets the *date restrict* query property to the given value.
@@ -1572,9 +1624,20 @@ where
 /// # use customsearch1::{CustomSearchAPI, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1585,7 +1648,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = CustomSearchAPI::new(client, auth);
@@ -1593,38 +1656,39 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().list()
-///              .start(6)
-///              .sort("erat")
-///              .snippet_length(-82)
-///              .site_search_filter("amet")
-///              .site_search("est")
-///              .search_type("et")
-///              .safe("sea")
-///              .rights("consetetur")
-///              .related_site("consetetur")
-///              .q("Stet")
-///              .or_terms("est")
-///              .num(-82)
-///              .lr("elitr")
-///              .low_range("duo")
-///              .link_site("diam")
-///              .img_type("est")
-///              .img_size("sit")
-///              .img_dominant_color("sed")
-///              .img_color_type("eos")
-///              .hq("Lorem")
-///              .hl("ea")
-///              .high_range("Stet")
-///              .googlehost("dolores")
-///              .gl("eos")
-///              .filter("et")
-///              .file_type("sea")
-///              .exclude_terms("et")
-///              .exact_terms("At")
-///              .date_restrict("dolore")
-///              .cx("eirmod")
-///              .cr("Lorem")
-///              .c2coff("accusam")
+///              .start(5)
+///              .sort("consetetur")
+///              .snippet_length(-65)
+///              .site_search_filter("est")
+///              .site_search("aliquyam")
+///              .search_type("elitr")
+///              .safe("duo")
+///              .rights("diam")
+///              .related_site("est")
+///              .q("sit")
+///              .or_terms("sed")
+///              .num(-75)
+///              .lr("Lorem")
+///              .low_range("ea")
+///              .link_site("Stet")
+///              .img_type("dolores")
+///              .img_size("eos")
+///              .img_dominant_color("et")
+///              .img_color_type("sea")
+///              .hq("et")
+///              .hl("At")
+///              .high_range("dolore")
+///              .googlehost("eirmod")
+///              .gl("Lorem")
+///              .filter("accusam")
+///              .file_type("amet")
+///              .exclude_terms("erat")
+///              .exact_terms("dolores")
+///              .enable_alternate_search_handler(false)
+///              .date_restrict("accusam")
+///              .cx("sea")
+///              .cr("takimata")
+///              .c2coff("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1661,6 +1725,7 @@ where
     _file_type: Option<String>,
     _exclude_terms: Option<String>,
     _exact_terms: Option<String>,
+    _enable_alternate_search_handler: Option<bool>,
     _date_restrict: Option<String>,
     _cx: Option<String>,
     _cr: Option<String>,
@@ -1720,6 +1785,7 @@ where
             "fileType",
             "excludeTerms",
             "exactTerms",
+            "enableAlternateSearchHandler",
             "dateRestrict",
             "cx",
             "cr",
@@ -1733,7 +1799,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(34 + self._additional_params.len());
+        let mut params = Params::with_capacity(35 + self._additional_params.len());
         if let Some(value) = self._start.as_ref() {
             params.push("start", value.to_string());
         }
@@ -1817,6 +1883,9 @@ where
         }
         if let Some(value) = self._exact_terms.as_ref() {
             params.push("exactTerms", value);
+        }
+        if let Some(value) = self._enable_alternate_search_handler.as_ref() {
+            params.push("enableAlternateSearchHandler", value.to_string());
         }
         if let Some(value) = self._date_restrict.as_ref() {
             params.push("dateRestrict", value);
@@ -2109,6 +2178,13 @@ where
     /// Sets the *exact terms* query property to the given value.
     pub fn exact_terms(mut self, new_value: &str) -> CseListCall<'a, C> {
         self._exact_terms = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Enables routing of Programmable Search Engine requests to an alternate search handler.
+    ///
+    /// Sets the *enable alternate search handler* query property to the given value.
+    pub fn enable_alternate_search_handler(mut self, new_value: bool) -> CseListCall<'a, C> {
+        self._enable_alternate_search_handler = Some(new_value);
         self
     }
     /// Restricts results to URLs based on date. Supported values include: * `d[number]`: requests results from the specified number of past days. * `w[number]`: requests results from the specified number of past weeks. * `m[number]`: requests results from the specified number of past months. * `y[number]`: requests results from the specified number of past years.

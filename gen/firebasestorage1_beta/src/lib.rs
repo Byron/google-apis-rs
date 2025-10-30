@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebasestorage* crate version *6.0.0+20240621*, where *20240621* is the exact revision of the *firebasestorage:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Firebasestorage* crate version *8.0.0+20251024*, where *20251024* is the exact revision of the *firebasestorage:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Firebasestorage* *v1_beta* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/storage).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Firebasestorage) ...
 //!
 //! * projects
-//!  * [*buckets add firebase*](api::ProjectBucketAddFirebaseCall), [*buckets get*](api::ProjectBucketGetCall), [*buckets list*](api::ProjectBucketListCall) and [*buckets remove firebase*](api::ProjectBucketRemoveFirebaseCall)
+//!  * [*buckets add firebase*](api::ProjectBucketAddFirebaseCall), [*buckets get*](api::ProjectBucketGetCall), [*buckets list*](api::ProjectBucketListCall), [*buckets remove firebase*](api::ProjectBucketRemoveFirebaseCall), [*default bucket create*](api::ProjectDefaultBucketCreateCall), [*delete default bucket*](api::ProjectDeleteDefaultBucketCall) and [*get default bucket*](api::ProjectGetDefaultBucketCall)
 //!
 //!
 //!
@@ -47,8 +47,8 @@
 //! Or specifically ...
 //!
 //! ```ignore
-//! let r = hub.projects().buckets_add_firebase(...).doit().await
-//! let r = hub.projects().buckets_get(...).doit().await
+//! let r = hub.projects().default_bucket_create(...).doit().await
+//! let r = hub.projects().get_default_bucket(...).doit().await
 //! ```
 //!
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
@@ -75,7 +75,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_firebasestorage1_beta as firebasestorage1_beta;
-//! use firebasestorage1_beta::api::AddFirebaseRequest;
+//! use firebasestorage1_beta::api::DefaultBucket;
 //! use firebasestorage1_beta::{Result, Error};
 //! # async fn dox() {
 //! use firebasestorage1_beta::{Firebasestorage, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -88,9 +88,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -101,19 +112,19 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Firebasestorage::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = AddFirebaseRequest::default();
+//! let mut req = DefaultBucket::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().buckets_add_firebase(req, "bucket")
+//! let result = hub.projects().default_bucket_create(req, "parent")
 //!              .doit().await;
 //!
 //! match result {

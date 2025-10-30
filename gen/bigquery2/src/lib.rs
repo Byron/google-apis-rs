@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Bigquery* crate version *6.0.0+20240616*, where *20240616* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Bigquery* crate version *8.0.0+20250928*, where *20250928* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -20,9 +20,9 @@
 //! * projects
 //!  * [*get service account*](api::ProjectGetServiceAccountCall) and [*list*](api::ProjectListCall)
 //! * [routines](api::Routine)
-//!  * [*delete*](api::RoutineDeleteCall), [*get*](api::RoutineGetCall), [*get iam policy*](api::RoutineGetIamPolicyCall), [*insert*](api::RoutineInsertCall), [*list*](api::RoutineListCall), [*set iam policy*](api::RoutineSetIamPolicyCall) and [*update*](api::RoutineUpdateCall)
+//!  * [*delete*](api::RoutineDeleteCall), [*get*](api::RoutineGetCall), [*get iam policy*](api::RoutineGetIamPolicyCall), [*insert*](api::RoutineInsertCall), [*list*](api::RoutineListCall), [*set iam policy*](api::RoutineSetIamPolicyCall), [*test iam permissions*](api::RoutineTestIamPermissionCall) and [*update*](api::RoutineUpdateCall)
 //! * [row access policies](api::RowAccessPolicy)
-//!  * [*get iam policy*](api::RowAccessPolicyGetIamPolicyCall), [*list*](api::RowAccessPolicyListCall) and [*test iam permissions*](api::RowAccessPolicyTestIamPermissionCall)
+//!  * [*batch delete*](api::RowAccessPolicyBatchDeleteCall), [*delete*](api::RowAccessPolicyDeleteCall), [*get*](api::RowAccessPolicyGetCall), [*get iam policy*](api::RowAccessPolicyGetIamPolicyCall), [*insert*](api::RowAccessPolicyInsertCall), [*list*](api::RowAccessPolicyListCall), [*test iam permissions*](api::RowAccessPolicyTestIamPermissionCall) and [*update*](api::RowAccessPolicyUpdateCall)
 //! * tabledata
 //!  * [*insert all*](api::TabledataInsertAllCall) and [*list*](api::TabledataListCall)
 //! * [tables](api::Table)
@@ -112,9 +112,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -125,7 +136,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Bigquery::new(client, auth);

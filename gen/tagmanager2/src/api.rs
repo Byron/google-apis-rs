@@ -86,9 +86,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -99,7 +110,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = TagManager::new(client, auth);
@@ -150,7 +161,7 @@ impl<'a, C> TagManager<C> {
         TagManager {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://tagmanager.googleapis.com/".to_string(),
             _root_url: "https://tagmanager.googleapis.com/".to_string(),
         }
@@ -161,7 +172,7 @@ impl<'a, C> TagManager<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -245,6 +256,7 @@ impl<'a, C> TagManager<C> {
 /// * [containers workspaces templates create accounts](AccountContainerWorkspaceTemplateCreateCall) (none)
 /// * [containers workspaces templates delete accounts](AccountContainerWorkspaceTemplateDeleteCall) (none)
 /// * [containers workspaces templates get accounts](AccountContainerWorkspaceTemplateGetCall) (none)
+/// * [containers workspaces templates import_from_gallery accounts](AccountContainerWorkspaceTemplateImportFromGalleryCall) (none)
 /// * [containers workspaces templates list accounts](AccountContainerWorkspaceTemplateListCall) (none)
 /// * [containers workspaces templates revert accounts](AccountContainerWorkspaceTemplateRevertCall) (none)
 /// * [containers workspaces templates update accounts](AccountContainerWorkspaceTemplateUpdateCall) (none)
@@ -310,11 +322,11 @@ pub struct Account {
     pub features: Option<AccountFeatures>,
     /// The fingerprint of the GTM Account as computed at storage time. This value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
-    /// Account display name. @mutable tagmanager.accounts.create @mutable tagmanager.accounts.update
+    /// Account display name.
     pub name: Option<String>,
     /// GTM Account's API relative path.
     pub path: Option<String>,
-    /// Whether the account shares data anonymously with Google and others. This flag enables benchmarking by sharing your data in an anonymous form. Google will remove all identifiable information about your website, combine the data with hundreds of other anonymous sites and report aggregate trends in the benchmarking service. @mutable tagmanager.accounts.create @mutable tagmanager.accounts.update
+    /// Whether the account shares data anonymously with Google and others. This flag enables benchmarking by sharing your data in an anonymous form. Google will remove all identifiable information about your website, combine the data with hundreds of other anonymous sites and report aggregate trends in the benchmarking service.
     #[serde(rename = "shareData")]
     pub share_data: Option<bool>,
     /// Auto generated link to the tag manager UI
@@ -334,7 +346,7 @@ impl common::ResponseResult for Account {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AccountAccess {
-    /// Whether the user has no access, user access, or admin access to an account. @mutable tagmanager.accounts.permissions.create @mutable tagmanager.accounts.permissions.update
+    /// Whether the user has no access, user access, or admin access to an account.
     pub permission: Option<String>,
 }
 
@@ -376,7 +388,7 @@ pub struct BuiltInVariable {
     pub name: Option<String>,
     /// GTM BuiltInVariable's API relative path.
     pub path: Option<String>,
-    /// Type of built-in variable. @required.tagmanager.accounts.containers.workspaces.built_in_variable.update @mutable tagmanager.accounts.containers.workspaces.built_in_variable.update
+    /// Type of built-in variable.
     #[serde(rename = "type")]
     pub type_: Option<String>,
     /// GTM Workspace ID.
@@ -411,23 +423,23 @@ pub struct Client {
     pub container_id: Option<String>,
     /// The fingerprint of the GTM Client as computed at storage time. This value is recomputed whenever the client is modified.
     pub fingerprint: Option<String>,
-    /// Client display name. @mutable tagmanager.accounts.containers.workspaces.clients.create @mutable tagmanager.accounts.containers.workspaces.clients.update
+    /// Client display name.
     pub name: Option<String>,
-    /// User notes on how to apply this tag in the container. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// User notes on how to apply this tag in the container.
     pub notes: Option<String>,
-    /// The client's parameters. @mutable tagmanager.accounts.containers.workspaces.clients.create @mutable tagmanager.accounts.containers.workspaces.clients.update
+    /// The client's parameters.
     pub parameter: Option<Vec<Parameter>>,
     /// Parent folder id.
     #[serde(rename = "parentFolderId")]
     pub parent_folder_id: Option<String>,
     /// GTM client's API relative path.
     pub path: Option<String>,
-    /// Priority determines relative firing order. @mutable tagmanager.accounts.containers.workspaces.clients.create @mutable tagmanager.accounts.containers.workspaces.clients.update
+    /// Priority determines relative firing order.
     pub priority: Option<i32>,
     /// Auto generated link to the tag manager UI
     #[serde(rename = "tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// Client type. @mutable tagmanager.accounts.containers.workspaces.clients.create @mutable tagmanager.accounts.containers.workspaces.clients.update
+    /// Client type.
     #[serde(rename = "type")]
     pub type_: Option<String>,
     /// GTM Workspace ID.
@@ -446,9 +458,9 @@ impl common::ResponseResult for Client {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Condition {
-    /// A list of named parameters (key/value), depending on the condition's type. Notes: - For binary operators, include parameters named arg0 and arg1 for specifying the left and right operands, respectively. - At this time, the left operand (arg0) must be a reference to a variable. - For case-insensitive Regex matching, include a boolean parameter named ignore_case that is set to true. If not specified or set to any other value, the matching will be case sensitive. - To negate an operator, include a boolean parameter named negate boolean parameter that is set to true. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// A list of named parameters (key/value), depending on the condition's type. Notes: - For binary operators, include parameters named arg0 and arg1 for specifying the left and right operands, respectively. - At this time, the left operand (arg0) must be a reference to a variable. - For case-insensitive Regex matching, include a boolean parameter named ignore_case that is set to true. If not specified or set to any other value, the matching will be case sensitive. - To negate an operator, include a boolean parameter named negate boolean parameter that is set to true.
     pub parameter: Option<Vec<Parameter>>,
-    /// The type of operator for this condition. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// The type of operator for this condition.
     #[serde(rename = "type")]
     pub type_: Option<String>,
 }
@@ -478,16 +490,16 @@ pub struct Container {
     /// The Container ID uniquely identifies the GTM Container.
     #[serde(rename = "containerId")]
     pub container_id: Option<String>,
-    /// List of domain names associated with the Container. @mutable tagmanager.accounts.containers.create @mutable tagmanager.accounts.containers.update
+    /// List of domain names associated with the Container.
     #[serde(rename = "domainName")]
     pub domain_name: Option<Vec<String>>,
     /// Read-only Container feature set.
     pub features: Option<ContainerFeatures>,
     /// The fingerprint of the GTM Container as computed at storage time. This value is recomputed whenever the account is modified.
     pub fingerprint: Option<String>,
-    /// Container display name. @mutable tagmanager.accounts.containers.create @mutable tagmanager.accounts.containers.update
+    /// Container display name.
     pub name: Option<String>,
-    /// Container Notes. @mutable tagmanager.accounts.containers.create @mutable tagmanager.accounts.containers.update
+    /// Container Notes.
     pub notes: Option<String>,
     /// GTM Container's API relative path.
     pub path: Option<String>,
@@ -500,10 +512,10 @@ pub struct Container {
     /// Auto generated link to the tag manager UI
     #[serde(rename = "tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// List of server-side container URLs for the Container. If multiple URLs are provided, all URL paths must match. @mutable tagmanager.accounts.containers.create @mutable tagmanager.accounts.containers.update
+    /// List of server-side container URLs for the Container. If multiple URLs are provided, all URL paths must match.
     #[serde(rename = "taggingServerUrls")]
     pub tagging_server_urls: Option<Vec<String>>,
-    /// List of Usage Contexts for the Container. Valid values include: web, android, or ios. @mutable tagmanager.accounts.containers.create @mutable tagmanager.accounts.containers.update
+    /// List of Usage Contexts for the Container. Valid values include: web, android, or ios.
     #[serde(rename = "usageContext")]
     pub usage_context: Option<Vec<String>>,
 }
@@ -519,10 +531,10 @@ impl common::ResponseResult for Container {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ContainerAccess {
-    /// GTM Container ID. @mutable tagmanager.accounts.permissions.create @mutable tagmanager.accounts.permissions.update
+    /// GTM Container ID.
     #[serde(rename = "containerId")]
     pub container_id: Option<String>,
-    /// List of Container permissions. @mutable tagmanager.accounts.permissions.create @mutable tagmanager.accounts.permissions.update
+    /// List of Container permissions.
     pub permission: Option<String>,
 }
 
@@ -619,7 +631,7 @@ pub struct ContainerVersion {
     pub custom_template: Option<Vec<CustomTemplate>>,
     /// A value of true indicates this container version has been deleted.
     pub deleted: Option<bool>,
-    /// Container version description. @mutable tagmanager.accounts.containers.versions.update
+    /// Container version description.
     pub description: Option<String>,
     /// The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified.
     pub fingerprint: Option<String>,
@@ -628,7 +640,7 @@ pub struct ContainerVersion {
     /// The Google tag configs in the container that this version was taken from.
     #[serde(rename = "gtagConfig")]
     pub gtag_config: Option<Vec<GtagConfig>>,
-    /// Container version display name. @mutable tagmanager.accounts.containers.versions.update
+    /// Container version display name.
     pub name: Option<String>,
     /// GTM Container Version's API relative path.
     pub path: Option<String>,
@@ -684,12 +696,6 @@ pub struct ContainerVersionHeader {
     /// Number of Google tag configs in the container version.
     #[serde(rename = "numGtagConfigs")]
     pub num_gtag_configs: Option<String>,
-    /// Number of macros in the container version.
-    #[serde(rename = "numMacros")]
-    pub num_macros: Option<String>,
-    /// Number of rules in the container version.
-    #[serde(rename = "numRules")]
-    pub num_rules: Option<String>,
     /// Number of tags in the container version.
     #[serde(rename = "numTags")]
     pub num_tags: Option<String>,
@@ -787,6 +793,7 @@ impl common::ResponseResult for CreateContainerVersionResponse {}
 ///
 /// * [containers workspaces templates create accounts](AccountContainerWorkspaceTemplateCreateCall) (request|response)
 /// * [containers workspaces templates get accounts](AccountContainerWorkspaceTemplateGetCall) (response)
+/// * [containers workspaces templates import_from_gallery accounts](AccountContainerWorkspaceTemplateImportFromGalleryCall) (response)
 /// * [containers workspaces templates update accounts](AccountContainerWorkspaceTemplateUpdateCall) (request|response)
 #[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as]
@@ -934,9 +941,9 @@ pub struct Environment {
     /// Represents a link to a container version.
     #[serde(rename = "containerVersionId")]
     pub container_version_id: Option<String>,
-    /// The environment description. Can be set or changed only on USER type environments. @mutable tagmanager.accounts.containers.environments.create @mutable tagmanager.accounts.containers.environments.update
+    /// The environment description. Can be set or changed only on USER type environments.
     pub description: Option<String>,
-    /// Whether or not to enable debug by default for the environment. @mutable tagmanager.accounts.containers.environments.create @mutable tagmanager.accounts.containers.environments.update
+    /// Whether or not to enable debug by default for the environment.
     #[serde(rename = "enableDebug")]
     pub enable_debug: Option<bool>,
     /// GTM Environment ID uniquely identifies the GTM Environment.
@@ -944,7 +951,7 @@ pub struct Environment {
     pub environment_id: Option<String>,
     /// The fingerprint of the GTM environment as computed at storage time. This value is recomputed whenever the environment is modified.
     pub fingerprint: Option<String>,
-    /// The environment display name. Can be set or changed only on USER type environments. @mutable tagmanager.accounts.containers.environments.create @mutable tagmanager.accounts.containers.environments.update
+    /// The environment display name. Can be set or changed only on USER type environments.
     pub name: Option<String>,
     /// GTM Environment's API relative path.
     pub path: Option<String>,
@@ -954,7 +961,7 @@ pub struct Environment {
     /// The type of this environment.
     #[serde(rename = "type")]
     pub type_: Option<String>,
-    /// Default preview page url for the environment. @mutable tagmanager.accounts.containers.environments.create @mutable tagmanager.accounts.containers.environments.update
+    /// Default preview page url for the environment.
     pub url: Option<String>,
     /// Represents a link to a quick preview of a workspace.
     #[serde(rename = "workspaceId")]
@@ -990,9 +997,9 @@ pub struct Folder {
     /// The Folder ID uniquely identifies the GTM Folder.
     #[serde(rename = "folderId")]
     pub folder_id: Option<String>,
-    /// Folder display name. @mutable tagmanager.accounts.containers.workspaces.folders.create @mutable tagmanager.accounts.containers.workspaces.folders.update
+    /// Folder display name.
     pub name: Option<String>,
-    /// User notes on how to apply this folder in the container. @mutable tagmanager.accounts.containers.workspaces.folders.create @mutable tagmanager.accounts.containers.workspaces.folders.update
+    /// User notes on how to apply this folder in the container.
     pub notes: Option<String>,
     /// GTM Folder's API relative path.
     pub path: Option<String>,
@@ -1040,6 +1047,9 @@ impl common::ResponseResult for FolderEntities {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GalleryReference {
+    /// ID for the gallery template that is generated once during first sync and travels with the template redirects.
+    #[serde(rename = "galleryTemplateId")]
+    pub gallery_template_id: Option<String>,
     /// The name of the host for the community gallery template.
     pub host: Option<String>,
     /// If a user has manually edited the community gallery template.
@@ -1051,6 +1061,9 @@ pub struct GalleryReference {
     pub repository: Option<String>,
     /// The signature of the community gallery template as computed at import time. This value is recomputed whenever the template is updated from the gallery.
     pub signature: Option<String>,
+    /// The developer id of the community gallery template. This value is set whenever the template is created from the gallery.
+    #[serde(rename = "templateDeveloperId")]
+    pub template_developer_id: Option<String>,
     /// The version of the community gallery template.
     pub version: Option<String>,
 }
@@ -1069,6 +1082,9 @@ impl common::Part for GalleryReference {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GetContainerSnippetResponse {
+    /// Server container config param for manually provisioning a tagging server.
+    #[serde(rename = "containerConfig")]
+    pub container_config: Option<String>,
     /// Tagging snippet for a Container.
     pub snippet: Option<String>,
 }
@@ -1122,14 +1138,14 @@ pub struct GtagConfig {
     /// The ID uniquely identifies the Google tag config.
     #[serde(rename = "gtagConfigId")]
     pub gtag_config_id: Option<String>,
-    /// The Google tag config's parameters. @mutable tagmanager.accounts.containers.workspaces.gtag_config.create @mutable tagmanager.accounts.containers.workspaces.gtag_config.update
+    /// The Google tag config's parameters.
     pub parameter: Option<Vec<Parameter>>,
     /// Google tag config's API relative path.
     pub path: Option<String>,
     /// Auto generated link to the tag manager UI
     #[serde(rename = "tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// Google tag config type. @required tagmanager.accounts.containers.workspaces.gtag_config.create @required tagmanager.accounts.containers.workspaces.gtag_config.update @mutable tagmanager.accounts.containers.workspaces.gtag_config.create @mutable tagmanager.accounts.containers.workspaces.gtag_config.update
+    /// Google tag config type.
     #[serde(rename = "type")]
     pub type_: Option<String>,
     /// Google tag workspace ID. Only used by GTM containers. Set to 0 otherwise.
@@ -1527,19 +1543,19 @@ impl common::Part for MergeConflict {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Parameter {
-    /// Whether or not a reference type parameter is strongly or weakly referenced. Only used by Transformations. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update
+    /// Whether or not a reference type parameter is strongly or weakly referenced. Only used by Transformations.
     #[serde(rename = "isWeakReference")]
     pub is_weak_reference: Option<bool>,
-    /// The named key that uniquely identifies a parameter. Required for top-level parameters, as well as map values. Ignored for list values. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// The named key that uniquely identifies a parameter. Required for top-level parameters, as well as map values. Ignored for list values.
     pub key: Option<String>,
-    /// This list parameter's parameters (keys will be ignored). @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// This list parameter's parameters (keys will be ignored).
     pub list: Option<Vec<Parameter>>,
-    /// This map parameter's parameters (must have keys; keys must be unique). @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// This map parameter's parameters (must have keys; keys must be unique).
     pub map: Option<Vec<Parameter>>,
-    /// The parameter type. Valid values are: - boolean: The value represents a boolean, represented as 'true' or 'false' - integer: The value represents a 64-bit signed integer value, in base 10 - list: A list of parameters should be specified - map: A map of parameters should be specified - template: The value represents any text; this can include variable references (even variable references that might return non-string types) - trigger_reference: The value represents a trigger, represented as the trigger id - tag_reference: The value represents a tag, represented as the tag name @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// The parameter type. Valid values are: - boolean: The value represents a boolean, represented as 'true' or 'false' - integer: The value represents a 64-bit signed integer value, in base 10 - list: A list of parameters should be specified - map: A map of parameters should be specified - template: The value represents any text; this can include variable references (even variable references that might return non-string types) - trigger_reference: The value represents a trigger, represented as the trigger id - tag_reference: The value represents a tag, represented as the tag name
     #[serde(rename = "type")]
     pub type_: Option<String>,
-    /// A parameter's value (may contain variable references such as "{{myVariable}}") as appropriate to the specified type. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// A parameter's value (may contain variable references). as appropriate to the specified type.
     pub value: Option<String>,
 }
 
@@ -1829,13 +1845,10 @@ pub struct Tag {
     /// GTM Account ID.
     #[serde(rename = "accountId")]
     pub account_id: Option<String>,
-    /// Blocking rule IDs. If any of the listed rules evaluate to true, the tag will not fire. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
-    #[serde(rename = "blockingRuleId")]
-    pub blocking_rule_id: Option<Vec<String>>,
-    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the tag will not fire. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// Blocking trigger IDs. If any of the listed triggers evaluate to true, the tag will not fire.
     #[serde(rename = "blockingTriggerId")]
     pub blocking_trigger_id: Option<Vec<String>>,
-    /// Consent settings of a tag. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// Consent settings of a tag.
     #[serde(rename = "consentSettings")]
     pub consent_settings: Option<TagConsentSetting>,
     /// GTM Container ID.
@@ -1843,41 +1856,38 @@ pub struct Tag {
     pub container_id: Option<String>,
     /// The fingerprint of the GTM Tag as computed at storage time. This value is recomputed whenever the tag is modified.
     pub fingerprint: Option<String>,
-    /// Firing rule IDs. A tag will fire when any of the listed rules are true and all of its blockingRuleIds (if any specified) are false. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
-    #[serde(rename = "firingRuleId")]
-    pub firing_rule_id: Option<Vec<String>>,
-    /// Firing trigger IDs. A tag will fire when any of the listed triggers are true and all of its blockingTriggerIds (if any specified) are false. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// Firing trigger IDs. A tag will fire when any of the listed triggers are true and all of its blockingTriggerIds (if any specified) are false.
     #[serde(rename = "firingTriggerId")]
     pub firing_trigger_id: Option<Vec<String>>,
-    /// If set to true, this tag will only fire in the live environment (e.g. not in preview or debug mode). @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// If set to true, this tag will only fire in the live environment (e.g. not in preview or debug mode).
     #[serde(rename = "liveOnly")]
     pub live_only: Option<bool>,
-    /// A map of key-value pairs of tag metadata to be included in the event data for tag monitoring. Notes: - This parameter must be type MAP. - Each parameter in the map are type TEMPLATE, however cannot contain variable references. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// A map of key-value pairs of tag metadata to be included in the event data for tag monitoring. Notes: - This parameter must be type MAP. - Each parameter in the map are type TEMPLATE, however cannot contain variable references.
     #[serde(rename = "monitoringMetadata")]
     pub monitoring_metadata: Option<Parameter>,
-    /// If non-empty, then the tag display name will be included in the monitoring metadata map using the key specified. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// If non-empty, then the tag display name will be included in the monitoring metadata map using the key specified.
     #[serde(rename = "monitoringMetadataTagNameKey")]
     pub monitoring_metadata_tag_name_key: Option<String>,
-    /// Tag display name. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// Tag display name.
     pub name: Option<String>,
-    /// User notes on how to apply this tag in the container. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// User notes on how to apply this tag in the container.
     pub notes: Option<String>,
-    /// The tag's parameters. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// The tag's parameters.
     pub parameter: Option<Vec<Parameter>>,
     /// Parent folder id.
     #[serde(rename = "parentFolderId")]
     pub parent_folder_id: Option<String>,
     /// GTM Tag's API relative path.
     pub path: Option<String>,
-    /// Indicates whether the tag is paused, which prevents the tag from firing. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// Indicates whether the tag is paused, which prevents the tag from firing.
     pub paused: Option<bool>,
-    /// User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0.
     pub priority: Option<Parameter>,
-    /// The end timestamp in milliseconds to schedule a tag. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// The end timestamp in milliseconds to schedule a tag.
     #[serde(rename = "scheduleEndMs")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub schedule_end_ms: Option<i64>,
-    /// The start timestamp in milliseconds to schedule a tag. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// The start timestamp in milliseconds to schedule a tag.
     #[serde(rename = "scheduleStartMs")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub schedule_start_ms: Option<i64>,
@@ -1896,7 +1906,7 @@ pub struct Tag {
     /// The list of teardown tags. Currently we only allow one.
     #[serde(rename = "teardownTag")]
     pub teardown_tag: Option<Vec<TeardownTag>>,
-    /// GTM Tag Type. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update
+    /// GTM Tag Type.
     #[serde(rename = "type")]
     pub type_: Option<String>,
     /// GTM Workspace ID.
@@ -1965,11 +1975,11 @@ pub struct Transformation {
     pub container_id: Option<String>,
     /// The fingerprint of the GTM Transformation as computed at storage time. This value is recomputed whenever the transformation is modified.
     pub fingerprint: Option<String>,
-    /// Transformation display name. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update
+    /// Transformation display name.
     pub name: Option<String>,
-    /// User notes on how to apply this transformation in the container. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update
+    /// User notes on how to apply this transformation in the container.
     pub notes: Option<String>,
-    /// The transformation's parameters. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update
+    /// The transformation's parameters.
     pub parameter: Option<Vec<Parameter>>,
     /// Parent folder id.
     #[serde(rename = "parentFolderId")]
@@ -1982,7 +1992,7 @@ pub struct Transformation {
     /// The Transformation ID uniquely identifies the GTM transformation.
     #[serde(rename = "transformationId")]
     pub transformation_id: Option<String>,
-    /// Transformation type. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update
+    /// Transformation type.
     #[serde(rename = "type")]
     pub type_: Option<String>,
     /// GTM Workspace ID.
@@ -2010,85 +2020,85 @@ pub struct Trigger {
     /// GTM Account ID.
     #[serde(rename = "accountId")]
     pub account_id: Option<String>,
-    /// Used in the case of auto event tracking. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Used in the case of auto event tracking.
     #[serde(rename = "autoEventFilter")]
     pub auto_event_filter: Option<Vec<Condition>>,
-    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Whether or not we should only fire tags if the form submit or link click event is not cancelled by some other event handler (e.g. because of validation). Only valid for Form Submission and Link Click triggers.
     #[serde(rename = "checkValidation")]
     pub check_validation: Option<Parameter>,
     /// GTM Container ID.
     #[serde(rename = "containerId")]
     pub container_id: Option<String>,
-    /// A visibility trigger minimum continuous visible time (in milliseconds). Only valid for AMP Visibility trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// A visibility trigger minimum continuous visible time (in milliseconds). Only valid for AMP Visibility trigger.
     #[serde(rename = "continuousTimeMinMilliseconds")]
     pub continuous_time_min_milliseconds: Option<Parameter>,
-    /// Used in the case of custom event, which is fired iff all Conditions are true. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Used in the case of custom event, which is fired iff all Conditions are true.
     #[serde(rename = "customEventFilter")]
     pub custom_event_filter: Option<Vec<Condition>>,
-    /// Name of the GTM event that is fired. Only valid for Timer triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Name of the GTM event that is fired. Only valid for Timer triggers.
     #[serde(rename = "eventName")]
     pub event_name: Option<Parameter>,
-    /// The trigger will only fire iff all Conditions are true. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// The trigger will only fire iff all Conditions are true.
     pub filter: Option<Vec<Condition>>,
     /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
     pub fingerprint: Option<String>,
-    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled horizontally. Only valid for AMP scroll triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled horizontally. Only valid for AMP scroll triggers.
     #[serde(rename = "horizontalScrollPercentageList")]
     pub horizontal_scroll_percentage_list: Option<Parameter>,
-    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
     pub interval: Option<Parameter>,
-    /// Time between Timer Events to fire (in seconds). Only valid for AMP Timer trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Time between Timer Events to fire (in seconds). Only valid for AMP Timer trigger.
     #[serde(rename = "intervalSeconds")]
     pub interval_seconds: Option<Parameter>,
-    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Limit of the number of GTM events this Timer Trigger will fire. If no limit is set, we will continue to fire GTM events until the user leaves the page. Only valid for Timer triggers.
     pub limit: Option<Parameter>,
-    /// Max time to fire Timer Events (in seconds). Only valid for AMP Timer trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Max time to fire Timer Events (in seconds). Only valid for AMP Timer trigger.
     #[serde(rename = "maxTimerLengthSeconds")]
     pub max_timer_length_seconds: Option<Parameter>,
-    /// Trigger display name. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Trigger display name.
     pub name: Option<String>,
-    /// User notes on how to apply this trigger in the container. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// User notes on how to apply this trigger in the container.
     pub notes: Option<String>,
-    /// Additional parameters. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Additional parameters.
     pub parameter: Option<Vec<Parameter>>,
     /// Parent folder id.
     #[serde(rename = "parentFolderId")]
     pub parent_folder_id: Option<String>,
     /// GTM Trigger's API relative path.
     pub path: Option<String>,
-    /// A click trigger CSS selector (i.e. "a", "button" etc.). Only valid for AMP Click trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// A click trigger CSS selector (i.e. "a", "button" etc.). Only valid for AMP Click trigger.
     pub selector: Option<Parameter>,
     /// Auto generated link to the tag manager UI
     #[serde(rename = "tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// A visibility trigger minimum total visible time (in milliseconds). Only valid for AMP Visibility trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// A visibility trigger minimum total visible time (in milliseconds). Only valid for AMP Visibility trigger.
     #[serde(rename = "totalTimeMinMilliseconds")]
     pub total_time_min_milliseconds: Option<Parameter>,
     /// The Trigger ID uniquely identifies the GTM Trigger.
     #[serde(rename = "triggerId")]
     pub trigger_id: Option<String>,
-    /// Defines the data layer event that causes this trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Defines the data layer event that causes this trigger.
     #[serde(rename = "type")]
     pub type_: Option<String>,
-    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
     #[serde(rename = "uniqueTriggerId")]
     pub unique_trigger_id: Option<Parameter>,
-    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled vertically. Only valid for AMP scroll triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled vertically. Only valid for AMP scroll triggers.
     #[serde(rename = "verticalScrollPercentageList")]
     pub vertical_scroll_percentage_list: Option<Parameter>,
-    /// A visibility trigger CSS selector (i.e. "#id"). Only valid for AMP Visibility trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// A visibility trigger CSS selector (i.e. "#id"). Only valid for AMP Visibility trigger.
     #[serde(rename = "visibilitySelector")]
     pub visibility_selector: Option<Parameter>,
-    /// A visibility trigger maximum percent visibility. Only valid for AMP Visibility trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// A visibility trigger maximum percent visibility. Only valid for AMP Visibility trigger.
     #[serde(rename = "visiblePercentageMax")]
     pub visible_percentage_max: Option<Parameter>,
-    /// A visibility trigger minimum percent visibility. Only valid for AMP Visibility trigger. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// A visibility trigger minimum percent visibility. Only valid for AMP Visibility trigger.
     #[serde(rename = "visiblePercentageMin")]
     pub visible_percentage_min: Option<Parameter>,
-    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
     #[serde(rename = "waitForTags")]
     pub wait_for_tags: Option<Parameter>,
-    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers. @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update
+    /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
     #[serde(rename = "waitForTagsTimeout")]
     pub wait_for_tags_timeout: Option<Parameter>,
     /// GTM Workspace ID.
@@ -2113,16 +2123,16 @@ impl common::ResponseResult for Trigger {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct UserPermission {
-    /// GTM Account access permissions. @mutable tagmanager.accounts.permissions.create @mutable tagmanager.accounts.permissions.update
+    /// GTM Account access permissions.
     #[serde(rename = "accountAccess")]
     pub account_access: Option<AccountAccess>,
     /// The Account ID uniquely identifies the GTM Account.
     #[serde(rename = "accountId")]
     pub account_id: Option<String>,
-    /// GTM Container access permissions. @mutable tagmanager.accounts.permissions.create @mutable tagmanager.accounts.permissions.update
+    /// GTM Container access permissions.
     #[serde(rename = "containerAccess")]
     pub container_access: Option<Vec<ContainerAccess>>,
-    /// User's email address. @mutable tagmanager.accounts.permissions.create
+    /// User's email address.
     #[serde(rename = "emailAddress")]
     pub email_address: Option<String>,
     /// GTM UserPermission's API relative path.
@@ -2152,10 +2162,10 @@ pub struct Variable {
     /// GTM Container ID.
     #[serde(rename = "containerId")]
     pub container_id: Option<String>,
-    /// For mobile containers only: A list of trigger IDs for disabling conditional variables; the variable is enabled if one of the enabling trigger is true while all the disabling trigger are false. Treated as an unordered set. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// For mobile containers only: A list of trigger IDs for disabling conditional variables; the variable is enabled if one of the enabling trigger is true while all the disabling trigger are false. Treated as an unordered set.
     #[serde(rename = "disablingTriggerId")]
     pub disabling_trigger_id: Option<Vec<String>>,
-    /// For mobile containers only: A list of trigger IDs for enabling conditional variables; the variable is enabled if one of the enabling triggers is true while all the disabling triggers are false. Treated as an unordered set. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// For mobile containers only: A list of trigger IDs for enabling conditional variables; the variable is enabled if one of the enabling triggers is true while all the disabling triggers are false. Treated as an unordered set.
     #[serde(rename = "enablingTriggerId")]
     pub enabling_trigger_id: Option<Vec<String>>,
     /// The fingerprint of the GTM Variable as computed at storage time. This value is recomputed whenever the variable is modified.
@@ -2163,29 +2173,29 @@ pub struct Variable {
     /// Option to convert a variable value to other value.
     #[serde(rename = "formatValue")]
     pub format_value: Option<VariableFormatValue>,
-    /// Variable display name. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// Variable display name.
     pub name: Option<String>,
-    /// User notes on how to apply this variable in the container. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// User notes on how to apply this variable in the container.
     pub notes: Option<String>,
-    /// The variable's parameters. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// The variable's parameters.
     pub parameter: Option<Vec<Parameter>>,
     /// Parent folder id.
     #[serde(rename = "parentFolderId")]
     pub parent_folder_id: Option<String>,
     /// GTM Variable's API relative path.
     pub path: Option<String>,
-    /// The end timestamp in milliseconds to schedule a variable. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// The end timestamp in milliseconds to schedule a variable.
     #[serde(rename = "scheduleEndMs")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub schedule_end_ms: Option<i64>,
-    /// The start timestamp in milliseconds to schedule a variable. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// The start timestamp in milliseconds to schedule a variable.
     #[serde(rename = "scheduleStartMs")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub schedule_start_ms: Option<i64>,
     /// Auto generated link to the tag manager UI
     #[serde(rename = "tagManagerUrl")]
     pub tag_manager_url: Option<String>,
-    /// GTM Variable Type. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update
+    /// GTM Variable Type.
     #[serde(rename = "type")]
     pub type_: Option<String>,
     /// The Variable ID uniquely identifies the GTM Variable.
@@ -2246,11 +2256,11 @@ pub struct Workspace {
     /// GTM Container ID.
     #[serde(rename = "containerId")]
     pub container_id: Option<String>,
-    /// Workspace description. @mutable tagmanager.accounts.containers.workspaces.create @mutable tagmanager.accounts.containers.workspaces.update
+    /// Workspace description.
     pub description: Option<String>,
     /// The fingerprint of the GTM Workspace as computed at storage time. This value is recomputed whenever the workspace is modified.
     pub fingerprint: Option<String>,
-    /// Workspace display name. @mutable tagmanager.accounts.containers.workspaces.create @mutable tagmanager.accounts.containers.workspaces.update
+    /// Workspace display name.
     pub name: Option<String>,
     /// GTM Workspace's API relative path.
     pub path: Option<String>,
@@ -2386,9 +2396,20 @@ impl common::Part for ZoneTypeRestriction {}
 /// use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -2399,12 +2420,12 @@ impl common::Part for ZoneTypeRestriction {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = TagManager::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `containers_combine(...)`, `containers_create(...)`, `containers_delete(...)`, `containers_destinations_get(...)`, `containers_destinations_link(...)`, `containers_destinations_list(...)`, `containers_environments_create(...)`, `containers_environments_delete(...)`, `containers_environments_get(...)`, `containers_environments_list(...)`, `containers_environments_reauthorize(...)`, `containers_environments_update(...)`, `containers_get(...)`, `containers_list(...)`, `containers_lookup(...)`, `containers_move_tag_id(...)`, `containers_snippet(...)`, `containers_update(...)`, `containers_version_headers_latest(...)`, `containers_version_headers_list(...)`, `containers_versions_delete(...)`, `containers_versions_get(...)`, `containers_versions_live(...)`, `containers_versions_publish(...)`, `containers_versions_set_latest(...)`, `containers_versions_undelete(...)`, `containers_versions_update(...)`, `containers_workspaces_built_in_variables_create(...)`, `containers_workspaces_built_in_variables_delete(...)`, `containers_workspaces_built_in_variables_list(...)`, `containers_workspaces_built_in_variables_revert(...)`, `containers_workspaces_clients_create(...)`, `containers_workspaces_clients_delete(...)`, `containers_workspaces_clients_get(...)`, `containers_workspaces_clients_list(...)`, `containers_workspaces_clients_revert(...)`, `containers_workspaces_clients_update(...)`, `containers_workspaces_create(...)`, `containers_workspaces_create_version(...)`, `containers_workspaces_delete(...)`, `containers_workspaces_folders_create(...)`, `containers_workspaces_folders_delete(...)`, `containers_workspaces_folders_entities(...)`, `containers_workspaces_folders_get(...)`, `containers_workspaces_folders_list(...)`, `containers_workspaces_folders_move_entities_to_folder(...)`, `containers_workspaces_folders_revert(...)`, `containers_workspaces_folders_update(...)`, `containers_workspaces_get(...)`, `containers_workspaces_get_status(...)`, `containers_workspaces_gtag_config_create(...)`, `containers_workspaces_gtag_config_delete(...)`, `containers_workspaces_gtag_config_get(...)`, `containers_workspaces_gtag_config_list(...)`, `containers_workspaces_gtag_config_update(...)`, `containers_workspaces_list(...)`, `containers_workspaces_quick_preview(...)`, `containers_workspaces_resolve_conflict(...)`, `containers_workspaces_sync(...)`, `containers_workspaces_tags_create(...)`, `containers_workspaces_tags_delete(...)`, `containers_workspaces_tags_get(...)`, `containers_workspaces_tags_list(...)`, `containers_workspaces_tags_revert(...)`, `containers_workspaces_tags_update(...)`, `containers_workspaces_templates_create(...)`, `containers_workspaces_templates_delete(...)`, `containers_workspaces_templates_get(...)`, `containers_workspaces_templates_list(...)`, `containers_workspaces_templates_revert(...)`, `containers_workspaces_templates_update(...)`, `containers_workspaces_transformations_create(...)`, `containers_workspaces_transformations_delete(...)`, `containers_workspaces_transformations_get(...)`, `containers_workspaces_transformations_list(...)`, `containers_workspaces_transformations_revert(...)`, `containers_workspaces_transformations_update(...)`, `containers_workspaces_triggers_create(...)`, `containers_workspaces_triggers_delete(...)`, `containers_workspaces_triggers_get(...)`, `containers_workspaces_triggers_list(...)`, `containers_workspaces_triggers_revert(...)`, `containers_workspaces_triggers_update(...)`, `containers_workspaces_update(...)`, `containers_workspaces_variables_create(...)`, `containers_workspaces_variables_delete(...)`, `containers_workspaces_variables_get(...)`, `containers_workspaces_variables_list(...)`, `containers_workspaces_variables_revert(...)`, `containers_workspaces_variables_update(...)`, `containers_workspaces_zones_create(...)`, `containers_workspaces_zones_delete(...)`, `containers_workspaces_zones_get(...)`, `containers_workspaces_zones_list(...)`, `containers_workspaces_zones_revert(...)`, `containers_workspaces_zones_update(...)`, `get(...)`, `list(...)`, `update(...)`, `user_permissions_create(...)`, `user_permissions_delete(...)`, `user_permissions_get(...)`, `user_permissions_list(...)` and `user_permissions_update(...)`
+/// // like `containers_combine(...)`, `containers_create(...)`, `containers_delete(...)`, `containers_destinations_get(...)`, `containers_destinations_link(...)`, `containers_destinations_list(...)`, `containers_environments_create(...)`, `containers_environments_delete(...)`, `containers_environments_get(...)`, `containers_environments_list(...)`, `containers_environments_reauthorize(...)`, `containers_environments_update(...)`, `containers_get(...)`, `containers_list(...)`, `containers_lookup(...)`, `containers_move_tag_id(...)`, `containers_snippet(...)`, `containers_update(...)`, `containers_version_headers_latest(...)`, `containers_version_headers_list(...)`, `containers_versions_delete(...)`, `containers_versions_get(...)`, `containers_versions_live(...)`, `containers_versions_publish(...)`, `containers_versions_set_latest(...)`, `containers_versions_undelete(...)`, `containers_versions_update(...)`, `containers_workspaces_built_in_variables_create(...)`, `containers_workspaces_built_in_variables_delete(...)`, `containers_workspaces_built_in_variables_list(...)`, `containers_workspaces_built_in_variables_revert(...)`, `containers_workspaces_clients_create(...)`, `containers_workspaces_clients_delete(...)`, `containers_workspaces_clients_get(...)`, `containers_workspaces_clients_list(...)`, `containers_workspaces_clients_revert(...)`, `containers_workspaces_clients_update(...)`, `containers_workspaces_create(...)`, `containers_workspaces_create_version(...)`, `containers_workspaces_delete(...)`, `containers_workspaces_folders_create(...)`, `containers_workspaces_folders_delete(...)`, `containers_workspaces_folders_entities(...)`, `containers_workspaces_folders_get(...)`, `containers_workspaces_folders_list(...)`, `containers_workspaces_folders_move_entities_to_folder(...)`, `containers_workspaces_folders_revert(...)`, `containers_workspaces_folders_update(...)`, `containers_workspaces_get(...)`, `containers_workspaces_get_status(...)`, `containers_workspaces_gtag_config_create(...)`, `containers_workspaces_gtag_config_delete(...)`, `containers_workspaces_gtag_config_get(...)`, `containers_workspaces_gtag_config_list(...)`, `containers_workspaces_gtag_config_update(...)`, `containers_workspaces_list(...)`, `containers_workspaces_quick_preview(...)`, `containers_workspaces_resolve_conflict(...)`, `containers_workspaces_sync(...)`, `containers_workspaces_tags_create(...)`, `containers_workspaces_tags_delete(...)`, `containers_workspaces_tags_get(...)`, `containers_workspaces_tags_list(...)`, `containers_workspaces_tags_revert(...)`, `containers_workspaces_tags_update(...)`, `containers_workspaces_templates_create(...)`, `containers_workspaces_templates_delete(...)`, `containers_workspaces_templates_get(...)`, `containers_workspaces_templates_import_from_gallery(...)`, `containers_workspaces_templates_list(...)`, `containers_workspaces_templates_revert(...)`, `containers_workspaces_templates_update(...)`, `containers_workspaces_transformations_create(...)`, `containers_workspaces_transformations_delete(...)`, `containers_workspaces_transformations_get(...)`, `containers_workspaces_transformations_list(...)`, `containers_workspaces_transformations_revert(...)`, `containers_workspaces_transformations_update(...)`, `containers_workspaces_triggers_create(...)`, `containers_workspaces_triggers_delete(...)`, `containers_workspaces_triggers_get(...)`, `containers_workspaces_triggers_list(...)`, `containers_workspaces_triggers_revert(...)`, `containers_workspaces_triggers_update(...)`, `containers_workspaces_update(...)`, `containers_workspaces_variables_create(...)`, `containers_workspaces_variables_delete(...)`, `containers_workspaces_variables_get(...)`, `containers_workspaces_variables_list(...)`, `containers_workspaces_variables_revert(...)`, `containers_workspaces_variables_update(...)`, `containers_workspaces_zones_create(...)`, `containers_workspaces_zones_delete(...)`, `containers_workspaces_zones_get(...)`, `containers_workspaces_zones_list(...)`, `containers_workspaces_zones_revert(...)`, `containers_workspaces_zones_update(...)`, `get(...)`, `list(...)`, `update(...)`, `user_permissions_create(...)`, `user_permissions_delete(...)`, `user_permissions_get(...)`, `user_permissions_list(...)` and `user_permissions_update(...)`
 /// // to build up your call.
 /// let rb = hub.accounts();
 /// # }
@@ -2425,7 +2446,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - Google Tag Destination's API relative path. Example: accounts/{account_id}/containers/{container_id}/destinations/{destination_link_id}
+    /// * `path` - Google Tag Destination's API relative path.
     pub fn containers_destinations_get(
         &self,
         path: &str,
@@ -2445,7 +2466,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM parent Container's API relative path.
     pub fn containers_destinations_link(
         &self,
         parent: &str,
@@ -2467,7 +2488,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM parent Container's API relative path.
     pub fn containers_destinations_list(
         &self,
         parent: &str,
@@ -2488,7 +2509,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
     pub fn containers_environments_create(
         &self,
         request: Environment,
@@ -2510,7 +2531,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
     pub fn containers_environments_delete(
         &self,
         path: &str,
@@ -2530,7 +2551,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
     pub fn containers_environments_get(
         &self,
         path: &str,
@@ -2550,7 +2571,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
     pub fn containers_environments_list(
         &self,
         parent: &str,
@@ -2572,7 +2593,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
     pub fn containers_environments_reauthorize(
         &self,
         request: Environment,
@@ -2595,7 +2616,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// * `path` - GTM Environment's API relative path.
     pub fn containers_environments_update(
         &self,
         request: Environment,
@@ -2618,7 +2639,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
     pub fn containers_version_headers_latest(
         &self,
         parent: &str,
@@ -2638,7 +2659,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
     pub fn containers_version_headers_list(
         &self,
         parent: &str,
@@ -2660,7 +2681,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
     pub fn containers_versions_delete(
         &self,
         path: &str,
@@ -2680,7 +2701,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
     pub fn containers_versions_get(&self, path: &str) -> AccountContainerVersionGetCall<'a, C> {
         AccountContainerVersionGetCall {
             hub: self.hub,
@@ -2698,7 +2719,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM Container's API relative path.
     pub fn containers_versions_live(&self, parent: &str) -> AccountContainerVersionLiveCall<'a, C> {
         AccountContainerVersionLiveCall {
             hub: self.hub,
@@ -2715,7 +2736,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
     pub fn containers_versions_publish(
         &self,
         path: &str,
@@ -2736,7 +2757,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
     pub fn containers_versions_set_latest(
         &self,
         path: &str,
@@ -2756,7 +2777,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
     pub fn containers_versions_undelete(
         &self,
         path: &str,
@@ -2777,7 +2798,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// * `path` - GTM ContainerVersion's API relative path.
     pub fn containers_versions_update(
         &self,
         request: ContainerVersion,
@@ -2800,7 +2821,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_built_in_variables_create(
         &self,
         parent: &str,
@@ -2821,7 +2842,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// * `path` - GTM BuiltInVariable's API relative path.
     pub fn containers_workspaces_built_in_variables_delete(
         &self,
         path: &str,
@@ -2842,7 +2863,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_built_in_variables_list(
         &self,
         parent: &str,
@@ -2863,7 +2884,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// * `path` - GTM BuiltInVariable's API relative path.
     pub fn containers_workspaces_built_in_variables_revert(
         &self,
         path: &str,
@@ -2885,7 +2906,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_clients_create(
         &self,
         request: Client,
@@ -2907,7 +2928,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// * `path` - GTM Client's API relative path.
     pub fn containers_workspaces_clients_delete(
         &self,
         path: &str,
@@ -2927,7 +2948,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// * `path` - GTM Client's API relative path.
     pub fn containers_workspaces_clients_get(
         &self,
         path: &str,
@@ -2947,7 +2968,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_clients_list(
         &self,
         parent: &str,
@@ -2968,7 +2989,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// * `path` - GTM Client's API relative path.
     pub fn containers_workspaces_clients_revert(
         &self,
         path: &str,
@@ -2990,7 +3011,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// * `path` - GTM Client's API relative path.
     pub fn containers_workspaces_clients_update(
         &self,
         request: Client,
@@ -3014,7 +3035,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_folders_create(
         &self,
         request: Folder,
@@ -3036,7 +3057,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
     pub fn containers_workspaces_folders_delete(
         &self,
         path: &str,
@@ -3056,7 +3077,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
     pub fn containers_workspaces_folders_entities(
         &self,
         path: &str,
@@ -3077,7 +3098,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
     pub fn containers_workspaces_folders_get(
         &self,
         path: &str,
@@ -3097,7 +3118,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_folders_list(
         &self,
         parent: &str,
@@ -3119,7 +3140,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
     pub fn containers_workspaces_folders_move_entities_to_folder(
         &self,
         request: Folder,
@@ -3144,7 +3165,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
     pub fn containers_workspaces_folders_revert(
         &self,
         path: &str,
@@ -3166,7 +3187,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// * `path` - GTM Folder's API relative path.
     pub fn containers_workspaces_folders_update(
         &self,
         request: Folder,
@@ -3190,7 +3211,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - Workspace's API relative path.
     pub fn containers_workspaces_gtag_config_create(
         &self,
         request: GtagConfig,
@@ -3212,7 +3233,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}
+    /// * `path` - Google tag config's API relative path.
     pub fn containers_workspaces_gtag_config_delete(
         &self,
         path: &str,
@@ -3232,7 +3253,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}
+    /// * `path` - Google tag config's API relative path.
     pub fn containers_workspaces_gtag_config_get(
         &self,
         path: &str,
@@ -3252,7 +3273,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - Workspace's API relative path.
     pub fn containers_workspaces_gtag_config_list(
         &self,
         parent: &str,
@@ -3274,7 +3295,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}
+    /// * `path` - Google tag config's API relative path.
     pub fn containers_workspaces_gtag_config_update(
         &self,
         request: GtagConfig,
@@ -3298,7 +3319,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_tags_create(
         &self,
         request: Tag,
@@ -3320,7 +3341,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
     pub fn containers_workspaces_tags_delete(
         &self,
         path: &str,
@@ -3340,7 +3361,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
     pub fn containers_workspaces_tags_get(
         &self,
         path: &str,
@@ -3360,7 +3381,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_tags_list(
         &self,
         parent: &str,
@@ -3381,7 +3402,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
     pub fn containers_workspaces_tags_revert(
         &self,
         path: &str,
@@ -3403,7 +3424,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// * `path` - GTM Tag's API relative path.
     pub fn containers_workspaces_tags_update(
         &self,
         request: Tag,
@@ -3427,7 +3448,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_templates_create(
         &self,
         request: CustomTemplate,
@@ -3449,7 +3470,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
     pub fn containers_workspaces_templates_delete(
         &self,
         path: &str,
@@ -3469,7 +3490,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
     pub fn containers_workspaces_templates_get(
         &self,
         path: &str,
@@ -3485,11 +3506,35 @@ impl<'a, C> AccountMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Imports a GTM Custom Template from Gallery.
+    ///
+    /// # Arguments
+    ///
+    /// * `parent` - GTM Workspace's API relative path.
+    pub fn containers_workspaces_templates_import_from_gallery(
+        &self,
+        parent: &str,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        AccountContainerWorkspaceTemplateImportFromGalleryCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _gallery_sha: Default::default(),
+            _gallery_repository: Default::default(),
+            _gallery_owner: Default::default(),
+            _acknowledge_permissions: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists all GTM Templates of a GTM container workspace.
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_templates_list(
         &self,
         parent: &str,
@@ -3510,7 +3555,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
     pub fn containers_workspaces_templates_revert(
         &self,
         path: &str,
@@ -3532,7 +3577,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// * `path` - GTM Custom Template's API relative path.
     pub fn containers_workspaces_templates_update(
         &self,
         request: CustomTemplate,
@@ -3556,7 +3601,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_transformations_create(
         &self,
         request: Transformation,
@@ -3578,7 +3623,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// * `path` - GTM Transformation's API relative path.
     pub fn containers_workspaces_transformations_delete(
         &self,
         path: &str,
@@ -3598,7 +3643,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// * `path` - GTM Transformation's API relative path.
     pub fn containers_workspaces_transformations_get(
         &self,
         path: &str,
@@ -3618,7 +3663,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_transformations_list(
         &self,
         parent: &str,
@@ -3639,7 +3684,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// * `path` - GTM Transformation's API relative path.
     pub fn containers_workspaces_transformations_revert(
         &self,
         path: &str,
@@ -3661,7 +3706,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// * `path` - GTM Transformation's API relative path.
     pub fn containers_workspaces_transformations_update(
         &self,
         request: Transformation,
@@ -3685,7 +3730,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_triggers_create(
         &self,
         request: Trigger,
@@ -3707,7 +3752,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
     pub fn containers_workspaces_triggers_delete(
         &self,
         path: &str,
@@ -3727,7 +3772,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
     pub fn containers_workspaces_triggers_get(
         &self,
         path: &str,
@@ -3747,7 +3792,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_triggers_list(
         &self,
         parent: &str,
@@ -3768,7 +3813,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
     pub fn containers_workspaces_triggers_revert(
         &self,
         path: &str,
@@ -3790,7 +3835,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// * `path` - GTM Trigger's API relative path.
     pub fn containers_workspaces_triggers_update(
         &self,
         request: Trigger,
@@ -3814,7 +3859,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_variables_create(
         &self,
         request: Variable,
@@ -3836,7 +3881,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
     pub fn containers_workspaces_variables_delete(
         &self,
         path: &str,
@@ -3856,7 +3901,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
     pub fn containers_workspaces_variables_get(
         &self,
         path: &str,
@@ -3876,7 +3921,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_variables_list(
         &self,
         parent: &str,
@@ -3897,7 +3942,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
     pub fn containers_workspaces_variables_revert(
         &self,
         path: &str,
@@ -3919,7 +3964,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// * `path` - GTM Variable's API relative path.
     pub fn containers_workspaces_variables_update(
         &self,
         request: Variable,
@@ -3943,7 +3988,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_zones_create(
         &self,
         request: Zone,
@@ -3965,7 +4010,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
     pub fn containers_workspaces_zones_delete(
         &self,
         path: &str,
@@ -3985,7 +4030,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
     pub fn containers_workspaces_zones_get(
         &self,
         path: &str,
@@ -4005,7 +4050,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `parent` - GTM Workspace's API relative path.
     pub fn containers_workspaces_zones_list(
         &self,
         parent: &str,
@@ -4026,7 +4071,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
     pub fn containers_workspaces_zones_revert(
         &self,
         path: &str,
@@ -4048,7 +4093,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// * `path` - GTM Zone's API relative path.
     pub fn containers_workspaces_zones_update(
         &self,
         request: Zone,
@@ -4072,7 +4117,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM parent Container's API relative path.
     pub fn containers_workspaces_create(
         &self,
         request: Workspace,
@@ -4095,7 +4140,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_create_version(
         &self,
         request: CreateContainerVersionRequestVersionOptions,
@@ -4117,7 +4162,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_delete(
         &self,
         path: &str,
@@ -4137,7 +4182,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_get(&self, path: &str) -> AccountContainerWorkspaceGetCall<'a, C> {
         AccountContainerWorkspaceGetCall {
             hub: self.hub,
@@ -4154,7 +4199,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_get_status(
         &self,
         path: &str,
@@ -4174,7 +4219,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `parent` - GTM parent Container's API relative path.
     pub fn containers_workspaces_list(
         &self,
         parent: &str,
@@ -4195,7 +4240,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_quick_preview(
         &self,
         path: &str,
@@ -4216,7 +4261,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_resolve_conflict(
         &self,
         request: Entity,
@@ -4239,7 +4284,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_sync(
         &self,
         path: &str,
@@ -4260,7 +4305,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// * `path` - GTM Workspace's API relative path.
     pub fn containers_workspaces_update(
         &self,
         request: Workspace,
@@ -4283,7 +4328,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
     pub fn containers_combine(&self, path: &str) -> AccountContainerCombineCall<'a, C> {
         AccountContainerCombineCall {
             hub: self.hub,
@@ -4304,7 +4349,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Account's API relative path. Example: accounts/{account_id}.
+    /// * `parent` - GTM Account's API relative path.
     pub fn containers_create(
         &self,
         request: Container,
@@ -4326,7 +4371,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
     pub fn containers_delete(&self, path: &str) -> AccountContainerDeleteCall<'a, C> {
         AccountContainerDeleteCall {
             hub: self.hub,
@@ -4343,7 +4388,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
     pub fn containers_get(&self, path: &str) -> AccountContainerGetCall<'a, C> {
         AccountContainerGetCall {
             hub: self.hub,
@@ -4360,7 +4405,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Account's API relative path. Example: accounts/{account_id}.
+    /// * `parent` - GTM Account's API relative path.
     pub fn containers_list(&self, parent: &str) -> AccountContainerListCall<'a, C> {
         AccountContainerListCall {
             hub: self.hub,
@@ -4374,10 +4419,11 @@ impl<'a, C> AccountMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Looks up a Container by destination ID.
+    /// Looks up a Container by destination ID or tag ID.
     pub fn containers_lookup(&self) -> AccountContainerLookupCall<'a, C> {
         AccountContainerLookupCall {
             hub: self.hub,
+            _tag_id: Default::default(),
             _destination_id: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -4391,7 +4437,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
     pub fn containers_move_tag_id(&self, path: &str) -> AccountContainerMoveTagIdCall<'a, C> {
         AccountContainerMoveTagIdCall {
             hub: self.hub,
@@ -4414,7 +4460,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - Container snippet's API relative path. Example: accounts/{account_id}/containers/{container_id}:snippet
+    /// * `path` - Container snippet's API relative path.
     pub fn containers_snippet(&self, path: &str) -> AccountContainerSnippetCall<'a, C> {
         AccountContainerSnippetCall {
             hub: self.hub,
@@ -4432,7 +4478,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// * `path` - GTM Container's API relative path.
     pub fn containers_update(
         &self,
         request: Container,
@@ -4456,7 +4502,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - GTM Account's API relative path. Example: accounts/{account_id}
+    /// * `parent` - GTM Account's API relative path.
     pub fn user_permissions_create(
         &self,
         request: UserPermission,
@@ -4478,7 +4524,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// * `path` - GTM UserPermission's API relative path.
     pub fn user_permissions_delete(&self, path: &str) -> AccountUserPermissionDeleteCall<'a, C> {
         AccountUserPermissionDeleteCall {
             hub: self.hub,
@@ -4495,7 +4541,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// * `path` - GTM UserPermission's API relative path.
     pub fn user_permissions_get(&self, path: &str) -> AccountUserPermissionGetCall<'a, C> {
         AccountUserPermissionGetCall {
             hub: self.hub,
@@ -4512,7 +4558,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `parent` - GTM Account's API relative path. Example: accounts/{account_id}
+    /// * `parent` - GTM Account's API relative path.
     pub fn user_permissions_list(&self, parent: &str) -> AccountUserPermissionListCall<'a, C> {
         AccountUserPermissionListCall {
             hub: self.hub,
@@ -4531,7 +4577,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// * `path` - GTM UserPermission's API relative path.
     pub fn user_permissions_update(
         &self,
         request: UserPermission,
@@ -4553,7 +4599,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// # Arguments
     ///
-    /// * `path` - GTM Account's API relative path. Example: accounts/{account_id}
+    /// * `path` - GTM Account's API relative path.
     pub fn get(&self, path: &str) -> AccountGetCall<'a, C> {
         AccountGetCall {
             hub: self.hub,
@@ -4585,7 +4631,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `path` - GTM Account's API relative path. Example: accounts/{account_id}
+    /// * `path` - GTM Account's API relative path.
     pub fn update(&self, request: Account, path: &str) -> AccountUpdateCall<'a, C> {
         AccountUpdateCall {
             hub: self.hub,
@@ -4620,9 +4666,20 @@ impl<'a, C> AccountMethods<'a, C> {
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4633,7 +4690,7 @@ impl<'a, C> AccountMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -4793,7 +4850,7 @@ where
         }
     }
 
-    /// Google Tag Destination's API relative path. Example: accounts/{account_id}/containers/{container_id}/destinations/{destination_link_id}
+    /// Google Tag Destination's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -4905,9 +4962,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4918,7 +4986,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -5096,7 +5164,7 @@ where
         }
     }
 
-    /// GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM parent Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5225,9 +5293,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5238,7 +5317,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -5398,7 +5477,7 @@ where
         }
     }
 
-    /// GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM parent Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5511,9 +5590,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5524,7 +5614,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -5724,7 +5814,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -5836,9 +5926,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -5849,7 +5950,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -5996,7 +6097,7 @@ where
         }
     }
 
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -6108,9 +6209,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6121,7 +6233,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -6281,7 +6393,7 @@ where
         }
     }
 
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -6393,9 +6505,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6406,7 +6529,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -6571,7 +6694,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6691,9 +6814,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6704,7 +6838,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -6903,7 +7037,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -7023,9 +7157,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7036,7 +7181,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -7241,7 +7386,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}
+    /// GTM Environment's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -7360,9 +7505,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7373,7 +7529,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -7533,7 +7689,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7645,9 +7801,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7658,7 +7825,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -7830,7 +7997,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -7959,9 +8126,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7972,7 +8150,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -8119,7 +8297,7 @@ where
         }
     }
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -8231,9 +8409,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8244,7 +8433,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -8409,7 +8598,7 @@ where
         }
     }
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -8531,9 +8720,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8544,7 +8744,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -8704,7 +8904,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -8816,9 +9016,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8829,7 +9040,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -8996,7 +9207,7 @@ where
         }
     }
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -9115,9 +9326,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9128,7 +9350,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -9289,7 +9511,7 @@ where
         }
     }
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -9401,9 +9623,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9414,7 +9647,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -9575,7 +9808,7 @@ where
         }
     }
 
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -9688,9 +9921,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9701,7 +9945,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -9906,7 +10150,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM ContainerVersion's API relative path. Example: accounts/{account_id}/containers/{container_id}/versions/{version_id}
+    /// GTM ContainerVersion's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -10025,9 +10269,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10038,7 +10293,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -10208,7 +10463,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10344,9 +10599,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10357,7 +10623,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -10511,7 +10777,7 @@ where
         }
     }
 
-    /// GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// GTM BuiltInVariable's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -10647,9 +10913,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10660,7 +10937,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -10827,7 +11104,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -10962,9 +11239,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10975,7 +11263,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -11144,7 +11432,7 @@ where
         }
     }
 
-    /// GTM BuiltInVariable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/built_in_variables
+    /// GTM BuiltInVariable's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -11280,9 +11568,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11293,7 +11592,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -11493,7 +11792,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -11608,9 +11907,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11621,7 +11931,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -11768,7 +12078,7 @@ where
         }
     }
 
-    /// GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// GTM Client's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -11883,9 +12193,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11896,7 +12217,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -12056,7 +12377,7 @@ where
         }
     }
 
-    /// GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// GTM Client's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -12168,9 +12489,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12181,7 +12513,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -12346,7 +12678,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -12465,9 +12797,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12478,7 +12821,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -12644,7 +12987,7 @@ where
         }
     }
 
-    /// GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// GTM Client's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -12770,9 +13113,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12783,7 +13137,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -12988,7 +13342,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Client's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/clients/{client_id}
+    /// GTM Client's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -13114,9 +13468,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13127,7 +13492,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -13327,7 +13692,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -13442,9 +13807,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13455,7 +13831,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -13602,7 +13978,7 @@ where
         }
     }
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -13717,9 +14093,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13730,7 +14117,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -13793,8 +14180,7 @@ where
         params.push("alt", "json");
         let mut url = self.hub._base_url.clone() + "tagmanager/v2/{+path}:entities";
         if self._scopes.is_empty() {
-            self._scopes
-                .insert(Scope::EditContainer.as_ref().to_string());
+            self._scopes.insert(Scope::Readonly.as_ref().to_string());
         }
 
         #[allow(clippy::single_element_loop)]
@@ -13896,7 +14282,7 @@ where
         }
     }
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -13964,7 +14350,7 @@ where
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::EditContainer`].
+    /// [`Scope::Readonly`].
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -14021,9 +14407,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14034,7 +14431,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -14194,7 +14591,7 @@ where
         }
     }
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -14306,9 +14703,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14319,7 +14727,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -14484,7 +14892,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -14604,9 +15012,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14617,7 +15036,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -14824,7 +15243,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -14984,9 +15403,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14997,7 +15427,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -15163,7 +15593,7 @@ where
         }
     }
 
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -15289,9 +15719,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15302,7 +15743,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -15507,7 +15948,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Folder's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/folders/{folder_id}
+    /// GTM Folder's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -15633,9 +16074,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15646,7 +16098,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -15846,7 +16298,7 @@ where
         self._request = new_value;
         self
     }
-    /// Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -15971,9 +16423,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15984,7 +16447,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -16131,7 +16594,7 @@ where
         }
     }
 
-    /// Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}
+    /// Google tag config's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -16253,9 +16716,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16266,7 +16740,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -16426,7 +16900,7 @@ where
         }
     }
 
-    /// Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}
+    /// Google tag config's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -16545,9 +17019,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16558,7 +17043,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -16723,7 +17208,7 @@ where
         }
     }
 
-    /// Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -16853,9 +17338,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16866,7 +17362,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -17071,7 +17567,7 @@ where
         self._request = new_value;
         self
     }
-    /// Google tag config's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/gtag_config/{gtag_config_id}
+    /// Google tag config's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -17204,9 +17700,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17217,7 +17724,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -17414,7 +17921,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -17526,9 +18033,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17539,7 +18057,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -17686,7 +18204,7 @@ where
         }
     }
 
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -17798,9 +18316,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17811,7 +18340,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -17971,7 +18500,7 @@ where
         }
     }
 
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -18083,9 +18612,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18096,7 +18636,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -18261,7 +18801,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18380,9 +18920,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18393,7 +18944,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -18559,7 +19110,7 @@ where
         }
     }
 
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -18679,9 +19230,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18692,7 +19254,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -18894,7 +19456,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Tag's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/tags/{tag_id}
+    /// GTM Tag's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -19014,9 +19576,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19027,7 +19600,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -19227,7 +19800,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -19346,9 +19919,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19359,7 +19943,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -19506,7 +20090,7 @@ where
         }
     }
 
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -19625,9 +20209,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19638,7 +20233,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -19798,7 +20393,7 @@ where
         }
     }
 
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -19893,6 +20488,386 @@ where
     }
 }
 
+/// Imports a GTM Custom Template from Gallery.
+///
+/// A builder for the *containers.workspaces.templates.import_from_gallery* method supported by a *account* resource.
+/// It is not used directly, but through a [`AccountMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_tagmanager2 as tagmanager2;
+/// # async fn dox() {
+/// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = TagManager::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().containers_workspaces_templates_import_from_gallery("parent")
+///              .gallery_sha("Lorem")
+///              .gallery_repository("est")
+///              .gallery_owner("sed")
+///              .acknowledge_permissions(true)
+///              .doit().await;
+/// # }
+/// ```
+pub struct AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a TagManager<C>,
+    _parent: String,
+    _gallery_sha: Option<String>,
+    _gallery_repository: Option<String>,
+    _gallery_owner: Option<String>,
+    _acknowledge_permissions: Option<bool>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {}
+
+impl<'a, C> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, CustomTemplate)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "tagmanager.accounts.containers.workspaces.templates.import_from_gallery",
+            http_method: hyper::Method::POST,
+        });
+
+        for &field in [
+            "alt",
+            "parent",
+            "gallerySha",
+            "galleryRepository",
+            "galleryOwner",
+            "acknowledgePermissions",
+        ]
+        .iter()
+        {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._gallery_sha.as_ref() {
+            params.push("gallerySha", value);
+        }
+        if let Some(value) = self._gallery_repository.as_ref() {
+            params.push("galleryRepository", value);
+        }
+        if let Some(value) = self._gallery_owner.as_ref() {
+            params.push("galleryOwner", value);
+        }
+        if let Some(value) = self._acknowledge_permissions.as_ref() {
+            params.push("acknowledgePermissions", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url =
+            self.hub._base_url.clone() + "tagmanager/v2/{+parent}/templates:import_from_gallery";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::EditContainer.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// GTM Workspace's API relative path.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(
+        mut self,
+        new_value: &str,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// SHA version of the Gallery template to import. Defaulted to the latest SHA version if not provided.
+    ///
+    /// Sets the *gallery sha* query property to the given value.
+    pub fn gallery_sha(
+        mut self,
+        new_value: &str,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        self._gallery_sha = Some(new_value.to_string());
+        self
+    }
+    /// Repository of the Gallery template to import
+    ///
+    /// Sets the *gallery repository* query property to the given value.
+    pub fn gallery_repository(
+        mut self,
+        new_value: &str,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        self._gallery_repository = Some(new_value.to_string());
+        self
+    }
+    /// Owner of the Gallery template to import
+    ///
+    /// Sets the *gallery owner* query property to the given value.
+    pub fn gallery_owner(
+        mut self,
+        new_value: &str,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        self._gallery_owner = Some(new_value.to_string());
+        self
+    }
+    /// Must be set to true to allow Gallery template to be imported into the workspace. If this bit is false, the import operation will fail.
+    ///
+    /// Sets the *acknowledge permissions* query property to the given value.
+    pub fn acknowledge_permissions(
+        mut self,
+        new_value: bool,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        self._acknowledge_permissions = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::EditContainer`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> AccountContainerWorkspaceTemplateImportFromGalleryCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Lists all GTM Templates of a GTM container workspace.
 ///
 /// A builder for the *containers.workspaces.templates.list* method supported by a *account* resource.
@@ -19910,9 +20885,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19923,7 +20909,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -19931,7 +20917,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_templates_list("parent")
-///              .page_token("Lorem")
+///              .page_token("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20088,7 +21074,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -20213,9 +21199,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20226,7 +21223,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -20234,7 +21231,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_templates_revert("path")
-///              .fingerprint("sed")
+///              .fingerprint("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20392,7 +21389,7 @@ where
         }
     }
 
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -20522,9 +21519,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20535,7 +21543,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -20548,7 +21556,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_templates_update(req, "path")
-///              .fingerprint("dolores")
+///              .fingerprint("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20740,7 +21748,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}
+    /// GTM Custom Template's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -20870,9 +21878,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20883,7 +21902,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -21083,7 +22102,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -21208,9 +22227,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21221,7 +22251,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -21368,7 +22398,7 @@ where
         }
     }
 
-    /// GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// GTM Transformation's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -21493,9 +22523,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21506,7 +22547,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -21666,7 +22707,7 @@ where
         }
     }
 
-    /// GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// GTM Transformation's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -21791,9 +22832,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21804,7 +22856,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -21812,7 +22864,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_transformations_list("parent")
-///              .page_token("et")
+///              .page_token("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21969,7 +23021,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -22104,9 +23156,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22117,7 +23180,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -22125,7 +23188,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_transformations_revert("path")
-///              .fingerprint("sed")
+///              .fingerprint("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22285,7 +23348,7 @@ where
         }
     }
 
-    /// GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// GTM Transformation's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -22421,9 +23484,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22434,7 +23508,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -22447,7 +23521,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_transformations_update(req, "path")
-///              .fingerprint("nonumy")
+///              .fingerprint("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22639,7 +23713,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}
+    /// GTM Transformation's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -22775,9 +23849,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22788,7 +23873,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -22988,7 +24073,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -23107,9 +24192,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23120,7 +24216,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -23267,7 +24363,7 @@ where
         }
     }
 
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -23386,9 +24482,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23399,7 +24506,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -23559,7 +24666,7 @@ where
         }
     }
 
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -23671,9 +24778,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23684,7 +24802,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -23692,7 +24810,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_list("parent")
-///              .page_token("sadipscing")
+///              .page_token("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23849,7 +24967,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -23971,9 +25089,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23984,7 +25113,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -23992,7 +25121,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_revert("path")
-///              .fingerprint("aliquyam")
+///              .fingerprint("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24150,7 +25279,7 @@ where
         }
     }
 
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -24280,9 +25409,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24293,7 +25433,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -24306,7 +25446,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_triggers_update(req, "path")
-///              .fingerprint("est")
+///              .fingerprint("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24498,7 +25638,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Trigger's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/triggers/{trigger_id}
+    /// GTM Trigger's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -24628,9 +25768,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24641,7 +25792,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -24841,7 +25992,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -24960,9 +26111,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24973,7 +26135,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -25120,7 +26282,7 @@ where
         }
     }
 
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -25239,9 +26401,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25252,7 +26425,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -25412,7 +26585,7 @@ where
         }
     }
 
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -25524,9 +26697,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25537,7 +26721,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -25545,7 +26729,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_variables_list("parent")
-///              .page_token("Stet")
+///              .page_token("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25702,7 +26886,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -25827,9 +27011,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25840,7 +27035,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -25848,7 +27043,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_variables_revert("path")
-///              .fingerprint("aliquyam")
+///              .fingerprint("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26006,7 +27201,7 @@ where
         }
     }
 
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -26136,9 +27331,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26149,7 +27355,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -26162,7 +27368,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_variables_update(req, "path")
-///              .fingerprint("duo")
+///              .fingerprint("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -26354,7 +27560,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}
+    /// GTM Variable's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -26484,9 +27690,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26497,7 +27714,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -26694,7 +27911,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -26806,9 +28023,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26819,7 +28047,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -26966,7 +28194,7 @@ where
         }
     }
 
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -27078,9 +28306,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27091,7 +28330,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -27251,7 +28490,7 @@ where
         }
     }
 
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -27363,9 +28602,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27376,7 +28626,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -27384,7 +28634,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_list("parent")
-///              .page_token("eos")
+///              .page_token("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27541,7 +28791,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -27660,9 +28910,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27673,7 +28934,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -27681,7 +28942,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_revert("path")
-///              .fingerprint("ea")
+///              .fingerprint("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27839,7 +29100,7 @@ where
         }
     }
 
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -27962,9 +29223,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27975,7 +29247,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -27988,7 +29260,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_zones_update(req, "path")
-///              .fingerprint("dolores")
+///              .fingerprint("eirmod")
 ///              .doit().await;
 /// # }
 /// ```
@@ -28177,7 +29449,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}
+    /// GTM Zone's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -28300,9 +29572,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28313,7 +29596,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -28510,7 +29793,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM parent Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -28623,9 +29906,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28636,7 +29930,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -28838,7 +30132,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -28957,9 +30251,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -28970,7 +30275,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -29117,7 +30422,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -29229,9 +30534,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29242,7 +30558,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -29402,7 +30718,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -29514,9 +30830,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29527,7 +30854,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -29687,7 +31014,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -29799,9 +31126,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -29812,7 +31150,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -29820,7 +31158,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_list("parent")
-///              .page_token("eirmod")
+///              .page_token("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29977,7 +31315,7 @@ where
         }
     }
 
-    /// GTM parent Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM parent Container's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -30096,9 +31434,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30109,7 +31458,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -30270,7 +31619,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -30386,9 +31735,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30399,7 +31759,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -30412,7 +31772,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_resolve_conflict(req, "path")
-///              .fingerprint("amet")
+///              .fingerprint("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -30590,7 +31950,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -30719,9 +32079,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -30732,7 +32103,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -30893,7 +32264,7 @@ where
         }
     }
 
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -31006,9 +32377,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31019,7 +32401,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -31032,7 +32414,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_workspaces_update(req, "path")
-///              .fingerprint("erat")
+///              .fingerprint("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -31221,7 +32603,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}
+    /// GTM Workspace's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -31340,9 +32722,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31353,7 +32746,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -31361,8 +32754,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_combine("path")
-///              .setting_source("sea")
-///              .container_id("takimata")
+///              .setting_source("sit")
+///              .container_id("erat")
 ///              .allow_user_permission_feature_update(true)
 ///              .doit().await;
 /// # }
@@ -31537,7 +32930,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -31674,9 +33067,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -31687,7 +33091,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -31884,7 +33288,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Account's API relative path. Example: accounts/{account_id}.
+    /// GTM Account's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -31996,9 +33400,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32009,7 +33424,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -32156,7 +33571,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -32268,9 +33683,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32281,7 +33707,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -32441,7 +33867,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -32553,9 +33979,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32566,7 +34003,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -32574,7 +34011,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_list("parent")
-///              .page_token("sit")
+///              .page_token("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -32731,7 +34168,7 @@ where
         }
     }
 
-    /// GTM Account's API relative path. Example: accounts/{account_id}.
+    /// GTM Account's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -32833,7 +34270,7 @@ where
     }
 }
 
-/// Looks up a Container by destination ID.
+/// Looks up a Container by destination ID or tag ID.
 ///
 /// A builder for the *containers.lookup* method supported by a *account* resource.
 /// It is not used directly, but through a [`AccountMethods`] instance.
@@ -32850,9 +34287,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -32863,7 +34311,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -32871,7 +34319,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_lookup()
-///              .destination_id("erat")
+///              .tag_id("sit")
+///              .destination_id("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -32880,6 +34329,7 @@ where
     C: 'a,
 {
     hub: &'a TagManager<C>,
+    _tag_id: Option<String>,
     _destination_id: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -32907,14 +34357,17 @@ where
             http_method: hyper::Method::GET,
         });
 
-        for &field in ["alt", "destinationId"].iter() {
+        for &field in ["alt", "tagId", "destinationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._tag_id.as_ref() {
+            params.push("tagId", value);
+        }
         if let Some(value) = self._destination_id.as_ref() {
             params.push("destinationId", value);
         }
@@ -33017,7 +34470,14 @@ where
         }
     }
 
-    /// Destination ID linked to a GTM Container, e.g. AW-123456789. Example: accounts/containers:lookup?destination_id={destination_id}.
+    /// Tag ID for a GTM Container, e.g. GTM-123456789. Only one of destination_id or tag_id should be set.
+    ///
+    /// Sets the *tag id* query property to the given value.
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerLookupCall<'a, C> {
+        self._tag_id = Some(new_value.to_string());
+        self
+    }
+    /// Destination ID linked to a GTM Container, e.g. AW-123456789. Only one of destination_id or tag_id should be set.
     ///
     /// Sets the *destination id* query property to the given value.
     pub fn destination_id(mut self, new_value: &str) -> AccountContainerLookupCall<'a, C> {
@@ -33126,9 +34586,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33139,7 +34610,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -33147,12 +34618,12 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().containers_move_tag_id("path")
-///              .tag_name("nonumy")
-///              .tag_id("et")
+///              .tag_name("At")
+///              .tag_id("dolores")
 ///              .copy_users(true)
-///              .copy_terms_of_service(false)
-///              .copy_settings(false)
-///              .allow_user_permission_feature_update(false)
+///              .copy_terms_of_service(true)
+///              .copy_settings(true)
+///              .allow_user_permission_feature_update(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33341,7 +34812,7 @@ where
         }
     }
 
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -33501,9 +34972,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33514,7 +34996,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -33674,7 +35156,7 @@ where
         }
     }
 
-    /// Container snippet's API relative path. Example: accounts/{account_id}/containers/{container_id}:snippet
+    /// Container snippet's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -33787,9 +35269,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -33800,7 +35293,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -34002,7 +35495,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}
+    /// GTM Container's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -34122,9 +35615,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34135,7 +35639,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -34331,7 +35835,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Account's API relative path. Example: accounts/{account_id}
+    /// GTM Account's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -34443,9 +35947,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34456,7 +35971,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -34602,7 +36117,7 @@ where
         }
     }
 
-    /// GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// GTM UserPermission's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -34714,9 +36229,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -34727,7 +36253,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -34887,7 +36413,7 @@ where
         }
     }
 
-    /// GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// GTM UserPermission's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -34999,9 +36525,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35012,7 +36549,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -35020,7 +36557,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().user_permissions_list("parent")
-///              .page_token("ipsum")
+///              .page_token("sit")
 ///              .doit().await;
 /// # }
 /// ```
@@ -35177,7 +36714,7 @@ where
         }
     }
 
-    /// GTM Account's API relative path. Example: accounts/{account_id}
+    /// GTM Account's API relative path.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -35297,9 +36834,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35310,7 +36858,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -35506,7 +37054,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM UserPermission's API relative path. Example: accounts/{account_id}/user_permissions/{user_permission_id}
+    /// GTM UserPermission's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -35618,9 +37166,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35631,7 +37190,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -35791,7 +37350,7 @@ where
         }
     }
 
-    /// GTM Account's API relative path. Example: accounts/{account_id}
+    /// GTM Account's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///
@@ -35900,9 +37459,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -35913,7 +37483,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -35921,8 +37491,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list()
-///              .page_token("gubergren")
-///              .include_google_tags(true)
+///              .page_token("rebum.")
+///              .include_google_tags(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -36186,9 +37756,20 @@ where
 /// # use tagmanager2::{TagManager, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -36199,7 +37780,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TagManager::new(client, auth);
@@ -36212,7 +37793,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().update(req, "path")
-///              .fingerprint("sit")
+///              .fingerprint("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -36401,7 +37982,7 @@ where
         self._request = new_value;
         self
     }
-    /// GTM Account's API relative path. Example: accounts/{account_id}
+    /// GTM Account's API relative path.
     ///
     /// Sets the *path* path property to the given value.
     ///

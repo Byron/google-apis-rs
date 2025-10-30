@@ -4,12 +4,12 @@
 [package]
 
 name = "google-containeranalysis1_beta1"
-version = "6.0.0+20240625"
+version = "8.0.0+20251015"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container Analysis (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/containeranalysis1_beta1"
 homepage = "https://cloud.google.com/container-analysis/api/reference/rest/"
-documentation = "https://docs.rs/google-containeranalysis1_beta1/6.0.0+20240625"
+documentation = "https://docs.rs/google-containeranalysis1_beta1/8.0.0+20251015"
 license = "MIT"
 keywords = ["containeranalysis", "google", "protocol", "web", "api"]
 autobins = false
@@ -19,22 +19,29 @@ edition = "2021"
 [dependencies]
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
 hyper = "1"
-hyper-rustls = { version = "0.27", default-features = false }
+hyper-rustls = { version = "0.27", default-features = false, features = ["http2", "rustls-native-certs", "native-tokio"] }
 hyper-util = "0.1"
 mime = "0.3"
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = "1.0.130"
 serde_with = "3"
 tokio = "1"
 url = "2"
 utoipa = { version = "4", optional = true }
-yup-oauth2 = { version = "11", optional = true }
+yup-oauth2 = { version = "12", default-features = false, optional = true }
 
-google-apis-common = { path = "../../google-apis-common", version = "7" }
+google-apis-common = { path = "../../google-apis-common", version = "8" }
 
 
 
 [features]
-default = ["yup-oauth2"]
+default = ["yup-oauth2", "ring"]
 utoipa = ["dep:utoipa"]
+
 yup-oauth2 = ["dep:yup-oauth2", "google-apis-common/yup-oauth2"]
+
+yup-oauth2-service-account = ["yup-oauth2", "yup-oauth2/service-account", "google-apis-common/yup-oauth2-service-account"]
+
+aws-lc-rs = ["yup-oauth2?/aws-lc-rs", "google-apis-common/aws-lc-rs", "hyper-rustls/aws-lc-rs"]
+
+ring = ["yup-oauth2?/ring", "google-apis-common/ring", "hyper-rustls/ring"]

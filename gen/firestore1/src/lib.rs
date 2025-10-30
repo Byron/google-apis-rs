@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firestore* crate version *6.0.0+20240617*, where *20240617* is the exact revision of the *firestore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Firestore* crate version *8.0.0+20251014*, where *20251014* is the exact revision of the *firestore:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Firestore* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/firestore).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Firestore) ...
 //!
 //! * projects
-//!  * [*databases backup schedules create*](api::ProjectDatabaseBackupScheduleCreateCall), [*databases backup schedules delete*](api::ProjectDatabaseBackupScheduleDeleteCall), [*databases backup schedules get*](api::ProjectDatabaseBackupScheduleGetCall), [*databases backup schedules list*](api::ProjectDatabaseBackupScheduleListCall), [*databases backup schedules patch*](api::ProjectDatabaseBackupSchedulePatchCall), [*databases bulk delete documents*](api::ProjectDatabaseBulkDeleteDocumentCall), [*databases collection groups fields get*](api::ProjectDatabaseCollectionGroupFieldGetCall), [*databases collection groups fields list*](api::ProjectDatabaseCollectionGroupFieldListCall), [*databases collection groups fields patch*](api::ProjectDatabaseCollectionGroupFieldPatchCall), [*databases collection groups indexes create*](api::ProjectDatabaseCollectionGroupIndexCreateCall), [*databases collection groups indexes delete*](api::ProjectDatabaseCollectionGroupIndexDeleteCall), [*databases collection groups indexes get*](api::ProjectDatabaseCollectionGroupIndexGetCall), [*databases collection groups indexes list*](api::ProjectDatabaseCollectionGroupIndexListCall), [*databases create*](api::ProjectDatabaseCreateCall), [*databases delete*](api::ProjectDatabaseDeleteCall), [*databases documents batch get*](api::ProjectDatabaseDocumentBatchGetCall), [*databases documents batch write*](api::ProjectDatabaseDocumentBatchWriteCall), [*databases documents begin transaction*](api::ProjectDatabaseDocumentBeginTransactionCall), [*databases documents commit*](api::ProjectDatabaseDocumentCommitCall), [*databases documents create document*](api::ProjectDatabaseDocumentCreateDocumentCall), [*databases documents delete*](api::ProjectDatabaseDocumentDeleteCall), [*databases documents get*](api::ProjectDatabaseDocumentGetCall), [*databases documents list*](api::ProjectDatabaseDocumentListCall), [*databases documents list collection ids*](api::ProjectDatabaseDocumentListCollectionIdCall), [*databases documents list documents*](api::ProjectDatabaseDocumentListDocumentCall), [*databases documents listen*](api::ProjectDatabaseDocumentListenCall), [*databases documents partition query*](api::ProjectDatabaseDocumentPartitionQueryCall), [*databases documents patch*](api::ProjectDatabaseDocumentPatchCall), [*databases documents rollback*](api::ProjectDatabaseDocumentRollbackCall), [*databases documents run aggregation query*](api::ProjectDatabaseDocumentRunAggregationQueryCall), [*databases documents run query*](api::ProjectDatabaseDocumentRunQueryCall), [*databases documents write*](api::ProjectDatabaseDocumentWriteCall), [*databases export documents*](api::ProjectDatabaseExportDocumentCall), [*databases get*](api::ProjectDatabaseGetCall), [*databases import documents*](api::ProjectDatabaseImportDocumentCall), [*databases list*](api::ProjectDatabaseListCall), [*databases operations cancel*](api::ProjectDatabaseOperationCancelCall), [*databases operations delete*](api::ProjectDatabaseOperationDeleteCall), [*databases operations get*](api::ProjectDatabaseOperationGetCall), [*databases operations list*](api::ProjectDatabaseOperationListCall), [*databases patch*](api::ProjectDatabasePatchCall), [*databases restore*](api::ProjectDatabaseRestoreCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations get*](api::ProjectLocationGetCall) and [*locations list*](api::ProjectLocationListCall)
+//!  * [*databases backup schedules create*](api::ProjectDatabaseBackupScheduleCreateCall), [*databases backup schedules delete*](api::ProjectDatabaseBackupScheduleDeleteCall), [*databases backup schedules get*](api::ProjectDatabaseBackupScheduleGetCall), [*databases backup schedules list*](api::ProjectDatabaseBackupScheduleListCall), [*databases backup schedules patch*](api::ProjectDatabaseBackupSchedulePatchCall), [*databases bulk delete documents*](api::ProjectDatabaseBulkDeleteDocumentCall), [*databases clone*](api::ProjectDatabaseCloneCall), [*databases collection groups fields get*](api::ProjectDatabaseCollectionGroupFieldGetCall), [*databases collection groups fields list*](api::ProjectDatabaseCollectionGroupFieldListCall), [*databases collection groups fields patch*](api::ProjectDatabaseCollectionGroupFieldPatchCall), [*databases collection groups indexes create*](api::ProjectDatabaseCollectionGroupIndexCreateCall), [*databases collection groups indexes delete*](api::ProjectDatabaseCollectionGroupIndexDeleteCall), [*databases collection groups indexes get*](api::ProjectDatabaseCollectionGroupIndexGetCall), [*databases collection groups indexes list*](api::ProjectDatabaseCollectionGroupIndexListCall), [*databases create*](api::ProjectDatabaseCreateCall), [*databases delete*](api::ProjectDatabaseDeleteCall), [*databases documents batch get*](api::ProjectDatabaseDocumentBatchGetCall), [*databases documents batch write*](api::ProjectDatabaseDocumentBatchWriteCall), [*databases documents begin transaction*](api::ProjectDatabaseDocumentBeginTransactionCall), [*databases documents commit*](api::ProjectDatabaseDocumentCommitCall), [*databases documents create document*](api::ProjectDatabaseDocumentCreateDocumentCall), [*databases documents delete*](api::ProjectDatabaseDocumentDeleteCall), [*databases documents get*](api::ProjectDatabaseDocumentGetCall), [*databases documents list*](api::ProjectDatabaseDocumentListCall), [*databases documents list collection ids*](api::ProjectDatabaseDocumentListCollectionIdCall), [*databases documents list documents*](api::ProjectDatabaseDocumentListDocumentCall), [*databases documents listen*](api::ProjectDatabaseDocumentListenCall), [*databases documents partition query*](api::ProjectDatabaseDocumentPartitionQueryCall), [*databases documents patch*](api::ProjectDatabaseDocumentPatchCall), [*databases documents rollback*](api::ProjectDatabaseDocumentRollbackCall), [*databases documents run aggregation query*](api::ProjectDatabaseDocumentRunAggregationQueryCall), [*databases documents run query*](api::ProjectDatabaseDocumentRunQueryCall), [*databases documents write*](api::ProjectDatabaseDocumentWriteCall), [*databases export documents*](api::ProjectDatabaseExportDocumentCall), [*databases get*](api::ProjectDatabaseGetCall), [*databases import documents*](api::ProjectDatabaseImportDocumentCall), [*databases list*](api::ProjectDatabaseListCall), [*databases operations cancel*](api::ProjectDatabaseOperationCancelCall), [*databases operations delete*](api::ProjectDatabaseOperationDeleteCall), [*databases operations get*](api::ProjectDatabaseOperationGetCall), [*databases operations list*](api::ProjectDatabaseOperationListCall), [*databases patch*](api::ProjectDatabasePatchCall), [*databases restore*](api::ProjectDatabaseRestoreCall), [*databases user creds create*](api::ProjectDatabaseUserCredCreateCall), [*databases user creds delete*](api::ProjectDatabaseUserCredDeleteCall), [*databases user creds disable*](api::ProjectDatabaseUserCredDisableCall), [*databases user creds enable*](api::ProjectDatabaseUserCredEnableCall), [*databases user creds get*](api::ProjectDatabaseUserCredGetCall), [*databases user creds list*](api::ProjectDatabaseUserCredListCall), [*databases user creds reset password*](api::ProjectDatabaseUserCredResetPasswordCall), [*locations backups delete*](api::ProjectLocationBackupDeleteCall), [*locations backups get*](api::ProjectLocationBackupGetCall), [*locations backups list*](api::ProjectLocationBackupListCall), [*locations get*](api::ProjectLocationGetCall) and [*locations list*](api::ProjectLocationListCall)
 //!
 //!
 //!
@@ -51,6 +51,7 @@
 //! let r = hub.projects().databases_collection_groups_indexes_create(...).doit().await
 //! let r = hub.projects().databases_operations_get(...).doit().await
 //! let r = hub.projects().databases_bulk_delete_documents(...).doit().await
+//! let r = hub.projects().databases_clone(...).doit().await
 //! let r = hub.projects().databases_create(...).doit().await
 //! let r = hub.projects().databases_delete(...).doit().await
 //! let r = hub.projects().databases_export_documents(...).doit().await
@@ -96,9 +97,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -109,7 +121,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = Firestore::new(client, auth);

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Deploy* crate version *6.0.0+20240619*, where *20240619* is the exact revision of the *clouddeploy:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloud Deploy* crate version *8.0.0+20251015*, where *20251015* is the exact revision of the *clouddeploy:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Cloud Deploy* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/deploy/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudDeploy) ...
 //!
 //! * projects
-//!  * [*locations custom target types create*](api::ProjectLocationCustomTargetTypeCreateCall), [*locations custom target types delete*](api::ProjectLocationCustomTargetTypeDeleteCall), [*locations custom target types get*](api::ProjectLocationCustomTargetTypeGetCall), [*locations custom target types get iam policy*](api::ProjectLocationCustomTargetTypeGetIamPolicyCall), [*locations custom target types list*](api::ProjectLocationCustomTargetTypeListCall), [*locations custom target types patch*](api::ProjectLocationCustomTargetTypePatchCall), [*locations custom target types set iam policy*](api::ProjectLocationCustomTargetTypeSetIamPolicyCall), [*locations delivery pipelines automation runs cancel*](api::ProjectLocationDeliveryPipelineAutomationRunCancelCall), [*locations delivery pipelines automation runs get*](api::ProjectLocationDeliveryPipelineAutomationRunGetCall), [*locations delivery pipelines automation runs list*](api::ProjectLocationDeliveryPipelineAutomationRunListCall), [*locations delivery pipelines automations create*](api::ProjectLocationDeliveryPipelineAutomationCreateCall), [*locations delivery pipelines automations delete*](api::ProjectLocationDeliveryPipelineAutomationDeleteCall), [*locations delivery pipelines automations get*](api::ProjectLocationDeliveryPipelineAutomationGetCall), [*locations delivery pipelines automations list*](api::ProjectLocationDeliveryPipelineAutomationListCall), [*locations delivery pipelines automations patch*](api::ProjectLocationDeliveryPipelineAutomationPatchCall), [*locations delivery pipelines create*](api::ProjectLocationDeliveryPipelineCreateCall), [*locations delivery pipelines delete*](api::ProjectLocationDeliveryPipelineDeleteCall), [*locations delivery pipelines get*](api::ProjectLocationDeliveryPipelineGetCall), [*locations delivery pipelines get iam policy*](api::ProjectLocationDeliveryPipelineGetIamPolicyCall), [*locations delivery pipelines list*](api::ProjectLocationDeliveryPipelineListCall), [*locations delivery pipelines patch*](api::ProjectLocationDeliveryPipelinePatchCall), [*locations delivery pipelines releases abandon*](api::ProjectLocationDeliveryPipelineReleaseAbandonCall), [*locations delivery pipelines releases create*](api::ProjectLocationDeliveryPipelineReleaseCreateCall), [*locations delivery pipelines releases get*](api::ProjectLocationDeliveryPipelineReleaseGetCall), [*locations delivery pipelines releases list*](api::ProjectLocationDeliveryPipelineReleaseListCall), [*locations delivery pipelines releases rollouts advance*](api::ProjectLocationDeliveryPipelineReleaseRolloutAdvanceCall), [*locations delivery pipelines releases rollouts approve*](api::ProjectLocationDeliveryPipelineReleaseRolloutApproveCall), [*locations delivery pipelines releases rollouts cancel*](api::ProjectLocationDeliveryPipelineReleaseRolloutCancelCall), [*locations delivery pipelines releases rollouts create*](api::ProjectLocationDeliveryPipelineReleaseRolloutCreateCall), [*locations delivery pipelines releases rollouts get*](api::ProjectLocationDeliveryPipelineReleaseRolloutGetCall), [*locations delivery pipelines releases rollouts ignore job*](api::ProjectLocationDeliveryPipelineReleaseRolloutIgnoreJobCall), [*locations delivery pipelines releases rollouts job runs get*](api::ProjectLocationDeliveryPipelineReleaseRolloutJobRunGetCall), [*locations delivery pipelines releases rollouts job runs list*](api::ProjectLocationDeliveryPipelineReleaseRolloutJobRunListCall), [*locations delivery pipelines releases rollouts job runs terminate*](api::ProjectLocationDeliveryPipelineReleaseRolloutJobRunTerminateCall), [*locations delivery pipelines releases rollouts list*](api::ProjectLocationDeliveryPipelineReleaseRolloutListCall), [*locations delivery pipelines releases rollouts retry job*](api::ProjectLocationDeliveryPipelineReleaseRolloutRetryJobCall), [*locations delivery pipelines rollback target*](api::ProjectLocationDeliveryPipelineRollbackTargetCall), [*locations delivery pipelines set iam policy*](api::ProjectLocationDeliveryPipelineSetIamPolicyCall), [*locations delivery pipelines test iam permissions*](api::ProjectLocationDeliveryPipelineTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations get config*](api::ProjectLocationGetConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations targets create*](api::ProjectLocationTargetCreateCall), [*locations targets delete*](api::ProjectLocationTargetDeleteCall), [*locations targets get*](api::ProjectLocationTargetGetCall), [*locations targets get iam policy*](api::ProjectLocationTargetGetIamPolicyCall), [*locations targets list*](api::ProjectLocationTargetListCall), [*locations targets patch*](api::ProjectLocationTargetPatchCall), [*locations targets set iam policy*](api::ProjectLocationTargetSetIamPolicyCall) and [*locations targets test iam permissions*](api::ProjectLocationTargetTestIamPermissionCall)
+//!  * [*locations custom target types create*](api::ProjectLocationCustomTargetTypeCreateCall), [*locations custom target types delete*](api::ProjectLocationCustomTargetTypeDeleteCall), [*locations custom target types get*](api::ProjectLocationCustomTargetTypeGetCall), [*locations custom target types get iam policy*](api::ProjectLocationCustomTargetTypeGetIamPolicyCall), [*locations custom target types list*](api::ProjectLocationCustomTargetTypeListCall), [*locations custom target types patch*](api::ProjectLocationCustomTargetTypePatchCall), [*locations custom target types set iam policy*](api::ProjectLocationCustomTargetTypeSetIamPolicyCall), [*locations delivery pipelines automation runs cancel*](api::ProjectLocationDeliveryPipelineAutomationRunCancelCall), [*locations delivery pipelines automation runs get*](api::ProjectLocationDeliveryPipelineAutomationRunGetCall), [*locations delivery pipelines automation runs list*](api::ProjectLocationDeliveryPipelineAutomationRunListCall), [*locations delivery pipelines automations create*](api::ProjectLocationDeliveryPipelineAutomationCreateCall), [*locations delivery pipelines automations delete*](api::ProjectLocationDeliveryPipelineAutomationDeleteCall), [*locations delivery pipelines automations get*](api::ProjectLocationDeliveryPipelineAutomationGetCall), [*locations delivery pipelines automations list*](api::ProjectLocationDeliveryPipelineAutomationListCall), [*locations delivery pipelines automations patch*](api::ProjectLocationDeliveryPipelineAutomationPatchCall), [*locations delivery pipelines create*](api::ProjectLocationDeliveryPipelineCreateCall), [*locations delivery pipelines delete*](api::ProjectLocationDeliveryPipelineDeleteCall), [*locations delivery pipelines get*](api::ProjectLocationDeliveryPipelineGetCall), [*locations delivery pipelines get iam policy*](api::ProjectLocationDeliveryPipelineGetIamPolicyCall), [*locations delivery pipelines list*](api::ProjectLocationDeliveryPipelineListCall), [*locations delivery pipelines patch*](api::ProjectLocationDeliveryPipelinePatchCall), [*locations delivery pipelines releases abandon*](api::ProjectLocationDeliveryPipelineReleaseAbandonCall), [*locations delivery pipelines releases create*](api::ProjectLocationDeliveryPipelineReleaseCreateCall), [*locations delivery pipelines releases get*](api::ProjectLocationDeliveryPipelineReleaseGetCall), [*locations delivery pipelines releases list*](api::ProjectLocationDeliveryPipelineReleaseListCall), [*locations delivery pipelines releases rollouts advance*](api::ProjectLocationDeliveryPipelineReleaseRolloutAdvanceCall), [*locations delivery pipelines releases rollouts approve*](api::ProjectLocationDeliveryPipelineReleaseRolloutApproveCall), [*locations delivery pipelines releases rollouts cancel*](api::ProjectLocationDeliveryPipelineReleaseRolloutCancelCall), [*locations delivery pipelines releases rollouts create*](api::ProjectLocationDeliveryPipelineReleaseRolloutCreateCall), [*locations delivery pipelines releases rollouts get*](api::ProjectLocationDeliveryPipelineReleaseRolloutGetCall), [*locations delivery pipelines releases rollouts ignore job*](api::ProjectLocationDeliveryPipelineReleaseRolloutIgnoreJobCall), [*locations delivery pipelines releases rollouts job runs get*](api::ProjectLocationDeliveryPipelineReleaseRolloutJobRunGetCall), [*locations delivery pipelines releases rollouts job runs list*](api::ProjectLocationDeliveryPipelineReleaseRolloutJobRunListCall), [*locations delivery pipelines releases rollouts job runs terminate*](api::ProjectLocationDeliveryPipelineReleaseRolloutJobRunTerminateCall), [*locations delivery pipelines releases rollouts list*](api::ProjectLocationDeliveryPipelineReleaseRolloutListCall), [*locations delivery pipelines releases rollouts retry job*](api::ProjectLocationDeliveryPipelineReleaseRolloutRetryJobCall), [*locations delivery pipelines rollback target*](api::ProjectLocationDeliveryPipelineRollbackTargetCall), [*locations delivery pipelines set iam policy*](api::ProjectLocationDeliveryPipelineSetIamPolicyCall), [*locations delivery pipelines test iam permissions*](api::ProjectLocationDeliveryPipelineTestIamPermissionCall), [*locations deploy policies create*](api::ProjectLocationDeployPolicyCreateCall), [*locations deploy policies delete*](api::ProjectLocationDeployPolicyDeleteCall), [*locations deploy policies get*](api::ProjectLocationDeployPolicyGetCall), [*locations deploy policies get iam policy*](api::ProjectLocationDeployPolicyGetIamPolicyCall), [*locations deploy policies list*](api::ProjectLocationDeployPolicyListCall), [*locations deploy policies patch*](api::ProjectLocationDeployPolicyPatchCall), [*locations deploy policies set iam policy*](api::ProjectLocationDeployPolicySetIamPolicyCall), [*locations get*](api::ProjectLocationGetCall), [*locations get config*](api::ProjectLocationGetConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations targets create*](api::ProjectLocationTargetCreateCall), [*locations targets delete*](api::ProjectLocationTargetDeleteCall), [*locations targets get*](api::ProjectLocationTargetGetCall), [*locations targets get iam policy*](api::ProjectLocationTargetGetIamPolicyCall), [*locations targets list*](api::ProjectLocationTargetListCall), [*locations targets patch*](api::ProjectLocationTargetPatchCall), [*locations targets set iam policy*](api::ProjectLocationTargetSetIamPolicyCall) and [*locations targets test iam permissions*](api::ProjectLocationTargetTestIamPermissionCall)
 //!
 //!
 //!
@@ -58,6 +58,9 @@
 //! let r = hub.projects().locations_delivery_pipelines_create(...).doit().await
 //! let r = hub.projects().locations_delivery_pipelines_delete(...).doit().await
 //! let r = hub.projects().locations_delivery_pipelines_patch(...).doit().await
+//! let r = hub.projects().locations_deploy_policies_create(...).doit().await
+//! let r = hub.projects().locations_deploy_policies_delete(...).doit().await
+//! let r = hub.projects().locations_deploy_policies_patch(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
 //! let r = hub.projects().locations_targets_create(...).doit().await
 //! let r = hub.projects().locations_targets_delete(...).doit().await
@@ -88,7 +91,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_clouddeploy1 as clouddeploy1;
-//! use clouddeploy1::api::CustomTargetType;
+//! use clouddeploy1::api::Rollout;
 //! use clouddeploy1::{Result, Error};
 //! # async fn dox() {
 //! use clouddeploy1::{CloudDeploy, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
@@ -101,9 +104,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -114,23 +128,24 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CloudDeploy::new(client, auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = CustomTargetType::default();
+//! let mut req = Rollout::default();
 //!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_custom_target_types_patch(req, "name")
+//! let result = hub.projects().locations_delivery_pipelines_releases_rollouts_create(req, "parent")
 //!              .validate_only(true)
-//!              .update_mask(FieldMask::new::<&str>(&[]))
-//!              .request_id("amet.")
-//!              .allow_missing(true)
+//!              .starting_phase_id("amet.")
+//!              .rollout_id("duo")
+//!              .request_id("ipsum")
+//!              .add_override_deploy_policy("gubergren")
 //!              .doit().await;
 //!
 //! match result {

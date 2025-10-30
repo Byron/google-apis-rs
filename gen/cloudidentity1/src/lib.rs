@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Identity* crate version *6.0.0+20240625*, where *20240625* is the exact revision of the *cloudidentity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+//! This documentation was generated from *Cloud Identity* crate version *8.0.0+20251027*, where *20251027* is the exact revision of the *cloudidentity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Cloud Identity* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/identity/).
@@ -17,10 +17,14 @@
 //!  * [*cancel wipe*](api::DeviceCancelWipeCall), [*create*](api::DeviceCreateCall), [*delete*](api::DeviceDeleteCall), [*device users approve*](api::DeviceDeviceUserApproveCall), [*device users block*](api::DeviceDeviceUserBlockCall), [*device users cancel wipe*](api::DeviceDeviceUserCancelWipeCall), [*device users client states get*](api::DeviceDeviceUserClientStateGetCall), [*device users client states list*](api::DeviceDeviceUserClientStateListCall), [*device users client states patch*](api::DeviceDeviceUserClientStatePatchCall), [*device users delete*](api::DeviceDeviceUserDeleteCall), [*device users get*](api::DeviceDeviceUserGetCall), [*device users list*](api::DeviceDeviceUserListCall), [*device users lookup*](api::DeviceDeviceUserLookupCall), [*device users wipe*](api::DeviceDeviceUserWipeCall), [*get*](api::DeviceGetCall), [*list*](api::DeviceListCall) and [*wipe*](api::DeviceWipeCall)
 //! * [groups](api::Group)
 //!  * [*create*](api::GroupCreateCall), [*delete*](api::GroupDeleteCall), [*get*](api::GroupGetCall), [*get security settings*](api::GroupGetSecuritySettingCall), [*list*](api::GroupListCall), [*lookup*](api::GroupLookupCall), [*memberships check transitive membership*](api::GroupMembershipCheckTransitiveMembershipCall), [*memberships create*](api::GroupMembershipCreateCall), [*memberships delete*](api::GroupMembershipDeleteCall), [*memberships get*](api::GroupMembershipGetCall), [*memberships get membership graph*](api::GroupMembershipGetMembershipGraphCall), [*memberships list*](api::GroupMembershipListCall), [*memberships lookup*](api::GroupMembershipLookupCall), [*memberships modify membership roles*](api::GroupMembershipModifyMembershipRoleCall), [*memberships search direct groups*](api::GroupMembershipSearchDirectGroupCall), [*memberships search transitive groups*](api::GroupMembershipSearchTransitiveGroupCall), [*memberships search transitive memberships*](api::GroupMembershipSearchTransitiveMembershipCall), [*patch*](api::GroupPatchCall), [*search*](api::GroupSearchCall) and [*update security settings*](api::GroupUpdateSecuritySettingCall)
+//! * [inbound oidc sso profiles](api::InboundOidcSsoProfile)
+//!  * [*create*](api::InboundOidcSsoProfileCreateCall), [*delete*](api::InboundOidcSsoProfileDeleteCall), [*get*](api::InboundOidcSsoProfileGetCall), [*list*](api::InboundOidcSsoProfileListCall) and [*patch*](api::InboundOidcSsoProfilePatchCall)
 //! * [inbound saml sso profiles](api::InboundSamlSsoProfile)
 //!  * [*create*](api::InboundSamlSsoProfileCreateCall), [*delete*](api::InboundSamlSsoProfileDeleteCall), [*get*](api::InboundSamlSsoProfileGetCall), [*idp credentials add*](api::InboundSamlSsoProfileIdpCredentialAddCall), [*idp credentials delete*](api::InboundSamlSsoProfileIdpCredentialDeleteCall), [*idp credentials get*](api::InboundSamlSsoProfileIdpCredentialGetCall), [*idp credentials list*](api::InboundSamlSsoProfileIdpCredentialListCall), [*list*](api::InboundSamlSsoProfileListCall) and [*patch*](api::InboundSamlSsoProfilePatchCall)
 //! * [inbound sso assignments](api::InboundSsoAssignment)
 //!  * [*create*](api::InboundSsoAssignmentCreateCall), [*delete*](api::InboundSsoAssignmentDeleteCall), [*get*](api::InboundSsoAssignmentGetCall), [*list*](api::InboundSsoAssignmentListCall) and [*patch*](api::InboundSsoAssignmentPatchCall)
+//! * [policies](api::Policy)
+//!  * [*get*](api::PolicyGetCall) and [*list*](api::PolicyListCall)
 //!
 //!
 //!
@@ -74,6 +78,9 @@
 //! let r = hub.groups().delete(...).doit().await
 //! let r = hub.groups().patch(...).doit().await
 //! let r = hub.groups().update_security_settings(...).doit().await
+//! let r = hub.inbound_oidc_sso_profiles().create(...).doit().await
+//! let r = hub.inbound_oidc_sso_profiles().delete(...).doit().await
+//! let r = hub.inbound_oidc_sso_profiles().patch(...).doit().await
 //! let r = hub.inbound_saml_sso_profiles().idp_credentials_add(...).doit().await
 //! let r = hub.inbound_saml_sso_profiles().idp_credentials_delete(...).doit().await
 //! let r = hub.inbound_saml_sso_profiles().create(...).doit().await
@@ -121,9 +128,20 @@
 //! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
-//! let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+//! let connector = hyper_rustls::HttpsConnectorBuilder::new()
+//!     .with_native_roots()
+//!     .unwrap()
+//!     .https_only()
+//!     .enable_http2()
+//!     .build();
+//!
+//! let executor = hyper_util::rt::TokioExecutor::new();
+//! let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 //!     secret,
 //!     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+//!     yup_oauth2::client::CustomHyperClientBuilder::from(
+//!         hyper_util::client::legacy::Client::builder(executor).build(connector),
+//!     ),
 //! ).build().await.unwrap();
 //!
 //! let client = hyper_util::client::legacy::Client::builder(
@@ -134,7 +152,7 @@
 //!         .with_native_roots()
 //!         .unwrap()
 //!         .https_or_http()
-//!         .enable_http1()
+//!         .enable_http2()
 //!         .build()
 //! );
 //! let mut hub = CloudIdentity::new(client, auth);

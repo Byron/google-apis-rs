@@ -62,9 +62,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -75,7 +86,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = TasksHub::new(client, auth);
@@ -83,16 +94,17 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tasks().list("tasklist")
-///              .updated_min("ipsum")
+///              .updated_min("est")
 ///              .show_hidden(true)
-///              .show_deleted(true)
-///              .show_completed(false)
-///              .page_token("Lorem")
-///              .max_results(-25)
-///              .due_min("labore")
-///              .due_max("sed")
-///              .completed_min("duo")
-///              .completed_max("sed")
+///              .show_deleted(false)
+///              .show_completed(true)
+///              .show_assigned(false)
+///              .page_token("sed")
+///              .max_results(-70)
+///              .due_min("sed")
+///              .due_max("no")
+///              .completed_min("Stet")
+///              .completed_max("kasd")
 ///              .doit().await;
 ///
 /// match result {
@@ -130,7 +142,7 @@ impl<'a, C> TasksHub<C> {
         TasksHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://tasks.googleapis.com/".to_string(),
             _root_url: "https://tasks.googleapis.com/".to_string(),
         }
@@ -144,7 +156,7 @@ impl<'a, C> TasksHub<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -171,6 +183,62 @@ impl<'a, C> TasksHub<C> {
 // ############
 // SCHEMAS ###
 // ##########
+/// Information about the source of the task assignment (Document, Chat Space).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AssignmentInfo {
+    /// Output only. Information about the Drive file where this task originates from. Currently, the Drive file can only be a document. This field is read-only.
+    #[serde(rename = "driveResourceInfo")]
+    pub drive_resource_info: Option<DriveResourceInfo>,
+    /// Output only. An absolute link to the original task in the surface of assignment (Docs, Chat spaces, etc.).
+    #[serde(rename = "linkToTask")]
+    pub link_to_task: Option<String>,
+    /// Output only. Information about the Chat Space where this task originates from. This field is read-only.
+    #[serde(rename = "spaceInfo")]
+    pub space_info: Option<SpaceInfo>,
+    /// Output only. The type of surface this assigned task originates from. Currently limited to DOCUMENT or SPACE.
+    #[serde(rename = "surfaceType")]
+    pub surface_type: Option<String>,
+}
+
+impl common::Part for AssignmentInfo {}
+
+/// Information about the Drive resource where a task was assigned from (the document, sheet, etc.).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DriveResourceInfo {
+    /// Output only. Identifier of the file in the Drive API.
+    #[serde(rename = "driveFileId")]
+    pub drive_file_id: Option<String>,
+    /// Output only. Resource key required to access files shared via a shared link. Not required for all files. See also developers.google.com/drive/api/guides/resource-keys.
+    #[serde(rename = "resourceKey")]
+    pub resource_key: Option<String>,
+}
+
+impl common::Part for DriveResourceInfo {}
+
+/// Information about the Chat Space where a task was assigned from.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SpaceInfo {
+    /// Output only. The Chat space where this task originates from. The format is "spaces/{space}".
+    pub space: Option<String>,
+}
+
+impl common::Part for SpaceInfo {}
+
 /// There is no detailed description.
 ///
 /// # Activities
@@ -190,9 +258,12 @@ impl<'a, C> TasksHub<C> {
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Task {
+    /// Output only. Context information for assigned tasks. A task can be assigned to a user, currently possible from surfaces like Docs and Chat Spaces. This field is populated for tasks assigned to the current user and identifies where the task was assigned from. This field is read-only.
+    #[serde(rename = "assignmentInfo")]
+    pub assignment_info: Option<AssignmentInfo>,
     /// Completion date of the task (as a RFC 3339 timestamp). This field is omitted if the task has not been completed.
     pub completed: Option<String>,
-    /// Flag indicating whether the task has been deleted. The default is False.
+    /// Flag indicating whether the task has been deleted. For assigned tasks this field is read-only. They can only be deleted by calling tasks.delete, in which case both the assigned task and the original task (in Docs or Chat Spaces) are deleted. To delete the assigned task only, navigate to the assignment surface and unassign the task from there. The default is False.
     pub deleted: Option<bool>,
     /// Due date of the task (as a RFC 3339 timestamp). Optional. The due date only records date information; the time portion of the timestamp is discarded when setting the due date. It isn't possible to read or write the time that a task is due via the API.
     pub due: Option<String>,
@@ -206,9 +277,9 @@ pub struct Task {
     pub kind: Option<String>,
     /// Output only. Collection of links. This collection is read-only.
     pub links: Option<Vec<TaskLinks>>,
-    /// Notes describing the task. Optional. Maximum length allowed: 8192 characters.
+    /// Notes describing the task. Tasks assigned from Google Docs cannot have notes. Optional. Maximum length allowed: 8192 characters.
     pub notes: Option<String>,
-    /// Output only. Parent task identifier. This field is omitted if it is a top-level task. This field is read-only. Use the "move" method to move the task under a different parent or to the top level.
+    /// Output only. Parent task identifier. This field is omitted if it is a top-level task. Use the "move" method to move the task under a different parent or to the top level. A parent task can never be an assigned task (from Chat Spaces, Docs). This field is read-only.
     pub parent: Option<String>,
     /// Output only. String indicating the position of the task among its sibling tasks under the same parent task or at the top level. If this string is greater than another task's corresponding position string according to lexicographical ordering, the task is positioned after the other task under the same parent task (or at the top level). Use the "move" method to move the task to another position.
     pub position: Option<String>,
@@ -322,11 +393,11 @@ impl common::ResponseResult for Tasks {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct TaskLinks {
-    /// The description. In HTML speak: Everything between <a> and </a>.
+    /// The description (might be empty).
     pub description: Option<String>,
     /// The URL.
     pub link: Option<String>,
-    /// Type of the link, e.g. "email".
+    /// Type of the link, e.g. "email", "generic", "chat_message", "keep_note".
     #[serde(rename = "type")]
     pub type_: Option<String>,
 }
@@ -354,9 +425,20 @@ impl common::Part for TaskLinks {}
 /// use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -367,7 +449,7 @@ impl common::Part for TaskLinks {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = TasksHub::new(client, auth);
@@ -389,7 +471,7 @@ impl<'a, C> common::MethodsBuilder for TasklistMethods<'a, C> {}
 impl<'a, C> TasklistMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the authenticated user's specified task list.
+    /// Deletes the authenticated user's specified task list. If the list contains assigned tasks, both the assigned tasks and the original tasks in the assignment surface (Docs, Chat Spaces) are deleted.
     ///
     /// # Arguments
     ///
@@ -507,9 +589,20 @@ impl<'a, C> TasklistMethods<'a, C> {
 /// use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -520,7 +613,7 @@ impl<'a, C> TasklistMethods<'a, C> {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = TasksHub::new(client, auth);
@@ -559,7 +652,7 @@ impl<'a, C> TaskMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the specified task from the task list.
+    /// Deletes the specified task from the task list. If the task is assigned, both the assigned task and the original task (in Docs, Chat Spaces) are deleted. To delete the assigned task only, navigate to the assignment surface and unassign the task from there.
     ///
     /// # Arguments
     ///
@@ -597,7 +690,7 @@ impl<'a, C> TaskMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new task on the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
+    /// Creates a new task on the specified task list. Tasks assigned from Docs or Chat Spaces cannot be inserted from Tasks Public API; they can only be created by assigning them from Docs or Chat Spaces. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
     ///
     /// # Arguments
     ///
@@ -618,7 +711,7 @@ impl<'a, C> TaskMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all tasks in the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
+    /// Returns all tasks in the specified task list. Doesn't return assigned tasks by default (from Docs, Chat Spaces). A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
     ///
     /// # Arguments
     ///
@@ -631,6 +724,7 @@ impl<'a, C> TaskMethods<'a, C> {
             _show_hidden: Default::default(),
             _show_deleted: Default::default(),
             _show_completed: Default::default(),
+            _show_assigned: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _due_min: Default::default(),
@@ -645,7 +739,7 @@ impl<'a, C> TaskMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task.
+    /// Moves the specified task to another position in the destination task list. If the destination list is not specified, the task is moved within its current list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task.
     ///
     /// # Arguments
     ///
@@ -658,6 +752,7 @@ impl<'a, C> TaskMethods<'a, C> {
             _task: task.to_string(),
             _previous: Default::default(),
             _parent: Default::default(),
+            _destination_tasklist: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -711,7 +806,7 @@ impl<'a, C> TaskMethods<'a, C> {
 // CallBuilders   ###
 // #################
 
-/// Deletes the authenticated user's specified task list.
+/// Deletes the authenticated user's specified task list. If the list contains assigned tasks, both the assigned tasks and the original tasks in the assignment surface (Docs, Chat Spaces) are deleted.
 ///
 /// A builder for the *delete* method supported by a *tasklist* resource.
 /// It is not used directly, but through a [`TasklistMethods`] instance.
@@ -728,9 +823,20 @@ impl<'a, C> TaskMethods<'a, C> {
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -741,7 +847,7 @@ impl<'a, C> TaskMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -999,9 +1105,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1012,7 +1129,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -1282,9 +1399,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1295,7 +1423,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -1582,9 +1710,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1595,7 +1734,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -1603,8 +1742,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tasklists().list()
-///              .page_token("kasd")
-///              .max_results(-24)
+///              .page_token("et")
+///              .max_results(-68)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1761,7 +1900,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
+    /// Maximum number of task lists returned on one page. Optional. The default is 1000 (max allowed: 1000).
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> TasklistListCall<'a, C> {
@@ -1868,9 +2007,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -1881,7 +2031,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -2187,9 +2337,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2200,7 +2361,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -2508,9 +2669,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2521,7 +2693,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -2759,7 +2931,7 @@ where
     }
 }
 
-/// Deletes the specified task from the task list.
+/// Deletes the specified task from the task list. If the task is assigned, both the assigned task and the original task (in Docs, Chat Spaces) are deleted. To delete the assigned task only, navigate to the assignment surface and unassign the task from there.
 ///
 /// A builder for the *delete* method supported by a *task* resource.
 /// It is not used directly, but through a [`TaskMethods`] instance.
@@ -2776,9 +2948,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -2789,7 +2972,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -3056,9 +3239,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3069,7 +3263,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -3333,7 +3527,7 @@ where
     }
 }
 
-/// Creates a new task on the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
+/// Creates a new task on the specified task list. Tasks assigned from Docs or Chat Spaces cannot be inserted from Tasks Public API; they can only be created by assigning them from Docs or Chat Spaces. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
 ///
 /// A builder for the *insert* method supported by a *task* resource.
 /// It is not used directly, but through a [`TaskMethods`] instance.
@@ -3351,9 +3545,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3364,7 +3569,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -3377,8 +3582,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tasks().insert(req, "tasklist")
-///              .previous("et")
-///              .parent("voluptua.")
+///              .previous("consetetur")
+///              .parent("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3587,7 +3792,7 @@ where
         self._previous = Some(new_value.to_string());
         self
     }
-    /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.
+    /// Parent task identifier. If the task is created at the top level, this parameter is omitted. An assigned task cannot be a parent task, nor can it have a parent. Setting the parent to an assigned task results in failure of the request. Optional.
     ///
     /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, C> {
@@ -3676,7 +3881,7 @@ where
     }
 }
 
-/// Returns all tasks in the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
+/// Returns all tasks in the specified task list. Doesn't return assigned tasks by default (from Docs, Chat Spaces). A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
 ///
 /// A builder for the *list* method supported by a *task* resource.
 /// It is not used directly, but through a [`TaskMethods`] instance.
@@ -3693,9 +3898,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -3706,7 +3922,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -3714,16 +3930,17 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tasks().list("tasklist")
-///              .updated_min("consetetur")
+///              .updated_min("et")
 ///              .show_hidden(false)
-///              .show_deleted(true)
+///              .show_deleted(false)
 ///              .show_completed(false)
-///              .page_token("Stet")
-///              .max_results(-99)
-///              .due_min("duo")
-///              .due_max("vero")
-///              .completed_min("vero")
-///              .completed_max("invidunt")
+///              .show_assigned(false)
+///              .page_token("invidunt")
+///              .max_results(-65)
+///              .due_min("vero")
+///              .due_max("elitr")
+///              .completed_min("Lorem")
+///              .completed_max("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -3737,6 +3954,7 @@ where
     _show_hidden: Option<bool>,
     _show_deleted: Option<bool>,
     _show_completed: Option<bool>,
+    _show_assigned: Option<bool>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _due_min: Option<String>,
@@ -3776,6 +3994,7 @@ where
             "showHidden",
             "showDeleted",
             "showCompleted",
+            "showAssigned",
             "pageToken",
             "maxResults",
             "dueMin",
@@ -3791,7 +4010,7 @@ where
             }
         }
 
-        let mut params = Params::with_capacity(13 + self._additional_params.len());
+        let mut params = Params::with_capacity(14 + self._additional_params.len());
         params.push("tasklist", self._tasklist);
         if let Some(value) = self._updated_min.as_ref() {
             params.push("updatedMin", value);
@@ -3804,6 +4023,9 @@ where
         }
         if let Some(value) = self._show_completed.as_ref() {
             params.push("showCompleted", value.to_string());
+        }
+        if let Some(value) = self._show_assigned.as_ref() {
+            params.push("showAssigned", value.to_string());
         }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -3962,11 +4184,18 @@ where
         self._show_deleted = Some(new_value);
         self
     }
-    /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True. Note that showHidden must also be True to show tasks completed in first party clients, such as the web UI and Google's mobile apps.
+    /// Flag indicating whether completed tasks are returned in the result. Note that showHidden must also be True to show tasks completed in first party clients, such as the web UI and Google's mobile apps. Optional. The default is True.
     ///
     /// Sets the *show completed* query property to the given value.
     pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, C> {
         self._show_completed = Some(new_value);
+        self
+    }
+    /// Optional. Flag indicating whether tasks assigned to the current user are returned in the result. Optional. The default is False.
+    ///
+    /// Sets the *show assigned* query property to the given value.
+    pub fn show_assigned(mut self, new_value: bool) -> TaskListCall<'a, C> {
+        self._show_assigned = Some(new_value);
         self
     }
     /// Token specifying the result page to return. Optional.
@@ -4093,7 +4322,7 @@ where
     }
 }
 
-/// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task.
+/// Moves the specified task to another position in the destination task list. If the destination list is not specified, the task is moved within its current list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task.
 ///
 /// A builder for the *move* method supported by a *task* resource.
 /// It is not used directly, but through a [`TaskMethods`] instance.
@@ -4110,9 +4339,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4123,7 +4363,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -4131,8 +4371,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tasks().move_("tasklist", "task")
-///              .previous("elitr")
-///              .parent("Lorem")
+///              .previous("accusam")
+///              .parent("takimata")
+///              .destination_tasklist("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4145,6 +4386,7 @@ where
     _task: String,
     _previous: Option<String>,
     _parent: Option<String>,
+    _destination_tasklist: Option<String>,
     _delegate: Option<&'a mut dyn common::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeSet<String>,
@@ -4171,14 +4413,23 @@ where
             http_method: hyper::Method::POST,
         });
 
-        for &field in ["alt", "tasklist", "task", "previous", "parent"].iter() {
+        for &field in [
+            "alt",
+            "tasklist",
+            "task",
+            "previous",
+            "parent",
+            "destinationTasklist",
+        ]
+        .iter()
+        {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(common::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("tasklist", self._tasklist);
         params.push("task", self._task);
         if let Some(value) = self._previous.as_ref() {
@@ -4186,6 +4437,9 @@ where
         }
         if let Some(value) = self._parent.as_ref() {
             params.push("parent", value);
+        }
+        if let Some(value) = self._destination_tasklist.as_ref() {
+            params.push("destinationTasklist", value);
         }
 
         params.extend(self._additional_params.iter());
@@ -4315,18 +4569,25 @@ where
         self._task = new_value.to_string();
         self
     }
-    /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.
+    /// Optional. New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. The task set as previous must exist in the task list and can not be hidden. Exceptions: 1. Tasks that are both completed and hidden can only be moved to position 0, so the previous field must be empty.
     ///
     /// Sets the *previous* query property to the given value.
     pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, C> {
         self._previous = Some(new_value.to_string());
         self
     }
-    /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.
+    /// Optional. New parent task identifier. If the task is moved to the top level, this parameter is omitted. The task set as parent must exist in the task list and can not be hidden. Exceptions: 1. Assigned and repeating tasks cannot be set as parent tasks (have subtasks), or be moved under a parent task (become subtasks). 2. Tasks that are both completed and hidden cannot be nested, so the parent field must be empty.
     ///
     /// Sets the *parent* query property to the given value.
     pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, C> {
         self._parent = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Destination task list identifier. If set, the task is moved from tasklist to the destinationTasklist list. Otherwise the task is moved within its current list. Recurrent tasks cannot currently be moved between lists.
+    ///
+    /// Sets the *destination tasklist* query property to the given value.
+    pub fn destination_tasklist(mut self, new_value: &str) -> TaskMoveCall<'a, C> {
+        self._destination_tasklist = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -4429,9 +4690,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4442,7 +4714,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);
@@ -4760,9 +5032,20 @@ where
 /// # use tasks1::{TasksHub, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -4773,7 +5056,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = TasksHub::new(client, auth);

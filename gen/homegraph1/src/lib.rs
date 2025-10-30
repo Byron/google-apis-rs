@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Home Graph Service* crate version *7.0.0+20240621*, where *20240621* is the exact revision of the *homegraph:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v7.0.0*.
+//! This documentation was generated from *Home Graph Service* crate version *8.0.0+20251017*, where *20251017* is the exact revision of the *homegraph:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 //!
 //! Everything else about the *Home Graph Service* *v1* API can be found at the
 //! [official documentation site](https://developers.home.google.com/cloud-to-cloud/get-started).

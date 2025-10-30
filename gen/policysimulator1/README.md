@@ -5,22 +5,22 @@ DO NOT EDIT !
 -->
 The `google-policysimulator1` library allows access to all features of the *Google Policy Simulator* service.
 
-This documentation was generated from *Policy Simulator* crate version *6.0.0+20240623*, where *20240623* is the exact revision of the *policysimulator:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v6.0.0*.
+This documentation was generated from *Policy Simulator* crate version *8.0.0+20251016*, where *20251016* is the exact revision of the *policysimulator:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v8.0.0*.
 
 Everything else about the *Policy Simulator* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/iam/docs/simulating-access).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/PolicySimulator) ...
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/PolicySimulator) ...
 
 * folders
- * [*locations org policy violations previews operations get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::FolderLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations replays create*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::FolderLocationReplayCreateCall), [*locations replays get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::FolderLocationReplayGetCall), [*locations replays operations get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::FolderLocationReplayOperationGetCall), [*locations replays operations list*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::FolderLocationReplayOperationListCall) and [*locations replays results list*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::FolderLocationReplayResultListCall)
+ * [*locations access policy simulations operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::FolderLocationAccessPolicySimulationOperationGetCall), [*locations org policy violations previews operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::FolderLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations replays create*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::FolderLocationReplayCreateCall), [*locations replays get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::FolderLocationReplayGetCall), [*locations replays operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::FolderLocationReplayOperationGetCall), [*locations replays operations list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::FolderLocationReplayOperationListCall) and [*locations replays results list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::FolderLocationReplayResultListCall)
 * operations
- * [*get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OperationGetCall) and [*list*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OperationListCall)
+ * [*get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OperationGetCall) and [*list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OperationListCall)
 * organizations
- * [*locations org policy violations previews operations get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OrganizationLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations replays create*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OrganizationLocationReplayCreateCall), [*locations replays get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OrganizationLocationReplayGetCall), [*locations replays operations get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OrganizationLocationReplayOperationGetCall), [*locations replays operations list*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OrganizationLocationReplayOperationListCall) and [*locations replays results list*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::OrganizationLocationReplayResultListCall)
+ * [*locations access policy simulations operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationAccessPolicySimulationOperationGetCall), [*locations org policy violations previews create*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationOrgPolicyViolationsPreviewCreateCall), [*locations org policy violations previews get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationOrgPolicyViolationsPreviewGetCall), [*locations org policy violations previews list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationOrgPolicyViolationsPreviewListCall), [*locations org policy violations previews operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations org policy violations previews org policy violations list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationOrgPolicyViolationsPreviewOrgPolicyViolationListCall), [*locations replays create*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationReplayCreateCall), [*locations replays get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationReplayGetCall), [*locations replays operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationReplayOperationGetCall), [*locations replays operations list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationReplayOperationListCall) and [*locations replays results list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::OrganizationLocationReplayResultListCall)
 * projects
- * [*locations org policy violations previews operations get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::ProjectLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations replays create*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::ProjectLocationReplayCreateCall), [*locations replays get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::ProjectLocationReplayGetCall), [*locations replays operations get*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::ProjectLocationReplayOperationGetCall), [*locations replays operations list*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::ProjectLocationReplayOperationListCall) and [*locations replays results list*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/api::ProjectLocationReplayResultListCall)
+ * [*locations access policy simulations operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::ProjectLocationAccessPolicySimulationOperationGetCall), [*locations org policy violations previews operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::ProjectLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations replays create*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::ProjectLocationReplayCreateCall), [*locations replays get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::ProjectLocationReplayGetCall), [*locations replays operations get*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::ProjectLocationReplayOperationGetCall), [*locations replays operations list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::ProjectLocationReplayOperationListCall) and [*locations replays results list*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/api::ProjectLocationReplayResultListCall)
 
 
 
@@ -29,17 +29,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/PolicySimulator)**
+* **[Hub](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/PolicySimulator)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::CallBuilder)
-* **[Resources](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::CallBuilder)
+* **[Resources](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Part)**
+    * **[Parts](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::CallBuilder)**
+* **[Activities](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -53,13 +53,17 @@ let r = hub.resource().activity(...).doit().await
 Or specifically ...
 
 ```ignore
+let r = hub.folders().locations_access_policy_simulations_operations_get(...).doit().await
 let r = hub.folders().locations_org_policy_violations_previews_operations_get(...).doit().await
 let r = hub.folders().locations_replays_operations_get(...).doit().await
 let r = hub.folders().locations_replays_create(...).doit().await
 let r = hub.operations().get(...).doit().await
+let r = hub.organizations().locations_access_policy_simulations_operations_get(...).doit().await
 let r = hub.organizations().locations_org_policy_violations_previews_operations_get(...).doit().await
+let r = hub.organizations().locations_org_policy_violations_previews_create(...).doit().await
 let r = hub.organizations().locations_replays_operations_get(...).doit().await
 let r = hub.organizations().locations_replays_create(...).doit().await
+let r = hub.projects().locations_access_policy_simulations_operations_get(...).doit().await
 let r = hub.projects().locations_org_policy_violations_previews_operations_get(...).doit().await
 let r = hub.projects().locations_replays_operations_get(...).doit().await
 let r = hub.projects().locations_replays_create(...).doit().await
@@ -89,7 +93,7 @@ serde_json = "1"
 extern crate hyper;
 extern crate hyper_rustls;
 extern crate google_policysimulator1 as policysimulator1;
-use policysimulator1::api::GoogleCloudPolicysimulatorV1Replay;
+use policysimulator1::api::GoogleCloudPolicysimulatorV1OrgPolicyViolationsPreview;
 use policysimulator1::{Result, Error};
 use policysimulator1::{PolicySimulator, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 
@@ -101,9 +105,20 @@ let secret: yup_oauth2::ApplicationSecret = Default::default();
 // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let connector = hyper_rustls::HttpsConnectorBuilder::new()
+    .with_native_roots()
+    .unwrap()
+    .https_only()
+    .enable_http2()
+    .build();
+
+let executor = hyper_util::rt::TokioExecutor::new();
+let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
     secret,
     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    yup_oauth2::client::CustomHyperClientBuilder::from(
+        hyper_util::client::legacy::Client::builder(executor).build(connector),
+    ),
 ).build().await.unwrap();
 
 let client = hyper_util::client::legacy::Client::builder(
@@ -114,19 +129,20 @@ let client = hyper_util::client::legacy::Client::builder(
         .with_native_roots()
         .unwrap()
         .https_or_http()
-        .enable_http1()
+        .enable_http2()
         .build()
 );
 let mut hub = PolicySimulator::new(client, auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = GoogleCloudPolicysimulatorV1Replay::default();
+let mut req = GoogleCloudPolicysimulatorV1OrgPolicyViolationsPreview::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.folders().locations_replays_create(req, "parent")
+let result = hub.organizations().locations_org_policy_violations_previews_create(req, "parent")
+             .org_policy_violations_preview_id("magna")
              .doit().await;
 
 match result {
@@ -150,17 +166,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the
-[Hub Delegate](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -170,29 +186,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Delegate) to the
-[Method Builder](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::CallBuilder) before making the final `doit()` call.
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Delegate) to the
+[Method Builder](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::CallBuilder) before making the final `doit()` call.
 Respective methods will be called to provide progress information, as well as determine whether the system should
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::RequestValue) and
-[decodable](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
+All structures provided by this library are made to be [encodable](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::RequestValue) and
+[decodable](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::Part) which are identifiable by name, which will be sent to
+Most optionals are are considered [Parts](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::Part) which are identifiable by name, which will be sent to
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-policysimulator1/6.0.0+20240623/google_policysimulator1/common::RequestValue) are moved
+* [request values](https://docs.rs/google-policysimulator1/8.0.0+20251016/google_policysimulator1/common::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

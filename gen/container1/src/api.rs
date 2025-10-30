@@ -58,9 +58,20 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -71,7 +82,7 @@ impl Default for Scope {
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Container::new(client, auth);
@@ -120,7 +131,7 @@ impl<'a, C> Container<C> {
         Container {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/6.0.0".to_string(),
+            _user_agent: "google-api-rust-client/8.0.0".to_string(),
             _base_url: "https://container.googleapis.com/".to_string(),
             _root_url: "https://container.googleapis.com/".to_string(),
         }
@@ -131,7 +142,7 @@ impl<'a, C> Container<C> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/6.0.0`.
+    /// It defaults to `google-api-rust-client/8.0.0`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -186,6 +197,23 @@ pub struct AcceleratorConfig {
 
 impl common::Part for AcceleratorConfig {}
 
+/// AdditionalIPRangesConfig is the configuration for individual additional subnetwork attached to the cluster
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AdditionalIPRangesConfig {
+    /// List of secondary ranges names within this subnetwork that can be used for pod IPs. Example1: gke-pod-range1 Example2: gke-pod-range1,gke-pod-range2
+    #[serde(rename = "podIpv4RangeNames")]
+    pub pod_ipv4_range_names: Option<Vec<String>>,
+    /// Name of the subnetwork. This can be the full path of the subnetwork or just the name. Example1: my-subnet Example2: projects/gke-project/regions/us-central1/subnetworks/my-subnet
+    pub subnetwork: Option<String>,
+}
+
+impl common::Part for AdditionalIPRangesConfig {}
+
 /// AdditionalNodeNetworkConfig is the configuration for additional node networks within the NodeNetworkConfig message
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -210,13 +238,16 @@ impl common::Part for AdditionalNodeNetworkConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AdditionalPodNetworkConfig {
-    /// The maximum number of pods per node which use this pod network
+    /// The maximum number of pods per node which use this pod network.
     #[serde(rename = "maxPodsPerNode")]
     pub max_pods_per_node: Option<MaxPodsConstraint>,
-    /// The name of the secondary range on the subnet which provides IP address for this pod range
+    /// The name of the network attachment for pods to communicate to; cannot be specified along with subnetwork or secondary_pod_range.
+    #[serde(rename = "networkAttachment")]
+    pub network_attachment: Option<String>,
+    /// The name of the secondary range on the subnet which provides IP address for this pod range.
     #[serde(rename = "secondaryPodRange")]
     pub secondary_pod_range: Option<String>,
-    /// Name of the subnetwork where the additional pod network belongs
+    /// Name of the subnetwork where the additional pod network belongs.
     pub subnetwork: Option<String>,
 }
 
@@ -230,7 +261,7 @@ impl common::Part for AdditionalPodNetworkConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AdditionalPodRangesConfig {
-    /// Output only. [Output only] Information for additional pod range.
+    /// Output only. Information for additional pod range.
     #[serde(rename = "podRangeInfo")]
     pub pod_range_info: Option<Vec<RangeInfo>>,
     /// Name for pod secondary ipv4 range which has the actual range defined ahead.
@@ -251,7 +282,7 @@ pub struct AddonsConfig {
     /// Configuration for the Cloud Run addon, which allows the user to use a managed Knative service.
     #[serde(rename = "cloudRunConfig")]
     pub cloud_run_config: Option<CloudRunConfig>,
-    /// Configuration for the ConfigConnector add-on, a Kubernetes extension to manage hosted GCP services through the Kubernetes API
+    /// Configuration for the ConfigConnector add-on, a Kubernetes extension to manage hosted Google Cloud services through the Kubernetes API.
     #[serde(rename = "configConnectorConfig")]
     pub config_connector_config: Option<ConfigConnectorConfig>,
     /// Configuration for NodeLocalDNS, a dns cache running on cluster nodes
@@ -260,7 +291,7 @@ pub struct AddonsConfig {
     /// Configuration for the Compute Engine Persistent Disk CSI driver.
     #[serde(rename = "gcePersistentDiskCsiDriverConfig")]
     pub gce_persistent_disk_csi_driver_config: Option<GcePersistentDiskCsiDriverConfig>,
-    /// Configuration for the GCP Filestore CSI driver.
+    /// Configuration for the Filestore CSI driver.
     #[serde(rename = "gcpFilestoreCsiDriverConfig")]
     pub gcp_filestore_csi_driver_config: Option<GcpFilestoreCsiDriverConfig>,
     /// Configuration for the Cloud Storage Fuse CSI driver.
@@ -269,6 +300,9 @@ pub struct AddonsConfig {
     /// Configuration for the Backup for GKE agent addon.
     #[serde(rename = "gkeBackupAgentConfig")]
     pub gke_backup_agent_config: Option<GkeBackupAgentConfig>,
+    /// Configuration for the High Scale Checkpointing add-on.
+    #[serde(rename = "highScaleCheckpointingConfig")]
+    pub high_scale_checkpointing_config: Option<HighScaleCheckpointingConfig>,
     /// Configuration for the horizontal pod autoscaling feature, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods.
     #[serde(rename = "horizontalPodAutoscaling")]
     pub horizontal_pod_autoscaling: Option<HorizontalPodAutoscaling>,
@@ -278,9 +312,18 @@ pub struct AddonsConfig {
     /// Configuration for the Kubernetes Dashboard. This addon is deprecated, and will be disabled in 1.15. It is recommended to use the Cloud Console to manage and monitor your Kubernetes clusters, workloads and applications. For more information, see: https://cloud.google.com/kubernetes-engine/docs/concepts/dashboards
     #[serde(rename = "kubernetesDashboard")]
     pub kubernetes_dashboard: Option<KubernetesDashboard>,
+    /// Configuration for the Lustre CSI driver.
+    #[serde(rename = "lustreCsiDriverConfig")]
+    pub lustre_csi_driver_config: Option<LustreCsiDriverConfig>,
     /// Configuration for NetworkPolicy. This only tracks whether the addon is enabled or not on the Master, it does not track whether network policy is enabled for the nodes.
     #[serde(rename = "networkPolicyConfig")]
     pub network_policy_config: Option<NetworkPolicyConfig>,
+    /// Configuration for the Cloud Storage Parallelstore CSI driver.
+    #[serde(rename = "parallelstoreCsiDriverConfig")]
+    pub parallelstore_csi_driver_config: Option<ParallelstoreCsiDriverConfig>,
+    /// Optional. Configuration for Ray Operator addon.
+    #[serde(rename = "rayOperatorConfig")]
+    pub ray_operator_config: Option<RayOperatorConfig>,
     /// Optional. Configuration for the StatefulHA add-on.
     #[serde(rename = "statefulHaConfig")]
     pub stateful_ha_config: Option<StatefulHAConfig>,
@@ -320,6 +363,9 @@ pub struct AdvancedMachineFeatures {
     /// Whether or not to enable nested virtualization (defaults to false).
     #[serde(rename = "enableNestedVirtualization")]
     pub enable_nested_virtualization: Option<bool>,
+    /// Type of Performance Monitoring Unit (PMU) requested on node pool instances. If unset, PMU will not be available to the node.
+    #[serde(rename = "performanceMonitoringUnit")]
+    pub performance_monitoring_unit: Option<String>,
     /// The number of threads per physical core. To disable simultaneous multithreading (SMT) set this to 1. If unset, the maximum number of threads supported per core by the underlying processor is assumed.
     #[serde(rename = "threadsPerCore")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
@@ -327,6 +373,20 @@ pub struct AdvancedMachineFeatures {
 }
 
 impl common::Part for AdvancedMachineFeatures {}
+
+/// AnonymousAuthenticationConfig defines the settings needed to limit endpoints that allow anonymous authentication.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AnonymousAuthenticationConfig {
+    /// Defines the mode of limiting anonymous access in the cluster.
+    pub mode: Option<String>,
+}
+
+impl common::Part for AnonymousAuthenticationConfig {}
 
 /// Configuration for returning group information from authenticators.
 ///
@@ -345,6 +405,34 @@ pub struct AuthenticatorGroupsConfig {
 
 impl common::Part for AuthenticatorGroupsConfig {}
 
+/// AutoIpamConfig contains all information related to Auto IPAM
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AutoIpamConfig {
+    /// The flag that enables Auto IPAM on this cluster
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for AutoIpamConfig {}
+
+/// AutoMonitoringConfig defines the configuration for GKE Workload Auto-Monitoring.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AutoMonitoringConfig {
+    /// Scope for GKE Workload Auto-Monitoring.
+    pub scope: Option<String>,
+}
+
+impl common::Part for AutoMonitoringConfig {}
+
 /// AutoUpgradeOptions defines the set of options for the user to control how the Auto Upgrades will proceed.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -353,10 +441,10 @@ impl common::Part for AuthenticatorGroupsConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct AutoUpgradeOptions {
-    /// [Output only] This field is set when upgrades are about to commence with the approximate start time for the upgrades, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    /// Output only. This field is set when upgrades are about to commence with the approximate start time for the upgrades, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     #[serde(rename = "autoUpgradeStartTime")]
     pub auto_upgrade_start_time: Option<String>,
-    /// [Output only] This field is set when upgrades are about to commence with the description of the upgrade.
+    /// Output only. This field is set when upgrades are about to commence with the description of the upgrade.
     pub description: Option<String>,
 }
 
@@ -372,7 +460,10 @@ impl common::Part for AutoUpgradeOptions {}
 pub struct Autopilot {
     /// Enable Autopilot
     pub enabled: Option<bool>,
-    /// Workload policy configuration for Autopilot.
+    /// PrivilegedAdmissionConfig is the configuration related to privileged admission control.
+    #[serde(rename = "privilegedAdmissionConfig")]
+    pub privileged_admission_config: Option<PrivilegedAdmissionConfig>,
+    /// WorkloadPolicyConfig is the configuration related to GCW workload policy
     #[serde(rename = "workloadPolicyConfig")]
     pub workload_policy_config: Option<WorkloadPolicyConfig>,
 }
@@ -392,7 +483,7 @@ pub struct AutopilotCompatibilityIssue {
     pub constraint_type: Option<String>,
     /// The description of the issue.
     pub description: Option<String>,
-    /// A URL to a public documnetation, which addresses resolving this issue.
+    /// A URL to a public documentation, which addresses resolving this issue.
     #[serde(rename = "documentationUrl")]
     pub documentation_url: Option<String>,
     /// The incompatibility type of this issue.
@@ -406,6 +497,20 @@ pub struct AutopilotCompatibilityIssue {
 }
 
 impl common::Part for AutopilotCompatibilityIssue {}
+
+/// AutopilotConfig contains configuration of autopilot feature for this nodepool.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AutopilotConfig {
+    /// Denotes that nodes belonging to this node pool are Autopilot nodes.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for AutopilotConfig {}
 
 /// AutoprovisioningNodePoolDefaults contains defaults for a node pool created by NAP.
 ///
@@ -427,7 +532,7 @@ pub struct AutoprovisioningNodePoolDefaults {
     /// The image type to use for NAP created node. Please see https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for available image types.
     #[serde(rename = "imageType")]
     pub image_type: Option<String>,
-    /// Enable or disable Kubelet read only port.
+    /// DEPRECATED. Use NodePoolAutoConfig.NodeKubeletConfig instead.
     #[serde(rename = "insecureKubeletReadonlyPortEnabled")]
     pub insecure_kubelet_readonly_port_enabled: Option<bool>,
     /// Specifies the node management options for NAP created node-pools.
@@ -450,6 +555,22 @@ pub struct AutoprovisioningNodePoolDefaults {
 }
 
 impl common::Part for AutoprovisioningNodePoolDefaults {}
+
+/// Autoscaled rollout policy utilizes the cluster autoscaler during blue-green upgrade to scale both the blue and green pools.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct AutoscaledRolloutPolicy {
+    /// Optional. Time to wait after cordoning the blue pool before draining the nodes. Defaults to 3 days. The value can be set between 0 and 7 days, inclusive.
+    #[serde(rename = "waitForDrainDuration")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub wait_for_drain_duration: Option<chrono::Duration>,
+}
+
+impl common::Part for AutoscaledRolloutPolicy {}
 
 /// Best effort provisioning.
 ///
@@ -534,6 +655,9 @@ impl common::Part for BlueGreenInfo {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct BlueGreenSettings {
+    /// Autoscaled policy for cluster autoscaler enabled blue-green upgrade.
+    #[serde(rename = "autoscaledRolloutPolicy")]
+    pub autoscaled_rollout_policy: Option<AutoscaledRolloutPolicy>,
     /// Time needed after draining entire blue pool. After this period, blue pool will be cleaned up.
     #[serde(rename = "nodePoolSoakDuration")]
     #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
@@ -544,6 +668,33 @@ pub struct BlueGreenSettings {
 }
 
 impl common::Part for BlueGreenSettings {}
+
+/// BootDisk specifies the boot disk configuration for nodepools.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct BootDisk {
+    /// Disk type of the boot disk. (i.e. Hyperdisk-Balanced, PD-Balanced, etc.)
+    #[serde(rename = "diskType")]
+    pub disk_type: Option<String>,
+    /// For Hyperdisk-Balanced only, the provisioned IOPS config value.
+    #[serde(rename = "provisionedIops")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub provisioned_iops: Option<i64>,
+    /// For Hyperdisk-Balanced only, the provisioned throughput config value.
+    #[serde(rename = "provisionedThroughput")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub provisioned_throughput: Option<i64>,
+    /// Disk size in GB. Replaces NodeConfig.disk_size_gb
+    #[serde(rename = "sizeGb")]
+    #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
+    pub size_gb: Option<i64>,
+}
+
+impl common::Part for BootDisk {}
 
 /// CancelOperationRequest cancels a single operation.
 ///
@@ -580,7 +731,7 @@ impl common::RequestValue for CancelOperationRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CertificateAuthorityDomainConfig {
-    /// List of fully qualified domain names (FQDN). Specifying port is supported. Wilcards are NOT supported. Examples: - my.customdomain.com - 10.0.1.2:5000
+    /// List of fully qualified domain names (FQDN). Specifying port is supported. Wildcards are NOT supported. Examples: - my.customdomain.com - 10.0.1.2:5000
     pub fqdns: Option<Vec<String>>,
     /// Google Secret Manager (GCP) certificate configuration.
     #[serde(rename = "gcpSecretManagerCertificateConfig")]
@@ -675,6 +826,12 @@ pub struct Cluster {
     /// Configurations for the various addons available to run in the cluster.
     #[serde(rename = "addonsConfig")]
     pub addons_config: Option<AddonsConfig>,
+    /// The list of user specified Kubernetes feature gates. Each string represents the activation status of a feature gate (e.g. "featureX=true" or "featureX=false")
+    #[serde(rename = "alphaClusterFeatureGates")]
+    pub alpha_cluster_feature_gates: Option<Vec<String>>,
+    /// Configuration for limiting anonymous access to all endpoints except the health checks.
+    #[serde(rename = "anonymousAuthenticationConfig")]
+    pub anonymous_authentication_config: Option<AnonymousAuthenticationConfig>,
     /// Configuration controlling RBAC group membership information.
     #[serde(rename = "authenticatorGroupsConfig")]
     pub authenticator_groups_config: Option<AuthenticatorGroupsConfig>,
@@ -688,24 +845,30 @@ pub struct Cluster {
     /// The IP address range of the container pods in this cluster, in [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `10.96.0.0/14`). Leave blank to have one automatically chosen or specify a `/14` block in `10.0.0.0/8`.
     #[serde(rename = "clusterIpv4Cidr")]
     pub cluster_ipv4_cidr: Option<String>,
+    /// Enable/Disable Compliance Posture features for the cluster.
+    #[serde(rename = "compliancePostureConfig")]
+    pub compliance_posture_config: Option<CompliancePostureConfig>,
     /// Which conditions caused the current cluster state.
     pub conditions: Option<Vec<StatusCondition>>,
     /// Configuration of Confidential Nodes. All the nodes in the cluster will be Confidential VM once enabled.
     #[serde(rename = "confidentialNodes")]
     pub confidential_nodes: Option<ConfidentialNodes>,
+    /// Configuration for all cluster's control plane endpoints.
+    #[serde(rename = "controlPlaneEndpointsConfig")]
+    pub control_plane_endpoints_config: Option<ControlPlaneEndpointsConfig>,
     /// Configuration for the fine-grained cost management feature.
     #[serde(rename = "costManagementConfig")]
     pub cost_management_config: Option<CostManagementConfig>,
-    /// [Output only] The time the cluster was created, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    /// Output only. The time the cluster was created, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     #[serde(rename = "createTime")]
     pub create_time: Option<String>,
-    /// [Output only] The current software version of the master endpoint.
+    /// Output only. The current software version of the master endpoint.
     #[serde(rename = "currentMasterVersion")]
     pub current_master_version: Option<String>,
-    /// [Output only] The number of nodes currently in the cluster. Deprecated. Call Kubernetes API directly to retrieve node information.
+    /// Output only. The number of nodes currently in the cluster. Deprecated. Call Kubernetes API directly to retrieve node information.
     #[serde(rename = "currentNodeCount")]
     pub current_node_count: Option<i32>,
-    /// [Output only] Deprecated, use [NodePools.version](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools) instead. The current version of the node software components. If they are currently at multiple versions because they're in the process of being upgraded, this reflects the minimum version of all nodes.
+    /// Output only. Deprecated, use [NodePools.version](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools) instead. The current version of the node software components. If they are currently at multiple versions because they're in the process of being upgraded, this reflects the minimum version of all nodes.
     #[serde(rename = "currentNodeVersion")]
     pub current_node_version: Option<String>,
     /// Configuration of etcd encryption.
@@ -722,21 +885,24 @@ pub struct Cluster {
     /// Kubernetes alpha features are enabled on this cluster. This includes alpha API groups (e.g. v1alpha1) and features that may not be production ready in the kubernetes version of the master and nodes. The cluster has no SLA for uptime and master/node upgrades are disabled. Alpha enabled clusters are automatically deleted thirty days after creation.
     #[serde(rename = "enableKubernetesAlpha")]
     pub enable_kubernetes_alpha: Option<bool>,
-    /// Enable the ability to use Cloud TPUs in this cluster.
+    /// Enable the ability to use Cloud TPUs in this cluster. This field is deprecated due to the deprecation of 2VM TPU. The end of life date for 2VM TPU is 2025-04-25.
     #[serde(rename = "enableTpu")]
     pub enable_tpu: Option<bool>,
-    /// [Output only] The IP address of this cluster's master endpoint. The endpoint can be accessed from the internet at `https://username:password@endpoint/`. See the `masterAuth` property of this resource for username and password information.
+    /// Output only. The IP address of this cluster's master endpoint. The endpoint can be accessed from the internet at `https://username:password@endpoint/`. See the `masterAuth` property of this resource for username and password information.
     pub endpoint: Option<String>,
-    /// GKE Enterprise Configuration.
+    /// GKE Enterprise Configuration. Deprecated: GKE Enterprise features are now available without an Enterprise tier.
     #[serde(rename = "enterpriseConfig")]
     pub enterprise_config: Option<EnterpriseConfig>,
     /// This checksum is computed by the server based on the value of cluster fields, and may be sent on update requests to ensure the client has an up-to-date value before proceeding.
     pub etag: Option<String>,
-    /// [Output only] The time the cluster will be automatically deleted in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    /// Output only. The time the cluster will be automatically deleted in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     #[serde(rename = "expireTime")]
     pub expire_time: Option<String>,
     /// Fleet information for the cluster.
     pub fleet: Option<Fleet>,
+    /// Configuration for GKE auto upgrades.
+    #[serde(rename = "gkeAutoUpgradeConfig")]
+    pub gke_auto_upgrade_config: Option<GkeAutoUpgradeConfig>,
     /// Output only. Unique id for the cluster.
     pub id: Option<String>,
     /// Configuration for Identity Service component.
@@ -748,7 +914,7 @@ pub struct Cluster {
     /// The number of nodes to create in this cluster. You must ensure that your Compute Engine [resource quota](https://cloud.google.com/compute/quotas) is sufficient for this number of instances. You must also have available firewall and routes quota. For requests, this field should only be used in lieu of a "node_pool" object, since this configuration (along with the "node_config") will be used to create a "NodePool" object with an auto-generated name. Do not use this and a node_pool at the same time. This field is deprecated, use node_pool.initial_node_count instead.
     #[serde(rename = "initialNodeCount")]
     pub initial_node_count: Option<i32>,
-    /// Deprecated. Use node_pools.instance_group_urls.
+    /// Output only. Deprecated. Use node_pools.instance_group_urls.
     #[serde(rename = "instanceGroupUrls")]
     pub instance_group_urls: Option<Vec<String>>,
     /// Configuration for cluster IP allocation.
@@ -760,7 +926,7 @@ pub struct Cluster {
     /// Configuration for the legacy ABAC authorization mode.
     #[serde(rename = "legacyAbac")]
     pub legacy_abac: Option<LegacyAbac>,
-    /// [Output only] The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) or [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) in which the cluster resides.
+    /// Output only. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) or [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) in which the cluster resides.
     pub location: Option<String>,
     /// The list of Google Compute Engine [zones](https://cloud.google.com/compute/docs/zones#available) in which the cluster's nodes should be located. This field provides a default value if [NodePool.Locations](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.locations) are not specified during node pool creation. Warning: changing cluster locations will update the [NodePool.Locations](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters.nodePools#NodePool.FIELDS.locations) of all node pools and will result in nodes being added and/or removed.
     pub locations: Option<Vec<String>>,
@@ -776,7 +942,7 @@ pub struct Cluster {
     /// The authentication information for accessing the master endpoint. If unspecified, the defaults are used: For clusters before v1.12, if master_auth is unspecified, `username` will be set to "admin", a random password will be generated, and a client certificate will be issued.
     #[serde(rename = "masterAuth")]
     pub master_auth: Option<MasterAuth>,
-    /// The configuration options for master authorized networks feature.
+    /// The configuration options for master authorized networks feature. Deprecated: Use ControlPlaneEndpointsConfig.IPEndpointsConfig.authorized_networks_config instead.
     #[serde(rename = "masterAuthorizedNetworksConfig")]
     pub master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
     /// Configuration for issuance of mTLS keys and certificates to Kubernetes pods.
@@ -785,7 +951,7 @@ pub struct Cluster {
     /// Monitoring configuration for the cluster.
     #[serde(rename = "monitoringConfig")]
     pub monitoring_config: Option<MonitoringConfig>,
-    /// The monitoring service the cluster should use to write metrics. Currently available options: * "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring service with a Kubernetes-native resource model * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * `none` - No metrics will be exported from the cluster. If left as an empty string,`monitoring.googleapis.com/kubernetes` will be used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
+    /// The monitoring service the cluster should use to write metrics. Currently available options: * `monitoring.googleapis.com/kubernetes` - The Cloud Monitoring service with a Kubernetes-native resource model * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * `none` - No metrics will be exported from the cluster. If left as an empty string,`monitoring.googleapis.com/kubernetes` will be used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     #[serde(rename = "monitoringService")]
     pub monitoring_service: Option<String>,
     /// The name of this cluster. The name must be unique within this project and location (e.g. zone or region), and can be up to 40 characters with the following restrictions: * Lowercase letters, numbers, and hyphens only. * Must start with a letter. * Must end with a number or a letter.
@@ -801,7 +967,7 @@ pub struct Cluster {
     /// Parameters used in creating the cluster's nodes. For requests, this field should only be used in lieu of a "node_pool" object, since this configuration (along with the "initial_node_count") will be used to create a "NodePool" object with an auto-generated name. Do not use this and a node_pool at the same time. For responses, this field will be populated with the node configuration of the first node pool. (For configuration of each node pool, see `node_pool.config`) If unspecified, the defaults are used. This field is deprecated, use node_pool.config instead.
     #[serde(rename = "nodeConfig")]
     pub node_config: Option<NodeConfig>,
-    /// [Output only] The size of the address space on each node for hosting containers. This is provisioned from within the `container_ipv4_cidr` range. This field will only be set when cluster is in route-based network mode.
+    /// Output only. The size of the address space on each node for hosting containers. This is provisioned from within the `container_ipv4_cidr` range. This field will only be set when cluster is in route-based network mode.
     #[serde(rename = "nodeIpv4CidrSize")]
     pub node_ipv4_cidr_size: Option<i32>,
     /// Node pool configs that apply to all auto-provisioned node pools in autopilot clusters and node auto-provisioning enabled clusters.
@@ -819,9 +985,15 @@ pub struct Cluster {
     /// The configuration of the parent product of the cluster. This field is used by Google internal products that are built on top of the GKE cluster and take the ownership of the cluster.
     #[serde(rename = "parentProductConfig")]
     pub parent_product_config: Option<ParentProductConfig>,
+    /// The config for pod autoscaling.
+    #[serde(rename = "podAutoscaling")]
+    pub pod_autoscaling: Option<PodAutoscaling>,
     /// Configuration for private cluster.
     #[serde(rename = "privateClusterConfig")]
     pub private_cluster_config: Option<PrivateClusterConfig>,
+    /// RBACBindingConfig allows user to restrict ClusterRoleBindings an RoleBindings that can be created.
+    #[serde(rename = "rbacBindingConfig")]
+    pub rbac_binding_config: Option<RBACBindingConfig>,
     /// Release channel configuration. If left unspecified on cluster creation and a version is specified, the cluster is enrolled in the most mature release channel where the version is available (first checking STABLE, then REGULAR, and finally RAPID). Otherwise, if no release channel configuration and no version is specified, the cluster is enrolled in the REGULAR channel with its default version.
     #[serde(rename = "releaseChannel")]
     pub release_channel: Option<ReleaseChannel>,
@@ -837,35 +1009,41 @@ pub struct Cluster {
     /// Output only. Reserved for future use.
     #[serde(rename = "satisfiesPzs")]
     pub satisfies_pzs: Option<bool>,
+    /// Secret CSI driver configuration.
+    #[serde(rename = "secretManagerConfig")]
+    pub secret_manager_config: Option<SecretManagerConfig>,
     /// Enable/Disable Security Posture API features for the cluster.
     #[serde(rename = "securityPostureConfig")]
     pub security_posture_config: Option<SecurityPostureConfig>,
-    /// [Output only] Server-defined URL for the resource.
+    /// Output only. Server-defined URL for the resource.
     #[serde(rename = "selfLink")]
     pub self_link: Option<String>,
-    /// [Output only] The IP address range of the Kubernetes services in this cluster, in [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `1.2.3.4/29`). Service addresses are typically put in the last `/16` from the container CIDR.
+    /// Output only. The IP address range of the Kubernetes services in this cluster, in [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `1.2.3.4/29`). Service addresses are typically put in the last `/16` from the container CIDR.
     #[serde(rename = "servicesIpv4Cidr")]
     pub services_ipv4_cidr: Option<String>,
     /// Shielded Nodes configuration.
     #[serde(rename = "shieldedNodes")]
     pub shielded_nodes: Option<ShieldedNodes>,
-    /// [Output only] The current status of this cluster.
+    /// Output only. The current status of this cluster.
     pub status: Option<String>,
-    /// [Output only] Deprecated. Use conditions instead. Additional information about the current status of this cluster, if available.
+    /// Output only. Deprecated. Use conditions instead. Additional information about the current status of this cluster, if available.
     #[serde(rename = "statusMessage")]
     pub status_message: Option<String>,
     /// The name of the Google Compute Engine [subnetwork](https://cloud.google.com/compute/docs/subnetworks) to which the cluster is connected.
     pub subnetwork: Option<String>,
-    /// [Output only] The IP address range of the Cloud TPUs in this cluster, in [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `1.2.3.4/29`).
+    /// Output only. The IP address range of the Cloud TPUs in this cluster, in [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `1.2.3.4/29`). This field is deprecated due to the deprecation of 2VM TPU. The end of life date for 2VM TPU is 2025-04-25.
     #[serde(rename = "tpuIpv4CidrBlock")]
     pub tpu_ipv4_cidr_block: Option<String>,
+    /// The Custom keys configuration for the cluster.
+    #[serde(rename = "userManagedKeysConfig")]
+    pub user_managed_keys_config: Option<UserManagedKeysConfig>,
     /// Cluster-level Vertical Pod Autoscaling configuration.
     #[serde(rename = "verticalPodAutoscaling")]
     pub vertical_pod_autoscaling: Option<VerticalPodAutoscaling>,
-    /// Configuration for the use of Kubernetes Service Accounts in GCP IAM policies.
+    /// Configuration for the use of Kubernetes Service Accounts in IAM policies.
     #[serde(rename = "workloadIdentityConfig")]
     pub workload_identity_config: Option<WorkloadIdentityConfig>,
-    /// [Output only] The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field is deprecated, use location instead.
+    /// Output only. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the cluster resides. This field is deprecated, use location instead.
     pub zone: Option<String>,
 }
 
@@ -888,6 +1066,9 @@ pub struct ClusterAutoscaling {
     /// Defines autoscaling behaviour.
     #[serde(rename = "autoscalingProfile")]
     pub autoscaling_profile: Option<String>,
+    /// Default compute class is a configuration for default compute class.
+    #[serde(rename = "defaultComputeClassConfig")]
+    pub default_compute_class_config: Option<DefaultComputeClassConfig>,
     /// Enables automatic node pool creation and deletion.
     #[serde(rename = "enableNodeAutoprovisioning")]
     pub enable_node_autoprovisioning: Option<bool>,
@@ -924,13 +1105,22 @@ pub struct ClusterUpdate {
     /// The additional pod ranges to be added to the cluster. These pod ranges can be used by node pools to allocate pod IPs.
     #[serde(rename = "additionalPodRangesConfig")]
     pub additional_pod_ranges_config: Option<AdditionalPodRangesConfig>,
+    /// The desired config for additional subnetworks attached to the cluster.
+    #[serde(rename = "desiredAdditionalIpRangesConfig")]
+    pub desired_additional_ip_ranges_config: Option<DesiredAdditionalIPRangesConfig>,
     /// Configurations for the various addons available to run in the cluster.
     #[serde(rename = "desiredAddonsConfig")]
     pub desired_addons_config: Option<AddonsConfig>,
+    /// Configuration for limiting anonymous access to all endpoints except the health checks.
+    #[serde(rename = "desiredAnonymousAuthenticationConfig")]
+    pub desired_anonymous_authentication_config: Option<AnonymousAuthenticationConfig>,
     /// The desired authenticator groups config for the cluster.
     #[serde(rename = "desiredAuthenticatorGroupsConfig")]
     pub desired_authenticator_groups_config: Option<AuthenticatorGroupsConfig>,
-    /// The desired workload policy configuration for the autopilot cluster.
+    /// AutoIpamConfig contains all information related to Auto IPAM
+    #[serde(rename = "desiredAutoIpamConfig")]
+    pub desired_auto_ipam_config: Option<AutoIpamConfig>,
+    /// WorkloadPolicyConfig is the configuration related to GCW workload policy
     #[serde(rename = "desiredAutopilotWorkloadPolicyConfig")]
     pub desired_autopilot_workload_policy_config: Option<WorkloadPolicyConfig>,
     /// The desired configuration options for the Binary Authorization feature.
@@ -939,9 +1129,15 @@ pub struct ClusterUpdate {
     /// Cluster-level autoscaling configuration.
     #[serde(rename = "desiredClusterAutoscaling")]
     pub desired_cluster_autoscaling: Option<ClusterAutoscaling>,
+    /// Enable/Disable Compliance Posture features for the cluster.
+    #[serde(rename = "desiredCompliancePostureConfig")]
+    pub desired_compliance_posture_config: Option<CompliancePostureConfig>,
     /// The desired containerd config for the cluster.
     #[serde(rename = "desiredContainerdConfig")]
     pub desired_containerd_config: Option<ContainerdConfig>,
+    /// Control plane endpoints configuration.
+    #[serde(rename = "desiredControlPlaneEndpointsConfig")]
+    pub desired_control_plane_endpoints_config: Option<ControlPlaneEndpointsConfig>,
     /// The desired configuration for the fine-grained cost management feature.
     #[serde(rename = "desiredCostManagementConfig")]
     pub desired_cost_management_config: Option<CostManagementConfig>,
@@ -951,9 +1147,15 @@ pub struct ClusterUpdate {
     /// The desired datapath provider for the cluster.
     #[serde(rename = "desiredDatapathProvider")]
     pub desired_datapath_provider: Option<String>,
+    /// Override the default setting of whether future created nodes have private IP addresses only, namely NetworkConfig.default_enable_private_nodes
+    #[serde(rename = "desiredDefaultEnablePrivateNodes")]
+    pub desired_default_enable_private_nodes: Option<bool>,
     /// The desired status of whether to disable default sNAT for this cluster.
     #[serde(rename = "desiredDefaultSnatStatus")]
     pub desired_default_snat_status: Option<DefaultSnatStatus>,
+    /// Enable/Disable L4 LB VPC firewall reconciliation for the cluster.
+    #[serde(rename = "desiredDisableL4LbFirewallReconciliation")]
+    pub desired_disable_l4_lb_firewall_reconciliation: Option<bool>,
     /// DNSConfig contains clusterDNS config for this cluster.
     #[serde(rename = "desiredDnsConfig")]
     pub desired_dns_config: Option<DNSConfig>,
@@ -966,9 +1168,12 @@ pub struct ClusterUpdate {
     /// Enable/Disable Multi-Networking for the cluster
     #[serde(rename = "desiredEnableMultiNetworking")]
     pub desired_enable_multi_networking: Option<bool>,
-    /// Enable/Disable private endpoint for the cluster's master.
+    /// Enable/Disable private endpoint for the cluster's master. Deprecated: Use desired_control_plane_endpoints_config.ip_endpoints_config.enable_public_endpoint instead. Note that the value of enable_public_endpoint is reversed: if enable_private_endpoint is false, then enable_public_endpoint will be true.
     #[serde(rename = "desiredEnablePrivateEndpoint")]
     pub desired_enable_private_endpoint: Option<bool>,
+    /// The desired enterprise configuration for the cluster. Deprecated: GKE Enterprise features are now available without an Enterprise tier.
+    #[serde(rename = "desiredEnterpriseConfig")]
+    pub desired_enterprise_config: Option<DesiredEnterpriseConfig>,
     /// The desired fleet configuration for the cluster.
     #[serde(rename = "desiredFleet")]
     pub desired_fleet: Option<Fleet>,
@@ -1005,7 +1210,7 @@ pub struct ClusterUpdate {
     /// The logging service the cluster should use to write logs. Currently available options: * `logging.googleapis.com/kubernetes` - The Cloud Logging service with a Kubernetes-native resource model * `logging.googleapis.com` - The legacy Cloud Logging service (no longer available as of GKE 1.15). * `none` - no logs will be exported from the cluster. If left as an empty string,`logging.googleapis.com/kubernetes` will be used for GKE 1.14+ or `logging.googleapis.com` for earlier versions.
     #[serde(rename = "desiredLoggingService")]
     pub desired_logging_service: Option<String>,
-    /// The desired configuration options for master authorized networks feature.
+    /// The desired configuration options for master authorized networks feature. Deprecated: Use desired_control_plane_endpoints_config.ip_endpoints_config.authorized_networks_config instead.
     #[serde(rename = "desiredMasterAuthorizedNetworksConfig")]
     pub desired_master_authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
     /// The Kubernetes version to change the master to. Users may specify either explicit versions offered by Kubernetes Engine or version aliases, which have the following behavior: - "latest": picks the highest valid Kubernetes version - "1.X": picks the highest valid patch+gke.N patch in the 1.X version - "1.X.Y": picks the highest valid gke.N patch in the 1.X.Y version - "1.X.Y-gke.N": picks an explicit Kubernetes version - "-": picks the default Kubernetes version
@@ -1017,18 +1222,24 @@ pub struct ClusterUpdate {
     /// The desired monitoring configuration.
     #[serde(rename = "desiredMonitoringConfig")]
     pub desired_monitoring_config: Option<MonitoringConfig>,
-    /// The monitoring service the cluster should use to write metrics. Currently available options: * "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring service with a Kubernetes-native resource model * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * `none` - No metrics will be exported from the cluster. If left as an empty string,`monitoring.googleapis.com/kubernetes` will be used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
+    /// The monitoring service the cluster should use to write metrics. Currently available options: * `monitoring.googleapis.com/kubernetes` - The Cloud Monitoring service with a Kubernetes-native resource model * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * `none` - No metrics will be exported from the cluster. If left as an empty string,`monitoring.googleapis.com/kubernetes` will be used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     #[serde(rename = "desiredMonitoringService")]
     pub desired_monitoring_service: Option<String>,
     /// The desired network performance config.
     #[serde(rename = "desiredNetworkPerformanceConfig")]
     pub desired_network_performance_config: Option<ClusterNetworkPerformanceConfig>,
+    /// The desired network tier configuration for the cluster.
+    #[serde(rename = "desiredNetworkTierConfig")]
+    pub desired_network_tier_config: Option<NetworkTierConfig>,
     /// The desired node kubelet config for the cluster.
     #[serde(rename = "desiredNodeKubeletConfig")]
     pub desired_node_kubelet_config: Option<NodeKubeletConfig>,
     /// The desired node kubelet config for all auto-provisioned node pools in autopilot clusters and node auto-provisioning enabled clusters.
     #[serde(rename = "desiredNodePoolAutoConfigKubeletConfig")]
     pub desired_node_pool_auto_config_kubelet_config: Option<NodeKubeletConfig>,
+    /// The desired Linux node config for all auto-provisioned node pools in autopilot clusters and node auto-provisioning enabled clusters. Currently only `cgroup_mode` can be set here.
+    #[serde(rename = "desiredNodePoolAutoConfigLinuxNodeConfig")]
+    pub desired_node_pool_auto_config_linux_node_config: Option<LinuxNodeConfig>,
     /// The desired network tags that apply to all auto-provisioned node pools in autopilot clusters and node auto-provisioning enabled clusters.
     #[serde(rename = "desiredNodePoolAutoConfigNetworkTags")]
     pub desired_node_pool_auto_config_network_tags: Option<NetworkTags>,
@@ -1053,18 +1264,27 @@ pub struct ClusterUpdate {
     /// The desired parent product config for the cluster.
     #[serde(rename = "desiredParentProductConfig")]
     pub desired_parent_product_config: Option<ParentProductConfig>,
-    /// The desired private cluster configuration. master_global_access_config is the only field that can be changed via this field. See also ClusterUpdate.desired_enable_private_endpoint for modifying other fields within PrivateClusterConfig.
+    /// The desired config for pod autoscaling.
+    #[serde(rename = "desiredPodAutoscaling")]
+    pub desired_pod_autoscaling: Option<PodAutoscaling>,
+    /// The desired private cluster configuration. master_global_access_config is the only field that can be changed via this field. See also ClusterUpdate.desired_enable_private_endpoint for modifying other fields within PrivateClusterConfig. Deprecated: Use desired_control_plane_endpoints_config.ip_endpoints_config.global_access instead.
     #[serde(rename = "desiredPrivateClusterConfig")]
     pub desired_private_cluster_config: Option<PrivateClusterConfig>,
     /// The desired state of IPv6 connectivity to Google Services.
     #[serde(rename = "desiredPrivateIpv6GoogleAccess")]
     pub desired_private_ipv6_google_access: Option<String>,
+    /// RBACBindingConfig allows user to restrict ClusterRoleBindings an RoleBindings that can be created.
+    #[serde(rename = "desiredRbacBindingConfig")]
+    pub desired_rbac_binding_config: Option<RBACBindingConfig>,
     /// The desired release channel configuration.
     #[serde(rename = "desiredReleaseChannel")]
     pub desired_release_channel: Option<ReleaseChannel>,
     /// The desired configuration for exporting resource usage.
     #[serde(rename = "desiredResourceUsageExportConfig")]
     pub desired_resource_usage_export_config: Option<ResourceUsageExportConfig>,
+    /// Enable/Disable Secret Manager Config.
+    #[serde(rename = "desiredSecretManagerConfig")]
+    pub desired_secret_manager_config: Option<SecretManagerConfig>,
     /// Enable/Disable Security Posture API features for the cluster.
     #[serde(rename = "desiredSecurityPostureConfig")]
     pub desired_security_posture_config: Option<SecurityPostureConfig>,
@@ -1077,6 +1297,9 @@ pub struct ClusterUpdate {
     /// The desired stack type of the cluster. If a stack type is provided and does not match the current stack type of the cluster, update will attempt to change the stack type to the new type.
     #[serde(rename = "desiredStackType")]
     pub desired_stack_type: Option<String>,
+    /// The desired user managed keys config for the cluster.
+    #[serde(rename = "desiredUserManagedKeysConfig")]
+    pub desired_user_managed_keys_config: Option<UserManagedKeysConfig>,
     /// Cluster-level Vertical Pod Autoscaling configuration.
     #[serde(rename = "desiredVerticalPodAutoscaling")]
     pub desired_vertical_pod_autoscaling: Option<VerticalPodAutoscaling>,
@@ -1088,12 +1311,56 @@ pub struct ClusterUpdate {
     pub enable_k8s_beta_apis: Option<K8sBetaAPIConfig>,
     /// The current etag of the cluster. If an etag is provided and does not match the current etag of the cluster, update will be blocked and an ABORTED error will be returned.
     pub etag: Option<String>,
+    /// Configuration for GKE auto upgrade.
+    #[serde(rename = "gkeAutoUpgradeConfig")]
+    pub gke_auto_upgrade_config: Option<GkeAutoUpgradeConfig>,
     /// The additional pod ranges that are to be removed from the cluster. The pod ranges specified here must have been specified earlier in the 'additional_pod_ranges_config' argument.
     #[serde(rename = "removedAdditionalPodRangesConfig")]
     pub removed_additional_pod_ranges_config: Option<AdditionalPodRangesConfig>,
+    /// The Custom keys configuration for the cluster. This field is deprecated. Use ClusterUpdate.desired_user_managed_keys_config instead.
+    #[serde(rename = "userManagedKeysConfig")]
+    pub user_managed_keys_config: Option<UserManagedKeysConfig>,
 }
 
 impl common::Part for ClusterUpdate {}
+
+/// ClusterUpgradeInfo contains the upgrade information of a cluster.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations clusters fetch cluster upgrade info projects](ProjectLocationClusterFetchClusterUpgradeInfoCall) (response)
+/// * [zones clusters fetch cluster upgrade info projects](ProjectZoneClusterFetchClusterUpgradeInfoCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ClusterUpgradeInfo {
+    /// The auto upgrade status.
+    #[serde(rename = "autoUpgradeStatus")]
+    pub auto_upgrade_status: Option<Vec<String>>,
+    /// The cluster's current minor version's end of extended support timestamp.
+    #[serde(rename = "endOfExtendedSupportTimestamp")]
+    pub end_of_extended_support_timestamp: Option<String>,
+    /// The cluster's current minor version's end of standard support timestamp.
+    #[serde(rename = "endOfStandardSupportTimestamp")]
+    pub end_of_standard_support_timestamp: Option<String>,
+    /// minor_target_version indicates the target version for minor upgrade.
+    #[serde(rename = "minorTargetVersion")]
+    pub minor_target_version: Option<String>,
+    /// patch_target_version indicates the target version for patch upgrade.
+    #[serde(rename = "patchTargetVersion")]
+    pub patch_target_version: Option<String>,
+    /// The auto upgrade paused reason.
+    #[serde(rename = "pausedReason")]
+    pub paused_reason: Option<Vec<String>>,
+    /// The list of past auto upgrades.
+    #[serde(rename = "upgradeDetails")]
+    pub upgrade_details: Option<Vec<UpgradeDetails>>,
+}
+
+impl common::ResponseResult for ClusterUpgradeInfo {}
 
 /// CompleteIPRotationRequest moves the cluster master back into single-IP mode.
 ///
@@ -1139,6 +1406,37 @@ pub struct CompleteNodePoolUpgradeRequest {
 
 impl common::RequestValue for CompleteNodePoolUpgradeRequest {}
 
+/// CompliancePostureConfig defines the settings needed to enable/disable features for the Compliance Posture.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct CompliancePostureConfig {
+    /// List of enabled compliance standards.
+    #[serde(rename = "complianceStandards")]
+    pub compliance_standards: Option<Vec<ComplianceStandard>>,
+    /// Defines the enablement mode for Compliance Posture.
+    pub mode: Option<String>,
+}
+
+impl common::Part for CompliancePostureConfig {}
+
+/// Defines the details of a compliance standard.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ComplianceStandard {
+    /// Name of the compliance standard.
+    pub standard: Option<String>,
+}
+
+impl common::Part for ComplianceStandard {}
+
 /// ConfidentialNodes is configuration for the confidential nodes feature, which makes nodes run on confidential VMs.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1147,6 +1445,9 @@ impl common::RequestValue for CompleteNodePoolUpgradeRequest {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ConfidentialNodes {
+    /// Defines the type of technology used by the confidential node.
+    #[serde(rename = "confidentialInstanceType")]
+    pub confidential_instance_type: Option<String>,
     /// Whether Confidential Nodes feature is enabled.
     pub enabled: Option<bool>,
 }
@@ -1192,9 +1493,30 @@ pub struct ContainerdConfig {
     /// PrivateRegistryAccessConfig is used to configure access configuration for private container registries.
     #[serde(rename = "privateRegistryAccessConfig")]
     pub private_registry_access_config: Option<PrivateRegistryAccessConfig>,
+    /// Optional. WritableCgroups defines writable cgroups configuration for the node pool.
+    #[serde(rename = "writableCgroups")]
+    pub writable_cgroups: Option<WritableCgroups>,
 }
 
 impl common::Part for ContainerdConfig {}
+
+/// Configuration for all of the cluster's control plane endpoints.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ControlPlaneEndpointsConfig {
+    /// DNS endpoint configuration.
+    #[serde(rename = "dnsEndpointConfig")]
+    pub dns_endpoint_config: Option<DNSEndpointConfig>,
+    /// IP endpoints configuration.
+    #[serde(rename = "ipEndpointsConfig")]
+    pub ip_endpoints_config: Option<IPEndpointsConfig>,
+}
+
+impl common::Part for ControlPlaneEndpointsConfig {}
 
 /// Configuration for fine-grained cost management feature.
 ///
@@ -1290,6 +1612,29 @@ pub struct DNSConfig {
 
 impl common::Part for DNSConfig {}
 
+/// Describes the configuration of a DNS endpoint.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DNSEndpointConfig {
+    /// Controls whether user traffic is allowed over this endpoint. Note that Google-managed services may still use the endpoint even if this is false.
+    #[serde(rename = "allowExternalTraffic")]
+    pub allow_external_traffic: Option<bool>,
+    /// Controls whether the k8s certs auth is allowed via DNS.
+    #[serde(rename = "enableK8sCertsViaDns")]
+    pub enable_k8s_certs_via_dns: Option<bool>,
+    /// Controls whether the k8s token auth is allowed via DNS.
+    #[serde(rename = "enableK8sTokensViaDns")]
+    pub enable_k8s_tokens_via_dns: Option<bool>,
+    /// Output only. The cluster's DNS endpoint configuration. A DNS format address. This is accessible from the public internet. Ex: uid.us-central1.gke.goog. Always present, but the behavior may change according to the value of DNSEndpointConfig.allow_external_traffic.
+    pub endpoint: Option<String>,
+}
+
+impl common::Part for DNSEndpointConfig {}
+
 /// Time window specified for daily maintenance operations.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1298,7 +1643,7 @@ impl common::Part for DNSConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct DailyMaintenanceWindow {
-    /// [Output only] Duration of the time window, automatically chosen to be smallest possible in the given scenario. Duration will be in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) format "PTnHnMnS".
+    /// Output only. Duration of the time window, automatically chosen to be smallest possible in the given scenario. Duration will be in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) format "PTnHnMnS".
     pub duration: Option<String>,
     /// Time within the maintenance window to start the maintenance operations. Time format should be in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) format "HH:MM", where HH : [00-23] and MM : [00-59] GMT.
     #[serde(rename = "startTime")]
@@ -1333,6 +1678,20 @@ pub struct DatabaseEncryption {
 
 impl common::Part for DatabaseEncryption {}
 
+/// DefaultComputeClassConfig defines default compute class configuration.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DefaultComputeClassConfig {
+    /// Enables default compute class.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for DefaultComputeClassConfig {}
+
 /// DefaultSnatStatus contains the desired state of whether default sNAT should be disabled on the cluster.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1346,6 +1705,36 @@ pub struct DefaultSnatStatus {
 }
 
 impl common::Part for DefaultSnatStatus {}
+
+/// DesiredAdditionalIPRangesConfig is a wrapper used for cluster update operation and contains multiple AdditionalIPRangesConfigs.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DesiredAdditionalIPRangesConfig {
+    /// List of additional IP ranges configs where each AdditionalIPRangesConfig corresponds to one subnetwork's IP ranges
+    #[serde(rename = "additionalIpRangesConfigs")]
+    pub additional_ip_ranges_configs: Option<Vec<AdditionalIPRangesConfig>>,
+}
+
+impl common::Part for DesiredAdditionalIPRangesConfig {}
+
+/// DesiredEnterpriseConfig is a wrapper used for updating enterprise_config. Deprecated: GKE Enterprise features are now available without an Enterprise tier.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct DesiredEnterpriseConfig {
+    /// desired_tier specifies the desired tier of the cluster.
+    #[serde(rename = "desiredTier")]
+    pub desired_tier: Option<String>,
+}
+
+impl common::Part for DesiredEnterpriseConfig {}
 
 /// Configuration for NodeLocal DNSCache
 ///
@@ -1380,7 +1769,7 @@ pub struct Empty {
 
 impl common::ResponseResult for Empty {}
 
-/// EnterpriseConfig is the cluster enterprise configuration.
+/// EnterpriseConfig is the cluster enterprise configuration. Deprecated: GKE Enterprise features are now available without an Enterprise tier.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1388,9 +1777,12 @@ impl common::ResponseResult for Empty {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct EnterpriseConfig {
-    /// Output only. [Output only] cluster_tier specifies the premium tier of the cluster.
+    /// Output only. cluster_tier indicates the effective tier of the cluster.
     #[serde(rename = "clusterTier")]
     pub cluster_tier: Option<String>,
+    /// desired_tier specifies the desired tier of the cluster.
+    #[serde(rename = "desiredTier")]
+    pub desired_tier: Option<String>,
 }
 
 impl common::Part for EnterpriseConfig {}
@@ -1403,12 +1795,105 @@ impl common::Part for EnterpriseConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct EphemeralStorageLocalSsdConfig {
+    /// Number of local SSDs to use for GKE Data Cache.
+    #[serde(rename = "dataCacheCount")]
+    pub data_cache_count: Option<i32>,
     /// Number of local SSDs to use to back ephemeral storage. Uses NVMe interfaces. A zero (or unset) value has different meanings depending on machine type being used: 1. For pre-Gen3 machines, which support flexible numbers of local ssds, zero (or unset) means to disable using local SSDs as ephemeral storage. The limit for this value is dependent upon the maximum number of disk available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information. 2. For Gen3 machines which dictate a specific number of local ssds, zero (or unset) means to use the default number of local ssds that goes with that machine type. For example, for a c3-standard-8-lssd machine, 2 local ssds would be provisioned. For c3-standard-8 (which doesn't support local ssds), 0 will be provisioned. See https://cloud.google.com/compute/docs/disks/local-ssd#choose_number_local_ssds for more info.
     #[serde(rename = "localSsdCount")]
     pub local_ssd_count: Option<i32>,
 }
 
 impl common::Part for EphemeralStorageLocalSsdConfig {}
+
+/// Eviction grace periods are grace periods for each eviction signal.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EvictionGracePeriod {
+    /// Optional. Grace period for eviction due to imagefs available signal. Sample format: "10s". Must be >= 0. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "imagefsAvailable")]
+    pub imagefs_available: Option<String>,
+    /// Optional. Grace period for eviction due to imagefs inodes free signal. Sample format: "10s". Must be >= 0. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "imagefsInodesFree")]
+    pub imagefs_inodes_free: Option<String>,
+    /// Optional. Grace period for eviction due to memory available signal. Sample format: "10s". Must be >= 0. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "memoryAvailable")]
+    pub memory_available: Option<String>,
+    /// Optional. Grace period for eviction due to nodefs available signal. Sample format: "10s". Must be >= 0. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "nodefsAvailable")]
+    pub nodefs_available: Option<String>,
+    /// Optional. Grace period for eviction due to nodefs inodes free signal. Sample format: "10s". Must be >= 0. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "nodefsInodesFree")]
+    pub nodefs_inodes_free: Option<String>,
+    /// Optional. Grace period for eviction due to pid available signal. Sample format: "10s". Must be >= 0. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "pidAvailable")]
+    pub pid_available: Option<String>,
+}
+
+impl common::Part for EvictionGracePeriod {}
+
+/// Eviction minimum reclaims are the resource amounts of minimum reclaims for each eviction signal.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EvictionMinimumReclaim {
+    /// Optional. Minimum reclaim for eviction due to imagefs available signal. Only take percentage value for now. Sample format: "10%". Must be <=10%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "imagefsAvailable")]
+    pub imagefs_available: Option<String>,
+    /// Optional. Minimum reclaim for eviction due to imagefs inodes free signal. Only take percentage value for now. Sample format: "10%". Must be <=10%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "imagefsInodesFree")]
+    pub imagefs_inodes_free: Option<String>,
+    /// Optional. Minimum reclaim for eviction due to memory available signal. Only take percentage value for now. Sample format: "10%". Must be <=10%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "memoryAvailable")]
+    pub memory_available: Option<String>,
+    /// Optional. Minimum reclaim for eviction due to nodefs available signal. Only take percentage value for now. Sample format: "10%". Must be <=10%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "nodefsAvailable")]
+    pub nodefs_available: Option<String>,
+    /// Optional. Minimum reclaim for eviction due to nodefs inodes free signal. Only take percentage value for now. Sample format: "10%". Must be <=10%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "nodefsInodesFree")]
+    pub nodefs_inodes_free: Option<String>,
+    /// Optional. Minimum reclaim for eviction due to pid available signal. Only take percentage value for now. Sample format: "10%". Must be <=10%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "pidAvailable")]
+    pub pid_available: Option<String>,
+}
+
+impl common::Part for EvictionMinimumReclaim {}
+
+/// Eviction signals are the current state of a particular resource at a specific point in time. The kubelet uses eviction signals to make eviction decisions by comparing the signals to eviction thresholds, which are the minimum amount of the resource that should be available on the node.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct EvictionSignals {
+    /// Optional. Amount of storage available on filesystem that container runtime uses for storing images layers. If the container filesystem and image filesystem are not separate, then imagefs can store both image layers and writeable layers. Defines the amount of "imagefs.available" signal in kubelet. Default is unset, if not specified in the kubelet config. It takses percentage value for now. Sample format: "30%". Must be >= 15% and <= 50%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "imagefsAvailable")]
+    pub imagefs_available: Option<String>,
+    /// Optional. Amount of inodes available on filesystem that container runtime uses for storing images layers. Defines the amount of "imagefs.inodesFree" signal in kubelet. Default is unset, if not specified in the kubelet config. Linux only. It takses percentage value for now. Sample format: "30%". Must be >= 5% and <= 50%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "imagefsInodesFree")]
+    pub imagefs_inodes_free: Option<String>,
+    /// Optional. Memory available (i.e. capacity - workingSet), in bytes. Defines the amount of "memory.available" signal in kubelet. Default is unset, if not specified in the kubelet config. Format: positive number + unit, e.g. 100Ki, 10Mi, 5Gi. Valid units are Ki, Mi, Gi. Must be >= 100Mi and <= 50% of the node's memory. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "memoryAvailable")]
+    pub memory_available: Option<String>,
+    /// Optional. Amount of storage available on filesystem that kubelet uses for volumes, daemon logs, etc. Defines the amount of "nodefs.available" signal in kubelet. Default is unset, if not specified in the kubelet config. It takses percentage value for now. Sample format: "30%". Must be >= 10% and <= 50%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "nodefsAvailable")]
+    pub nodefs_available: Option<String>,
+    /// Optional. Amount of inodes available on filesystem that kubelet uses for volumes, daemon logs, etc. Defines the amount of "nodefs.inodesFree" signal in kubelet. Default is unset, if not specified in the kubelet config. Linux only. It takses percentage value for now. Sample format: "30%". Must be >= 5% and <= 50%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "nodefsInodesFree")]
+    pub nodefs_inodes_free: Option<String>,
+    /// Optional. Amount of PID available for pod allocation. Defines the amount of "pid.available" signal in kubelet. Default is unset, if not specified in the kubelet config. It takses percentage value for now. Sample format: "30%". Must be >= 10% and <= 50%. See https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#eviction-signals
+    #[serde(rename = "pidAvailable")]
+    pub pid_available: Option<String>,
+}
+
+impl common::Part for EvictionSignals {}
 
 /// Configuration of Fast Socket feature.
 ///
@@ -1447,9 +1932,12 @@ impl common::Part for Filter {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct Fleet {
-    /// [Output only] The full resource name of the registered fleet membership of the cluster, in the format `//gkehub.googleapis.com/projects/*/locations/*/memberships/*`.
+    /// Output only. The full resource name of the registered fleet membership of the cluster, in the format `//gkehub.googleapis.com/projects/*/locations/*/memberships/*`.
     pub membership: Option<String>,
-    /// [Output only] Whether the cluster has been registered through the fleet API.
+    /// The type of the cluster's fleet membership.
+    #[serde(rename = "membershipType")]
+    pub membership_type: Option<String>,
+    /// Output only. Whether the cluster has been registered through the fleet API.
     #[serde(rename = "preRegistered")]
     pub pre_registered: Option<bool>,
     /// The Fleet host project(project ID or project number) where this cluster will be registered to. This field cannot be changed after the cluster has been registered.
@@ -1458,7 +1946,7 @@ pub struct Fleet {
 
 impl common::Part for Fleet {}
 
-/// GCPSecretManagerCertificateConfig configures a secret from [Google Secret Manager](https://cloud.google.com/secret-manager).
+/// GCPSecretManagerCertificateConfig configures a secret from [Secret Manager](https://cloud.google.com/secret-manager).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1549,7 +2037,7 @@ pub struct GcfsConfig {
 
 impl common::Part for GcfsConfig {}
 
-/// Configuration for the GCP Filestore CSI driver.
+/// Configuration for the Filestore CSI driver.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -1557,7 +2045,7 @@ impl common::Part for GcfsConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GcpFilestoreCsiDriverConfig {
-    /// Whether the GCP Filestore CSI driver is enabled for this cluster.
+    /// Whether the Filestore CSI driver is enabled for this cluster.
     pub enabled: Option<bool>,
 }
 
@@ -1577,7 +2065,7 @@ pub struct GcsFuseCsiDriverConfig {
 
 impl common::Part for GcsFuseCsiDriverConfig {}
 
-/// GetJSONWebKeysResponse is a valid JSON Web Key Set as specififed in rfc 7517
+/// GetJSONWebKeysResponse is a valid JSON Web Key Set as specified in rfc 7517
 ///
 /// # Activities
 ///
@@ -1589,7 +2077,7 @@ impl common::Part for GcsFuseCsiDriverConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GetJSONWebKeysResponse {
-    /// OnePlatform automatically extracts this field and uses it to set the HTTP Cache-Control header.
+    /// For HTTP requests, this field is automatically extracted into the Cache-Control HTTP header.
     #[serde(rename = "cacheHeader")]
     pub cache_header: Option<HttpCacheControlResponseHeader>,
     /// The public component of the keys used by the cluster to sign token requests.
@@ -1610,7 +2098,7 @@ impl common::ResponseResult for GetJSONWebKeysResponse {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct GetOpenIDConfigResponse {
-    /// OnePlatform automatically extracts this field and uses it to set the HTTP Cache-Control header.
+    /// For HTTP requests, this field is automatically extracted into the Cache-Control HTTP header.
     #[serde(rename = "cacheHeader")]
     pub cache_header: Option<HttpCacheControlResponseHeader>,
     /// Supported claims.
@@ -1631,6 +2119,21 @@ pub struct GetOpenIDConfigResponse {
 
 impl common::ResponseResult for GetOpenIDConfigResponse {}
 
+/// GkeAutoUpgradeConfig is the configuration for GKE auto upgrades.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct GkeAutoUpgradeConfig {
+    /// PatchMode specifies how auto upgrade patch builds should be selected.
+    #[serde(rename = "patchMode")]
+    pub patch_mode: Option<String>,
+}
+
+impl common::Part for GkeAutoUpgradeConfig {}
+
 /// Configuration for the Backup for GKE Agent.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1644,6 +2147,20 @@ pub struct GkeBackupAgentConfig {
 }
 
 impl common::Part for GkeBackupAgentConfig {}
+
+/// Configuration for the High Scale Checkpointing.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct HighScaleCheckpointingConfig {
+    /// Whether the High Scale Checkpointing is enabled for this cluster.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for HighScaleCheckpointingConfig {}
 
 /// Configuration options for the horizontal pod autoscaling feature, which increases or decreases the number of replica pods a replication controller has based on the resource usage of the existing pods.
 ///
@@ -1732,9 +2249,15 @@ impl common::Part for ILBSubsettingConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct IPAllocationPolicy {
-    /// Output only. [Output only] The additional pod ranges that are added to the cluster. These pod ranges can be used by new node pools to allocate pod IPs automatically. Once the range is removed it will not show up in IPAllocationPolicy.
+    /// Output only. The additional IP ranges that are added to the cluster. These IP ranges can be used by new node pools to allocate node and pod IPs automatically. Each AdditionalIPRangesConfig corresponds to a single subnetwork. Once a range is removed it will not show up in IPAllocationPolicy.
+    #[serde(rename = "additionalIpRangesConfigs")]
+    pub additional_ip_ranges_configs: Option<Vec<AdditionalIPRangesConfig>>,
+    /// Output only. The additional pod ranges that are added to the cluster. These pod ranges can be used by new node pools to allocate pod IPs automatically. Once the range is removed it will not show up in IPAllocationPolicy.
     #[serde(rename = "additionalPodRangesConfig")]
     pub additional_pod_ranges_config: Option<AdditionalPodRangesConfig>,
+    /// Optional. AutoIpamConfig contains all information related to Auto IPAM
+    #[serde(rename = "autoIpamConfig")]
+    pub auto_ipam_config: Option<AutoIpamConfig>,
     /// This field is deprecated, use cluster_ipv4_cidr_block.
     #[serde(rename = "clusterIpv4Cidr")]
     pub cluster_ipv4_cidr: Option<String>,
@@ -1747,12 +2270,15 @@ pub struct IPAllocationPolicy {
     /// Whether a new subnetwork will be created automatically for the cluster. This field is only applicable when `use_ip_aliases` is true.
     #[serde(rename = "createSubnetwork")]
     pub create_subnetwork: Option<bool>,
-    /// Output only. [Output only] The utilization of the cluster default IPv4 range for the pod. The ratio is Usage/[Total number of IPs in the secondary range], Usage=numNodes*numZones*podIPsPerNode.
+    /// Output only. The utilization of the cluster default IPv4 range for the pod. The ratio is Usage/[Total number of IPs in the secondary range], Usage=numNodes*numZones*podIPsPerNode.
     #[serde(rename = "defaultPodIpv4RangeUtilization")]
     pub default_pod_ipv4_range_utilization: Option<f64>,
     /// The ipv6 access type (internal or external) when create_subnetwork is true
     #[serde(rename = "ipv6AccessType")]
     pub ipv6_access_type: Option<String>,
+    /// Cluster-level network tier configuration is used to determine the default network tier for external IP addresses on cluster resources, such as node pools and load balancers.
+    #[serde(rename = "networkTierConfig")]
+    pub network_tier_config: Option<NetworkTierConfig>,
     /// This field is deprecated, use node_ipv4_cidr_block.
     #[serde(rename = "nodeIpv4Cidr")]
     pub node_ipv4_cidr: Option<String>,
@@ -1768,7 +2294,7 @@ pub struct IPAllocationPolicy {
     /// The IP address range of the services IPs in this cluster. If blank, a range will be automatically chosen with the default size. This field is only applicable when `use_ip_aliases` is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. `/14`) to have a range chosen with a specific netmask. Set to a [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g. `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range to use.
     #[serde(rename = "servicesIpv4CidrBlock")]
     pub services_ipv4_cidr_block: Option<String>,
-    /// Output only. [Output only] The services IPv6 CIDR block for the cluster.
+    /// Output only. The services IPv6 CIDR block for the cluster.
     #[serde(rename = "servicesIpv6CidrBlock")]
     pub services_ipv6_cidr_block: Option<String>,
     /// The name of the secondary range to be used as for the services CIDR block. The secondary range will be used for service ClusterIPs. This must be an existing secondary range associated with the cluster subnetwork. This field is only applicable with use_ip_aliases is true and create_subnetwork is false.
@@ -1777,13 +2303,13 @@ pub struct IPAllocationPolicy {
     /// The IP stack type of the cluster
     #[serde(rename = "stackType")]
     pub stack_type: Option<String>,
-    /// Output only. [Output only] The subnet's IPv6 CIDR block used by nodes and pods.
+    /// Output only. The subnet's IPv6 CIDR block used by nodes and pods.
     #[serde(rename = "subnetIpv6CidrBlock")]
     pub subnet_ipv6_cidr_block: Option<String>,
     /// A custom subnetwork name to be used if `create_subnetwork` is true. If this field is empty, then an automatic name will be chosen for the new subnetwork.
     #[serde(rename = "subnetworkName")]
     pub subnetwork_name: Option<String>,
-    /// The IP address range of the Cloud TPUs in this cluster. If unspecified, a range will be automatically chosen with the default size. This field is only applicable when `use_ip_aliases` is true. If unspecified, the range will use the default size. Set to /netmask (e.g. `/14`) to have a range chosen with a specific netmask. Set to a [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g. `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range to use.
+    /// The IP address range of the Cloud TPUs in this cluster. If unspecified, a range will be automatically chosen with the default size. This field is only applicable when `use_ip_aliases` is true. If unspecified, the range will use the default size. Set to /netmask (e.g. `/14`) to have a range chosen with a specific netmask. Set to a [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g. `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific range to use. This field is deprecated due to the deprecation of 2VM TPU. The end of life date for 2VM TPU is 2025-04-25.
     #[serde(rename = "tpuIpv4CidrBlock")]
     pub tpu_ipv4_cidr_block: Option<String>,
     /// Whether alias IPs will be used for pod IPs in the cluster. This is used in conjunction with use_routes. It cannot be true if use_routes is true. If both use_ip_aliases and use_routes are false, then the server picks the default IP allocation mode
@@ -1795,6 +2321,38 @@ pub struct IPAllocationPolicy {
 }
 
 impl common::Part for IPAllocationPolicy {}
+
+/// IP endpoints configuration.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct IPEndpointsConfig {
+    /// Configuration of authorized networks. If enabled, restricts access to the control plane based on source IP. It is invalid to specify both Cluster.masterAuthorizedNetworksConfig and this field at the same time.
+    #[serde(rename = "authorizedNetworksConfig")]
+    pub authorized_networks_config: Option<MasterAuthorizedNetworksConfig>,
+    /// Controls whether the control plane allows access through a public IP. It is invalid to specify both PrivateClusterConfig.enablePrivateEndpoint and this field at the same time.
+    #[serde(rename = "enablePublicEndpoint")]
+    pub enable_public_endpoint: Option<bool>,
+    /// Controls whether to allow direct IP access.
+    pub enabled: Option<bool>,
+    /// Controls whether the control plane's private endpoint is accessible from sources in other regions. It is invalid to specify both PrivateClusterMasterGlobalAccessConfig.enabled and this field at the same time.
+    #[serde(rename = "globalAccess")]
+    pub global_access: Option<bool>,
+    /// Output only. The internal IP address of this cluster's control plane. Only populated if enabled.
+    #[serde(rename = "privateEndpoint")]
+    pub private_endpoint: Option<String>,
+    /// Subnet to provision the master's private endpoint during cluster creation. Specified in projects/*/regions/*/subnetworks/* format. It is invalid to specify both PrivateClusterConfig.privateEndpointSubnetwork and this field at the same time.
+    #[serde(rename = "privateEndpointSubnetwork")]
+    pub private_endpoint_subnetwork: Option<String>,
+    /// Output only. The external IP address of this cluster's control plane. Only populated if enabled.
+    #[serde(rename = "publicEndpoint")]
+    pub public_endpoint: Option<String>,
+}
+
+impl common::Part for IPEndpointsConfig {}
 
 /// IdentityServiceConfig is configuration for Identity Service which allows customers to use external identity providers with the K8S API
 ///
@@ -1911,8 +2469,17 @@ pub struct LinuxNodeConfig {
     pub cgroup_mode: Option<String>,
     /// Optional. Amounts for 2M and 1G hugepages
     pub hugepages: Option<HugepagesConfig>,
-    /// The Linux kernel parameters to be applied to the nodes and all pods running on the nodes. The following parameters are supported. net.core.busy_poll net.core.busy_read net.core.netdev_max_backlog net.core.rmem_max net.core.wmem_default net.core.wmem_max net.core.optmem_max net.core.somaxconn net.ipv4.tcp_rmem net.ipv4.tcp_wmem net.ipv4.tcp_tw_reuse
+    /// Optional. Configuration for kernel module loading on nodes. When enabled, the node pool will be provisioned with a Container-Optimized OS image that enforces kernel module signature verification.
+    #[serde(rename = "nodeKernelModuleLoading")]
+    pub node_kernel_module_loading: Option<NodeKernelModuleLoading>,
+    /// The Linux kernel parameters to be applied to the nodes and all pods running on the nodes. The following parameters are supported. net.core.busy_poll net.core.busy_read net.core.netdev_max_backlog net.core.rmem_max net.core.rmem_default net.core.wmem_default net.core.wmem_max net.core.optmem_max net.core.somaxconn net.ipv4.tcp_rmem net.ipv4.tcp_wmem net.ipv4.tcp_tw_reuse net.ipv4.tcp_max_orphans net.netfilter.nf_conntrack_max net.netfilter.nf_conntrack_buckets net.netfilter.nf_conntrack_tcp_timeout_close_wait net.netfilter.nf_conntrack_tcp_timeout_time_wait net.netfilter.nf_conntrack_tcp_timeout_established net.netfilter.nf_conntrack_acct kernel.shmmni kernel.shmmax kernel.shmall fs.aio-max-nr fs.file-max fs.inotify.max_user_instances fs.inotify.max_user_watches fs.nr_open vm.dirty_background_ratio vm.dirty_expire_centisecs vm.dirty_ratio vm.dirty_writeback_centisecs vm.max_map_count vm.overcommit_memory vm.overcommit_ratio vm.vfs_cache_pressure vm.swappiness vm.watermark_scale_factor vm.min_free_kbytes
     pub sysctls: Option<HashMap<String, String>>,
+    /// Optional. Defines the transparent hugepage defrag configuration on the node. VM hugepage allocation can be managed by either limiting defragmentation for delayed allocation or skipping it entirely for immediate allocation only. See https://docs.kernel.org/admin-guide/mm/transhuge.html for more details.
+    #[serde(rename = "transparentHugepageDefrag")]
+    pub transparent_hugepage_defrag: Option<String>,
+    /// Optional. Transparent hugepage support for anonymous memory can be entirely disabled (mostly for debugging purposes) or only enabled inside MADV_HUGEPAGE regions (to avoid the risk of consuming more memory resources) or enabled system wide. See https://docs.kernel.org/admin-guide/mm/transhuge.html for more details.
+    #[serde(rename = "transparentHugepageEnabled")]
+    pub transparent_hugepage_enabled: Option<String>,
 }
 
 impl common::Part for LinuxNodeConfig {}
@@ -2061,6 +2628,23 @@ pub struct LoggingVariantConfig {
 
 impl common::Part for LoggingVariantConfig {}
 
+/// Configuration for the Lustre CSI driver.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct LustreCsiDriverConfig {
+    /// If set to true, the Lustre CSI driver will install Lustre kernel modules using port 6988. This serves as a workaround for a port conflict with the gke-metadata-server. This field is required ONLY under the following conditions: 1. The GKE node version is older than 1.33.2-gke.4655000. 2. You're connecting to a Lustre instance that has the 'gke-support-enabled' flag.
+    #[serde(rename = "enableLegacyLustrePort")]
+    pub enable_legacy_lustre_port: Option<bool>,
+    /// Whether the Lustre CSI driver is enabled for this cluster.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for LustreCsiDriverConfig {}
+
 /// Represents the Maintenance exclusion option.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2069,6 +2653,9 @@ impl common::Part for LoggingVariantConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MaintenanceExclusionOptions {
+    /// EndTimeBehavior specifies the behavior of the exclusion end time.
+    #[serde(rename = "endTimeBehavior")]
+    pub end_time_behavior: Option<String>,
     /// Scope specifies the upgrade scope which upgrades are blocked by the exclusion.
     pub scope: Option<String>,
 }
@@ -2121,6 +2708,9 @@ impl common::Part for MaintenanceWindow {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct ManagedPrometheusConfig {
+    /// GKE Workload Auto-Monitoring Configuration.
+    #[serde(rename = "autoMonitoringConfig")]
+    pub auto_monitoring_config: Option<AutoMonitoringConfig>,
     /// Enable Managed Collection.
     pub enabled: Option<bool>,
 }
@@ -2135,16 +2725,16 @@ impl common::Part for ManagedPrometheusConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct MasterAuth {
-    /// [Output only] Base64-encoded public certificate used by clients to authenticate to the cluster endpoint.
+    /// Output only. Base64-encoded public certificate used by clients to authenticate to the cluster endpoint. Issued only if client_certificate_config is set.
     #[serde(rename = "clientCertificate")]
     pub client_certificate: Option<String>,
     /// Configuration for client certificate authentication on the cluster. For clusters before v1.12, if no configuration is specified, a client certificate is issued.
     #[serde(rename = "clientCertificateConfig")]
     pub client_certificate_config: Option<ClientCertificateConfig>,
-    /// [Output only] Base64-encoded private key used by clients to authenticate to the cluster endpoint.
+    /// Output only. Base64-encoded private key used by clients to authenticate to the cluster endpoint.
     #[serde(rename = "clientKey")]
     pub client_key: Option<String>,
-    /// [Output only] Base64-encoded public certificate that is the root of trust for the cluster.
+    /// Output only. Base64-encoded public certificate that is the root of trust for the cluster.
     #[serde(rename = "clusterCaCertificate")]
     pub cluster_ca_certificate: Option<String>,
     /// The password to use for HTTP basic authentication to the master endpoint. Because the master endpoint is open to the Internet, you should create a strong password. If a password is provided for cluster creation, username must be non-empty. Warning: basic authentication is deprecated, and will be removed in GKE control plane versions 1.19 and newer. For a list of recommended authentication methods, see: https://cloud.google.com/kubernetes-engine/docs/how-to/api-server-authentication
@@ -2168,9 +2758,12 @@ pub struct MasterAuthorizedNetworksConfig {
     pub cidr_blocks: Option<Vec<CidrBlock>>,
     /// Whether or not master authorized networks is enabled.
     pub enabled: Option<bool>,
-    /// Whether master is accessbile via Google Compute Engine Public IP addresses.
+    /// Whether master is accessible via Google Compute Engine Public IP addresses.
     #[serde(rename = "gcpPublicCidrsAccessEnabled")]
     pub gcp_public_cidrs_access_enabled: Option<bool>,
+    /// Whether master authorized networks is enforced on private endpoint or not.
+    #[serde(rename = "privateEndpointEnforcementEnabled")]
+    pub private_endpoint_enforcement_enabled: Option<bool>,
 }
 
 impl common::Part for MasterAuthorizedNetworksConfig {}
@@ -2190,6 +2783,20 @@ pub struct MaxPodsConstraint {
 }
 
 impl common::Part for MaxPodsConstraint {}
+
+/// The option enables the Kubernetes NUMA-aware Memory Manager feature. Detailed description about the feature can be found [here](https://kubernetes.io/docs/tasks/administer-cluster/memory-manager/).
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct MemoryManager {
+    /// Controls the memory management policy on the Node. See https://kubernetes.io/docs/tasks/administer-cluster/memory-manager/#policies The following values are allowed. * "none" * "static" The default value is 'none' if unspecified.
+    pub policy: Option<String>,
+}
+
+impl common::Part for MemoryManager {}
 
 /// Configuration for issuance of mTLS keys and certificates to Kubernetes pods.
 ///
@@ -2277,9 +2884,15 @@ pub struct NetworkConfig {
     /// The desired datapath provider for this cluster. By default, uses the IPTables-based kube-proxy implementation.
     #[serde(rename = "datapathProvider")]
     pub datapath_provider: Option<String>,
+    /// Controls whether by default nodes have private IP addresses only. It is invalid to specify both PrivateClusterConfig.enablePrivateNodes and this field at the same time. To update the default setting, use ClusterUpdate.desired_default_enable_private_nodes
+    #[serde(rename = "defaultEnablePrivateNodes")]
+    pub default_enable_private_nodes: Option<bool>,
     /// Whether the cluster disables default in-node sNAT rules. In-node sNAT rules will be disabled when default_snat_status is disabled. When disabled is set to false, default IP masquerade rules will be applied to the nodes to prevent sNAT on cluster internal traffic.
     #[serde(rename = "defaultSnatStatus")]
     pub default_snat_status: Option<DefaultSnatStatus>,
+    /// Disable L4 load balancer VPC firewalls to enable firewall policies.
+    #[serde(rename = "disableL4LbFirewallReconciliation")]
+    pub disable_l4_lb_firewall_reconciliation: Option<bool>,
     /// DNSConfig contains clusterDNS config for this cluster.
     #[serde(rename = "dnsConfig")]
     pub dns_config: Option<DNSConfig>,
@@ -2304,7 +2917,7 @@ pub struct NetworkConfig {
     /// Specify the details of in-transit encryption. Now named inter-node transparent encryption.
     #[serde(rename = "inTransitEncryptionConfig")]
     pub in_transit_encryption_config: Option<String>,
-    /// Output only. The relative name of the Google Compute Engine network(https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the cluster is connected. Example: projects/my-project/global/networks/my-network
+    /// Output only. The relative name of the Google Compute Engine [network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the cluster is connected. Example: projects/my-project/global/networks/my-network
     pub network: Option<String>,
     /// Network bandwidth tier configuration.
     #[serde(rename = "networkPerformanceConfig")]
@@ -2380,6 +2993,21 @@ pub struct NetworkTags {
 
 impl common::Part for NetworkTags {}
 
+/// NetworkTierConfig contains network tier information.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct NetworkTierConfig {
+    /// Network tier configuration.
+    #[serde(rename = "networkTier")]
+    pub network_tier: Option<String>,
+}
+
+impl common::Part for NetworkTierConfig {}
+
 /// Specifies the NodeAffinity key, values, and affinity operator according to [shared sole tenant node group affinities](https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes#node_affinity_and_anti-affinity).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2411,6 +3039,9 @@ pub struct NodeConfig {
     /// Advanced features for the Compute Engine VM.
     #[serde(rename = "advancedMachineFeatures")]
     pub advanced_machine_features: Option<AdvancedMachineFeatures>,
+    /// The boot disk configuration for the node pool.
+    #[serde(rename = "bootDisk")]
+    pub boot_disk: Option<BootDisk>,
     ///  The Customer Managed Encryption Key used to encrypt the boot disk attached to each node in the node pool. This should be of the form projects/[KEY_PROJECT_ID]/locations/[LOCATION]/keyRings/[RING_NAME]/cryptoKeys/[KEY_NAME]. For more information about protecting resources with Cloud KMS Keys please see: https://cloud.google.com/compute/docs/disks/customer-managed-encryption
     #[serde(rename = "bootDiskKmsKey")]
     pub boot_disk_kms_key: Option<String>,
@@ -2426,6 +3057,9 @@ pub struct NodeConfig {
     /// Type of the disk attached to each node (e.g. 'pd-standard', 'pd-ssd' or 'pd-balanced') If unspecified, the default disk type is 'pd-standard'
     #[serde(rename = "diskType")]
     pub disk_type: Option<String>,
+    /// Output only. effective_cgroup_mode is the cgroup mode actually used by the node pool. It is determined by the cgroup mode specified in the LinuxNodeConfig or the default cgroup mode based on the cluster creation version.
+    #[serde(rename = "effectiveCgroupMode")]
+    pub effective_cgroup_mode: Option<String>,
     /// Optional. Reserved for future use.
     #[serde(rename = "enableConfidentialStorage")]
     pub enable_confidential_storage: Option<bool>,
@@ -2435,6 +3069,9 @@ pub struct NodeConfig {
     /// Enable or disable NCCL fast socket for the node pool.
     #[serde(rename = "fastSocket")]
     pub fast_socket: Option<FastSocket>,
+    /// Flex Start flag for enabling Flex Start VM.
+    #[serde(rename = "flexStart")]
+    pub flex_start: Option<bool>,
     /// Google Container File System (image streaming) configs.
     #[serde(rename = "gcfsConfig")]
     pub gcfs_config: Option<GcfsConfig>,
@@ -2457,12 +3094,19 @@ pub struct NodeConfig {
     /// The number of local SSD disks to be attached to the node. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information.
     #[serde(rename = "localSsdCount")]
     pub local_ssd_count: Option<i32>,
+    /// Specifies which method should be used for encrypting the Local SSDs attached to the node.
+    #[serde(rename = "localSsdEncryptionMode")]
+    pub local_ssd_encryption_mode: Option<String>,
     /// Logging configuration.
     #[serde(rename = "loggingConfig")]
     pub logging_config: Option<NodePoolLoggingConfig>,
     /// The name of a Google Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-types) If unspecified, the default machine type is `e2-medium`.
     #[serde(rename = "machineType")]
     pub machine_type: Option<String>,
+    /// The maximum duration for the nodes to exist. If unspecified, the nodes can exist indefinitely.
+    #[serde(rename = "maxRunDuration")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub max_run_duration: Option<chrono::Duration>,
     /// The metadata key/value pairs assigned to instances in the cluster. Keys must conform to the regexp `[a-zA-Z0-9-_]+` and be less than 128 bytes in length. These are reflected as part of a URL in the metadata server. Additionally, to avoid ambiguity, keys must not conflict with any other metadata keys for the project or be one of the reserved keys: - "cluster-location" - "cluster-name" - "cluster-uid" - "configure-sh" - "containerd-configure-sh" - "enable-os-login" - "gci-ensure-gke-docker" - "gci-metrics-enabled" - "gci-update-strategy" - "instance-template" - "kube-env" - "startup-script" - "user-data" - "disable-address-manager" - "windows-startup-script-ps1" - "common-psm1" - "k8s-node-setup-psm1" - "install-ssh-psm1" - "user-profile-psm1" Values are free-form strings, and only have meaning as interpreted by the image running in the instance. The only restriction placed on them is that each value's size must be less than or equal to 32 KB. The total size of all keys and values must be less than 512 KB.
     pub metadata: Option<HashMap<String, String>>,
     /// Minimum CPU platform to be used by this instance. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as `minCpuPlatform: "Intel Haswell"` or `minCpuPlatform: "Intel Sandy Bridge"`. For more information, read [how to specify min CPU platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform)
@@ -2471,7 +3115,7 @@ pub struct NodeConfig {
     /// Setting this field will assign instances of this pool to run on the specified node group. This is useful for running workloads on [sole tenant nodes](https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes).
     #[serde(rename = "nodeGroup")]
     pub node_group: Option<String>,
-    /// The set of Google API scopes to be made available on all of the node VMs under the "default" service account. The following scopes are recommended, but not required, and by default are not included: * `https://www.googleapis.com/auth/compute` is required for mounting persistent storage on your nodes. * `https://www.googleapis.com/auth/devstorage.read_only` is required for communicating with **gcr.io** (the [Google Container Registry](https://cloud.google.com/container-registry/)). If unspecified, no scopes are added, unless Cloud Logging or Cloud Monitoring are enabled, in which case their required scopes will be added.
+    /// The set of Google API scopes to be made available on all of the node VMs under the "default" service account. The following scopes are recommended, but not required, and by default are not included: * `https://www.googleapis.com/auth/compute` is required for mounting persistent storage on your nodes. * `https://www.googleapis.com/auth/devstorage.read_only` is required for communicating with **gcr.io** (the [Artifact Registry](https://cloud.google.com/artifact-registry/)). If unspecified, no scopes are added, unless Cloud Logging or Cloud Monitoring are enabled, in which case their required scopes will be added.
     #[serde(rename = "oauthScopes")]
     pub oauth_scopes: Option<Vec<String>>,
     /// Whether the nodes are created as preemptible VM instances. See: https://cloud.google.com/compute/docs/instances/preemptible for more information about preemptible VM instances.
@@ -2505,6 +3149,9 @@ pub struct NodeConfig {
     pub sole_tenant_config: Option<SoleTenantConfig>,
     /// Spot flag for enabling Spot VM, which is a rebrand of the existing preemptible flag.
     pub spot: Option<bool>,
+    /// List of Storage Pools where boot disks are provisioned.
+    #[serde(rename = "storagePools")]
+    pub storage_pools: Option<Vec<String>>,
     /// The list of instance tags applied to all nodes. Tags are used to identify valid sources or targets for network firewalls and are specified by the client during cluster or node pool creation. Each tag within the list must comply with RFC1035.
     pub tags: Option<Vec<String>>,
     /// List of kubernetes taints to be applied to each node. For more information, including usage and the valid values, see: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
@@ -2543,6 +3190,20 @@ pub struct NodeConfigDefaults {
 
 impl common::Part for NodeConfigDefaults {}
 
+/// Configuration for kernel module loading on nodes.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct NodeKernelModuleLoading {
+    /// Set the node module loading policy for nodes in the node pool.
+    pub policy: Option<String>,
+}
+
+impl common::Part for NodeKernelModuleLoading {}
+
 /// Node kubelet configs.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2551,22 +3212,67 @@ impl common::Part for NodeConfigDefaults {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NodeKubeletConfig {
+    /// Optional. Defines a comma-separated allowlist of unsafe sysctls or sysctl patterns (ending in `*`). The unsafe namespaced sysctl groups are `kernel.shm*`, `kernel.msg*`, `kernel.sem`, `fs.mqueue.*`, and `net.*`. Leaving this allowlist empty means they cannot be set on Pods. To allow certain sysctls or sysctl patterns to be set on Pods, list them separated by commas. For example: `kernel.msg*,net.ipv4.route.min_pmtu`. See https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ for more details.
+    #[serde(rename = "allowedUnsafeSysctls")]
+    pub allowed_unsafe_sysctls: Option<Vec<String>>,
+    /// Optional. Defines the maximum number of container log files that can be present for a container. See https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation The value must be an integer between 2 and 10, inclusive. The default value is 5 if unspecified.
+    #[serde(rename = "containerLogMaxFiles")]
+    pub container_log_max_files: Option<i32>,
+    /// Optional. Defines the maximum size of the container log file before it is rotated. See https://kubernetes.io/docs/concepts/cluster-administration/logging/#log-rotation Valid format is positive number + unit, e.g. 100Ki, 10Mi. Valid units are Ki, Mi, Gi. The value must be between 10Mi and 500Mi, inclusive. Note that the total container log size (container_log_max_size * container_log_max_files) cannot exceed 1% of the total storage of the node, to avoid disk pressure caused by log files. The default value is 10Mi if unspecified.
+    #[serde(rename = "containerLogMaxSize")]
+    pub container_log_max_size: Option<String>,
     /// Enable CPU CFS quota enforcement for containers that specify CPU limits. This option is enabled by default which makes kubelet use CFS quota (https://www.kernel.org/doc/Documentation/scheduler/sched-bwc.txt) to enforce container CPU limits. Otherwise, CPU limits will not be enforced at all. Disable this option to mitigate CPU throttling problems while still having your pods to be in Guaranteed QoS class by specifying the CPU limits. The default value is 'true' if unspecified.
     #[serde(rename = "cpuCfsQuota")]
     pub cpu_cfs_quota: Option<bool>,
-    /// Set the CPU CFS quota period value 'cpu.cfs_period_us'. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The value must be a positive duration.
+    /// Set the CPU CFS quota period value 'cpu.cfs_period_us'. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The value must be a positive duration between 1ms and 1 second, inclusive.
     #[serde(rename = "cpuCfsQuotaPeriod")]
     pub cpu_cfs_quota_period: Option<String>,
     /// Control the CPU management policy on the node. See https://kubernetes.io/docs/tasks/administer-cluster/cpu-management-policies/ The following values are allowed. * "none": the default, which represents the existing scheduling behavior. * "static": allows pods with certain resource characteristics to be granted increased CPU affinity and exclusivity on the node. The default value is 'none' if unspecified.
     #[serde(rename = "cpuManagerPolicy")]
     pub cpu_manager_policy: Option<String>,
+    /// Optional. eviction_max_pod_grace_period_seconds is the maximum allowed grace period (in seconds) to use when terminating pods in response to a soft eviction threshold being met. This value effectively caps the Pod's terminationGracePeriodSeconds value during soft evictions. Default: 0. Range: [0, 300].
+    #[serde(rename = "evictionMaxPodGracePeriodSeconds")]
+    pub eviction_max_pod_grace_period_seconds: Option<i32>,
+    /// Optional. eviction_minimum_reclaim is a map of signal names to quantities that defines minimum reclaims, which describe the minimum amount of a given resource the kubelet will reclaim when performing a pod eviction while that resource is under pressure.
+    #[serde(rename = "evictionMinimumReclaim")]
+    pub eviction_minimum_reclaim: Option<EvictionMinimumReclaim>,
+    /// Optional. eviction_soft is a map of signal names to quantities that defines soft eviction thresholds. Each signal is compared to its corresponding threshold to determine if a pod eviction should occur.
+    #[serde(rename = "evictionSoft")]
+    pub eviction_soft: Option<EvictionSignals>,
+    /// Optional. eviction_soft_grace_period is a map of signal names to quantities that defines grace periods for each soft eviction signal. The grace period is the amount of time that a pod must be under pressure before an eviction occurs.
+    #[serde(rename = "evictionSoftGracePeriod")]
+    pub eviction_soft_grace_period: Option<EvictionGracePeriod>,
+    /// Optional. Defines the percent of disk usage after which image garbage collection is always run. The percent is calculated as this field value out of 100. The value must be between 10 and 85, inclusive and greater than image_gc_low_threshold_percent. The default value is 85 if unspecified.
+    #[serde(rename = "imageGcHighThresholdPercent")]
+    pub image_gc_high_threshold_percent: Option<i32>,
+    /// Optional. Defines the percent of disk usage before which image garbage collection is never run. Lowest disk usage to garbage collect to. The percent is calculated as this field value out of 100. The value must be between 10 and 85, inclusive and smaller than image_gc_high_threshold_percent. The default value is 80 if unspecified.
+    #[serde(rename = "imageGcLowThresholdPercent")]
+    pub image_gc_low_threshold_percent: Option<i32>,
+    /// Optional. Defines the maximum age an image can be unused before it is garbage collected. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300s", "1.5h", and "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The value must be a positive duration greater than image_minimum_gc_age or "0s". The default value is "0s" if unspecified, which disables this field, meaning images won't be garbage collected based on being unused for too long.
+    #[serde(rename = "imageMaximumGcAge")]
+    pub image_maximum_gc_age: Option<String>,
+    /// Optional. Defines the minimum age for an unused image before it is garbage collected. The string must be a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300s", "1.5h", and "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". The value must be a positive duration less than or equal to 2 minutes. The default value is "2m0s" if unspecified.
+    #[serde(rename = "imageMinimumGcAge")]
+    pub image_minimum_gc_age: Option<String>,
     /// Enable or disable Kubelet read only port.
     #[serde(rename = "insecureKubeletReadonlyPortEnabled")]
     pub insecure_kubelet_readonly_port_enabled: Option<bool>,
+    /// Optional. Defines the maximum number of image pulls in parallel. The range is 2 to 5, inclusive. The default value is 2 or 3 depending on the disk type. See https://kubernetes.io/docs/concepts/containers/images/#maximum-parallel-image-pulls for more details.
+    #[serde(rename = "maxParallelImagePulls")]
+    pub max_parallel_image_pulls: Option<i32>,
+    /// Optional. Controls NUMA-aware Memory Manager configuration on the node. For more information, see: https://kubernetes.io/docs/tasks/administer-cluster/memory-manager/
+    #[serde(rename = "memoryManager")]
+    pub memory_manager: Option<MemoryManager>,
     /// Set the Pod PID limits. See https://kubernetes.io/docs/concepts/policy/pid-limiting/#pod-pid-limits Controls the maximum number of processes allowed to run in a pod. The value must be greater than or equal to 1024 and less than 4194304.
     #[serde(rename = "podPidsLimit")]
     #[serde_as(as = "Option<serde_with::DisplayFromStr>")]
     pub pod_pids_limit: Option<i64>,
+    /// Optional. Defines whether to enable single process OOM killer. If true, will prevent the memory.oom.group flag from being set for container cgroups in cgroups v2. This causes processes in the container to be OOM killed individually instead of as a group.
+    #[serde(rename = "singleProcessOomKill")]
+    pub single_process_oom_kill: Option<bool>,
+    /// Optional. Controls Topology Manager configuration on the node. For more information, see: https://kubernetes.io/docs/tasks/administer-cluster/topology-manager/
+    #[serde(rename = "topologyManager")]
+    pub topology_manager: Option<TopologyManager>,
 }
 
 impl common::Part for NodeKubeletConfig {}
@@ -2623,24 +3329,29 @@ pub struct NodeNetworkConfig {
     /// Input only. Whether to create a new range for pod IPs in this node pool. Defaults are provided for `pod_range` and `pod_ipv4_cidr_block` if they are not specified. If neither `create_pod_range` or `pod_range` are specified, the cluster-level default (`ip_allocation_policy.cluster_ipv4_cidr_block`) is used. Only applicable if `ip_allocation_policy.use_ip_aliases` is true. This field cannot be changed after the node pool has been created.
     #[serde(rename = "createPodRange")]
     pub create_pod_range: Option<bool>,
-    /// Whether nodes have internal IP addresses only. If enable_private_nodes is not specified, then the value is derived from cluster.privateClusterConfig.enablePrivateNodes
+    /// Whether nodes have internal IP addresses only. If enable_private_nodes is not specified, then the value is derived from Cluster.NetworkConfig.default_enable_private_nodes
     #[serde(rename = "enablePrivateNodes")]
     pub enable_private_nodes: Option<bool>,
     /// Network bandwidth tier configuration.
     #[serde(rename = "networkPerformanceConfig")]
     pub network_performance_config: Option<NetworkPerformanceConfig>,
+    /// Output only. The network tier configuration for the node pool inherits from the cluster-level configuration and remains immutable throughout the node pool's lifecycle, including during upgrades.
+    #[serde(rename = "networkTierConfig")]
+    pub network_tier_config: Option<NetworkTierConfig>,
     /// [PRIVATE FIELD] Pod CIDR size overprovisioning config for the nodepool. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is rounded off to next power of 2 and we then double that to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (/27) when overprovisioning is disabled.
     #[serde(rename = "podCidrOverprovisionConfig")]
     pub pod_cidr_overprovision_config: Option<PodCIDROverprovisionConfig>,
     /// The IP address range for pod IPs in this node pool. Only applicable if `create_pod_range` is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. `/14`) to have a range chosen with a specific netmask. Set to a [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `10.96.0.0/14`) to pick a specific range to use. Only applicable if `ip_allocation_policy.use_ip_aliases` is true. This field cannot be changed after the node pool has been created.
     #[serde(rename = "podIpv4CidrBlock")]
     pub pod_ipv4_cidr_block: Option<String>,
-    /// Output only. [Output only] The utilization of the IPv4 range for the pod. The ratio is Usage/[Total number of IPs in the secondary range], Usage=numNodes*numZones*podIPsPerNode.
+    /// Output only. The utilization of the IPv4 range for the pod. The ratio is Usage/[Total number of IPs in the secondary range], Usage=numNodes*numZones*podIPsPerNode.
     #[serde(rename = "podIpv4RangeUtilization")]
     pub pod_ipv4_range_utilization: Option<f64>,
     /// The ID of the secondary range for pod IPs. If `create_pod_range` is true, this ID is used for the new range. If `create_pod_range` is false, uses an existing secondary range with this ID. Only applicable if `ip_allocation_policy.use_ip_aliases` is true. This field cannot be changed after the node pool has been created.
     #[serde(rename = "podRange")]
     pub pod_range: Option<String>,
+    /// Output only. The subnetwork path for the node pool. Format: projects/{project}/regions/{region}/subnetworks/{subnetwork} If the cluster is associated with multiple subnetworks, the subnetwork for the node pool is picked based on the IP utilization during node pool creation and is immutable.
+    pub subnetwork: Option<String>,
 }
 
 impl common::Part for NodeNetworkConfig {}
@@ -2658,6 +3369,9 @@ impl common::Part for NodeNetworkConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NodePool {
+    /// Specifies the autopilot configuration for this node pool. This field is exclusively reserved for Cluster Autoscaler.
+    #[serde(rename = "autopilotConfig")]
+    pub autopilot_config: Option<AutopilotConfig>,
     /// Autoscaler configuration for this NodePool. Autoscaler is enabled only if a valid configuration is present.
     pub autoscaling: Option<NodePoolAutoscaling>,
     /// Enable best effort provisioning for nodes
@@ -2672,7 +3386,7 @@ pub struct NodePool {
     /// The initial node count for the pool. You must ensure that your Compute Engine [resource quota](https://cloud.google.com/compute/quotas) is sufficient for this number of instances. You must also have available firewall and routes quota.
     #[serde(rename = "initialNodeCount")]
     pub initial_node_count: Option<i32>,
-    /// [Output only] The resource URLs of the [managed instance groups](https://cloud.google.com/compute/docs/instance-groups/creating-groups-of-managed-instances) associated with this node pool. During the node pool blue-green upgrade operation, the URLs contain both blue and green resources.
+    /// Output only. The resource URLs of the [managed instance groups](https://cloud.google.com/compute/docs/instance-groups/creating-groups-of-managed-instances) associated with this node pool. During the node pool blue-green upgrade operation, the URLs contain both blue and green resources.
     #[serde(rename = "instanceGroupUrls")]
     pub instance_group_urls: Option<Vec<String>>,
     /// The list of Google Compute Engine [zones](https://cloud.google.com/compute/docs/zones#available) in which the NodePool's nodes should be located. If this value is unspecified during node pool creation, the [Cluster.Locations](https://cloud.google.com/kubernetes-engine/docs/reference/rest/v1/projects.locations.clusters#Cluster.FIELDS.locations) value will be used, instead. Warning: changing node pool locations will result in nodes being added and/or removed.
@@ -2690,21 +3404,21 @@ pub struct NodePool {
     /// Specifies the node placement policy.
     #[serde(rename = "placementPolicy")]
     pub placement_policy: Option<PlacementPolicy>,
-    /// [Output only] The pod CIDR block size per node in this node pool.
+    /// Output only. The pod CIDR block size per node in this node pool.
     #[serde(rename = "podIpv4CidrSize")]
     pub pod_ipv4_cidr_size: Option<i32>,
     /// Specifies the configuration of queued provisioning.
     #[serde(rename = "queuedProvisioning")]
     pub queued_provisioning: Option<QueuedProvisioning>,
-    /// [Output only] Server-defined URL for the resource.
+    /// Output only. Server-defined URL for the resource.
     #[serde(rename = "selfLink")]
     pub self_link: Option<String>,
-    /// [Output only] The status of the nodes in this pool instance.
+    /// Output only. The status of the nodes in this pool instance.
     pub status: Option<String>,
-    /// [Output only] Deprecated. Use conditions instead. Additional information about the current status of this node pool instance, if available.
+    /// Output only. Deprecated. Use conditions instead. Additional information about the current status of this node pool instance, if available.
     #[serde(rename = "statusMessage")]
     pub status_message: Option<String>,
-    /// Output only. [Output only] Update info contains relevant information during a node pool update.
+    /// Output only. Update info contains relevant information during a node pool update.
     #[serde(rename = "updateInfo")]
     pub update_info: Option<UpdateInfo>,
     /// Upgrade settings control disruption and speed of the upgrade.
@@ -2724,6 +3438,9 @@ impl common::ResponseResult for NodePool {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct NodePoolAutoConfig {
+    /// Output only. Configuration options for Linux nodes.
+    #[serde(rename = "linuxNodeConfig")]
+    pub linux_node_config: Option<LinuxNodeConfig>,
     /// The list of instance tags applied to all nodes. Tags are used to identify valid sources or targets for network firewalls and are specified by the client during cluster creation. Each tag within the list must comply with RFC1035.
     #[serde(rename = "networkTags")]
     pub network_tags: Option<NetworkTags>,
@@ -2752,16 +3469,16 @@ pub struct NodePoolAutoscaling {
     /// Location policy used when scaling up a nodepool.
     #[serde(rename = "locationPolicy")]
     pub location_policy: Option<String>,
-    /// Maximum number of nodes for one location in the NodePool. Must be >= min_node_count. There has to be enough quota to scale up the cluster.
+    /// Maximum number of nodes for one location in the node pool. Must be >= min_node_count. There has to be enough quota to scale up the cluster.
     #[serde(rename = "maxNodeCount")]
     pub max_node_count: Option<i32>,
-    /// Minimum number of nodes for one location in the NodePool. Must be >= 1 and <= max_node_count.
+    /// Minimum number of nodes for one location in the node pool. Must be greater than or equal to 0 and less than or equal to max_node_count.
     #[serde(rename = "minNodeCount")]
     pub min_node_count: Option<i32>,
-    /// Maximum number of nodes in the node pool. Must be greater than total_min_node_count. There has to be enough quota to scale up the cluster. The total_*_node_count fields are mutually exclusive with the *_node_count fields.
+    /// Maximum number of nodes in the node pool. Must be greater than or equal to total_min_node_count. There has to be enough quota to scale up the cluster. The total_*_node_count fields are mutually exclusive with the *_node_count fields.
     #[serde(rename = "totalMaxNodeCount")]
     pub total_max_node_count: Option<i32>,
-    /// Minimum number of nodes in the node pool. Must be greater than 1 less than total_max_node_count. The total_*_node_count fields are mutually exclusive with the *_node_count fields.
+    /// Minimum number of nodes in the node pool. Must be greater than or equal to 0 and less than or equal to total_max_node_count. The total_*_node_count fields are mutually exclusive with the *_node_count fields.
     #[serde(rename = "totalMinNodeCount")]
     pub total_min_node_count: Option<i32>,
 }
@@ -2797,6 +3514,44 @@ pub struct NodePoolLoggingConfig {
 }
 
 impl common::Part for NodePoolLoggingConfig {}
+
+/// NodePoolUpgradeInfo contains the upgrade information of a nodepool.
+///
+/// # Activities
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+///
+/// * [locations clusters node pools fetch node pool upgrade info projects](ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall) (response)
+/// * [zones clusters node pools fetch node pool upgrade info projects](ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct NodePoolUpgradeInfo {
+    /// The auto upgrade status.
+    #[serde(rename = "autoUpgradeStatus")]
+    pub auto_upgrade_status: Option<Vec<String>>,
+    /// The nodepool's current minor version's end of extended support timestamp.
+    #[serde(rename = "endOfExtendedSupportTimestamp")]
+    pub end_of_extended_support_timestamp: Option<String>,
+    /// The nodepool's current minor version's end of standard support timestamp.
+    #[serde(rename = "endOfStandardSupportTimestamp")]
+    pub end_of_standard_support_timestamp: Option<String>,
+    /// minor_target_version indicates the target version for minor upgrade.
+    #[serde(rename = "minorTargetVersion")]
+    pub minor_target_version: Option<String>,
+    /// patch_target_version indicates the target version for patch upgrade.
+    #[serde(rename = "patchTargetVersion")]
+    pub patch_target_version: Option<String>,
+    /// The auto upgrade paused reason.
+    #[serde(rename = "pausedReason")]
+    pub paused_reason: Option<Vec<String>>,
+    /// The list of past auto upgrades.
+    #[serde(rename = "upgradeDetails")]
+    pub upgrade_details: Option<Vec<UpgradeDetails>>,
+}
+
+impl common::ResponseResult for NodePoolUpgradeInfo {}
 
 /// Kubernetes taint is composed of three fields: key, value, and effect. Effect can only be one of three types: NoSchedule, PreferNoSchedule or NoExecute. See [here](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration) for more information, including usage and the valid values.
 ///
@@ -2904,40 +3659,40 @@ pub struct Operation {
     /// Which conditions caused the current cluster state. Deprecated. Use field error instead.
     #[serde(rename = "clusterConditions")]
     pub cluster_conditions: Option<Vec<StatusCondition>>,
-    /// Detailed operation progress, if available.
+    /// Output only. Detailed operation progress, if available.
     pub detail: Option<String>,
-    /// [Output only] The time the operation completed, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    /// Output only. The time the operation completed, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     #[serde(rename = "endTime")]
     pub end_time: Option<String>,
     /// The error result of the operation in case of failure.
     pub error: Option<Status>,
-    /// [Output only] The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) or [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) in which the cluster resides.
+    /// Output only. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) or [region](https://cloud.google.com/compute/docs/regions-zones/regions-zones#available) in which the cluster resides.
     pub location: Option<String>,
-    /// The server-assigned ID for the operation.
+    /// Output only. The server-assigned ID for the operation.
     pub name: Option<String>,
     /// Which conditions caused the current node pool state. Deprecated. Use field error instead.
     #[serde(rename = "nodepoolConditions")]
     pub nodepool_conditions: Option<Vec<StatusCondition>>,
-    /// The operation type.
+    /// Output only. The operation type.
     #[serde(rename = "operationType")]
     pub operation_type: Option<String>,
-    /// Output only. [Output only] Progress information for an operation.
+    /// Output only. Progress information for an operation.
     pub progress: Option<OperationProgress>,
-    /// Server-defined URI for the operation. Example: `https://container.googleapis.com/v1alpha1/projects/123/locations/us-central1/operations/operation-123`.
+    /// Output only. Server-defined URI for the operation. Example: `https://container.googleapis.com/v1alpha1/projects/123/locations/us-central1/operations/operation-123`.
     #[serde(rename = "selfLink")]
     pub self_link: Option<String>,
-    /// [Output only] The time the operation started, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
+    /// Output only. The time the operation started, in [RFC3339](https://www.ietf.org/rfc/rfc3339.txt) text format.
     #[serde(rename = "startTime")]
     pub start_time: Option<String>,
-    /// The current status of the operation.
+    /// Output only. The current status of the operation.
     pub status: Option<String>,
     /// Output only. If an error has occurred, a textual description of the error. Deprecated. Use the field error instead.
     #[serde(rename = "statusMessage")]
     pub status_message: Option<String>,
-    /// Server-defined URI for the target of the operation. The format of this is a URI to the resource being modified (such as a cluster, node pool, or node). For node pool repairs, there may be multiple nodes being repaired, but only one will be the target. Examples: - ## `https://container.googleapis.com/v1/projects/123/locations/us-central1/clusters/my-cluster` ## `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np` `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np/node/my-node`
+    /// Output only. Server-defined URI for the target of the operation. The format of this is a URI to the resource being modified (such as a cluster, node pool, or node). For node pool repairs, there may be multiple nodes being repaired, but only one will be the target. Examples: - ## `https://container.googleapis.com/v1/projects/123/locations/us-central1/clusters/my-cluster` ## `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np` `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np/node/my-node`
     #[serde(rename = "targetLink")]
     pub target_link: Option<String>,
-    /// The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the operation is taking place. This field is deprecated, use location instead.
+    /// Output only. The name of the Google Compute Engine [zone](https://cloud.google.com/compute/docs/zones#available) in which the operation is taking place. This field is deprecated, use location instead.
     pub zone: Option<String>,
 }
 
@@ -2983,6 +3738,20 @@ pub struct OperationProgress {
 
 impl common::Part for OperationProgress {}
 
+/// Configuration for the Cloud Storage Parallelstore CSI driver.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct ParallelstoreCsiDriverConfig {
+    /// Whether the Cloud Storage Parallelstore CSI driver is enabled for this cluster.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for ParallelstoreCsiDriverConfig {}
+
 /// ParentProductConfig is the configuration of the parent product of the cluster. This field is used by Google internal products that are built on top of a GKE cluster and take the ownership of the cluster.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3021,6 +3790,21 @@ pub struct PlacementPolicy {
 
 impl common::Part for PlacementPolicy {}
 
+/// PodAutoscaling is used for configuration of parameters for workload autoscaling.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PodAutoscaling {
+    /// Selected Horizontal Pod Autoscaling profile.
+    #[serde(rename = "hpaProfile")]
+    pub hpa_profile: Option<String>,
+}
+
+impl common::Part for PodAutoscaling {}
+
 /// [PRIVATE FIELD] Config for pod CIDR size overprovisioning.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3043,13 +3827,13 @@ impl common::Part for PodCIDROverprovisionConfig {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct PrivateClusterConfig {
-    /// Whether the master's internal IP address is used as the cluster endpoint.
+    /// Whether the master's internal IP address is used as the cluster endpoint. Deprecated: Use ControlPlaneEndpointsConfig.IPEndpointsConfig.enable_public_endpoint instead. Note that the value of enable_public_endpoint is reversed: if enable_private_endpoint is false, then enable_public_endpoint will be true.
     #[serde(rename = "enablePrivateEndpoint")]
     pub enable_private_endpoint: Option<bool>,
-    /// Whether nodes have internal IP addresses only. If enabled, all nodes are given only RFC 1918 private addresses and communicate with the master via private networking.
+    /// Whether nodes have internal IP addresses only. If enabled, all nodes are given only RFC 1918 private addresses and communicate with the master via private networking. Deprecated: Use NetworkConfig.default_enable_private_nodes instead.
     #[serde(rename = "enablePrivateNodes")]
     pub enable_private_nodes: Option<bool>,
-    /// Controls master global access settings.
+    /// Controls master global access settings. Deprecated: Use ControlPlaneEndpointsConfig.IPEndpointsConfig.enable_global_access instead.
     #[serde(rename = "masterGlobalAccessConfig")]
     pub master_global_access_config: Option<PrivateClusterMasterGlobalAccessConfig>,
     /// The IP range in CIDR notation to use for the hosted master network. This range will be used for assigning internal IP addresses to the master or set of masters, as well as the ILB VIP. This range must not overlap with any other ranges in use within the cluster's network.
@@ -3058,13 +3842,13 @@ pub struct PrivateClusterConfig {
     /// Output only. The peering name in the customer VPC used by this cluster.
     #[serde(rename = "peeringName")]
     pub peering_name: Option<String>,
-    /// Output only. The internal IP address of this cluster's master endpoint.
+    /// Output only. The internal IP address of this cluster's master endpoint. Deprecated: Use ControlPlaneEndpointsConfig.IPEndpointsConfig.private_endpoint instead.
     #[serde(rename = "privateEndpoint")]
     pub private_endpoint: Option<String>,
-    /// Subnet to provision the master's private endpoint during cluster creation. Specified in projects/*/regions/*/subnetworks/* format.
+    /// Subnet to provision the master's private endpoint during cluster creation. Specified in projects/*/regions/*/subnetworks/* format. Deprecated: Use ControlPlaneEndpointsConfig.IPEndpointsConfig.private_endpoint_subnetwork instead.
     #[serde(rename = "privateEndpointSubnetwork")]
     pub private_endpoint_subnetwork: Option<String>,
-    /// Output only. The external IP address of this cluster's master endpoint.
+    /// Output only. The external IP address of this cluster's master endpoint. Deprecated:Use ControlPlaneEndpointsConfig.IPEndpointsConfig.public_endpoint instead.
     #[serde(rename = "publicEndpoint")]
     pub public_endpoint: Option<String>,
 }
@@ -3102,6 +3886,21 @@ pub struct PrivateRegistryAccessConfig {
 
 impl common::Part for PrivateRegistryAccessConfig {}
 
+/// PrivilegedAdmissionConfig stores the list of authorized allowlist paths for the cluster.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct PrivilegedAdmissionConfig {
+    /// The customer allowlist Cloud Storage paths for the cluster. These paths are used with the `--autopilot-privileged-admission` flag to authorize privileged workloads in Autopilot clusters. Paths can be GKE-owned, in the format `gke:////`, or customer-owned, in the format `gs:///`. Wildcards (`*`) are supported to authorize all allowlists under specific paths or directories. Example: `gs://my-bucket/*` will authorize all allowlists under the `my-bucket` bucket.
+    #[serde(rename = "allowlistPaths")]
+    pub allowlist_paths: Option<Vec<String>>,
+}
+
+impl common::Part for PrivilegedAdmissionConfig {}
+
 /// Pub/Sub specific notification config.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3134,6 +3933,24 @@ pub struct QueuedProvisioning {
 
 impl common::Part for QueuedProvisioning {}
 
+/// RBACBindingConfig allows user to restrict ClusterRoleBindings an RoleBindings that can be created.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RBACBindingConfig {
+    /// Setting this to true will allow any ClusterRoleBinding and RoleBinding with subjects system:authenticated.
+    #[serde(rename = "enableInsecureBindingSystemAuthenticated")]
+    pub enable_insecure_binding_system_authenticated: Option<bool>,
+    /// Setting this to true will allow any ClusterRoleBinding and RoleBinding with subjets system:anonymous or system:unauthenticated.
+    #[serde(rename = "enableInsecureBindingSystemUnauthenticated")]
+    pub enable_insecure_binding_system_unauthenticated: Option<bool>,
+}
+
+impl common::Part for RBACBindingConfig {}
+
 /// RangeInfo contains the range name and the range utilization by this cluster.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3142,14 +3959,62 @@ impl common::Part for QueuedProvisioning {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct RangeInfo {
-    /// Output only. [Output only] Name of a range.
+    /// Output only. Name of a range.
     #[serde(rename = "rangeName")]
     pub range_name: Option<String>,
-    /// Output only. [Output only] The utilization of the range.
+    /// Output only. The utilization of the range.
     pub utilization: Option<f64>,
 }
 
 impl common::Part for RangeInfo {}
+
+/// RayClusterLoggingConfig specifies configuration of Ray logging.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RayClusterLoggingConfig {
+    /// Enable log collection for Ray clusters.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for RayClusterLoggingConfig {}
+
+/// RayClusterMonitoringConfig specifies monitoring configuration for Ray clusters.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RayClusterMonitoringConfig {
+    /// Enable metrics collection for Ray clusters.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for RayClusterMonitoringConfig {}
+
+/// Configuration options for the Ray Operator add-on.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RayOperatorConfig {
+    /// Whether the Ray Operator addon is enabled for this cluster.
+    pub enabled: Option<bool>,
+    /// Optional. Logging configuration for Ray clusters.
+    #[serde(rename = "rayClusterLoggingConfig")]
+    pub ray_cluster_logging_config: Option<RayClusterLoggingConfig>,
+    /// Optional. Monitoring configuration for Ray clusters.
+    #[serde(rename = "rayClusterMonitoringConfig")]
+    pub ray_cluster_monitoring_config: Option<RayClusterMonitoringConfig>,
+}
+
+impl common::Part for RayOperatorConfig {}
 
 /// Represents an arbitrary window of time that recurs.
 ///
@@ -3194,6 +4059,9 @@ pub struct ReleaseChannelConfig {
     /// The default version for newly created clusters on the channel.
     #[serde(rename = "defaultVersion")]
     pub default_version: Option<String>,
+    /// The auto upgrade target version for clusters on the channel.
+    #[serde(rename = "upgradeTargetVersion")]
+    pub upgrade_target_version: Option<String>,
     /// List of valid versions for the channel.
     #[serde(rename = "validVersions")]
     pub valid_versions: Option<Vec<String>>,
@@ -3220,7 +4088,7 @@ pub struct ReservationAffinity {
 
 impl common::Part for ReservationAffinity {}
 
-/// Collection of [GCP labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels).
+/// Collection of [Resource Manager labels](https://cloud.google.com/resource-manager/docs/creating-managing-labels).
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -3323,6 +4191,24 @@ pub struct RollbackNodePoolUpgradeRequest {
 
 impl common::RequestValue for RollbackNodePoolUpgradeRequest {}
 
+/// RotationConfig is config for secret manager auto rotation.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct RotationConfig {
+    /// Whether the rotation is enabled.
+    pub enabled: Option<bool>,
+    /// The interval between two consecutive rotations. Default rotation interval is 2 minutes.
+    #[serde(rename = "rotationInterval")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub rotation_interval: Option<chrono::Duration>,
+}
+
+impl common::Part for RotationConfig {}
+
 /// SandboxConfig contains configurations of the sandbox to use for the node.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3367,6 +4253,23 @@ pub struct SecondaryBootDiskUpdateStrategy {
 }
 
 impl common::Part for SecondaryBootDiskUpdateStrategy {}
+
+/// SecretManagerConfig is config for secret manager enablement.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct SecretManagerConfig {
+    /// Enable/Disable Secret Manager Config.
+    pub enabled: Option<bool>,
+    /// Rotation config for secret manager.
+    #[serde(rename = "rotationConfig")]
+    pub rotation_config: Option<RotationConfig>,
+}
+
+impl common::Part for SecretManagerConfig {}
 
 /// SecurityPostureConfig defines the flags needed to enable/disable features for the Security Posture API.
 ///
@@ -3661,7 +4564,7 @@ pub struct SetMonitoringServiceRequest {
     /// Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
     #[serde(rename = "clusterId")]
     pub cluster_id: Option<String>,
-    /// Required. The monitoring service the cluster should use to write metrics. Currently available options: * "monitoring.googleapis.com/kubernetes" - The Cloud Monitoring service with a Kubernetes-native resource model * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * `none` - No metrics will be exported from the cluster. If left as an empty string,`monitoring.googleapis.com/kubernetes` will be used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
+    /// Required. The monitoring service the cluster should use to write metrics. Currently available options: * `monitoring.googleapis.com/kubernetes` - The Cloud Monitoring service with a Kubernetes-native resource model * `monitoring.googleapis.com` - The legacy Cloud Monitoring service (no longer available as of GKE 1.15). * `none` - No metrics will be exported from the cluster. If left as an empty string,`monitoring.googleapis.com/kubernetes` will be used for GKE 1.14+ or `monitoring.googleapis.com` for earlier versions.
     #[serde(rename = "monitoringService")]
     pub monitoring_service: Option<String>,
     /// The name (project, location, cluster) of the cluster to set monitoring. Specified in the format `projects/*/locations/*/clusters/*`.
@@ -3842,6 +4745,9 @@ impl common::Part for ShieldedNodes {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct SoleTenantConfig {
+    /// Optional. The minimum number of virtual CPUs this instance will consume when running on a sole-tenant node. This field can only be set if the node pool is created in a shared sole-tenant node group.
+    #[serde(rename = "minNodeCpus")]
+    pub min_node_cpus: Option<i32>,
     /// NodeAffinities used to match to a shared sole tenant node group.
     #[serde(rename = "nodeAffinities")]
     pub node_affinities: Option<Vec<NodeAffinity>>,
@@ -3973,6 +4879,22 @@ pub struct TimeWindow {
 
 impl common::Part for TimeWindow {}
 
+/// TopologyManager defines the configuration options for Topology Manager feature. See https://kubernetes.io/docs/tasks/administer-cluster/topology-manager/
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct TopologyManager {
+    /// Configures the strategy for resource alignment. Allowed values are: * none: the default policy, and does not perform any topology alignment. * restricted: the topology manager stores the preferred NUMA node affinity for the container, and will reject the pod if the affinity if not preferred. * best-effort: the topology manager stores the preferred NUMA node affinity for the container. If the affinity is not preferred, the topology manager will admit the pod to the node anyway. * single-numa-node: the topology manager determines if the single NUMA node affinity is possible. If it is, Topology Manager will store this and the Hint Providers can then use this information when making the resource allocation decision. If, however, this is not possible then the Topology Manager will reject the pod from the node. This will result in a pod in a Terminated state with a pod admission failure. The default policy value is 'none' if unspecified. Details about each strategy can be found [here](https://kubernetes.io/docs/tasks/administer-cluster/topology-manager/#topology-manager-policies).
+    pub policy: Option<String>,
+    /// The Topology Manager aligns resources in following scopes: * container * pod The default scope is 'container' if unspecified. See https://kubernetes.io/docs/tasks/administer-cluster/topology-manager/#topology-manager-scopes
+    pub scope: Option<String>,
+}
+
+impl common::Part for TopologyManager {}
+
 /// UpdateClusterRequest updates the settings of a cluster.
 ///
 /// # Activities
@@ -4062,6 +4984,9 @@ impl common::RequestValue for UpdateMasterRequest {}
 pub struct UpdateNodePoolRequest {
     /// A list of hardware accelerators to be attached to each node. See https://cloud.google.com/compute/docs/gpus for more information about support for GPUs.
     pub accelerators: Option<Vec<AcceleratorConfig>>,
+    /// The desired boot disk config for nodes in the node pool. Initiates an upgrade operation that migrates the nodes in the node pool to the specified boot disk config.
+    #[serde(rename = "bootDisk")]
+    pub boot_disk: Option<BootDisk>,
     /// Deprecated. The name of the cluster to upgrade. This field has been deprecated and replaced by the name field.
     #[serde(rename = "clusterId")]
     pub cluster_id: Option<String>,
@@ -4083,6 +5008,9 @@ pub struct UpdateNodePoolRequest {
     /// Enable or disable NCCL fast socket for the node pool.
     #[serde(rename = "fastSocket")]
     pub fast_socket: Option<FastSocket>,
+    /// Flex Start flag for enabling Flex Start VM.
+    #[serde(rename = "flexStart")]
+    pub flex_start: Option<bool>,
     /// GCFS config.
     #[serde(rename = "gcfsConfig")]
     pub gcfs_config: Option<GcfsConfig>,
@@ -4099,7 +5027,7 @@ pub struct UpdateNodePoolRequest {
     /// Parameters that can be configured on Linux nodes.
     #[serde(rename = "linuxNodeConfig")]
     pub linux_node_config: Option<LinuxNodeConfig>,
-    /// The desired list of Google Compute Engine [zones](https://cloud.google.com/compute/docs/zones#available) in which the node pool's nodes should be located. Changing the locations for a node pool will result in nodes being either created or removed from the node pool, depending on whether locations are being added or removed.
+    /// The desired list of Google Compute Engine [zones](https://cloud.google.com/compute/docs/zones#available) in which the node pool's nodes should be located. Changing the locations for a node pool will result in nodes being either created or removed from the node pool, depending on whether locations are being added or removed. Warning: It is recommended to update node pool locations in a standalone API call. Do not combine a location update with changes to other fields (such as `tags`, `labels`, `taints`, etc.) in the same request. Otherwise, the API performs a structural modification where changes to other fields will only apply to newly created nodes and will not be applied to existing nodes in the node pool. To ensure all nodes are updated consistently, use a separate API call for location changes.
     pub locations: Option<Vec<String>>,
     /// Logging configuration.
     #[serde(rename = "loggingConfig")]
@@ -4107,6 +5035,10 @@ pub struct UpdateNodePoolRequest {
     /// Optional. The desired [Google Compute Engine machine type](https://cloud.google.com/compute/docs/machine-types) for nodes in the node pool. Initiates an upgrade operation that migrates the nodes in the node pool to the specified machine type.
     #[serde(rename = "machineType")]
     pub machine_type: Option<String>,
+    /// The maximum duration for the nodes to exist. If unspecified, the nodes can exist indefinitely.
+    #[serde(rename = "maxRunDuration")]
+    #[serde_as(as = "Option<common::serde::duration::Wrapper>")]
+    pub max_run_duration: Option<chrono::Duration>,
     /// The name (project, location, cluster, node pool) of the node pool to update. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     pub name: Option<String>,
     /// Node network config.
@@ -4130,6 +5062,9 @@ pub struct UpdateNodePoolRequest {
     /// Desired resource manager tag keys and values to be attached to the nodes for managing Compute Engine firewalls using Network Firewall Policies. Existing tags will be replaced with new values.
     #[serde(rename = "resourceManagerTags")]
     pub resource_manager_tags: Option<ResourceManagerTags>,
+    /// List of Storage Pools where boot disks are provisioned. Existing Storage Pools will be replaced with storage-pools.
+    #[serde(rename = "storagePools")]
+    pub storage_pools: Option<Vec<String>>,
     /// The desired network tags to be applied to all nodes in the node pool. If this field is not present, the tags will not be changed. Otherwise, the existing network tags will be *replaced* with the provided tags.
     pub tags: Option<NetworkTags>,
     /// The desired node taints to be applied to all nodes in the node pool. If this field is not present, the taints will not be changed. Otherwise, the existing node taints will be *replaced* with the provided taints.
@@ -4148,6 +5083,35 @@ pub struct UpdateNodePoolRequest {
 }
 
 impl common::RequestValue for UpdateNodePoolRequest {}
+
+/// UpgradeDetails contains detailed information of each individual upgrade operation.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct UpgradeDetails {
+    /// The end timestamp of the upgrade.
+    #[serde(rename = "endTime")]
+    pub end_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The version before the upgrade.
+    #[serde(rename = "initialVersion")]
+    pub initial_version: Option<String>,
+    /// The start timestamp of the upgrade.
+    #[serde(rename = "startTime")]
+    pub start_time: Option<chrono::DateTime<chrono::offset::Utc>>,
+    /// The start type of the upgrade.
+    #[serde(rename = "startType")]
+    pub start_type: Option<String>,
+    /// Output only. The state of the upgrade.
+    pub state: Option<String>,
+    /// The version after the upgrade.
+    #[serde(rename = "targetVersion")]
+    pub target_version: Option<String>,
+}
+
+impl common::Part for UpgradeDetails {}
 
 /// These upgrade settings control the level of parallelism and the level of disruption caused by an upgrade. maxUnavailable controls the number of nodes that can be simultaneously unavailable. maxSurge controls the number of additional nodes that can be added to the node pool temporarily for the time of the upgrade to increase the number of available nodes. (maxUnavailable + maxSurge) determines the level of parallelism (how many nodes are being upgraded at the same time). Note: upgrades inevitably introduce some disruption since workloads need to be moved from old nodes to new, upgraded ones. Even if maxUnavailable=0, this holds true. (Disruption stays within the limits of PodDisruptionBudget, if it is configured.) Consider a hypothetical node pool with 5 nodes having maxSurge=2, maxUnavailable=1. This means the upgrade process upgrades 3 nodes simultaneously. It creates 2 additional (upgraded) nodes, then it brings down 3 old (not yet upgraded) nodes at the same time. This ensures that there are always at least 4 nodes available. These upgrade settings configure the upgrade strategy for the node pool. Use strategy to switch between the strategies applied to the node pool. If the strategy is ROLLING, use max_surge and max_unavailable to control the level of parallelism and the level of disruption caused by upgrade. 1. maxSurge controls the number of additional nodes that can be added to the node pool temporarily for the time of the upgrade to increase the number of available nodes. 2. maxUnavailable controls the number of nodes that can be simultaneously unavailable. 3. (maxUnavailable + maxSurge) determines the level of parallelism (how many nodes are being upgraded at the same time). If the strategy is BLUE_GREEN, use blue_green_settings to configure the blue-green upgrade related settings. 1. standard_rollout_policy is the default policy. The policy is used to control the way blue pool gets drained. The draining is executed in the batch mode. The batch size could be specified as either percentage of the node pool size or the number of nodes. batch_soak_duration is the soak time after each batch gets drained. 2. node_pool_soak_duration is the soak time after all blue nodes are drained. After this period, the blue pool nodes will be deleted.
 ///
@@ -4217,6 +5181,42 @@ pub struct UsableSubnetworkSecondaryRange {
 
 impl common::Part for UsableSubnetworkSecondaryRange {}
 
+/// UserManagedKeysConfig holds the resource address to Keys which are used for signing certs and token that are used for communication within cluster.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct UserManagedKeysConfig {
+    /// The Certificate Authority Service caPool to use for the aggregation CA in this cluster.
+    #[serde(rename = "aggregationCa")]
+    pub aggregation_ca: Option<String>,
+    /// The Certificate Authority Service caPool to use for the cluster CA in this cluster.
+    #[serde(rename = "clusterCa")]
+    pub cluster_ca: Option<String>,
+    /// The Cloud KMS cryptoKey to use for Confidential Hyperdisk on the control plane nodes.
+    #[serde(rename = "controlPlaneDiskEncryptionKey")]
+    pub control_plane_disk_encryption_key: Option<String>,
+    /// Resource path of the Certificate Authority Service caPool to use for the etcd API CA in this cluster.
+    #[serde(rename = "etcdApiCa")]
+    pub etcd_api_ca: Option<String>,
+    /// Resource path of the Certificate Authority Service caPool to use for the etcd peer CA in this cluster.
+    #[serde(rename = "etcdPeerCa")]
+    pub etcd_peer_ca: Option<String>,
+    /// Resource path of the Cloud KMS cryptoKey to use for encryption of internal etcd backups.
+    #[serde(rename = "gkeopsEtcdBackupEncryptionKey")]
+    pub gkeops_etcd_backup_encryption_key: Option<String>,
+    /// The Cloud KMS cryptoKeyVersions to use for signing service account JWTs issued by this cluster. Format: `projects/{project}/locations/{location}/keyRings/{keyring}/cryptoKeys/{cryptoKey}/cryptoKeyVersions/{cryptoKeyVersion}`
+    #[serde(rename = "serviceAccountSigningKeys")]
+    pub service_account_signing_keys: Option<Vec<String>>,
+    /// The Cloud KMS cryptoKeyVersions to use for verifying service account JWTs issued by this cluster. Format: `projects/{project}/locations/{location}/keyRings/{keyring}/cryptoKeys/{cryptoKey}/cryptoKeyVersions/{cryptoKeyVersion}`
+    #[serde(rename = "serviceAccountVerificationKeys")]
+    pub service_account_verification_keys: Option<Vec<String>>,
+}
+
+impl common::Part for UserManagedKeysConfig {}
+
 /// VerticalPodAutoscaling contains global, per-cluster information required by Vertical Pod Autoscaler to automatically adjust the resources of pods controlled by it.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -4245,7 +5245,7 @@ pub struct VirtualNIC {
 
 impl common::Part for VirtualNIC {}
 
-/// Parameters that can be configured on Windows nodes. Windows Node Config that define the parameters that will be used to configure the Windows node pool settings
+/// Parameters that can be configured on Windows nodes. Windows Node Config that define the parameters that will be used to configure the Windows node pool settings.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -4253,14 +5253,14 @@ impl common::Part for VirtualNIC {}
 #[serde_with::serde_as]
 #[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub struct WindowsNodeConfig {
-    /// OSVersion specifies the Windows node config to be used on the node
+    /// OSVersion specifies the Windows node config to be used on the node.
     #[serde(rename = "osVersion")]
     pub os_version: Option<String>,
 }
 
 impl common::Part for WindowsNodeConfig {}
 
-/// Configuration for the use of Kubernetes Service Accounts in GCP IAM policies.
+/// Configuration for the use of Kubernetes Service Accounts in IAM policies.
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -4289,7 +5289,7 @@ pub struct WorkloadMetadataConfig {
 
 impl common::Part for WorkloadMetadataConfig {}
 
-/// WorkloadPolicyConfig is the configuration of workload policy for autopilot clusters.
+/// WorkloadPolicyConfig is the configuration related to GCW workload policy
 ///
 /// This type is not used in any activity, and only used as *part* of another schema.
 ///
@@ -4300,9 +5300,26 @@ pub struct WorkloadPolicyConfig {
     /// If true, workloads can use NET_ADMIN capability.
     #[serde(rename = "allowNetAdmin")]
     pub allow_net_admin: Option<bool>,
+    /// If true, enables the GCW Auditor that audits workloads on standard clusters.
+    #[serde(rename = "autopilotCompatibilityAuditingEnabled")]
+    pub autopilot_compatibility_auditing_enabled: Option<bool>,
 }
 
 impl common::Part for WorkloadPolicyConfig {}
+
+/// Defines writable cgroups configuration.
+///
+/// This type is not used in any activity, and only used as *part* of another schema.
+///
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as]
+#[derive(Default, Clone, Debug, serde::Serialize, serde::Deserialize)]
+pub struct WritableCgroups {
+    /// Optional. Whether writable cgroups is enabled.
+    pub enabled: Option<bool>,
+}
+
+impl common::Part for WritableCgroups {}
 
 // ###################
 // MethodBuilders ###
@@ -4324,9 +5341,20 @@ impl common::Part for WorkloadPolicyConfig {}
 /// use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let connector = hyper_rustls::HttpsConnectorBuilder::new()
+///     .with_native_roots()
+///     .unwrap()
+///     .https_only()
+///     .enable_http2()
+///     .build();
+///
+/// let executor = hyper_util::rt::TokioExecutor::new();
+/// let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 ///     secret,
 ///     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     yup_oauth2::client::CustomHyperClientBuilder::from(
+///         hyper_util::client::legacy::Client::builder(executor).build(connector),
+///     ),
 /// ).build().await.unwrap();
 ///
 /// let client = hyper_util::client::legacy::Client::builder(
@@ -4337,12 +5365,12 @@ impl common::Part for WorkloadPolicyConfig {}
 ///         .with_native_roots()
 ///         .unwrap()
 ///         .https_or_http()
-///         .enable_http1()
+///         .enable_http2()
 ///         .build()
 /// );
 /// let mut hub = Container::new(client, auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `aggregated_usable_subnetworks_list(...)`, `locations_clusters_check_autopilot_compatibility(...)`, `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_complete_upgrade(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
+/// // like `aggregated_usable_subnetworks_list(...)`, `locations_clusters_check_autopilot_compatibility(...)`, `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_fetch_cluster_upgrade_info(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_complete_upgrade(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_fetch_node_pool_upgrade_info(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_fetch_cluster_upgrade_info(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_fetch_node_pool_upgrade_info(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -4444,6 +5472,27 @@ impl<'a, C> ProjectMethods<'a, C> {
             _project_id: Default::default(),
             _node_pool_id: Default::default(),
             _cluster_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Fetch upgrade information of a specific nodepool.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name (project, location, cluster, nodepool) of the nodepool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*` or `projects/*/zones/*/clusters/*/nodePools/*`.
+    pub fn locations_clusters_node_pools_fetch_node_pool_upgrade_info(
+        &self,
+        name: &str,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _version: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4676,7 +5725,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the Kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
+    /// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
     ///
     /// # Arguments
     ///
@@ -4711,6 +5760,27 @@ impl<'a, C> ProjectMethods<'a, C> {
             _zone: Default::default(),
             _project_id: Default::default(),
             _cluster_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Fetch upgrade information of a specific cluster.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name (project, location, cluster) of the cluster to get. Specified in the format `projects/*/locations/*/clusters/*` or `projects/*/zones/*/clusters/*`.
+    pub fn locations_clusters_fetch_cluster_upgrade_info(
+        &self,
+        name: &str,
+    ) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C> {
+        ProjectLocationClusterFetchClusterUpgradeInfoCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _version: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5231,6 +6301,27 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
+    /// Fetch upgrade information of a specific nodepool.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name (project, location, cluster, nodepool) of the nodepool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*` or `projects/*/zones/*/clusters/*/nodePools/*`.
+    pub fn zones_clusters_node_pools_fetch_node_pool_upgrade_info(
+        &self,
+        name: &str,
+    ) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _version: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves the requested node pool.
     ///
     /// # Arguments
@@ -5474,7 +6565,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the Kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
+    /// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
     ///
     /// # Arguments
     ///
@@ -5519,6 +6610,27 @@ impl<'a, C> ProjectMethods<'a, C> {
             _zone: zone.to_string(),
             _cluster_id: cluster_id.to_string(),
             _name: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Fetch upgrade information of a specific cluster.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name (project, location, cluster) of the cluster to get. Specified in the format `projects/*/locations/*/clusters/*` or `projects/*/zones/*/clusters/*`.
+    pub fn zones_clusters_fetch_cluster_upgrade_info(
+        &self,
+        name: &str,
+    ) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C> {
+        ProjectZoneClusterFetchClusterUpgradeInfoCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _version: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -6021,9 +7133,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6034,7 +7157,7 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -6352,9 +7475,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6365,7 +7499,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -6691,9 +7825,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -6704,7 +7849,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -7016,9 +8161,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7029,7 +8185,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -7351,6 +8507,336 @@ where
     }
 }
 
+/// Fetch upgrade information of a specific nodepool.
+///
+/// A builder for the *locations.clusters.nodePools.fetchNodePoolUpgradeInfo* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_container1 as container1;
+/// # async fn dox() {
+/// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Container::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_clusters_node_pools_fetch_node_pool_upgrade_info("name")
+///              .version("rebum.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Container<C>,
+    _name: String,
+    _version: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder
+    for ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+{
+}
+
+impl<'a, C> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, NodePoolUpgradeInfo)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "container.projects.locations.clusters.nodePools.fetchNodePoolUpgradeInfo",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "version"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._version.as_ref() {
+            params.push("version", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:fetchNodePoolUpgradeInfo";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name (project, location, cluster, nodepool) of the nodepool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*` or `projects/*/zones/*/clusters/*/nodePools/*`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// API request version that initiates this operation.
+    ///
+    /// Sets the *version* query property to the given value.
+    pub fn version(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._version = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(
+        mut self,
+    ) -> ProjectLocationClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Retrieves the requested node pool.
 ///
 /// A builder for the *locations.clusters.nodePools.get* method supported by a *project* resource.
@@ -7368,9 +8854,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7381,7 +8878,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -7389,10 +8886,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_node_pools_get("name")
-///              .zone("rebum.")
-///              .project_id("est")
-///              .node_pool_id("ipsum")
-///              .cluster_id("ipsum")
+///              .zone("ipsum")
+///              .project_id("ipsum")
+///              .node_pool_id("est")
+///              .cluster_id("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7711,9 +9208,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -7724,7 +9232,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -7732,9 +9240,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_node_pools_list("parent")
-///              .zone("gubergren")
-///              .project_id("ea")
-///              .cluster_id("dolor")
+///              .zone("dolor")
+///              .project_id("Lorem")
+///              .cluster_id("eos")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8034,9 +9542,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8047,7 +9566,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -8367,9 +9886,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8380,7 +9910,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -8706,9 +10236,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -8719,7 +10260,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -9045,9 +10586,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9058,7 +10610,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -9374,9 +10926,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9387,7 +10950,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -9699,9 +11262,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9712,7 +11286,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -9940,9 +11514,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -9953,7 +11538,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -10242,9 +11827,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10255,7 +11851,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -10557,7 +12153,7 @@ where
     }
 }
 
-/// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the Kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
+/// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
 ///
 /// A builder for the *locations.clusters.create* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -10575,9 +12171,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10588,7 +12195,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -10900,9 +12507,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -10913,7 +12531,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -10921,9 +12539,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_delete("name")
-///              .zone("sed")
-///              .project_id("et")
-///              .cluster_id("et")
+///              .zone("et")
+///              .project_id("vero")
+///              .cluster_id("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11205,6 +12823,331 @@ where
     }
 }
 
+/// Fetch upgrade information of a specific cluster.
+///
+/// A builder for the *locations.clusters.fetchClusterUpgradeInfo* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_container1 as container1;
+/// # async fn dox() {
+/// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Container::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_clusters_fetch_cluster_upgrade_info("name")
+///              .version("duo")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Container<C>,
+    _name: String,
+    _version: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C> {}
+
+impl<'a, C> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ClusterUpgradeInfo)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "container.projects.locations.clusters.fetchClusterUpgradeInfo",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "version"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._version.as_ref() {
+            params.push("version", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:fetchClusterUpgradeInfo";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name (project, location, cluster) of the cluster to get. Specified in the format `projects/*/locations/*/clusters/*` or `projects/*/zones/*/clusters/*`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// API request version that initiates this operation.
+    ///
+    /// Sets the *version* query property to the given value.
+    pub fn version(
+        mut self,
+        new_value: &str,
+    ) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._version = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets the details of a specific cluster.
 ///
 /// A builder for the *locations.clusters.get* method supported by a *project* resource.
@@ -11222,9 +13165,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11235,7 +13189,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -11243,9 +13197,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_get("name")
-///              .zone("erat")
-///              .project_id("sed")
-///              .cluster_id("duo")
+///              .zone("et")
+///              .project_id("voluptua.")
+///              .cluster_id("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11544,9 +13498,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11557,7 +13522,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -11775,9 +13740,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -11788,7 +13764,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -11796,8 +13772,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_list("parent")
-///              .zone("voluptua.")
-///              .project_id("amet.")
+///              .zone("dolor")
+///              .project_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12086,9 +14062,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12099,7 +14086,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -12412,9 +14399,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12425,7 +14423,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -12738,9 +14736,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -12751,7 +14760,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -13064,9 +15073,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13077,7 +15097,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -13390,9 +15410,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13403,7 +15434,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -13729,9 +15760,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -13742,7 +15784,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -14055,9 +16097,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14068,7 +16121,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -14381,9 +16434,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14394,7 +16458,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -14714,9 +16778,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -14727,7 +16802,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -15047,9 +17122,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15060,7 +17146,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -15376,9 +17462,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15389,7 +17486,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -15702,9 +17799,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -15715,7 +17823,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -16028,9 +18136,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16041,7 +18160,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -16353,9 +18472,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16366,7 +18496,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -16374,9 +18504,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_get("name")
-///              .zone("elitr")
-///              .project_id("Lorem")
-///              .operation_id("diam")
+///              .zone("ipsum")
+///              .project_id("accusam")
+///              .operation_id("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16675,9 +18805,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16688,7 +18829,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -16696,8 +18837,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("parent")
-///              .zone("ipsum")
-///              .project_id("accusam")
+///              .zone("voluptua.")
+///              .project_id("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16985,9 +19126,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -16998,7 +19150,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -17007,7 +19159,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_get_server_config("name")
 ///              .zone("consetetur")
-///              .project_id("voluptua.")
+///              .project_id("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17296,9 +19448,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17309,7 +19472,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -17677,9 +19840,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -17690,7 +19864,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -18033,9 +20207,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18046,7 +20231,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -18054,7 +20239,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_delete("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("dolore")
+///              .name("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18367,6 +20552,331 @@ where
     }
 }
 
+/// Fetch upgrade information of a specific nodepool.
+///
+/// A builder for the *zones.clusters.nodePools.fetchNodePoolUpgradeInfo* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_container1 as container1;
+/// # async fn dox() {
+/// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Container::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().zones_clusters_node_pools_fetch_node_pool_upgrade_info("name")
+///              .version("sadipscing")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Container<C>,
+    _name: String,
+    _version: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {}
+
+impl<'a, C> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, NodePoolUpgradeInfo)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "container.projects.zones.clusters.nodePools.fetchNodePoolUpgradeInfo",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "version"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._version.as_ref() {
+            params.push("version", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:fetchNodePoolUpgradeInfo";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name (project, location, cluster, nodepool) of the nodepool to get. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*` or `projects/*/zones/*/clusters/*/nodePools/*`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(
+        mut self,
+        new_value: &str,
+    ) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// API request version that initiates this operation.
+    ///
+    /// Sets the *version* query property to the given value.
+    pub fn version(
+        mut self,
+        new_value: &str,
+    ) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._version = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectZoneClusterNodePoolFetchNodePoolUpgradeInfoCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Retrieves the requested node pool.
 ///
 /// A builder for the *zones.clusters.nodePools.get* method supported by a *project* resource.
@@ -18384,9 +20894,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18397,7 +20918,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -18405,7 +20926,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_get("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("ea")
+///              .name("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18735,9 +21256,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -18748,7 +21280,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -18756,7 +21288,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_list("projectId", "zone", "clusterId")
-///              .parent("no")
+///              .parent("tempor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19065,9 +21597,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19078,7 +21621,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -19437,9 +21980,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19450,7 +22004,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -19822,9 +22376,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -19835,7 +22400,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -20191,9 +22756,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20204,7 +22780,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -20560,9 +23136,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20573,7 +23160,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -20917,9 +23504,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -20930,7 +23528,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -21262,7 +23860,7 @@ where
     }
 }
 
-/// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the Kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
+/// Creates a cluster, consisting of the specified number and type of Google Compute Engine instances. By default, the cluster is created in the project's [default network](https://cloud.google.com/compute/docs/networks-and-firewalls#networks). One firewall is added for the cluster. After cluster creation, the kubelet creates routes for each node to allow the containers on that node to communicate with all other instances in the cluster. Finally, an entry is added to the project's global metadata indicating which CIDR range the cluster is using.
 ///
 /// A builder for the *zones.clusters.create* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -21280,9 +23878,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21293,7 +23902,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -21617,9 +24226,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21630,7 +24250,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -21638,7 +24258,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_delete("projectId", "zone", "clusterId")
-///              .name("dolores")
+///              .name("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -21929,6 +24549,328 @@ where
     }
 }
 
+/// Fetch upgrade information of a specific cluster.
+///
+/// A builder for the *zones.clusters.fetchClusterUpgradeInfo* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_container1 as container1;
+/// # async fn dox() {
+/// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
+///
+/// # let secret: yup_oauth2::ApplicationSecret = Default::default();
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
+/// #     secret,
+/// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
+/// # ).build().await.unwrap();
+///
+/// # let client = hyper_util::client::legacy::Client::builder(
+/// #     hyper_util::rt::TokioExecutor::new()
+/// # )
+/// # .build(
+/// #     hyper_rustls::HttpsConnectorBuilder::new()
+/// #         .with_native_roots()
+/// #         .unwrap()
+/// #         .https_or_http()
+/// #         .enable_http2()
+/// #         .build()
+/// # );
+/// # let mut hub = Container::new(client, auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().zones_clusters_fetch_cluster_upgrade_info("name")
+///              .version("consetetur")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C>
+where
+    C: 'a,
+{
+    hub: &'a Container<C>,
+    _name: String,
+    _version: Option<String>,
+    _delegate: Option<&'a mut dyn common::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>,
+}
+
+impl<'a, C> common::CallBuilder for ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C> {}
+
+impl<'a, C> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C>
+where
+    C: common::Connector,
+{
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> common::Result<(common::Response, ClusterUpgradeInfo)> {
+        use std::borrow::Cow;
+        use std::io::{Read, Seek};
+
+        use common::{url::Params, ToParts};
+        use hyper::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, LOCATION, USER_AGENT};
+
+        let mut dd = common::DefaultDelegate;
+        let mut dlg: &mut dyn common::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(common::MethodInfo {
+            id: "container.projects.zones.clusters.fetchClusterUpgradeInfo",
+            http_method: hyper::Method::GET,
+        });
+
+        for &field in ["alt", "name", "version"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(common::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._version.as_ref() {
+            params.push("version", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:fetchClusterUpgradeInfo";
+        if self._scopes.is_empty() {
+            self._scopes
+                .insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        #[allow(clippy::single_element_loop)]
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        loop {
+            let token = match self
+                .hub
+                .auth
+                .get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..])
+                .await
+            {
+                Ok(token) => token,
+                Err(e) => match dlg.token(e) {
+                    Ok(token) => token,
+                    Err(e) => {
+                        dlg.finished(false);
+                        return Err(common::Error::MissingToken(e));
+                    }
+                },
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+                let request = req_builder
+                    .header(CONTENT_LENGTH, 0_u64)
+                    .body(common::to_body::<String>(None));
+
+                client.request(request.unwrap()).await
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let common::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(common::Error::HttpError(err));
+                }
+                Ok(res) => {
+                    let (mut parts, body) = res.into_parts();
+                    let mut body = common::Body::new(body);
+                    if !parts.status.is_success() {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let error = serde_json::from_str(&common::to_string(&bytes));
+                        let response = common::to_response(parts, bytes.into());
+
+                        if let common::Retry::After(d) =
+                            dlg.http_failure(&response, error.as_ref().ok())
+                        {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return Err(match error {
+                            Ok(value) => common::Error::BadRequest(value),
+                            _ => common::Error::Failure(response),
+                        });
+                    }
+                    let response = {
+                        let bytes = common::to_bytes(body).await.unwrap_or_default();
+                        let encoded = common::to_string(&bytes);
+                        match serde_json::from_str(&encoded) {
+                            Ok(decoded) => (common::to_response(parts, bytes.into()), decoded),
+                            Err(error) => {
+                                dlg.response_json_decode_error(&encoded, &error);
+                                return Err(common::Error::JsonDecodeError(
+                                    encoded.to_string(),
+                                    error,
+                                ));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(response);
+                }
+            }
+        }
+    }
+
+    /// Required. The name (project, location, cluster) of the cluster to get. Specified in the format `projects/*/locations/*/clusters/*` or `projects/*/zones/*/clusters/*`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// API request version that initiates this operation.
+    ///
+    /// Sets the *version* query property to the given value.
+    pub fn version(
+        mut self,
+        new_value: &str,
+    ) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._version = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    ///
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(
+        mut self,
+        new_value: &'a mut dyn common::Delegate,
+    ) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(
+        mut self,
+        name: T,
+        value: T,
+    ) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C>
+    where
+        T: AsRef<str>,
+    {
+        self._additional_params
+            .insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(
+        mut self,
+        scope: St,
+    ) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C>
+    where
+        St: AsRef<str>,
+    {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(
+        mut self,
+        scopes: I,
+    ) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C>
+    where
+        I: IntoIterator<Item = St>,
+        St: AsRef<str>,
+    {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectZoneClusterFetchClusterUpgradeInfoCall<'a, C> {
+        self._scopes.clear();
+        self
+    }
+}
+
 /// Gets the details of a specific cluster.
 ///
 /// A builder for the *zones.clusters.get* method supported by a *project* resource.
@@ -21946,9 +24888,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -21959,7 +24912,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -21967,7 +24920,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_get("projectId", "zone", "clusterId")
-///              .name("amet")
+///              .name("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22276,9 +25229,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22289,7 +25253,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -22632,9 +25596,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22645,7 +25620,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -22653,7 +25628,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_list("projectId", "zone")
-///              .parent("Stet")
+///              .parent("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -22943,9 +25918,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -22956,7 +25942,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -23300,9 +26286,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23313,7 +26310,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -23657,9 +26654,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -23670,7 +26678,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -24014,9 +27022,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24027,7 +27046,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -24371,9 +27390,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24384,7 +27414,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -24728,9 +27758,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -24741,7 +27782,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -25098,9 +28139,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25111,7 +28163,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -25455,9 +28507,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25468,7 +28531,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -25812,9 +28875,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -25825,7 +28899,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -26169,9 +29243,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26182,7 +29267,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -26526,9 +29611,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26539,7 +29635,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -26882,9 +29978,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -26895,7 +30002,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -26903,7 +30010,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_get("projectId", "zone", "operationId")
-///              .name("sea")
+///              .name("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27211,9 +30318,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27224,7 +30342,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -27232,7 +30350,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_list("projectId", "zone")
-///              .parent("gubergren")
+///              .parent("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -27522,9 +30640,20 @@ where
 /// # use container1::{Container, FieldMask, hyper_rustls, hyper_util, yup_oauth2};
 ///
 /// # let secret: yup_oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let connector = hyper_rustls::HttpsConnectorBuilder::new()
+/// #     .with_native_roots()
+/// #     .unwrap()
+/// #     .https_only()
+/// #     .enable_http2()
+/// #     .build();
+///
+/// # let executor = hyper_util::rt::TokioExecutor::new();
+/// # let auth = yup_oauth2::InstalledFlowAuthenticator::with_client(
 /// #     secret,
 /// #     yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     yup_oauth2::client::CustomHyperClientBuilder::from(
+/// #         hyper_util::client::legacy::Client::builder(executor).build(connector),
+/// #     ),
 /// # ).build().await.unwrap();
 ///
 /// # let client = hyper_util::client::legacy::Client::builder(
@@ -27535,7 +30664,7 @@ where
 /// #         .with_native_roots()
 /// #         .unwrap()
 /// #         .https_or_http()
-/// #         .enable_http1()
+/// #         .enable_http2()
 /// #         .build()
 /// # );
 /// # let mut hub = Container::new(client, auth);
@@ -27543,7 +30672,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_get_serverconfig("projectId", "zone")
-///              .name("consetetur")
+///              .name("dolor")
 ///              .doit().await;
 /// # }
 /// ```
