@@ -3,56 +3,35 @@ api:
   # exclude APIs which currently don't build correctly. State the reason for the exclusion as well
   # to allow looking at it at a later point.
   blacklist:
-    # recursive type
-    - analyticsadmin
-    # resursive type
-    - bigtableadmin
-    # redefinition of `Scope`
-    - binaryauthorization
-    # ampersand & in type name
-    - mybusinessqanda
-    # recursive type
-    - chat
-    # recursive type
-    - trafficdirector
-    # Assertion error during generation
-    - admin
-    # in beta, there is not a single method !
-    - dataflow
-    # It doesn't generate due to a recursive data structure, that we currently don't handle it seems
-    # Alternatively, it's too deep for our stack ;).
-    - civicinfo
-    # It seems functions are containing illegal characters, like `@context`
-    - kgsearch
-    - gkehub
-    - firebaserules
-    - servicemanagement
-    # defines its own `Option` type
-    - serviceconsumermanagement
-    # defines its own `Option` type
-    - serviceuser
-    # defines its own `Option` type
-    - serviceusage
-    # defines its own `Option` type
-    - servicenetworking
+    - admin # assertion error
+    - analyticsadmin # recursive type
+    - bigtableadmin # resursive type
+    - binaryauthorization # redefined type
+    - chat # recursive type
+    - civicinfo # recursive type
     - cloudsearch
-    - toolresults
-    # redefinition of type (`Feed`)
-    - script
-    # redefinition of types apparently
-    - streetviewpublish
+    - compute # assertion error
+    - dataflow # in beta
+    - firebaserules
+    - gkehub
+    - kgsearch # illegal characters
+    - mybusinessqanda # illegal characters
     - oauth2
-    # Recursive type - we don't handle cycles yet it appears
-    - slides
-    # invalid code generation - syntax error
-    - poly
-    # versions listed but do not exists
-    - websecurityscanner-v1beta
-    # The following do not have any sub-commands, and we don't currently support that. args_data array turns out empty in CLI
-    - websecurityscanner
+    - osconfig # failure to fetch
+    - poly # syntax error
+    - script # redefined type
+    - serviceconsumermanagement # redefined type
+    - servicemanagement
+    - servicenetworking # redefined type
+    - serviceusage # redefined type
+    - serviceuser # redefined type
+    - slides # recursive type
+    - streetviewpublish # redefined type
+    - toolresults
+    - trafficdirector # recursive type
+    - websecurityscanner # no subcommands
+    - websecurityscanner-v1beta # failure to fetch
     - youtubeanalytics
-    # returned by google APIs, but can't be fetched
-    - osconfig
   manually_added:
     - name: mybusiness
       version: v4
